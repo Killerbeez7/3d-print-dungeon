@@ -28,3 +28,17 @@ git push origin feature/your-branch
 git rebase main | git merge feature/your-branch
 git push origin main
 ```
+
+-------------------------------------------
+
+1. Update local main
+   
+git checkout main
+git pull origin main
+
+2. Switch to my branch and update
+   
+git checkout feature/your-branch
+git pull origin main
+
+3. 
