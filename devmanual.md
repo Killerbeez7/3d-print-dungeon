@@ -9,6 +9,7 @@ git pull origin main
 #### 2. Switch to your feature branch:
 ```sh
 git checkout feature/your-branch
+git pull origin main
 ```
 
 #### 3. Commit your changes:
