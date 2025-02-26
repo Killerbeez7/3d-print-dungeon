@@ -1,12 +1,29 @@
-#### Make sure you are on the correct branch
+## Workflow
+
+#### 1. Pull latest changes:
 ```sh
-git checkout feature/"your-branch"
+git checkout main
+git pull origin main
 ```
 
-#### Push to your specific branch
+#### 2. Switch to your feature branch:
+```sh
+git checkout feature/your-branch
+```
+
+#### 3. Commit your changes:
 ```sh
 git add .
 git commit -m "Your commit message"
-git push origin feature/"your-branch"
 ```
 
+##### 4. Push your feature branch:
+```sh
+git push origin feature/your-branch
+```
+
+#### 5. Rebase and merge (at the end of your work):
+```sh
+git rebase main | git merge feature/your-branch
+git push origin main
+```
