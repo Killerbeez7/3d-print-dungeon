@@ -1,44 +1,39 @@
 ## Workflow Guide
 
-#### 1. Pull latest changes:
+#### 1. Open your branch (when using GitHub Desktop) or type:
 ```sh
-git checkout main
+git checkout your-branch
+```
+
+#### 2. Update with the last changes in main
+```sh
 git pull origin main
 ```
 
-#### 2. Switch to your feature branch:
-```sh
-git checkout feature/your-branch
-git pull origin main
-```
-
-#### 3. Commit your changes:
+#### 3. Commit and push your changes:
 ```sh
 git add .
 git commit -m "Your commit message"
+git push
 ```
 
-##### 4. Push your feature branch:
+##### 4. Check for changes in main and update it (if there are no updates you can move forward to step 5)
 ```sh
-git push origin feature/your-branch
+git fetch origin
+git rebase origin/main
 ```
 
-#### 5. Rebase and merge (at the end of your work):
+#### 5. Switch to main
 ```sh
-git rebase main | git merge feature/your-branch
+git checkout main
+```
+
+#### 6. Merge your branch with main
+```sh
+git merge your-branch
+```
+
+#### 7. Push to main
+```sh
 git push origin main
 ```
-
--------------------------------------------
-
-1. Update local main
-   
-git checkout main
-git pull origin main
-
-2. Switch to my branch and update
-   
-git checkout feature/your-branch
-git pull origin main
-
-3. 
