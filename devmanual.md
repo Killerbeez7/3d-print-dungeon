@@ -1,4 +1,4 @@
-## Workflow
+## Workflow Guide
 
 #### 1. Pull latest changes:
 ```sh
