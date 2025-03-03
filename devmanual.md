@@ -15,11 +15,13 @@ main: git checkout -b [branch-name]
 branch: git add .
 branch: git commit -am "message"
 branch: git push origin [branch-name]
-```
 
 NOTE!
 #push the branch to remote repo, so others can see it
 #do not merge with main yet!
+```
+
+
 
 
 
