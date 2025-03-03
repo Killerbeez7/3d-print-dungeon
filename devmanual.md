@@ -7,14 +7,14 @@ main: git pull origin main
 
 #### 2.Create new branch
 ```sh
--main: git checkout -b [branch-name]
+main: git checkout -b [branch-name]
 ```
 
 #### 3.When job is done.. add, commit, push
 ```sh
--branch: git add .
--branch: git commit -am "message"
--branch: git push origin [branch-name]
+branch: git add .
+branch: git commit -am "message"
+branch: git push origin [branch-name]
 ```
 
 NOTE!
