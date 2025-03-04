@@ -1,5 +1,3 @@
-import React from "react";
-
 export const Home = () => {
     return (
         <section style={{ padding: "1rem" }}>
