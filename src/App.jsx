@@ -1,4 +1,3 @@
-import React from "react";
 import { Routes, Route } from "react-router-dom";
 
 // components
@@ -8,7 +7,7 @@ import { Home } from "./components/home/Home";
 
 export default function App() {
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen bg-bgPrimary text-txPrimary">
             <Navbar />
 
             <main className="flex-grow px-4 py-4">

@@ -1,8 +1,6 @@
-import React from "react";
-
 export const Navbar = () => {
     return (
-        <header className="flex items-center justify-between bg-white shadow-sm px-4 py-2">
+        <header className="flex items-center justify-between bg-bgPrimary shadow-sm px-4 py-2">
             <button
                 className="text-xl text-gray-700 md:hidden"
                 aria-label="navigation"
@@ -12,7 +10,7 @@ export const Navbar = () => {
 
             <a
                 href="/"
-                className="flex items-center no-underline text-gray-800"
+                className="flex items-center no-underline text-primary"
                 aria-label="Go to main page"
             >
                 <svg
@@ -59,7 +57,7 @@ export const Navbar = () => {
                 <input
                     type="text"
                     placeholder="Search 3D models"
-                    className="border border-gray-300 rounded-md pl-3 pr-8 py-1 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                    className="border border-gray-300 rounded-md pl-3 pr-8 py-1 focus:outline-none focus:ring-1 focus:ring-primary"
                 />
                 <i className="fas fa-search absolute right-2 text-gray-400"></i>
             </div>
@@ -67,19 +65,19 @@ export const Navbar = () => {
             <div className="flex items-center space-x-2">
                 <a
                     href="/login"
-                    className="border border-blue-400 text-blue-400 px-3 py-1 rounded-md hover:bg-blue-400 hover:text-white transition-colors"
+                    className="border border-primary text-primary px-3 py-1 rounded-md hover:bg-primary hover:text-white transition-colors"
                 >
                     Login
                 </a>
                 <a
                     href="/signup"
-                    className="border border-blue-400 text-blue-400 px-3 py-1 rounded-md hover:bg-blue-400 hover:text-white transition-colors"
+                    className="border border-primary text-primary px-3 py-1 rounded-md hover:bg-primary hover:text-white transition-colors"
                 >
                     Sign Up
                 </a>
                 <a
                     href="/upload"
-                    className="bg-blue-400 text-white font-semibold px-3 py-1 rounded-md hover:bg-blue-500 transition-colors"
+                    className="bg-primary text-white font-semibold px-3 py-1 rounded-md hover:bg-blue-500 transition-colors"
                 >
                     <i className="fas fa-upload mr-1"></i>
                     Upload
