@@ -23,46 +23,15 @@ NOTE!
 
 
 
-
-
-
-
-OLD DATED INFO xD
-
-#### 1. Open your branch (when using GitHub Desktop) or type:
+#### 4. Test Locally (Optional)
+Before deploying, run the app locally to make sure everything works as expected:
 ```sh
-git checkout your-branch
+npm run dev
 ```
 
-#### 2. Update with the last changes in main
+#### 5. Deploy to Firebase
+Once you're confident everything is working, deploy the latest changes to Firebase:
 ```sh
-git pull origin main
-```
-
-#### 3. Commit and push your changes:
-```sh
-git add .
-git commit -m "Your commit message"
-git push
-```
-
-##### 4. Check for changes in main and update it (if there are no updates you can move forward to step 5)
-```sh
-git fetch origin
-git rebase origin/main
-```
-
-#### 5. Switch to main
-```sh
-git checkout main
-```
-
-#### 6. Merge your branch with main
-```sh
-git merge your-branch
-```
-
-#### 7. Push to main
-```sh
-git push origin main
+npm build
+firebase deploy
 ```
