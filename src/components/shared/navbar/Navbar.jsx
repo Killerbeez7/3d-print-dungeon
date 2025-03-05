@@ -1,6 +1,11 @@
-export const Navbar = () => {
+import { Link } from "react-router-dom";
+
+import React from "react";
+
+export const Navbar = ({ onLoginClick }) => {
     return (
         <header className="flex items-center justify-between bg-bgPrimary shadow-sm px-4 py-2">
+            {/* menu */}
             <button
                 className="text-xl text-gray-700 md:hidden"
                 aria-label="navigation"
@@ -8,6 +13,7 @@ export const Navbar = () => {
                 <i className="fas fa-bars"></i>
             </button>
 
+            {/* logo */}
             <a
                 href="/"
                 className="flex items-center no-underline text-primary"
@@ -24,11 +30,12 @@ export const Navbar = () => {
                 <span className="ml-2 font-bold text-lg">3D PRINT DUNGEON</span>
             </a>
 
+            {/* features */}
             <nav className="hidden md:block ml-4">
                 <ul className="flex space-x-6">
                     <li>
                         <a
-                            href="#"
+                            href="/explore"
                             className="text-gray-600 hover:text-blue-500 transition-colors"
                         >
                             Explore
@@ -36,7 +43,7 @@ export const Navbar = () => {
                     </li>
                     <li>
                         <a
-                            href="#"
+                            href="/3dstore"
                             className="text-gray-600 hover:text-blue-500 transition-colors"
                         >
                             Buy 3D Models
@@ -44,7 +51,7 @@ export const Navbar = () => {
                     </li>
                     <li>
                         <a
-                            href="#"
+                            href="/business"
                             className="text-gray-600 hover:text-blue-500 transition-colors"
                         >
                             For Business
@@ -53,35 +60,51 @@ export const Navbar = () => {
                 </ul>
             </nav>
 
+            {/* search */}
             <div className="hidden md:flex items-center relative mx-4">
                 <input
                     type="text"
                     placeholder="Search 3D models"
-                    className="border border-gray-300 rounded-md pl-3 pr-8 py-1 focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="border border-gray-300 rounded-md pl-3 pr-8 py-1 
+                     focus:outline-none focus:ring-1 focus:ring-primary"
                 />
                 <i className="fas fa-search absolute right-2 text-gray-400"></i>
             </div>
 
+            {/* buttons */}
             <div className="flex items-center space-x-2">
-                <a
+                <button
                     href="/login"
-                    className="border border-primary text-primary px-3 py-1 rounded-md hover:bg-primary hover:text-white transition-colors"
+                    className="border border-primary text-primary px-3 py-1 
+                     rounded-md hover:bg-primary hover:text-white 
+                     transition-colors"
+                    onClick={onLoginClick}
                 >
                     Login
-                </a>
-                <a
+                </button>
+                {/* <a
                     href="/signup"
-                    className="border border-primary text-primary px-3 py-1 rounded-md hover:bg-primary hover:text-white transition-colors"
+                    className="border border-primary text-primary px-3 py-1 
+                     rounded-md hover:bg-primary hover:text-white 
+                     transition-colors"
                 >
                     Sign Up
-                </a>
-                <a
-                    href="/upload"
-                    className="bg-primary text-white font-semibold px-3 py-1 rounded-md hover:bg-blue-500 transition-colors"
+                </a> */}
+
+                {/* <button
+                    className="bg-primary text-white font-semibold px-3 py-1 
+                     rounded-md hover:bg-blue-500 transition-colors"
                 >
                     <i className="fas fa-upload mr-1"></i>
                     Upload
-                </a>
+                </button> */}
+                <Link
+                    to="/upload"
+                    className="bg-primary text-white font-semibold px-3 py-1 
+                     rounded-md hover:bg-blue-500 transition-colors"
+                >
+                    Upload
+                </Link>
             </div>
         </header>
     );
