@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
-
-import React from "react";
+import PropTypes from 'prop-types';
 
 export const Navbar = ({ onLoginClick }) => {
     return (
@@ -82,22 +81,6 @@ export const Navbar = ({ onLoginClick }) => {
                 >
                     Login
                 </button>
-                {/* <a
-                    href="/signup"
-                    className="border border-primary text-primary px-3 py-1 
-                     rounded-md hover:bg-primary hover:text-white 
-                     transition-colors"
-                >
-                    Sign Up
-                </a> */}
-
-                {/* <button
-                    className="bg-primary text-white font-semibold px-3 py-1 
-                     rounded-md hover:bg-blue-500 transition-colors"
-                >
-                    <i className="fas fa-upload mr-1"></i>
-                    Upload
-                </button> */}
                 <Link
                     to="/upload"
                     className="bg-primary text-white font-semibold px-3 py-1 
@@ -108,4 +91,9 @@ export const Navbar = ({ onLoginClick }) => {
             </div>
         </header>
     );
+};
+
+// PropTypes validation for onLoginClick prop
+Navbar.propTypes = {
+    onLoginClick: PropTypes.func.isRequired,
 };

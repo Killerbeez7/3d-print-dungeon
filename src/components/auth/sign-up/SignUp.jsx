@@ -1,4 +1,3 @@
-import React from "react";
 import { Link } from "react-router-dom"; // optional, if using React Router
 
 export const SignUp = () => {

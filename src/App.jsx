@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 
 // common
@@ -23,7 +23,7 @@ export default function App() {
     const handleSwitchMode = () => setIsSignUp((prev) => !prev);
 
     return (
-        <div className="flex flex-col min-h-screen bg-gray-50">
+        <div className="flex flex-col min-h-screen bg-bgPrimary text-txPrimary">
             <Navbar
                 onLoginClick={() => {
                     setIsSignUp(false); // set sign-in mode
