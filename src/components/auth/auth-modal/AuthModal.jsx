@@ -1,4 +1,4 @@
-import React from "react";
+import PropTypes from 'prop-types';
 
 export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
     if (!isOpen) return null; // Hide if the modal is closed
@@ -194,3 +194,10 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
         </div>
     );
 }
+
+AuthModal.propTypes = {
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    isSignUp: PropTypes.bool.isRequired,
+    onSwitchMode: PropTypes.func.isRequired,
+};
