@@ -36,17 +36,17 @@ export const Upload3DModelPage = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8 flex flex-col items-center">
-            <h1 className="text-3xl font-bold text-gray-800 mb-6">
+        <div className="min-h-screen p-8 flex flex-col items-center">
+            <h1 className="text-3xl font-bold text-txPrimary mb-6">
                 Upload 3D Printable Model
             </h1>
             <form
                 onSubmit={handleSubmit}
-                className="w-full max-w-2xl bg-white rounded-lg shadow p-6 space-y-6"
+                className="w-full max-w-2xl bg-bgDarker rounded-lg shadow-xl p-6 space-y-6"
             >
                 {/* Model Name */}
                 <div>
-                    <label className="block text-gray-700 font-medium mb-1">
+                    <label className="block text-txPrimary font-medium mb-1">
                         Model Name
                     </label>
                     <input
@@ -57,7 +57,7 @@ export const Upload3DModelPage = () => {
               w-full px-3 py-2 
               border border-gray-300 rounded 
               focus:outline-none 
-              focus:ring focus:ring-blue-300
+              focus:ring focus:ring-primary
             "
                         placeholder="E.g. Medieval Castle Tower"
                         required
@@ -66,7 +66,7 @@ export const Upload3DModelPage = () => {
 
                 {/* Description */}
                 <div>
-                    <label className="block text-gray-700 font-medium mb-1">
+                    <label className="block text-txPrimary font-medium mb-1">
                         Description
                     </label>
                     <textarea
@@ -76,7 +76,7 @@ export const Upload3DModelPage = () => {
               w-full px-3 py-2 
               border border-gray-300 rounded 
               focus:outline-none 
-              focus:ring focus:ring-blue-300
+              focus:ring focus:ring-primary
             "
                         rows="3"
                         placeholder="Describe your model (dimensions, usage, instructions, etc.)"
@@ -85,7 +85,7 @@ export const Upload3DModelPage = () => {
 
                 {/* Tags */}
                 <div>
-                    <label className="block text-gray-700 font-medium mb-1">
+                    <label className="block text-txPrimary font-medium mb-1">
                         Tags (comma-separated)
                     </label>
                     <input
@@ -96,7 +96,7 @@ export const Upload3DModelPage = () => {
               w-full px-3 py-2
               border border-gray-300 rounded
               focus:outline-none 
-              focus:ring focus:ring-blue-300
+              focus:ring focus:ring-primary
             "
                         placeholder="architecture, medieval, tower, etc."
                     />
@@ -130,9 +130,9 @@ export const Upload3DModelPage = () => {
                                 <label
                                     htmlFor="fileInput"
                                     className="
-                    bg-blue-500 text-white 
+                    bg-primary text-white 
                     py-2 px-4 rounded 
-                    hover:bg-blue-600 
+                    hover:bg-hvPrimary 
                     cursor-pointer
                   "
                                 >
@@ -154,9 +154,9 @@ export const Upload3DModelPage = () => {
                 <button
                     type="submit"
                     className="
-            w-full bg-blue-500 text-white
+            w-full bg-primary text-white
             py-2 rounded 
-            hover:bg-blue-600 
+            hover:bg-hvPrimary 
             transition-colors
           "
                 >

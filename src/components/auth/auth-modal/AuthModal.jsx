@@ -16,7 +16,7 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
             <div
                 className="
           w-full max-w-md p-6 
-          bg-white rounded-md shadow-md 
+          bg-bgPrimary rounded-md shadow-lg shadow-primary
           relative
         "
                 onClick={(e) =>
@@ -24,7 +24,7 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
                 } /* Prevent overlay click from closing modal */
             >
                 {/* Header */}
-                <h2 className="text-2xl font-semibold text-center text-gray-700 mb-4">
+                <h2 className="text-2xl font-semibold text-center text-txPrimary mb-4">
                     {isSignUp ? "Sign Up" : "Sign In"}
                 </h2>
 
@@ -34,7 +34,7 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
                         <>
                             <div>
                                 <label
-                                    className="block text-gray-600 mb-1"
+                                    className="block text-txPrimary mb-1"
                                     htmlFor="name"
                                 >
                                     Name
@@ -47,7 +47,7 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
                     w-full px-3 py-2 
                     border border-gray-300 
                     rounded-md focus:outline-none 
-                    focus:ring-1 focus:ring-blue-500
+                    focus:ring-1 focus:ring-primary
                   "
                                     placeholder="John Doe"
                                 />
@@ -58,7 +58,7 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
                     {/* Email Field */}
                     <div>
                         <label
-                            className="block text-gray-600 mb-1"
+                            className="block text-txPrimary mb-1"
                             htmlFor="email"
                         >
                             Email
@@ -71,7 +71,7 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
                 w-full px-3 py-2 
                 border border-gray-300 
                 rounded-md 
-                focus:outline-none focus:ring-1 focus:ring-blue-500
+                focus:outline-none focus:ring-1 focus:ring-primary
               "
                             placeholder="you@example.com"
                         />
@@ -80,7 +80,7 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
                     {/* Password Field */}
                     <div>
                         <label
-                            className="block text-gray-600 mb-1"
+                            className="block text-txPrimary mb-1"
                             htmlFor="password"
                         >
                             Password
@@ -93,7 +93,7 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
                 w-full px-3 py-2 
                 border border-gray-300 
                 rounded-md 
-                focus:outline-none focus:ring-1 focus:ring-blue-500
+                focus:outline-none focus:ring-1 focus:ring-primary
               "
                             placeholder="Enter your password"
                         />
@@ -103,7 +103,7 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
                     {isSignUp && (
                         <div>
                             <label
-                                className="block text-gray-600 mb-1"
+                                className="block text-txPrimary mb-1"
                                 htmlFor="confirmPass"
                             >
                                 Confirm Password
@@ -117,7 +117,7 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
                   border border-gray-300 
                   rounded-md 
                   focus:outline-none 
-                  focus:ring-1 focus:ring-blue-500
+                  focus:ring-1 focus:ring-primary
                 "
                                 placeholder="Re-enter your password"
                             />
@@ -127,16 +127,16 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
                     {/* Extra row if sign in */}
                     {!isSignUp && (
                         <div className="flex items-center justify-between">
-                            <label className="inline-flex items-center text-gray-600">
+                            <label className="inline-flex items-center text-txPrimary">
                                 <input
                                     type="checkbox"
-                                    className="form-checkbox h-4 w-4 text-blue-500"
+                                    className="form-checkbox h-4 w-4 accent-primary"
                                 />
                                 <span className="ml-2">Remember me</span>
                             </label>
                             <a
                                 href="#"
-                                className="text-sm text-blue-600 hover:underline"
+                                className="text-sm text-primary hover:underline font-medium cursor-pointer"
                             >
                                 Forgot password?
                             </a>
@@ -147,9 +147,10 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
                     <button
                         type="submit"
                         className="
-              w-full bg-blue-500 text-white 
+              w-full bg-primary text-white 
               py-2 rounded-md 
-              hover:bg-blue-600 
+              hover:bg-hvPrimary
+              cursor-pointer
               transition-colors
             "
                     >
@@ -159,23 +160,23 @@ export function AuthModal({ isOpen, onClose, isSignUp, onSwitchMode }) {
 
                 {/* Switch Mode Link */}
                 {isSignUp ? (
-                    <p className="text-center text-sm text-gray-600 mt-4">
+                    <p className="text-center text-sm text-txPrimary mt-4">
                         Already have an account?{" "}
                         <button
                             type="button"
                             onClick={onSwitchMode}
-                            className="text-blue-600 hover:underline font-medium"
+                            className="text-primary hover:underline font-medium cursor-pointer"
                         >
                             Sign in
                         </button>
                     </p>
                 ) : (
-                    <p className="text-center text-sm text-gray-600 mt-4">
+                    <p className="text-center text-sm text-txPrimary mt-4">
                         Don&apos;t have an account?{" "}
                         <button
                             type="button"
                             onClick={onSwitchMode}
-                            className="text-blue-600 hover:underline font-medium"
+                            className="text-primary hover:underline font-medium cursor-pointer"
                         >
                             Sign up
                         </button>
