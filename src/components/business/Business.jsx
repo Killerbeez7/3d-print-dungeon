@@ -10,11 +10,11 @@ export const Business = () => {
                 your 3D strategy for maximum impact.
             </p>
             {/* Example: bullet points or feature list */}
-            <ul className="mt-4 space-y-2 text-txSecondary">
-                <li>• Team-based content management</li>
-                <li>• Secure cloud storage & version control</li>
-                <li>• Dedicated support & enterprise SLAs</li>
-                <li>• AR/VR integration & advanced analytics</li>
+            <ul className="mt-4 space-y-2 text-txSecondary list-disc list-inside">
+                <li>Team-based content management</li>
+                <li>Secure cloud storage & version control</li>
+                <li>Dedicated support & enterprise SLAs</li>
+                <li>AR/VR integration & advanced analytics</li>
             </ul>
             {/* Add more business details, pricing, contact info, etc. */}
         </div>
