@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 
+import { AuthContextProvider } from "./contexts/AuthProvider";
+
 // common
 import { Home } from "./components/home/Home";
 import { Navbar } from "./components/shared/navbar/Navbar";
@@ -36,13 +38,15 @@ export default function App() {
             />
 
             <main className="flex-grow">
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/3dstore" element={<Store />} />
-                    <Route path="/explore" element={<Explore />} />
-                    <Route path="/business" element={<Business />} />
-                    <Route path="/upload" element={<Upload3DModelPage />} />
-                </Routes>
+                <AuthContextProvider>
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/3dstore" element={<Store />} />
+                        <Route path="/explore" element={<Explore />} />
+                        <Route path="/business" element={<Business />} />
+                        <Route path="/upload" element={<Upload3DModelPage />} />
+                    </Routes>
+                </AuthContextProvider>
             </main>
 
             <Footer />
