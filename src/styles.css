@@ -1,8 +1,34 @@
+/* Reset CSS */
+
+html, body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+*,
+*::before,
+*::after { box-sizing: inherit; }
+
+h1 { font-size: 2.4em; }
+h2 { font-size: 2.0em; }
+h3 { font-size: 1.8em; }
+h4 { font-size: 1.4em; }
+h5 { font-size: 1.2em; }
+h6 { font-size: 1em; }
+
+/* Tailwind CSS */
+
 @import "tailwindcss";
 
 
 @theme {
-    --color-bgPrimary: rgb(53, 53, 53);
-    --color-txPrimary: rgb(255, 255, 255);
+    --color-bgPrimary: rgb(53, 53, 60);
+    --color-bgDarker: rgb(45, 45, 60);
+
+    --color-txPrimary: rgb(200, 200, 200);
+    --color-txSecondary: rgb(175, 175, 175);
+
     --color-primary: rgb(160, 80, 230);
+    --color-hvPrimary: rgb(176, 115, 230);
 }
