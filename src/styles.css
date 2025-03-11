@@ -1,34 +1,115 @@
 /* Reset CSS */
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
+}
 
 *,
 *::before,
-*::after { box-sizing: inherit; }
+*::after {
+    box-sizing: inherit;
+}
 
-h1 { font-size: 2.4em; }
-h2 { font-size: 2.0em; }
-h3 { font-size: 1.8em; }
-h4 { font-size: 1.4em; }
-h5 { font-size: 1.2em; }
-h6 { font-size: 1em; }
+h1 {
+    font-size: 2.4em;
+}
+h2 {
+    font-size: 2em;
+}
+h3 {
+    font-size: 1.8em;
+}
+h4 {
+    font-size: 1.4em;
+}
+h5 {
+    font-size: 1.2em;
+}
+h6 {
+    font-size: 1em;
+}
 
 /* Tailwind CSS */
 
 @import "tailwindcss";
 
-
-@theme {
-    --color-bgPrimary: rgb(53, 53, 60);
-    --color-bgDarker: rgb(45, 45, 60);
-
-    --color-txPrimary: rgb(200, 200, 200);
-    --color-txSecondary: rgb(175, 175, 175);
-
-    --color-primary: rgb(160, 80, 230);
-    --color-hvPrimary: rgb(176, 115, 230);
+* {
+    @apply transition-colors duration-300;
 }
+
+[data-theme="light"] {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f8f9fa;
+    --bg-surface: #f1f3f5;
+    --bg-accent: #eaeaea;
+
+    --text-primary: #212529;
+    --text-secondary: #6c757d;
+    --text-muted: #adb5bd;
+
+    --border-primary: #dee2e6;
+    --border-secondary: #ced4da;
+
+    --button-primary: #1d4ed8;
+    --button-hover: #1e40af;
+    --button-disabled: #9ca3af;
+
+    --success: #16a34a;
+    --error: #dc2626;
+}
+
+/* Dark mode overrides */
+[data-theme="dark"] {
+    --bg-primary: #121212;
+    --bg-secondary: #1e1e1e;
+    --bg-surface: #252525;
+    --bg-accent: #343434;
+
+    --text-primary: #e4e4e4;
+    --text-secondary: #a3a3a3;
+    --text-muted: #7e7e7e;
+
+    --border-primary: #2a2a2a;
+    --border-secondary: #3d3d3d;
+
+    --button-primary: #3b82f6;
+    --button-hover: #2563eb;
+    --button-disabled: #6b7280;
+
+    --success: #22c55e;
+    --error: #ef4444;
+}
+
+.text-primary {
+    color: var(--text-primary);
+}
+
+.bg-primary {
+    background-color: var(--bg-primary);
+}
+
+.border-primary {
+    border-color: var(--border-primary);
+}
+
+.button-primary {
+    background-color: var(--button-primary);
+}
+
+.button-primary:hover {
+    background-color: var(--button-hover);
+}
+
+/*
+--color-bgPrimary: rgb(53, 53, 60);
+--color-bgDarker: rgb(45, 45, 60);
+
+--color-txPrimary: rgb(200, 200, 200);
+--color-txSecondary: rgb(175, 175, 175);
+
+--color-primary: rgb(160, 80, 230);
+--color-hvPrimary: rgb(176, 115, 230);
+*/
