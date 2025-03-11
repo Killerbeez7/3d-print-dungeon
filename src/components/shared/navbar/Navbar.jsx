@@ -1,9 +1,20 @@
 import { Link } from "react-router-dom";
 import PropTypes from 'prop-types';
+import { useState } from "react";
 
 export const Navbar = ({ onLoginClick }) => {
+    const [theme, setTheme] = useState(false)
+
+    const changeTheme = () => {
+        setTheme((prev) => {
+            const newTheme = !prev;
+            document.documentElement.dataset.theme = newTheme ? "dark" : "light";
+            return newTheme;
+        });
+    };
+
     return (
-        <header className="flex items-center justify-between bg-bgPrimary shadow-sm py-2 px-4">
+        <header className="flex items-center justify-between bg-primary shadow-sm py-2 px-4">
             <button
                 className="text-xl text-gray-700 md:hidden"
                 aria-label="navigation"
@@ -66,6 +77,9 @@ export const Navbar = ({ onLoginClick }) => {
             </div>
 
             <div className="flex items-center space-x-4">
+                <button className="border border-primary text-primary px-3 py-1 rounded-md cursor-pointer" onClick={changeTheme}>
+                    Theme
+                </button>
                 <button
                     className="border border-primary text-primary font-semibold px-3 py-1 
                      rounded-md hover:bg-primary hover:text-white cursor-pointer
