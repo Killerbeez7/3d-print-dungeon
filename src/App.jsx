@@ -25,7 +25,7 @@ export default function App() {
     const handleSwitchMode = () => setIsSignUp((prev) => !prev);
 
     return (
-        <div className="flex flex-col min-h-screen bg-bgPrimary text-txPrimary">
+        <div className="flex flex-col min-h-screen bg-bg-primary">
             <Navbar
                 onLoginClick={() => {
                     setIsSignUp(false); // set sign-in mode
