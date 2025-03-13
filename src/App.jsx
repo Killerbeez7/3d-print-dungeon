@@ -13,7 +13,7 @@ import { Explore } from "./components/explore/Explore";
 import { Business } from "./components/business/Business";
 import { Upload3DModelPage } from "./components/Upload3DModelPage/Upload3DModelPage";
 // auth
-import { AuthModal } from "./components/auth/auth-modal/AuthModal";
+import { AuthModal } from "./components/auth-modal/AuthModal";
 
 export default function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
