@@ -1,34 +1,118 @@
 /* Reset CSS */
 
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
+}
 
-*,
+/* *,
 *::before,
-*::after { box-sizing: inherit; }
+*::after {
+    box-sizing: inherit;
+} */
 
-h1 { font-size: 2.4em; }
-h2 { font-size: 2.0em; }
-h3 { font-size: 1.8em; }
-h4 { font-size: 1.4em; }
-h5 { font-size: 1.2em; }
-h6 { font-size: 1em; }
+h1 {
+    font-size: 2.4em;
+}
+h2 {
+    font-size: 2em;
+}
+h3 {
+    font-size: 1.8em;
+}
+h4 {
+    font-size: 1.4em;
+}
+h5 {
+    font-size: 1.2em;
+}
+h6 {
+    font-size: 1em;
+}
 
 /* Tailwind CSS */
 
 @import "tailwindcss";
 
+* {
+    @apply transition-colors;
+}
+
+:root {
+    --bg-primary: #f2f2f2;
+    --bg-secondary: #d9d9d9;
+    --bg-surface: #ffffff;
+    --bg-reverse: #202026;
+
+    --txt-primary: #1a1a1a;
+    --txt-secondary: #616161;
+    --txt-highlight: #8c8c8c;
+    --txt-muted: #adb5bd;
+
+    --accent:#aa40e3;
+    --accent-hover:#ce78fc;
+
+    --br-primary: #999999;
+    --br-secondary: #a9a9c2;
+
+    --btn-secondary: #bfbfbf;
+    --btn-secondary-hover: #adadad;
+    --btn-disabled: #e0e0e0;
+
+    --success: #16a34a;
+    --error: #dc2626;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #202026;
+    --bg-secondary: #101014;
+    --bg-surface: #303038;
+    --bg-reverse: #f2f2f2;
+
+    --txt-primary: #e3e3e3;
+    --txt-secondary: #b3b3b3;
+    --txt-highlight: #ffffff;
+    --txt-muted: #7e7e7e;
+
+    --accent:#aa40e3;
+    --accent-hover:#ce78fc;
+
+    --br-primary: #7e7e7e;
+    --br-secondary: #3d3d3d;
+
+    --btn-secondary: #5e5e6e;
+    --btn-secondary-hover: #75758a;
+    --btn-disabled: #808080;
+
+    --success: #22c55e;
+    --error: #ef4444;
+}
 
 @theme {
-    --color-bgPrimary: rgb(53, 53, 60);
-    --color-bgDarker: rgb(45, 45, 60);
+    --color-bg-primary: var(--bg-primary);
+    --color-bg-secondary: var(--bg-secondary);
+    --color-bg-surface: var(--bg-surface);
+    --color-bg-revese: var(--bg-reverse);
 
-    --color-txPrimary: rgb(200, 200, 200);
-    --color-txSecondary: rgb(175, 175, 175);
+    --color-txt-primary: var(--txt-primary);
+    --color-txt-secondary: var(--txt-secondary);
+    --color-txt-highlighted: var(--txt-highlight);
+    --color-txt-muted: var(--txt-muted);
+    --color-txt-link: var(--accent);
+    --color-txt-link-hover: var(--accent-hover);
 
-    --color-primary: rgb(160, 80, 230);
-    --color-hvPrimary: rgb(176, 115, 230);
+    --color-br-primary: var(--br-primary);
+    --color-br-secondary: var(--br-secondary);
+
+    --color-btn-primary: var(--accent);
+    --color-btn-primary-hover: var(--accent-hover);
+    --color-btn-secondary: var(--btn-secondary);
+    --color-btn-secondary-hover: var(--btn-secondary-hover);
+    --color-btn-disabled: var(--btn-disabled);
+
+    --color-focus: var(--accent-hover);
+    --color-success: var(--success);
+    --color-error: var(--error);
 }
