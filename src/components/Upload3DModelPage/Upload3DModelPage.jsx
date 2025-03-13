@@ -37,28 +37,23 @@ export const Upload3DModelPage = () => {
 
     return (
         <div className="min-h-screen p-8 flex flex-col items-center">
-            <h1 className="text-3xl font-bold text-txPrimary mb-6">
+            <h1 className="text-3xl font-bold text-txt-primary mb-6">
                 Upload 3D Printable Model
             </h1>
             <form
                 onSubmit={handleSubmit}
-                className="w-full max-w-2xl bg-bgDarker rounded-lg shadow-xl p-6 space-y-6"
+                className="w-full max-w-2xl bg-bg-surface rounded-lg shadow-xl p-6 space-y-6"
             >
                 {/* Model Name */}
                 <div>
-                    <label className="block text-txPrimary font-medium mb-1">
+                    <label className="block text-txt-secondary font-medium mb-1">
                         Model Name
                     </label>
                     <input
                         type="text"
                         value={modelName}
                         onChange={(e) => setModelName(e.target.value)}
-                        className="
-              w-full px-3 py-2 
-              border border-gray-300 rounded 
-              focus:outline-none 
-              focus:ring focus:ring-primary
-            "
+                        className="text-txt-primary placeholder-txt-muted w-full px-3 py-2 border-2 border-br-primary rounded-lg focus:outline-none focus:border-focus focus:ring-focus"
                         placeholder="E.g. Medieval Castle Tower"
                         required
                     />
@@ -66,18 +61,13 @@ export const Upload3DModelPage = () => {
 
                 {/* Description */}
                 <div>
-                    <label className="block text-txPrimary font-medium mb-1">
+                    <label className="block text-txt-secondary font-medium mb-1">
                         Description
                     </label>
                     <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        className="
-              w-full px-3 py-2 
-              border border-gray-300 rounded 
-              focus:outline-none 
-              focus:ring focus:ring-primary
-            "
+                        className="text-txt-primary placeholder-txt-muted w-full px-3 py-2 border-2 border-br-primary rounded-lg focus:outline-none focus:border-focus focus:ring-focus"
                         rows="3"
                         placeholder="Describe your model (dimensions, usage, instructions, etc.)"
                     />
@@ -85,19 +75,14 @@ export const Upload3DModelPage = () => {
 
                 {/* Tags */}
                 <div>
-                    <label className="block text-txPrimary font-medium mb-1">
+                    <label className="block text-txt-secondary font-medium mb-1">
                         Tags (comma-separated)
                     </label>
                     <input
                         type="text"
                         value={tags}
                         onChange={(e) => setTags(e.target.value)}
-                        className="
-              w-full px-3 py-2
-              border border-gray-300 rounded
-              focus:outline-none 
-              focus:ring focus:ring-primary
-            "
+                        className="text-txt-primary placeholder-txt-muted w-full px-3 py-2 border-2 border-br-primary rounded-lg focus:outline-none focus:border-focus focus:ring-focus"
                         placeholder="architecture, medieval, tower, etc."
                     />
                 </div>
@@ -105,36 +90,33 @@ export const Upload3DModelPage = () => {
                 {/* Drag & Drop area or file upload */}
                 <div
                     className="
-            border-2 border-dashed border-gray-300 
+            border-2 border-dashed border-br-primary
             rounded-lg p-6 text-center 
-            hover:bg-gray-50 
-            transition-colors
-          "
+            hover:bg-bg-primary"
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
                 >
                     {file ? (
-                        <div className="text-gray-700">
-                            <i className="fas fa-check-circle text-green-500 mr-1"></i>
+                        <div className="text-txt-primary">
+                            <i className="fas fa-check-circle text-success mr-1"></i>
                             {file.name}
                         </div>
                     ) : (
                         <>
-                            <p className="text-gray-600 mb-2">
+                            <p className="text-txt-primary mb-2">
                                 Drag & drop your .STL or .OBJ file here
                             </p>
-                            <p className="text-gray-400 text-sm">
+                            <p className="text-txt-secondary text-sm">
                                 or click below to browse
                             </p>
                             <div className="mt-4">
                                 <label
                                     htmlFor="fileInput"
                                     className="
-                    bg-primary text-white 
+                    bg-primary text-txt-primary
                     py-2 px-4 rounded 
-                    hover:bg-hvPrimary 
-                    cursor-pointer
-                  "
+                    hover:bg-btn-primary 
+                    cursor-pointer"
                                 >
                                     Choose a file
                                 </label>
@@ -154,11 +136,11 @@ export const Upload3DModelPage = () => {
                 <button
                     type="submit"
                     className="
-            w-full bg-primary text-white
-            py-2 rounded 
-            hover:bg-hvPrimary 
-            transition-colors
-          "
+            w-full bg-btn-primary text-white
+            text-lg
+            font-medium
+            py-2 rounded
+            hover:bg-btn-primary-hover"
                 >
                     Publish Model
                 </button>
