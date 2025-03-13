@@ -15,9 +15,13 @@ export const AuthContextProvider = ({ children }) => {
     return (
         <AuthContext.Provider value={{ 
             user, 
+            // to change the func names (look at authService)
             signUp: AuthService.signUp, 
             signIn: AuthService.signIn, 
             logout: AuthService.signOut
+
+            //to add sign up/in google/facebook/twitter
+            
         }}>
             {children}
         </AuthContext.Provider>
