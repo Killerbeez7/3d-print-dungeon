@@ -1,22 +1,15 @@
 import { Link } from "react-router-dom";
 import PropTypes from 'prop-types';
-import { useState } from "react";
+import { useTheme } from "../../../utils/theme";
+
 
 export const Navbar = ({ onLoginClick }) => {
-    const [theme, setTheme] = useState(false)
-
-    const changeTheme = () => {
-        setTheme((prev) => {
-            const newTheme = !prev;
-            document.documentElement.dataset.theme = newTheme ? "dark" : "light";
-            return newTheme;
-        });
-    };
+    const [theme, toggleTheme] = useTheme();
 
     return (
-        <header className="flex items-center justify-between bg-primary shadow-sm py-2 px-4">
+        <header className="flex items-cente justify-between bg-bg-primary shadow-sm py-2 px-4">
             <button
-                className="text-xl text-gray-700 md:hidden"
+                className="text-xl bg-btn-primary md:hidden"
                 aria-label="navigation"
             >
                 <i className="fas fa-bars"></i>
@@ -24,7 +17,7 @@ export const Navbar = ({ onLoginClick }) => {
 
             <a
                 href="/"
-                className="flex items-center no-underline text-primary"
+                className="flex items-center no-underline text-btn-primary hover:text-btn-primary-hover"
                 aria-label="Go to main page"
             >
                 <svg
@@ -38,12 +31,12 @@ export const Navbar = ({ onLoginClick }) => {
                 <span className="ml-2 font-bold text-lg">3D PRINT DUNGEON</span>
             </a>
 
-            <nav className="hidden md:block ml-4">
-                <ul className="flex space-x-6">
+            <nav className="hidden md:flex ml-4">
+                <ul className="flex items-center space-x-6 font-medium">
                     <li>
                         <a
                             href="/explore"
-                            className="text-txSecondary hover:text-primary transition-colors"
+                            className="text-txt-secondary hover:text-txt-highlighted"
                         >
                             Explore
                         </a>
@@ -51,7 +44,7 @@ export const Navbar = ({ onLoginClick }) => {
                     <li>
                         <a
                             href="/3dstore"
-                            className="text-txSecondary hover:text-primary transition-colors"
+                            className="text-txt-secondary hover:text-txt-highlighted"
                         >
                             Buy 3D Models
                         </a>
@@ -59,7 +52,7 @@ export const Navbar = ({ onLoginClick }) => {
                     <li>
                         <a
                             href="/business"
-                            className="text-txSecondary hover:text-primary transition-colors"
+                            className="text-txt-secondary hover:text-txt-highlighted"
                         >
                             For Business
                         </a>
@@ -71,27 +64,26 @@ export const Navbar = ({ onLoginClick }) => {
                 <input
                     type="text"
                     placeholder="Search 3D models"
-                    className="border border-gray-300 rounded-md w-full pl-2 py-1 focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="border-2 border-br-primary text-txt-primary placeholder-txt-muted rounded-full w-full pl-4 py-1 focus:outline-none focus:border-focus focus:ring-focus"
                 />
-                <i className="fas fa-search absolute right-2 text-gray-400"></i>
+                <i className="fas fa-search absolute right-2 text-txt-secondary"></i>
             </div>
 
             <div className="flex items-center space-x-4">
-                <button className="border border-primary text-primary px-3 py-1 rounded-md cursor-pointer" onClick={changeTheme}>
+                <button className="border-2 border-br-primary text-txt-primary font-medium px-3 py-1 rounded-lg cursor-pointer" onClick={toggleTheme}>
                     Theme
                 </button>
                 <button
-                    className="border border-primary text-primary font-semibold px-3 py-1 
-                     rounded-md hover:bg-primary hover:text-white cursor-pointer
-                     transition-colors"
+                    className="bg-btn-secondary text-txt-primary font-medium px-3 py-1 
+                     rounded-lg hover:bg-btn-secondary-hover cursor-pointer"
                     onClick={onLoginClick}
                 >
                     Login
                 </button>
                 <Link
                     to="/upload"
-                    className="bg-primary text-white font-semibold px-3 py-1 
-                     rounded-md hover:bg-hvPrimary transition-colors"
+                    className="bg-btn-primary text-white font-medium px-3 py-1 
+                     rounded-lg hover:bg-btn-primary-hover"
                 >
                     Upload
                 </Link>
