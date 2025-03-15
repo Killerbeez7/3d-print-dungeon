@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import { useTheme } from "../../../utils/theme";
-
+import { useAuth } from "../../../contexts/authContext";
 
 export const Navbar = ({ onLoginClick }) => {
     const [theme, toggleTheme] = useTheme();
+
+    const { currentUser, handleSignOut } = useAuth();
 
     return (
         <header className="flex items-cente justify-between bg-bg-primary shadow-sm py-2 px-4">
@@ -70,16 +72,30 @@ export const Navbar = ({ onLoginClick }) => {
             </div>
 
             <div className="flex items-center space-x-4">
-                <button className="border-2 border-br-primary text-txt-primary font-medium px-3 py-1 rounded-lg cursor-pointer" onClick={toggleTheme}>
+                <button
+                    className="border-2 border-br-primary text-txt-primary font-medium px-3 py-1 rounded-lg cursor-pointer"
+                    onClick={toggleTheme}
+                >
                     Theme
                 </button>
-                <button
-                    className="bg-btn-secondary text-txt-primary font-medium px-3 py-1 
+                {currentUser ? (
+                    <button
+                        className="bg-btn-secondary text-txt-primary font-medium px-3 py-1 
+                rounded-lg hover:bg-btn-secondary-hover cursor-pointer"
+                        onClick={handleSignOut}
+                    >
+                        Logout
+                    </button>
+                ) : (
+                    <button
+                        className="bg-btn-secondary text-txt-primary font-medium px-3 py-1 
                      rounded-lg hover:bg-btn-secondary-hover cursor-pointer"
-                    onClick={onLoginClick}
-                >
-                    Login
-                </button>
+                        onClick={onLoginClick}
+                    >
+                        Sign In
+                    </button>
+                )}
+
                 <Link
                     to="/upload"
                     className="bg-btn-primary text-white font-medium px-3 py-1 
