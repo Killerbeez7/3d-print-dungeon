@@ -1,8 +1,5 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
-
-import { AuthContextProvider } from "./contexts/AuthProvider";
-
 // common
 import { Home } from "./components/home/Home";
 import { Navbar } from "./components/shared/navbar/Navbar";
@@ -13,6 +10,7 @@ import { Explore } from "./components/explore/Explore";
 import { Business } from "./components/business/Business";
 import { Upload3DModelPage } from "./components/Upload3DModelPage/Upload3DModelPage";
 // auth
+import { AuthProvider } from "./contexts/authContext";
 import { AuthModal } from "./components/auth-modal/AuthModal";
 
 export default function App() {
@@ -26,19 +24,21 @@ export default function App() {
 
     return (
         <div className="flex flex-col min-h-screen bg-bg-primary">
-            <Navbar
-                onLoginClick={() => {
-                    setIsSignUp(false); // set sign-in mode
-                    setIsModalOpen(true);
-                }}
-                onSignUpClick={() => {
-                    setIsSignUp(true); // set sign-up mode
-                    setIsModalOpen(true);
-                }}
-            />
+            <AuthProvider>
+                <Navbar
+                    onLoginClick={() => {
+                        // set sign-in mode
+                        setIsSignUp(false);
+                        setIsModalOpen(true);
+                    }}
+                    onSignUpClick={() => {
+                        // set sign-up mode
+                        setIsSignUp(true);
+                        setIsModalOpen(true);
+                    }}
+                />
 
-            <main className="flex-grow">
-                <AuthContextProvider>
+                <main className="flex-grow">
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/3dstore" element={<Store />} />
@@ -46,17 +46,18 @@ export default function App() {
                         <Route path="/business" element={<Business />} />
                         <Route path="/upload" element={<Upload3DModelPage />} />
                     </Routes>
-                </AuthContextProvider>
-            </main>
+                </main>
 
-            <Footer />
+                <Footer />
 
-            <AuthModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                isSignUp={isSignUp}
-                onSwitchMode={handleSwitchMode}
-            />
+                {/* Auth Modal for sign-in / sign-up */}
+                <AuthModal
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    isSignUp={isSignUp}
+                    onSwitchMode={handleSwitchMode}
+                />
+            </AuthProvider>
         </div>
     );
 }
