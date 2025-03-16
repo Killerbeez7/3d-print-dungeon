@@ -22,14 +22,6 @@ export const Navbar = ({ onLoginClick }) => {
                 className="flex items-center no-underline text-btn-primary hover:text-btn-primary-hover"
                 aria-label="Go to main page"
             >
-                <svg
-                    width="40"
-                    height="40"
-                    viewBox="0 0 121 25"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    <circle cx="12.5" cy="12.5" r="12" fill="#999999" />
-                </svg>
                 <span className="ml-2 font-bold text-lg">3D PRINT DUNGEON</span>
             </a>
 
