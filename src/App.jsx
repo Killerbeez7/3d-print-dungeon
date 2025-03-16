@@ -6,6 +6,7 @@ import { Navbar } from "./components/shared/navbar/Navbar";
 import { Footer } from "./components/shared/footer/Footer";
 // features
 import { Store } from "./components/store/Store";
+import { Gallery } from "./components/gallery/Gallery";
 import { Explore } from "./components/explore/Explore";
 import { Business } from "./components/business/Business";
 import { Upload3DModelPage } from "./components/Upload3DModelPage/Upload3DModelPage";
@@ -43,6 +44,7 @@ export default function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/3dstore" element={<Store />} />
                         <Route path="/explore" element={<Explore />} />
+                        <Route path="/gallery" element={<Gallery />} />
                         <Route path="/business" element={<Business />} />
                         <Route path="/upload" element={<Upload3DModelPage />} />
                     </Routes>

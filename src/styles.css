@@ -51,8 +51,8 @@ h6 {
     --txt-highlight: #8c8c8c;
     --txt-muted: #adb5bd;
 
-    --accent:#aa40e3;
-    --accent-hover:#ce78fc;
+    --accent: #aa40e3;
+    --accent-hover: #ce78fc;
 
     --br-primary: #999999;
     --br-secondary: #a9a9c2;
@@ -76,8 +76,8 @@ h6 {
     --txt-highlight: #ffffff;
     --txt-muted: #7e7e7e;
 
-    --accent:#aa40e3;
-    --accent-hover:#ce78fc;
+    --accent: #aa40e3;
+    --accent-hover: #ce78fc;
 
     --br-primary: #7e7e7e;
     --br-secondary: #3d3d3d;
