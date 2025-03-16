@@ -9,7 +9,6 @@ import {
     signInWithPopup,
     updateProfile,
     signOut,
-    onAuthStateChanged,
 } from "firebase/auth";
 
 // upscale profile picture
