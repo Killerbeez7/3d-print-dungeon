@@ -2,6 +2,14 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useTheme } from "../../../utils/theme";
 import { useAuth } from "../../../contexts/authContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faCircleHalfStroke,
+    faUserCircle,
+    faSignOutAlt,
+    faUser,
+    faCog
+} from "@fortawesome/free-solid-svg-icons";
 
 export const Navbar = ({ onLoginClick }) => {
     const [theme, toggleTheme] = useTheme();
@@ -39,7 +47,7 @@ export const Navbar = ({ onLoginClick }) => {
                         <Link
                             to="/explore"
                             onClick={disableClick}
-                            className="text-txt-secondary hover:text-txt-highlighted px-3 py-2 inline-block"
+                            className="text-txt-secondary group-hover:text-txt-highlighted px-3 py-2 inline-block"
                         >
                             Explore
                         </Link>
@@ -48,7 +56,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 absolute left-0 top-full 
                                 hidden group-hover:block 
                                 bg-bg-surface border border-br-primary 
-                                rounded shadow-lg min-w-[150px]
+                                rounded-md shadow-lg min-w-[150px]
                                 z-10
                             "
                         >
@@ -56,7 +64,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/gallery"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Gallery
                                     </Link>
@@ -64,7 +72,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/artists"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Artists
                                     </Link>
@@ -78,7 +86,7 @@ export const Navbar = ({ onLoginClick }) => {
                         <Link
                             to="/3dstore"
                             onClick={disableClick}
-                            className="text-txt-secondary hover:text-txt-highlighted px-3 py-2 inline-block"
+                            className="text-txt-secondary group-hover:text-txt-highlighted px-3 py-2 inline-block"
                         >
                             Buy 3D Models
                         </Link>
@@ -87,7 +95,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 absolute left-0 top-full 
                                 hidden group-hover:block 
                                 bg-bg-surface border border-br-primary 
-                                rounded shadow-lg min-w-[150px]
+                                rounded-md shadow-lg min-w-[150px]
                                 z-10
                             "
                         >
@@ -95,7 +103,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/3dstore/all"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         All Models
                                     </Link>
@@ -103,7 +111,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/3dstore/featured"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Featured
                                     </Link>
@@ -111,7 +119,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/3dstore/new"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         New Arrivals
                                     </Link>
@@ -125,7 +133,7 @@ export const Navbar = ({ onLoginClick }) => {
                         <Link
                             to="/business"
                             onClick={disableClick}
-                            className="text-txt-secondary hover:text-txt-highlighted px-3 py-2 inline-block"
+                            className="text-txt-secondary group-hover:text-txt-highlighted px-3 py-2 inline-block"
                         >
                             For Business
                         </Link>
@@ -134,7 +142,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 absolute left-0 top-full 
                                 hidden group-hover:block 
                                 bg-bg-surface border border-br-primary 
-                                rounded shadow-lg min-w-[150px]
+                                rounded-md shadow-lg min-w-[150px]
                                 z-10
                             "
                         >
@@ -142,7 +150,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/business/bulk-orders"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Bulk Orders
                                     </Link>
@@ -150,7 +158,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/business/custom-solutions"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Custom Solutions
                                     </Link>
@@ -158,7 +166,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/business/enterprise"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Enterprise
                                     </Link>
@@ -180,12 +188,16 @@ export const Navbar = ({ onLoginClick }) => {
             </div>
 
             {/* Right Side: Theme / Auth / Upload */}
+
             <div className="flex items-center space-x-4">
                 <button
-                    className="border-2 border-br-primary text-txt-primary font-medium px-3 py-1 rounded-lg cursor-pointer"
+                    className="outline-2 outline-br-primary text-txt-primary font-medium px-3 py-1 rounded-lg cursor-pointer"
                     onClick={toggleTheme}
                 >
-                    Theme
+                    <div>
+                        <FontAwesomeIcon icon={faCircleHalfStroke} className="text-txt-primary" />
+                        <span className="pl-2">Theme</span>
+                    </div>
                 </button>
 
                 {currentUser ? (
@@ -211,6 +223,35 @@ export const Navbar = ({ onLoginClick }) => {
                     Upload
                 </Link>
             </div>
+            <div className="relative group">
+                <button className="flex items-center text-txt-secondary group-hover:text-txt-highlighted">
+                    <FontAwesomeIcon icon={faUserCircle} className="text-3xl" />
+                </button>
+
+                <div className="absolute right-[-10px] top-full hidden group-hover:block bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[150px] z-10">
+                    <ul className="py-2">
+                        <li>
+                            <Link to="/profile" className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary">
+                                <FontAwesomeIcon icon={faUser} className="mr-2" />
+                                Profile
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/settings" className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary">
+                                <FontAwesomeIcon icon={faCog} className="mr-2" />
+                                Settings
+                            </Link>
+                        </li>
+                        <li>
+                            <button onClick={handleSignOut} className="block min-w-[150px] cursor-pointer text-left mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary">
+                                <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+                                Logout
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
         </header>
     );
 };
