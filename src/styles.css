@@ -36,10 +36,6 @@ h6 {
 
 @import "tailwindcss";
 
-* {
-    @apply transition-colors;
-}
-
 :root {
     --bg-primary: #f2f2f2;
     --bg-secondary: #d9d9d9;
@@ -94,14 +90,17 @@ h6 {
     --color-bg-primary: var(--bg-primary);
     --color-bg-secondary: var(--bg-secondary);
     --color-bg-surface: var(--bg-surface);
-    --color-bg-revese: var(--bg-reverse);
+    --color-bg-reverse: var(--bg-reverse);
+    --color-accent: var(--accent);
+    --color-accent-hover: var(--accent-hover);
 
     --color-txt-primary: var(--txt-primary);
     --color-txt-secondary: var(--txt-secondary);
     --color-txt-highlighted: var(--txt-highlight);
     --color-txt-muted: var(--txt-muted);
-    --color-txt-link: var(--accent);
-    --color-txt-link-hover: var(--accent-hover);
+
+    /* --color-txt-link: var(--accent);
+    --color-txt-link-hover: var(--accent-hover); */
 
     --color-br-primary: var(--br-primary);
     --color-br-secondary: var(--br-secondary);

@@ -19,10 +19,9 @@ export const Home = () => {
                 </p>
                 <button
                     className="
-              bg-bgSurface text-accent 
+              bg-bg-surface text-accent 
               font-semibold py-2 px-6 
-              rounded-full hover:bg-bgReverse 
-              transition-colors
+              rounded-full hover:bg-bg-reverse
             "
                 >
                     Get Started
@@ -120,7 +119,6 @@ export const Home = () => {
               py-2 px-6 rounded-full
               font-semibold 
               hover:bg-accent-hover
-              transition-colors
             "
                 >
                     Create a Free Account
