@@ -13,6 +13,7 @@ import { Upload3DModelPage } from "./components/Upload3DModelPage/Upload3DModelP
 // auth
 import { AuthProvider } from "./contexts/authContext";
 import { AuthModal } from "./components/auth-modal/AuthModal";
+import { UserProfile } from "./components/user/user-profile/UserProfile";
 
 export default function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -46,6 +47,7 @@ export default function App() {
                         <Route path="/explore" element={<Explore />} />
                         <Route path="/gallery" element={<Gallery />} />
                         <Route path="/business" element={<Business />} />
+                        <Route path="/profile" element={<UserProfile />} />
                         <Route path="/upload" element={<Upload3DModelPage />} />
                     </Routes>
                 </main>
