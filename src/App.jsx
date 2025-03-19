@@ -10,9 +10,12 @@ import { Gallery } from "./components/gallery/Gallery";
 import { Explore } from "./components/explore/Explore";
 import { Business } from "./components/business/Business";
 import { Upload3DModelPage } from "./components/Upload3DModelPage/Upload3DModelPage";
+import { ModelDetails } from "./components/model-details/ModelDetails";
 // auth
 import { AuthProvider } from "./contexts/authContext";
 import { AuthModal } from "./components/auth-modal/AuthModal";
+import { ProfileSettings } from "./components/user/profile-settings/ProfileSettings";
+import { Profile } from "./components/user/profile/Profile";
 
 export default function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -45,8 +48,13 @@ export default function App() {
                         <Route path="/3dstore" element={<Store />} />
                         <Route path="/explore" element={<Explore />} />
                         <Route path="/gallery" element={<Gallery />} />
+                        {/* Temporary Directory */}
+                        <Route path="/model/:id" element={<ModelDetails />} />
+
                         <Route path="/business" element={<Business />} />
                         <Route path="/upload" element={<Upload3DModelPage />} />
+                        <Route path="/profile" element={<Profile/>} />
+                        <Route path="/profile-settings" element={<ProfileSettings />} />
                     </Routes>
                 </main>
 

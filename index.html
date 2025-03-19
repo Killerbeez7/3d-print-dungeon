@@ -2,17 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/LOGO.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="/src/styles.css" rel="stylesheet">
     <script>
       (function() {
-        const theme = localStorage.getItem("theme") || 
-          (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        // Check the localStorage for a saved theme, or fall back to the system preference.
+        const savedTheme = localStorage.getItem("theme");
+        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        
+        // Set theme to system if no saved theme exists or if it's set to 'system'.
+        const theme = savedTheme === "system" ? systemTheme : savedTheme || systemTheme;
+        
+        // Apply the theme to the document element.
         document.documentElement.setAttribute("data-theme", theme);
       })();
     </script>
-    <title>3d print dungeon</title>
+    <title>3D Print Dungeon</title>
   </head>
   <body>
     <div id="root"></div>

@@ -1,10 +1,16 @@
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import { useTheme } from "../../../utils/theme";
 import { useAuth } from "../../../contexts/authContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faUserCircle,
+    faSignOutAlt,
+    faUser,
+    faCog,
+    faList
+} from "@fortawesome/free-solid-svg-icons";
 
 export const Navbar = ({ onLoginClick }) => {
-    const [theme, toggleTheme] = useTheme();
     const { currentUser, handleSignOut } = useAuth();
 
     // Helper to disable click navigation
@@ -39,24 +45,18 @@ export const Navbar = ({ onLoginClick }) => {
                         <Link
                             to="/explore"
                             onClick={disableClick}
-                            className="text-txt-secondary hover:text-txt-highlighted px-3 py-2 inline-block"
+                            className="text-txt-secondary group-hover:text-txt-highlighted px-3 py-2 inline-block"
                         >
                             Explore
                         </Link>
                         <div
-                            className="
-                                absolute left-0 top-full 
-                                hidden group-hover:block 
-                                bg-bg-surface border border-br-primary 
-                                rounded shadow-lg min-w-[150px]
-                                z-10
-                            "
+                            className="absolute left-0 top-full hidden group-hover:block bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[150px] z-10"
                         >
                             <ul className="py-2">
                                 <li>
                                     <Link
                                         to="/gallery"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Gallery
                                     </Link>
@@ -64,7 +64,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/artists"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Artists
                                     </Link>
@@ -78,24 +78,18 @@ export const Navbar = ({ onLoginClick }) => {
                         <Link
                             to="/3dstore"
                             onClick={disableClick}
-                            className="text-txt-secondary hover:text-txt-highlighted px-3 py-2 inline-block"
+                            className="text-txt-secondary group-hover:text-txt-highlighted px-3 py-2 inline-block"
                         >
                             Buy 3D Models
                         </Link>
                         <div
-                            className="
-                                absolute left-0 top-full 
-                                hidden group-hover:block 
-                                bg-bg-surface border border-br-primary 
-                                rounded shadow-lg min-w-[150px]
-                                z-10
-                            "
+                            className="absolute left-0 top-full hidden group-hover:block bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[150px] z-10"
                         >
                             <ul className="py-2">
                                 <li>
                                     <Link
                                         to="/3dstore/all"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         All Models
                                     </Link>
@@ -103,7 +97,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/3dstore/featured"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Featured
                                     </Link>
@@ -111,7 +105,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/3dstore/new"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         New Arrivals
                                     </Link>
@@ -125,24 +119,18 @@ export const Navbar = ({ onLoginClick }) => {
                         <Link
                             to="/business"
                             onClick={disableClick}
-                            className="text-txt-secondary hover:text-txt-highlighted px-3 py-2 inline-block"
+                            className="text-txt-secondary group-hover:text-txt-highlighted px-3 py-2 inline-block"
                         >
                             For Business
                         </Link>
                         <div
-                            className="
-                                absolute left-0 top-full 
-                                hidden group-hover:block 
-                                bg-bg-surface border border-br-primary 
-                                rounded shadow-lg min-w-[150px]
-                                z-10
-                            "
+                            className="absolute left-0 top-full hidden group-hover:block bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[150px] z-10"
                         >
                             <ul className="py-2">
                                 <li>
                                     <Link
                                         to="/business/bulk-orders"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Bulk Orders
                                     </Link>
@@ -150,7 +138,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/business/custom-solutions"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Custom Solutions
                                     </Link>
@@ -158,7 +146,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <li>
                                     <Link
                                         to="/business/enterprise"
-                                        className="block px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary transition-colors"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Enterprise
                                     </Link>
@@ -181,28 +169,14 @@ export const Navbar = ({ onLoginClick }) => {
 
             {/* Right Side: Theme / Auth / Upload */}
             <div className="flex items-center space-x-4">
-                <button
-                    className="border-2 border-br-primary text-txt-primary font-medium px-3 py-1 rounded-lg cursor-pointer"
-                    onClick={toggleTheme}
-                >
-                    Theme
-                </button>
-
-                {currentUser ? (
-                    <button
-                        className="bg-btn-secondary text-txt-primary font-medium px-3 py-1 rounded-lg hover:bg-btn-secondary-hover cursor-pointer"
-                        onClick={handleSignOut}
-                    >
-                        Logout
-                    </button>
-                ) : (
+                {!currentUser ? (
                     <button
                         className="bg-btn-secondary text-txt-primary font-medium px-3 py-1 rounded-lg hover:bg-btn-secondary-hover cursor-pointer"
                         onClick={onLoginClick}
                     >
                         Sign In
                     </button>
-                )}
+                ) : null}
 
                 <Link
                     to="/upload"
@@ -210,7 +184,70 @@ export const Navbar = ({ onLoginClick }) => {
                 >
                     Upload
                 </Link>
+
+                {currentUser ? (
+                    <div className="relative group">
+                        {/* Profile Icon and Dropdown */}
+                        <button className="flex items-center text-btn-secondary group-hover:text-btn-secondary-hover">
+                            <FontAwesomeIcon icon={faUserCircle} className="text-3xl" />
+                        </button>
+
+                        <div className="absolute right-[-10px] top-full hidden group-hover:block font-medium bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[180px] z-10">
+                            <ul className="py-2">
+                                {/* User Name - Not clickable */}
+                                <li className="px-4 py-1 text-txt-muted text-lg">{currentUser?.displayName || "Username"}</li>
+
+                                <li className="border-t border-br-secondary mx-4"></li>
+                                
+                                <li>
+                                    <Link
+                                        to="/profile"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
+                                        aria-label="View Profile"
+                                    >
+                                        <FontAwesomeIcon icon={faUser} className="mr-2" />
+                                        Profile
+                                    </Link>
+                                </li>
+
+                                <li>
+                                    <Link
+                                        to="/profile"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
+                                        aria-label="Order History"
+                                    >
+                                        <FontAwesomeIcon icon={faList} className="mr-2" />
+                                        Order History
+                                    </Link>
+                                </li>
+
+                                <li>
+                                    <Link
+                                        to="/profile-settings"
+                                        className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
+                                        aria-label="Profile Settings"
+                                    >
+                                        <FontAwesomeIcon icon={faCog} className="mr-2" />
+                                        Settings
+                                    </Link>
+                                </li>
+
+                                <li>
+                                    <button
+                                        onClick={handleSignOut}
+                                        className="block min-w-[150px] cursor-pointer text-left mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
+                                        aria-label="Logout"
+                                    >
+                                        <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+                                        Logout
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                ) : null}
             </div>
+
         </header>
     );
 };
@@ -218,3 +255,64 @@ export const Navbar = ({ onLoginClick }) => {
 Navbar.propTypes = {
     onLoginClick: PropTypes.func.isRequired,
 };
+
+
+/*
+
+<div className="flex items-center space-x-4">
+{currentUser ? (
+    <button
+        className="bg-btn-secondary text-txt-primary font-medium px-3 py-1 rounded-lg hover:bg-btn-secondary-hover cursor-pointer"
+        onClick={handleSignOut}
+    >
+        Sign Out
+    </button>
+    
+) : (
+    <button
+        className="bg-btn-secondary text-txt-primary font-medium px-3 py-1 rounded-lg hover:bg-btn-secondary-hover cursor-pointer"
+        onClick={onLoginClick}
+    >
+        Sign In
+    </button>
+)}
+
+<Link
+    to="/upload"
+    className="bg-btn-primary text-white font-medium px-3 py-1 rounded-lg hover:bg-btn-primary-hover"
+>
+    Upload
+</Link>
+</div>
+{currentUser ? (<div className="relative group">
+<button className="flex items-center text-txt-secondary group-hover:text-txt-highlighted">
+    <FontAwesomeIcon icon={faUserCircle} className="text-3xl" />
+</button>
+
+<div className="absolute right-[-10px] top-full hidden group-hover:block font-medium bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[150px] z-10">
+    <ul className="py-2">
+        <li>
+            <Link to="/profile" className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary">
+                <FontAwesomeIcon icon={faUser} className="mr-2" />
+                Profile
+            </Link>
+        </li>
+        <li>
+            <Link to="/profile-settings" className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary">
+                <FontAwesomeIcon icon={faCog} className="mr-2" />
+                Settings
+            </Link>
+        </li>
+        <li>
+            <button onClick={handleSignOut} className="block min-w-[150px] cursor-pointer text-left mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary">
+                <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+                Logout
+            </button>
+        </li>
+    </ul>
+</div>
+</div>)
+:
+null}
+
+*/
