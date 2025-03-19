@@ -92,18 +92,12 @@ const UploadsSection = ({ artworks }) => (
 
     <div className="container mx-auto px-4 pb-8 text-txt-primary">
         <div
-            className="
-            grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 
-            gap-4">
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Replace with actual uploaded models */}
             {artworks.map((art) => (
                 <article
                     key={art.id}
-                    className="
-                    relative bg-bg-surface border border-br-primary 
-                    rounded-md overflow-hidden shadow-sm
-                    hover:shadow-md transition-shadow
-                    "
+                    className="relative bg-bg-surface border border-br-primary rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                 >
                     {/* Artwork image */}
                     <img
