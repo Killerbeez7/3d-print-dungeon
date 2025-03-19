@@ -1,7 +1,7 @@
 import { useAuth } from "../../../contexts/authContext"
 import { useState } from "react";
 
-export const UserProfile = () => {
+export const Profile = () => {
     const { currentUser } = useAuth();
     const [activeTab, setActiveTab] = useState("uploads");
 

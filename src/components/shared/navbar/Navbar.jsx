@@ -237,7 +237,7 @@ export const Navbar = ({ onLoginClick }) => {
                             </Link>
                         </li>
                         <li>
-                            <Link to="/settings" className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary">
+                            <Link to="/profile-settings" className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary">
                                 <FontAwesomeIcon icon={faCog} className="mr-2" />
                                 Settings
                             </Link>

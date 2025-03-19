@@ -32,8 +32,8 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
       const isTextInput =
         activeEl &&
         (activeEl.tagName === "INPUT" ||
-         activeEl.tagName === "TEXTAREA" ||
-         activeEl.isContentEditable);
+          activeEl.tagName === "TEXTAREA" ||
+          activeEl.isContentEditable);
 
       // If the event is in a text field, let the user use arrow keys, etc.
       if (isTextInput) return;
@@ -139,7 +139,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
         onClick={(e) => e.stopPropagation()} // Prevent closing on modal clicks
         className="
           relative w-full max-w-md p-6
-          bg-white text-txt-primary
+          bg-bg-surface text-txt-primary
           border border-br-primary
           rounded-md shadow-lg
           mx-auto top-1/2 -translate-y-1/2
@@ -154,7 +154,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
         </button>
 
         {/* TITLE */}
-        <h2 className="text-center text-accent text-2xl font-bold mb-5">
+        <h2 className="text-center text--txt-primary text-2xl font-bold mb-5">
           {isSignUp ? "Sign Up" : "Sign In"}
         </h2>
 
@@ -177,9 +177,9 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
               placeholder="you@example.com"
               className="
                 w-full px-3 py-2 
-                border border-br-primary rounded
+                border-2 border-br-primary rounded
                 bg-bgPrimary text-txt-primary
-                focus:outline-none focus:ring-2 focus:ring-accent
+                focus:outline-none focus:border-focus focus:ring-focus
               "
             />
           </div>
@@ -194,9 +194,9 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
               placeholder="Enter your password"
               className="
                 w-full px-3 py-2 
-                border border-br-primary rounded
+                border-2 border-br-primary rounded
                 bg-bgPrimary text-txt-primary
-                focus:outline-none focus:ring-2 focus:ring-accent
+                focus:outline-none focus:border-focus focus:ring-focus
               "
             />
           </div>
@@ -215,9 +215,9 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                 placeholder="Re-enter your password"
                 className="
                   w-full px-3 py-2 
-                  border border-br-primary rounded
+                  border-2 border-br-primary rounded
                   bg-bgPrimary text-txt-primary
-                  focus:outline-none focus:ring-2 focus:ring-accent
+                  focus:outline-none focus:border-focus focus:ring-focus
                 "
               />
             </div>
@@ -238,8 +238,8 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
             {loading
               ? "Processing..."
               : isSignUp
-              ? "Create Account"
-              : "Sign In"}
+                ? "Create Account"
+                : "Sign In"}
           </button>
         </form>
 
