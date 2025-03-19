@@ -71,7 +71,7 @@ export const Profile = () => {
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`px-4 py-2 font-medium text-lg ${activeTab === tab.id ? "border-b-2 border-primary text-txt-highlighted" : "text-txt-secondary hover:text-txt-highlighted"}`}
+                        className={`px-4 py-2 font-medium text-lg ${activeTab === tab.id ? "border-b-2 border-accent text-txt-primary" : "text-txt-secondary hover:text-txt-highlighted"}`}
                     >
                         {tab.label}
                     </button>

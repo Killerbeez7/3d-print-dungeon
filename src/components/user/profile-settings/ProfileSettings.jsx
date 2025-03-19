@@ -1,9 +1,19 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 import { useAuth } from "../../../contexts/authContext";
+import { useTheme } from "../../../utils/theme";
 
 export const ProfileSettings = () => {
     const { currentUser } = useAuth();
     const [activeTab, setActiveTab] = useState("account");
+
+    const [theme, setTheme] = useTheme();
+
+    const themes = [
+        { id: "system", label: "OS Default" },
+        { id: "light", label: "Light" },
+        { id: "dark", label: "Dark" }
+    ];
 
     const tabs = [
         { id: "account", label: "Account" },
@@ -26,18 +36,17 @@ export const ProfileSettings = () => {
                         {currentUser?.displayName || "Anonymous"}
                     </h2>
                 </div>
-                
+
                 <nav className="mt-6">
                     <ul className="space-y-2">
-                        {tabs.map(tab => (
+                        {tabs.map((tab) => (
                             <li key={tab.id}>
                                 <button
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`w-full text-left px-4 py-2 rounded-md font-medium ${
-                                        activeTab === tab.id
-                                            ? "bg-accent text-txt-highlighted"
-                                            : "text-txt-secondary hover:bg-bg-secondary hover:text-txt-highlighted"
-                                    }`}
+                                    className={`w-full text-left px-4 py-2 rounded-md font-medium ${activeTab === tab.id
+                                            ? "bg-accent text-white"
+                                            : "text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
+                                        }`}
                                 >
                                     {tab.label}
                                 </button>
@@ -46,10 +55,10 @@ export const ProfileSettings = () => {
                     </ul>
                 </nav>
             </aside>
-            
+
             {/* Main Content */}
             <section className="w-3/4 p-6 bg-bg-surface shadow-md rounded-lg">
-                {activeTab === "account" && <AccountSettings />}
+                {activeTab === "account" && <AccountSettings theme={theme} setTheme={setTheme} themes={themes} />}
                 {activeTab === "notifications" && <NotificationSettings />}
                 {activeTab === "security" && <SecuritySettings />}
                 {activeTab === "bio" && <BioSettings />}
@@ -58,13 +67,58 @@ export const ProfileSettings = () => {
     );
 };
 
-const AccountSettings = () => (
-    <div>
-        <h2 className="text-xl font-semibold text-txt-primary">Account Settings</h2>
-        <p className="text-txt-secondary mt-2">Manage your personal details.</p>
-        {/* Form Fields Here */}
-    </div>
-);
+const AccountSettings = ({ theme, setTheme, themes }) => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    return (
+        <div>
+            <h2 className="text-xl font-semibold text-txt-primary pb-2 border-b border-br-primary">
+                Account Settings
+            </h2>
+
+            <div className="flex items-center justify-between mt-4">
+                <p className="w-1/3 text-txt-secondary font-semibold">Theme Preference</p>
+
+                <div className="relative w-2/3">
+                    <div
+                        className="relative cursor-pointer border border-br-primary px-2 py-2 text-txt-primary bg-bg-primary"
+                        onClick={() => setIsOpen(!isOpen)}
+                    >
+                    <span>{themes.find((t) => t.id === theme)?.label || "Select Theme"}</span>
+                    </div>
+
+                    {isOpen && (
+                        <div className="absolute text-txt-secondary mt-1 bg-bg-primary w-full border border-br-primary shadow-md z-10">
+                            {themes.map((t) => (
+                                <button
+                                    key={t.id}
+                                    className="block w-full text-left px-2 py-2 hover:bg-bg-secondary hover:text-txt-primary hover:cursor-pointer transition"
+                                    onClick={() => {
+                                        setTheme(t.id);
+                                        setIsOpen(false);
+                                    }}
+                                >
+                                    {t.label}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+AccountSettings.propTypes = {
+    theme: PropTypes.string.isRequired,
+    setTheme: PropTypes.func.isRequired,
+    themes: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            label: PropTypes.string.isRequired
+        })
+    ).isRequired
+};
 
 const NotificationSettings = () => (
     <div>

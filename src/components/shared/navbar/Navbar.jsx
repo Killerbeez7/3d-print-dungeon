@@ -1,10 +1,8 @@
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
-import { useTheme } from "../../../utils/theme";
 import { useAuth } from "../../../contexts/authContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-    faCircleHalfStroke,
     faUserCircle,
     faSignOutAlt,
     faUser,
@@ -12,7 +10,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 export const Navbar = ({ onLoginClick }) => {
-    const [theme, toggleTheme] = useTheme();
     const { currentUser, handleSignOut } = useAuth();
 
     // Helper to disable click navigation
@@ -190,16 +187,6 @@ export const Navbar = ({ onLoginClick }) => {
             {/* Right Side: Theme / Auth / Upload */}
 
             <div className="flex items-center space-x-4">
-                <button
-                    className="outline-2 outline-br-primary text-txt-primary font-medium px-3 py-1 rounded-lg cursor-pointer"
-                    onClick={toggleTheme}
-                >
-                    <div>
-                        <FontAwesomeIcon icon={faCircleHalfStroke} className="text-txt-primary" />
-                        <span className="pl-2">Theme</span>
-                    </div>
-                </button>
-
                 {currentUser ? (
                     <button
                         className="bg-btn-secondary text-txt-primary font-medium px-3 py-1 rounded-lg hover:bg-btn-secondary-hover cursor-pointer"
