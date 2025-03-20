@@ -11,7 +11,6 @@ import { Business } from "./components/business/Business";
 // models
 import { ModelView } from "./components/model-view/ModelView";
 import { UploadModel } from "./components/upload-model/UploadModel";
-import { ModelDetails } from "./components/model-details/ModelDetails";
 // auth
 import { AuthProvider } from "./contexts/authContext";
 import { ModelsProvider } from "./contexts/modelsContext";
@@ -50,8 +49,6 @@ export default function App() {
                             {/* models */}
                             <Route path="/upload" element={<UploadModel />} />
                             <Route path="/model/:id" element={<ModelView />} />
-                            {/* Temporary Directory */}
-                            <Route path="/models/:id" element={<ModelDetails />} />
                             {/* common */}
                             <Route path="/" element={<Gallery />} />
                             <Route path="/3dstore" element={<Store />} />
