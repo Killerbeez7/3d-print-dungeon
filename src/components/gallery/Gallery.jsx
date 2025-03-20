@@ -1,110 +1,57 @@
-import React, { useState } from "react";
+// components/gallery/Gallery.jsx
+import { useState, useEffect } from "react";
+import { useModels } from "../../contexts/modelsContext";
+import { Link } from "react-router-dom";
 
 export const Gallery = () => {
-    // Mock data
-    const initialArtworks = [
-        {
-            id: 1,
-            title: "Cyber Samurai",
-            artist: "Jane Doe",
-            category: "3D",
-            imageUrl: "https://source.unsplash.com/random/400x300?cyber",
-            likes: 234,
-            views: 3214,
-        },
-        {
-            id: 2,
-            title: "Fantasy Landscape",
-            artist: "John Smith",
-            category: "Concept",
-            imageUrl: "https://source.unsplash.com/random/400x300?fantasy",
-            likes: 120,
-            views: 2100,
-        },
-        {
-            id: 3,
-            title: "Sci-Fi Mech",
-            artist: "Ali Chen",
-            category: "3D",
-            imageUrl: "https://source.unsplash.com/random/400x300?robot",
-            likes: 89,
-            views: 1002,
-        },
-        {
-            id: 4,
-            title: "Character Design",
-            artist: "Emily Brown",
-            category: "2D",
-            imageUrl: "https://source.unsplash.com/random/400x300?character",
-            likes: 500,
-            views: 6000,
-        },
-        {
-            id: 5,
-            title: "Nature Sculpt",
-            artist: "Mike Tron",
-            category: "3D",
-            imageUrl: "https://source.unsplash.com/random/400x300?nature",
-            likes: 76,
-            views: 900,
-        },
-        {
-            id: 6,
-            title: "Epic Spaceship",
-            artist: "Grace Lin",
-            category: "3D",
-            imageUrl: "https://source.unsplash.com/random/400x300?spaceship",
-            likes: 312,
-            views: 2002,
-        },
-        {
-            id: 7,
-            title: "Cinematic Scene",
-            artist: "Carla Stone",
-            category: "Concept",
-            imageUrl: "https://source.unsplash.com/random/400x300?cinematic",
-            likes: 151,
-            views: 1800,
-        },
-        {
-            id: 8,
-            title: "Dragon Sketch",
-            artist: "Leo Wang",
-            category: "2D",
-            imageUrl: "https://source.unsplash.com/random/400x300?dragon",
-            likes: 220,
-            views: 2300,
-        },
-    ];
+    const { models, loading } = useModels();
 
-    const [artworks, setArtworks] = useState(initialArtworks.slice(0, 8));
+    // We transform Firestore docs into "artworks" that your sorting/filter expects.
+    const [artworks, setArtworks] = useState([]);
     const [hasMore, setHasMore] = useState(true);
 
     // Sorting and filters
     const [sortBy, setSortBy] = useState("community"); // default
     const [categoryFilter, setCategoryFilter] = useState("all");
 
-    // For mock load-more
-    const handleLoadMore = () => {
-        // Pretend we fetch the next batch from server. We'll just re-use the same items for demonstration.
-        const nextBatch = initialArtworks;
-        setArtworks((prev) => [...prev, ...nextBatch]);
-        setHasMore(false); // assume no more data after second fetch
-    };
+    useEffect(() => {
+        if (!models) return;
+        // Transform Firestore docs -> "artworks"
+        const transformed = models.map((m) => ({
+            id: m.id,
+            title: m.name || "Untitled Model",
+            artist: m.userId || "Anonymous",
+            category: m.type || "3D",
+            imageUrl:
+                m.fileUrl ||
+                "https://source.unsplash.com/random/400x300?3dmodel",
+            likes: 0, // placeholder
+            views: 0, // placeholder
+        }));
+        setArtworks(transformed);
+    }, [models]);
 
-    // This is a mock; you can implement real sorting logic
+    if (loading) {
+        return <p className="p-4">Loading models...</p>;
+    }
+
+    // Sort & filter
     const sortedArtworks = applySorting(artworks, sortBy);
-    // This is a mock; you can implement real category logic
     const displayedArtworks = applyCategoryFilter(
         sortedArtworks,
         categoryFilter
     );
 
+    // Mock "Load More"
+    const handleLoadMore = () => {
+        setHasMore(false);
+    };
+
     return (
         <div className="bg-bg-primary text-txt-primary min-h-screen">
             {/* HERO HEADER */}
             <section className="relative bg-gradient-to-r from-accent to-accent-hover px-4 py-12">
-      
+                {/* keep hero banner or text here */}
             </section>
 
             {/* FILTERS / SORTING BAR */}
@@ -160,41 +107,46 @@ export const Gallery = () => {
           "
                 >
                     {displayedArtworks.map((art) => (
-                        <article
-                            key={art.id}
-                            className="
-                relative bg-bg-surface border border-br-primary 
-                rounded-md overflow-hidden shadow-sm
-                hover:shadow-md transition-shadow
-              "
-                        >
-                            {/* Artwork image */}
-                            <img
-                                src={art.imageUrl}
-                                alt={art.title}
-                                className="w-full h-auto object-cover"
-                            />
+                        <Link key={art.id} to={`/model/${art.id}`}>
+                            <article
+                                className="
+                  relative bg-bg-surface border border-br-primary 
+                  rounded-md overflow-hidden shadow-sm
+                  hover:shadow-md transition-shadow
+                "
+                            >
+                                {/* Artwork image */}
+                                <img
+                                    src={art.imageUrl}
+                                    alt={art.title}
+                                    style={{
+                                        width: "100%",
+                                        height: "200px",
+                                        objectFit: "cover",
+                                    }}
+                                />
 
-                            {/* Info area */}
-                            <div className="p-3">
-                                <h2 className="text-lg font-semibold mb-1">
-                                    {art.title}
-                                </h2>
-                                <p className="text-txt-secondary text-sm mb-2">
-                                    By {art.artist}
-                                </p>
-                                <div className="flex items-center justify-between text-sm">
-                                    <span className="text-txt-secondary">
-                                        <i className="fas fa-heart text-error mr-1"></i>
-                                        {art.likes}
-                                    </span>
-                                    <span className="text-txt-secondary">
-                                        <i className="fas fa-eye text-txt-highlight mr-1"></i>
-                                        {art.views}
-                                    </span>
+                                {/* Info area */}
+                                <div className="p-3">
+                                    <h2 className="text-lg font-semibold mb-1">
+                                        {art.title}
+                                    </h2>
+                                    <p className="text-txt-secondary text-sm mb-2">
+                                        By {art.artist}
+                                    </p>
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-txt-secondary">
+                                            <i className="fas fa-heart text-error mr-1"></i>
+                                            {art.likes}
+                                        </span>
+                                        <span className="text-txt-secondary">
+                                            <i className="fas fa-eye text-txt-highlight mr-1"></i>
+                                            {art.views}
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
-                        </article>
+                            </article>
+                        </Link>
                     ))}
                 </div>
 
@@ -219,17 +171,16 @@ export const Gallery = () => {
 };
 
 /**
- * Mock sorting function. You can replace
- * with real logic or a server-side call.
+ * Apply sorting to the artworks array
  */
 function applySorting(artworks, sortBy) {
     switch (sortBy) {
         case "popular":
-            // e.g. sort by likes descending
+            // sort by likes descending
             return [...artworks].sort((a, b) => b.likes - a.likes);
         case "latest":
-            // pretend 'id' is chronological
-            return [...artworks].sort((a, b) => b.id - a.id);
+            // no real "date" in these placeholders, but you can sort by ID or something else
+            return [...artworks];
         case "views":
             // sort by views descending
             return [...artworks].sort((a, b) => b.views - a.views);
@@ -240,9 +191,11 @@ function applySorting(artworks, sortBy) {
 }
 
 /**
- * Mock category filter
+ * Filter by category
  */
 function applyCategoryFilter(artworks, category) {
     if (category === "all") return artworks;
-    return artworks.filter((a) => a.category === category);
+    return artworks.filter(
+        (a) => a.category.toLowerCase() === category.toLowerCase()
+    );
 }
