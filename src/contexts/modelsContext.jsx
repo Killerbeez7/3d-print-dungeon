@@ -1,6 +1,5 @@
-// contexts/modelsContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { db } from "../firebaseConfig";
+import { db } from "../firebase/firebaseConfig";
 import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
 import { createAdvancedModel } from "../services/modelService";
 
@@ -11,7 +10,7 @@ export const ModelsProvider = ({ children }) => {
     const [models, setModels] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // 1) Real-time listening to "models" for the gallery
+    // Real-time listener
     useEffect(() => {
         setLoading(true);
         const q = query(collection(db, "models"), orderBy("createdAt", "desc"));
@@ -33,12 +32,10 @@ export const ModelsProvider = ({ children }) => {
         return () => unsubscribe();
     }, []);
 
-    // 2) Delegating advanced logic to the modelService
     async function createModelInContext(data) {
         setLoading(true);
         try {
             await createAdvancedModel(data);
-            // We do not manually add doc to local state, because onSnapshot handles that
             setLoading(false);
         } catch (err) {
             setLoading(false);
@@ -48,11 +45,7 @@ export const ModelsProvider = ({ children }) => {
 
     return (
         <ModelsContext.Provider
-            value={{
-                models,
-                loading,
-                createModelInContext,
-            }}
+            value={{ models, loading, createModelInContext }}
         >
             {children}
         </ModelsContext.Provider>

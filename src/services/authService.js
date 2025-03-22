@@ -1,5 +1,5 @@
 import { doc, setDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../firebaseConfig";
+import { auth, db } from "../firebase/firebaseConfig";
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
@@ -24,7 +24,7 @@ export const addUserToDatabase = async (
     uid,
     email,
     displayName = "Anonymous",
-    profilePicture = "https://example.com/default-profile.png"
+    photoURL = "https://example.com/default-profile.png"
 ) => {
     const userDocRef = doc(db, "users", uid);
     try {
@@ -33,7 +33,7 @@ export const addUserToDatabase = async (
             {
                 displayName,
                 email,
-                profilePicture,
+                photoURL,
                 createdAt: serverTimestamp(),
             },
             { merge: true }

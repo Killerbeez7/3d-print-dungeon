@@ -1,7 +1,10 @@
-import { createContext, useContext, useEffect, useState } from "react";
+// src/contexts/authContext.jsx
+import React, { createContext, useContext, useEffect, useState } from "react";
+import PropTypes from "prop-types";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebaseConfig";
+import { auth } from "../firebase/firebaseConfig";
 
+// If you have these in a separate file, keep them:
 import {
     signOutUser,
     signUpWithEmail,
@@ -22,14 +25,16 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
     const [authError, setAuthError] = useState("");
 
+    // Listen for auth changes
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setCurrentUser(user ? { ...user } : null);
+            setCurrentUser(user || null);
             setLoading(false);
         });
         return () => unsubscribe();
     }, []);
 
+    // Methods
     const handleEmailSignUp = async (email, password) => {
         try {
             setAuthError("");
@@ -37,9 +42,7 @@ export const AuthProvider = ({ children }) => {
             setCurrentUser(user);
         } catch (error) {
             console.error("Sign-up error:", error);
-            setAuthError(
-                error.message || "Failed to sign up. Please try again."
-            );
+            setAuthError(error.message || "Failed to sign up.");
             throw error;
         }
     };
@@ -51,9 +54,7 @@ export const AuthProvider = ({ children }) => {
             setCurrentUser(user);
         } catch (error) {
             console.error("Sign-in error:", error);
-            setAuthError(
-                error.message || "Failed to sign in. Please try again."
-            );
+            setAuthError(error.message || "Failed to sign in.");
             throw error;
         }
     };
@@ -65,7 +66,7 @@ export const AuthProvider = ({ children }) => {
             setCurrentUser(user);
         } catch (error) {
             console.error("Google sign-in error:", error);
-            setAuthError(error.message || "Failed to sign in with Google.");
+            setAuthError(error.message || "Failed with Google.");
             throw error;
         }
     };
@@ -77,7 +78,7 @@ export const AuthProvider = ({ children }) => {
             setCurrentUser(user);
         } catch (error) {
             console.error("Twitter sign-in error:", error);
-            setAuthError(error.message || "Failed to sign in with Twitter.");
+            setAuthError(error.message || "Failed with Twitter.");
             throw error;
         }
     };
@@ -89,7 +90,7 @@ export const AuthProvider = ({ children }) => {
             setCurrentUser(user);
         } catch (error) {
             console.error("Facebook sign-in error:", error);
-            setAuthError(error.message || "Failed to sign in with Facebook.");
+            setAuthError(error.message || "Failed with Facebook.");
             throw error;
         }
     };
@@ -122,4 +123,8 @@ export const AuthProvider = ({ children }) => {
             {!loading && children}
         </AuthContext.Provider>
     );
+};
+
+AuthProvider.propTypes = {
+    children: PropTypes.node.isRequired,
 };

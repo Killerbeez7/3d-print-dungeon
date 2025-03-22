@@ -1,3 +1,5 @@
+import "@google/model-viewer";
+
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 // common
@@ -55,8 +57,11 @@ export default function App() {
                             <Route path="/explore" element={<Explore />} />
                             <Route path="/gallery" element={<Gallery />} />
                             <Route path="/business" element={<Business />} />
-                            <Route path="/profile" element={<Profile/>} />
-                            <Route path="/profile-settings" element={<ProfileSettings />} />
+                            <Route path="/profile" element={<Profile />} />
+                            <Route
+                                path="/profile-settings"
+                                element={<ProfileSettings />}
+                            />
                         </Routes>
                     </ModelsProvider>
                 </main>
