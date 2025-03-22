@@ -1,32 +1,24 @@
-// components/gallery/Gallery.jsx
 import { useState, useEffect } from "react";
 import { useModels } from "../../contexts/modelsContext";
 import { Link } from "react-router-dom";
 
 export const Gallery = () => {
     const { models, loading } = useModels();
-
-    // We transform Firestore docs into "artworks" that your sorting/filter expects.
     const [artworks, setArtworks] = useState([]);
     const [hasMore, setHasMore] = useState(true);
-
-    // Sorting and filters
-    const [sortBy, setSortBy] = useState("community"); // default
+    const [sortBy, setSortBy] = useState("community");
     const [categoryFilter, setCategoryFilter] = useState("all");
 
     useEffect(() => {
         if (!models) return;
-        // Transform Firestore docs -> "artworks"
+        // transform Firestore docs -> "artworks"
         const transformed = models.map((m) => ({
             id: m.id,
             title: m.name || "Untitled Model",
             artist: m.userId || "Anonymous",
             category: m.type || "3D",
-            imageUrl:
-                m.fileUrl ||
-                "https://source.unsplash.com/random/400x300?3dmodel",
-            likes: 0, // placeholder
-            views: 0, // placeholder
+            likes: 0,
+            views: 0,
         }));
         setArtworks(transformed);
     }, [models]);
@@ -35,26 +27,22 @@ export const Gallery = () => {
         return <p className="p-4">Loading models...</p>;
     }
 
-    // Sort & filter
     const sortedArtworks = applySorting(artworks, sortBy);
     const displayedArtworks = applyCategoryFilter(
         sortedArtworks,
         categoryFilter
     );
 
-    // Mock "Load More"
     const handleLoadMore = () => {
         setHasMore(false);
     };
 
     return (
         <div className="bg-bg-primary text-txt-primary min-h-screen">
-            {/* HERO HEADER */}
             <section className="relative bg-gradient-to-r from-accent to-accent-hover px-4 py-12">
-                {/* keep hero banner or text here */}
+                {/* hero banner */}
             </section>
 
-            {/* FILTERS / SORTING BAR */}
             <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center mb-3 md:mb-0 space-x-2">
                     <label
@@ -97,36 +85,20 @@ export const Gallery = () => {
                 </div>
             </div>
 
-            {/* GALLERY GRID */}
             <div className="container mx-auto px-4 pb-8">
-                <div
-                    className="
-            grid grid-cols-1 
-            sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 
-            gap-4
-          "
-                >
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {displayedArtworks.map((art) => (
                         <Link key={art.id} to={`/model/${art.id}`}>
-                            <article
-                                className="
-                  relative bg-bg-surface border border-br-primary 
-                  rounded-md overflow-hidden shadow-sm
-                  hover:shadow-md transition-shadow
-                "
-                            >
-                                {/* Artwork image */}
-                                <img
-                                    src={art.imageUrl}
-                                    alt={art.title}
-                                    style={{
-                                        width: "100%",
-                                        height: "200px",
-                                        objectFit: "cover",
-                                    }}
-                                />
-
-                                {/* Info area */}
+                            <article className="relative bg-bg-surface border border-br-primary rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                                {/* <img
+                  src={art.imageUrl}
+                  alt={art.title}
+                  style={{
+                    width: "100%",
+                    height: "200px",
+                    objectFit: "cover",
+                  }}
+                /> */}
                                 <div className="p-3">
                                     <h2 className="text-lg font-semibold mb-1">
                                         {art.title}
@@ -150,16 +122,11 @@ export const Gallery = () => {
                     ))}
                 </div>
 
-                {/* LOAD MORE BUTTON */}
                 {hasMore && (
                     <div className="text-center mt-8">
                         <button
                             onClick={handleLoadMore}
-                            className="
-                bg-accent text-white py-2 px-6 rounded-full 
-                font-medium hover:bg-accent-hover 
-                transition-colors
-              "
+                            className="bg-accent text-white py-2 px-6 rounded-full font-medium hover:bg-accent-hover transition-colors"
                         >
                             Load More
                         </button>
@@ -170,29 +137,19 @@ export const Gallery = () => {
     );
 };
 
-/**
- * Apply sorting to the artworks array
- */
 function applySorting(artworks, sortBy) {
     switch (sortBy) {
         case "popular":
-            // sort by likes descending
             return [...artworks].sort((a, b) => b.likes - a.likes);
         case "latest":
-            // no real "date" in these placeholders, but you can sort by ID or something else
             return [...artworks];
         case "views":
-            // sort by views descending
             return [...artworks].sort((a, b) => b.views - a.views);
         default:
-            // "community" or default
             return artworks;
     }
 }
 
-/**
- * Filter by category
- */
 function applyCategoryFilter(artworks, category) {
     if (category === "all") return artworks;
     return artworks.filter(

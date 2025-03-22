@@ -1,10 +1,10 @@
-// modelService.js
+// src/services/modelService.js
 import { db, storage } from "../firebase/firebaseConfig";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 
-// Use the new finalConvertFileToGLB
-import { finalConvertFileToGLB } from "../utils/converter";
+// Unified final conversion for stl/obj
+import { finalConvertFileToGltf } from "../utils/converter";
 
 export async function createAdvancedModel({
     name,
@@ -39,16 +39,14 @@ export async function createAdvancedModel({
         );
     });
 
-    // 2) Convert to .glb if .stl or .obj (progress 50 -> 100%)
+    // 2) Convert to .gltf if .stl or .obj (progress 50 -> 100%)
     let convertedFileUrl = null;
     const lower = file.name.toLowerCase();
 
     if (lower.endsWith(".stl") || lower.endsWith(".obj")) {
-        // final .glb
-        const { blob } = await finalConvertFileToGLB(file);
+        const { blob } = await finalConvertFileToGltf(file);
         const baseName = file.name.replace(/\.[^/.]+$/, "");
-        // store with .glb extension
-        const convertedRef = ref(storage, `models/converted/${baseName}.glb`);
+        const convertedRef = ref(storage, `models/converted/${baseName}.gltf`);
         const convertedTask = uploadBytesResumable(convertedRef, blob);
 
         convertedFileUrl = await new Promise((resolve, reject) => {
@@ -57,6 +55,7 @@ export async function createAdvancedModel({
                 (snapshot) => {
                     const ratio =
                         snapshot.bytesTransferred / snapshot.totalBytes;
+                    // offset the progress from 50 -> 100
                     const offset = 50 + ratio * 50;
                     progressFn(offset);
                 },
@@ -82,7 +81,7 @@ export async function createAdvancedModel({
         tags,
         userId,
         originalFileUrl,
-        // store .glb if we have it, else fallback
+        // If we have a .gltf, use that; otherwise fallback to original
         convertedFileUrl: convertedFileUrl || originalFileUrl,
         createdAt: serverTimestamp(),
     };

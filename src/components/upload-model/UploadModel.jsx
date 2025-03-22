@@ -1,7 +1,7 @@
-// UploadModel.jsx
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useAuth } from "../../contexts/authContext";
 import { useModels } from "../../contexts/modelsContext";
+import { localConvertToGLBForPreview } from "../../utils/converter";
 
 export const UploadModel = () => {
     const { currentUser } = useAuth();
@@ -12,54 +12,85 @@ export const UploadModel = () => {
     const [tags, setTags] = useState("");
     const [file, setFile] = useState(null);
 
-    // Local preview
-    const [previewUrl, setPreviewUrl] = useState(null);
+    // For local 2-step preview
+    const [localPreviewUrl, setLocalPreviewUrl] = useState(null); // raw file URL
+    const [convertedUrl, setConvertedUrl] = useState(null); // .glb for local preview
 
-    // Progress states
-    const [uploadProgress, setUploadProgress] = useState(0);
+    const [isConverting, setIsConverting] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
 
-    // Drag & drop
-    function handleDragOver(e) {
-        e.preventDefault();
-    }
-    function handleDrop(e) {
-        e.preventDefault();
-        if (e.dataTransfer.files?.[0]) {
-            const droppedFile = e.dataTransfer.files[0];
-            setFile(droppedFile);
-            setPreviewUrl(URL.createObjectURL(droppedFile));
-        }
-    }
+    // Just references for a possible Web Worker scenario
+    const workerRef = useRef(null);
 
-    // On file select
     function handleFileChange(e) {
         if (e.target.files?.[0]) {
             const chosenFile = e.target.files[0];
             setFile(chosenFile);
-            setPreviewUrl(URL.createObjectURL(chosenFile));
+            setLocalPreviewUrl(URL.createObjectURL(chosenFile));
+            setConvertedUrl(null);
         }
     }
 
-    // On form submit
+    function handleDragOver(e) {
+        e.preventDefault();
+    }
+
+    function handleDrop(e) {
+        e.preventDefault();
+        if (e.dataTransfer.files?.[0]) {
+            const chosenFile = e.dataTransfer.files[0];
+            setFile(chosenFile);
+            setLocalPreviewUrl(URL.createObjectURL(chosenFile));
+            setConvertedUrl(null);
+        }
+    }
+
+    // Convert for local 3D preview
+    async function handleConvertPreview() {
+        if (!file) {
+            setError("No file selected.");
+            return;
+        }
+        const lower = file.name.toLowerCase();
+        if (!lower.endsWith(".stl") && !lower.endsWith(".obj")) {
+            setError("Only .stl/.obj supported for local preview conversion.");
+            return;
+        }
+
+        setIsConverting(true);
+        setError("");
+
+        try {
+            const { blob, blobUrl } = await localConvertToGLBForPreview(file);
+            setConvertedUrl(blobUrl);
+        } catch (err) {
+            console.error("Convert error:", err);
+            setError("Conversion failed. Check console for details.");
+        }
+
+        setIsConverting(false);
+    }
+
+    // Final "Publish"
     async function handleSubmit(e) {
         e.preventDefault();
         setError("");
         setUploadProgress(0);
 
         if (!file) {
-            setError("Please select a file");
+            setError("Please select a file first.");
             return;
         }
         if (!modelName.trim()) {
-            setError("Please enter a name");
+            setError("Please enter a model name.");
             return;
         }
 
         setIsUploading(true);
+
         try {
-            // Call context method
             await createModelInContext({
                 name: modelName,
                 description,
@@ -68,28 +99,28 @@ export const UploadModel = () => {
                 userId: currentUser?.uid || "anonymous",
                 onProgress: (p) => setUploadProgress(p),
             });
-
-            alert("Model uploaded successfully!");
-            // Reset
+            alert("Model published successfully!");
+            // reset
             setModelName("");
             setDescription("");
             setTags("");
             setFile(null);
-            setPreviewUrl(null);
+            setLocalPreviewUrl(null);
+            setConvertedUrl(null);
             setUploadProgress(0);
         } catch (err) {
-            console.error(err);
+            console.error("Publish error:", err);
             setError("Upload failed. Check console for details.");
         }
+
         setIsUploading(false);
     }
 
     return (
         <div className="min-h-screen p-8 flex flex-col items-center bg-bg-primary">
             <h1 className="text-3xl font-bold text-txt-primary mb-6">
-                Upload 3D Printable Model
+                Two-Step Model Upload
             </h1>
-
             {error && <p className="text-red-600 mb-4">{error}</p>}
 
             <form
@@ -97,8 +128,8 @@ export const UploadModel = () => {
                 className="w-full max-w-4xl bg-bg-surface rounded-lg shadow-xl p-6 space-y-6"
             >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Left Column */}
-                    <div className="space-y-6">
+                    {/* Left column */}
+                    <div className="space-y-4">
                         {/* Model Name */}
                         <div>
                             <label className="block text-txt-secondary font-medium mb-1">
@@ -108,8 +139,8 @@ export const UploadModel = () => {
                                 type="text"
                                 value={modelName}
                                 onChange={(e) => setModelName(e.target.value)}
-                                className="text-txt-primary placeholder-txt-muted w-full px-3 py-2 border-2 border-br-primary rounded-lg"
-                                placeholder="E.g. Medieval Castle Tower"
+                                className="w-full px-3 py-2 border border-br-primary rounded"
+                                placeholder="e.g. Medieval Castle"
                                 required
                             />
                         </div>
@@ -122,9 +153,8 @@ export const UploadModel = () => {
                             <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="text-txt-primary placeholder-txt-muted w-full px-3 py-2 border-2 border-br-primary rounded-lg"
+                                className="w-full px-3 py-2 border border-br-primary rounded"
                                 rows="4"
-                                placeholder="Dimensions, usage, etc."
                             />
                         </div>
 
@@ -137,93 +167,102 @@ export const UploadModel = () => {
                                 type="text"
                                 value={tags}
                                 onChange={(e) => setTags(e.target.value)}
-                                className="text-txt-primary placeholder-txt-muted w-full px-3 py-2 border-2 border-br-primary rounded-lg"
-                                placeholder="architecture, tower, etc."
+                                className="w-full px-3 py-2 border border-br-primary rounded"
                             />
                         </div>
 
-                        {/* Drag/Drop File */}
+                        {/* Drag/Drop */}
                         <div
-                            className="border-2 border-dashed border-br-primary rounded-lg p-6 text-center"
+                            className="border-2 border-dashed border-br-primary rounded p-4 text-center"
                             onDragOver={handleDragOver}
                             onDrop={handleDrop}
                         >
                             {file ? (
-                                <div className="flex flex-col items-center">
-                                    <i className="fas fa-check-circle text-success mb-2"></i>
-                                    <span className="text-txt-primary">
-                                        {file.name}
-                                    </span>
+                                <div>
+                                    <p>Selected file: {file.name}</p>
                                 </div>
                             ) : (
                                 <>
-                                    <p className="text-txt-primary mb-2">
-                                        Drag & drop your file here
-                                    </p>
-                                    <p className="text-txt-secondary text-sm">
-                                        or click below to browse
-                                    </p>
-                                    <div className="mt-4">
-                                        <label
-                                            htmlFor="fileInput"
-                                            className="bg-btn-primary text-white py-2 px-4 rounded cursor-pointer hover:bg-btn-primary-hover"
-                                        >
-                                            Choose a file
-                                        </label>
+                                    <p>Drag and drop .stl/.obj here</p>
+                                    <label className="mt-2 inline-block bg-btn-primary text-white px-4 py-2 rounded cursor-pointer">
+                                        Choose File
                                         <input
-                                            id="fileInput"
                                             type="file"
                                             accept=".stl,.obj,.zip"
                                             className="hidden"
                                             onChange={handleFileChange}
                                         />
-                                    </div>
+                                    </label>
                                 </>
                             )}
                         </div>
 
-                        {/* Progress Bar */}
+                        {/* Step 1: Convert & Preview */}
+                        <button
+                            type="button"
+                            disabled={!file || isConverting}
+                            onClick={handleConvertPreview}
+                            className="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
+                        >
+                            {isConverting
+                                ? "Converting..."
+                                : "Convert & Preview"}
+                        </button>
+
+                        {/* Step 2: Publish */}
                         {isUploading && (
-                            <div className="w-full bg-bg-secondary rounded-full h-4 mt-2">
+                            <div className="w-full bg-gray-300 rounded h-4 mt-2">
                                 <div
-                                    className="bg-accent h-4 rounded-full transition-all duration-200"
+                                    className="bg-blue-600 h-4 rounded"
                                     style={{ width: `${uploadProgress}%` }}
-                                ></div>
+                                />
                             </div>
                         )}
-
-                        {/* Submit Button */}
                         <button
                             type="submit"
-                            disabled={isUploading}
-                            className="w-full bg-btn-primary text-white text-lg font-medium py-2 rounded"
+                            disabled={isUploading || isConverting}
+                            className="w-full bg-btn-primary text-white py-2 rounded disabled:opacity-50"
                         >
-                            {isUploading ? "Uploading..." : "Publish Model"}
+                            {isUploading ? "Publishing..." : "Publish Model"}
                         </button>
                     </div>
 
-                    {/* Right Column: local preview */}
-                    <div className="flex flex-col items-center justify-center">
-                        <h2 className="text-xl font-bold text-txt-primary mb-4">
-                            Model Preview
+                    {/* Right column: local preview */}
+                    <div>
+                        <h2 className="text-xl font-bold mb-2">
+                            Local Preview
                         </h2>
-                        {previewUrl ? (
+                        {/* 1) Raw file preview (for .zip or .obj won't show 3D, but let's show an image anyway) */}
+                        {localPreviewUrl ? (
                             <img
-                                src={previewUrl}
-                                alt="Preview of uploaded model"
+                                src={localPreviewUrl}
+                                alt="File preview (raw)"
+                                className="w-full h-40 object-cover border"
+                            />
+                        ) : (
+                            <div className="w-full h-40 border flex items-center justify-center">
+                                <p>No raw preview</p>
+                            </div>
+                        )}
+
+                        {/* 2) 3D model-viewer from the local conversion */}
+                        <h3 className="mt-4 mb-2">3D Converted Preview</h3>
+                        {convertedUrl ? (
+                            <model-viewer
+                                src={convertedUrl}
+                                alt="Converted 3D"
+                                camera-controls
+                                auto-rotate
+                                crossOrigin="anonymous"
                                 style={{
                                     width: "100%",
-                                    height: "400px",
-                                    borderRadius: "0.5rem",
-                                    border: "1px solid var(--br-primary)",
-                                    objectFit: "cover",
+                                    height: "300px",
+                                    border: "1px solid #ccc",
                                 }}
                             />
                         ) : (
-                            <div className="flex items-center justify-center w-full h-64 border-2 border-dashed border-br-primary rounded-lg">
-                                <p className="text-txt-secondary">
-                                    No model preview
-                                </p>
+                            <div className="w-full h-40 border flex items-center justify-center">
+                                <p>No 3D conversion preview</p>
                             </div>
                         )}
                     </div>
