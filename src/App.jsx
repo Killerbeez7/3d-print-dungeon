@@ -11,8 +11,9 @@ import { Gallery } from "./components/gallery/Gallery";
 import { Explore } from "./components/explore/Explore";
 import { Business } from "./components/business/Business";
 // models
-import { ModelView } from "./components/model-view/ModelView";
-import { UploadModel } from "./components/upload-model/UploadModel";
+import { ModelUpload } from "./components/models/model-upload/ModelUpload";
+import { ModelView } from "./components/models/model-view/ModelView";
+import { ModelEdit } from "./components/models/model-edit/ModelEdit";
 // auth
 import { AuthProvider } from "./contexts/authContext";
 import { ModelsProvider } from "./contexts/modelsContext";
@@ -48,9 +49,6 @@ export default function App() {
                 <main className="flex-grow">
                     <ModelsProvider>
                         <Routes>
-                            {/* models */}
-                            <Route path="/upload" element={<UploadModel />} />
-                            <Route path="/model/:id" element={<ModelView />} />
                             {/* common */}
                             <Route path="/" element={<Gallery />} />
                             <Route path="/3dstore" element={<Store />} />
@@ -58,6 +56,14 @@ export default function App() {
                             <Route path="/gallery" element={<Gallery />} />
                             <Route path="/business" element={<Business />} />
                             <Route path="/profile" element={<Profile />} />
+                            {/* models */}
+                            <Route path="/upload" element={<ModelUpload />} />
+                            <Route path="/model/:id" element={<ModelView />} />
+                            <Route
+                                path="/model/:id/edit"
+                                element={<ModelEdit />}
+                            />
+                            {/* auth */}
                             <Route
                                 path="/profile-settings"
                                 element={<ProfileSettings />}

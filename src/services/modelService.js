@@ -1,9 +1,6 @@
-// modelService.js
 import { db, storage } from "../firebase/firebaseConfig";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-
-// Use the new finalConvertFileToGLB
 import { finalConvertFileToGLB } from "../utils/converter";
 
 export async function createAdvancedModel({
@@ -11,18 +8,19 @@ export async function createAdvancedModel({
     description,
     tags,
     file,
+    renderFiles, // now an array of render files
+    selectedRenderIndex, // index of the primary render image
     userId,
     onProgress,
 }) {
-    if (!file) throw new Error("No file provided");
+    if (!file) throw new Error("No model file provided");
     const progressFn = onProgress || (() => {});
     let progress = 0;
     progressFn(progress);
 
-    // 1) Upload original file (progress 0 -> 50%)
+    // 1) Upload original model file (0 -> 50%)
     const originalRef = ref(storage, `models/original/${file.name}`);
     const originalTask = uploadBytesResumable(originalRef, file);
-
     const originalFileUrl = await new Promise((resolve, reject) => {
         originalTask.on(
             "state_changed",
@@ -39,18 +37,14 @@ export async function createAdvancedModel({
         );
     });
 
-    // 2) Convert to .glb if .stl or .obj (progress 50 -> 100%)
+    // 2) Convert to .glb if needed (50 -> 100%)
     let convertedFileUrl = null;
     const lower = file.name.toLowerCase();
-
     if (lower.endsWith(".stl") || lower.endsWith(".obj")) {
-        // final .glb
         const { blob } = await finalConvertFileToGLB(file);
         const baseName = file.name.replace(/\.[^/.]+$/, "");
-        // store with .glb extension
         const convertedRef = ref(storage, `models/converted/${baseName}.glb`);
         const convertedTask = uploadBytesResumable(convertedRef, blob);
-
         convertedFileUrl = await new Promise((resolve, reject) => {
             convertedTask.on(
                 "state_changed",
@@ -70,28 +64,52 @@ export async function createAdvancedModel({
             );
         });
     } else {
-        // For other file types (e.g. .zip), just use the original
         convertedFileUrl = originalFileUrl;
         progressFn(100);
     }
 
-    // 3) Add doc to Firestore
+    // 3) If render files are provided, upload each one
+    let renderFileUrls = [];
+    if (renderFiles && renderFiles.length > 0) {
+        for (const file of renderFiles) {
+            const renderRef = ref(storage, `models/render/${file.name}`);
+            const renderTask = uploadBytesResumable(renderRef, file);
+            const url = await new Promise((resolve, reject) => {
+                renderTask.on(
+                    "state_changed",
+                    () => {},
+                    reject,
+                    async () => {
+                        const url = await getDownloadURL(
+                            renderTask.snapshot.ref
+                        );
+                        resolve(url);
+                    }
+                );
+            });
+            renderFileUrls.push(url);
+        }
+    }
+
+    // 4) Save document in Firestore with both an array and a primary render field
     const docData = {
         name,
         description,
         tags,
         userId,
         originalFileUrl,
-        // store .glb if we have it, else fallback
         convertedFileUrl: convertedFileUrl || originalFileUrl,
+        renderFileUrls: renderFileUrls.length > 0 ? renderFileUrls : null,
+        primaryRenderUrl: renderFileUrls[selectedRenderIndex] || null,
         createdAt: serverTimestamp(),
     };
 
     await addDoc(collection(db, "models"), docData);
     progressFn(100);
-
     return {
         originalFileUrl,
         convertedFileUrl: convertedFileUrl || originalFileUrl,
+        renderFileUrls,
+        primaryRenderUrl: renderFileUrls[selectedRenderIndex] || null,
     };
 }
