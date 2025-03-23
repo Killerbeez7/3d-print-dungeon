@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import { db } from "../firebase/firebaseConfig";
 import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
 import { createAdvancedModel } from "../services/modelService";
+import PropTypes from "prop-types";
 
 const ModelsContext = createContext();
 export const useModels = () => useContext(ModelsContext);
@@ -50,4 +51,8 @@ export const ModelsProvider = ({ children }) => {
             {children}
         </ModelsContext.Provider>
     );
+};
+
+ModelsProvider.propTypes = {
+    children: PropTypes.node.isRequired,
 };

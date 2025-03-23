@@ -28,7 +28,7 @@ export const ProfileSettings = () => {
             <aside className="w-1/4 p-4 bg-bg-surface shadow-md rounded-lg">
                 <div className="flex flex-col items-center text-center">
                     <img
-                        src={currentUser?.photoURL || "/default-avatar.png"}
+                        src={currentUser?.photoURL || "/user.png"}
                         alt="User Avatar"
                         className="w-24 h-24 rounded-full border-2 border-br-primary"
                     />
