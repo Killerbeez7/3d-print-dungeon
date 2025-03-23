@@ -1,4 +1,3 @@
-import React from "react";
 import { useParams } from "react-router-dom";
 import { useModels } from "../../contexts/modelsContext";
 import { getAuth } from "firebase/auth";

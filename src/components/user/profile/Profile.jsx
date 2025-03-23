@@ -55,7 +55,7 @@ export const Profile = () => {
             {/* Profile Header */}
             <div className="flex items-center space-x-4 p-6 bg-bg-surface shadow-md rounded-lg">
                 <img
-                    src={currentUser?.photoURL || "/default-avatar.png"}
+                    src={currentUser?.photoURL || "/user.png"}
                     alt="User Avatar"
                     className="w-20 h-20 rounded-full border-2 border-br-primary"
                 />
