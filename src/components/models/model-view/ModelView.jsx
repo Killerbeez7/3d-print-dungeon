@@ -1,36 +1,43 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useModels } from "../../../contexts/modelsContext";
 import { getAuth } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
+
+// Firestore functions for fetching uploader data
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+
+// Comments / Reviews
+import { Comments } from "../model-comments/ModelComments";
+import { CommentsProvider } from "../../../contexts/CommentsContext";
 
 export const ModelView = () => {
   const { id } = useParams();
   const { models, loading } = useModels();
   const auth = getAuth();
   const user = auth.currentUser;
-  const db = getFirestore(); // Initialize Firestore
+  const db = getFirestore(); // Firestore instance
 
-  // State for uploader's information
+  // State for the “uploader” info
   const [uploader, setUploader] = useState(null);
-  
-  // -1 means the main preview shows the 3D model
-  // 0..N means the main preview shows renderFileUrls[index]
+
+  // -1 means show the 3D model in main preview; 0..N means show that index from renderFileUrls
   const [selectedRenderIndex, setSelectedRenderIndex] = useState(-1);
 
+  // Once models are loaded, fetch the “uploader” user doc if it exists
   useEffect(() => {
-    // Get the model based on the ID from the URL params
     const model = models.find((m) => m.id === id);
     if (model && model.uploaderId) {
-      // Fetch user data using the uploaderId (this should match the user document name)
       const fetchUploader = async () => {
-        const userDocRef = doc(db, "users", model.uploaderId);
-        const userDoc = await getDoc(userDocRef);
-        if (userDoc.exists()) {
-          setUploader(userDoc.data()); // Set the uploader data to state
+        try {
+          const userDocRef = doc(db, "users", model.uploaderId);
+          const userDoc = await getDoc(userDocRef);
+          if (userDoc.exists()) {
+            setUploader(userDoc.data());
+          }
+        } catch (err) {
+          console.error("Error fetching uploader data:", err);
         }
       };
-
       fetchUploader();
     }
   }, [id, models, db]);
@@ -43,6 +50,7 @@ export const ModelView = () => {
     );
   }
 
+  // Find the model by ID
   const model = models.find((m) => m.id === id);
   if (!model) {
     return (
@@ -52,10 +60,10 @@ export const ModelView = () => {
     );
   }
 
-  // Renders array (images) from Firestore
+  // Gather render images
   const renderFileUrls = model.renderFileUrls || [];
 
-  // MAIN PREVIEW:
+  // Main preview logic
   const mainPreview =
     selectedRenderIndex === -1 ? (
       model.convertedFileUrl ? (
@@ -82,14 +90,11 @@ export const ModelView = () => {
       />
     );
 
-  // THUMBNAILS:
   return (
     <div className="bg-bg-primary text-txt-primary min-h-screen p-6 flex flex-col lg:flex-row gap-8">
-      {/* Left: Main Preview + Thumbnails */}
+      {/* Left side: main 3D preview & thumbnails */}
       <div className="flex-1">
         <div className="relative">{mainPreview}</div>
-
-        {/* Thumbnail row */}
         <div className="mt-4 flex space-x-4 overflow-x-auto pb-2">
           {/* 3D model thumbnail */}
           <div
@@ -97,7 +102,7 @@ export const ModelView = () => {
             className={`flex-shrink-0 w-20 h-20 border-4 rounded-md cursor-pointer overflow-hidden ${
               selectedRenderIndex === -1
                 ? "border-fuchsia-600"
-                : "border-transparent hover:fuchsia-600"
+                : "border-transparent hover:border-fuchsia-500"
             }`}
           >
             {model.convertedFileUrl ? (
@@ -117,7 +122,7 @@ export const ModelView = () => {
             )}
           </div>
 
-          {/* Render image thumbnails */}
+          {/* Render images thumbnails */}
           {renderFileUrls.map((url, idx) => (
             <div
               key={idx}
@@ -125,7 +130,7 @@ export const ModelView = () => {
               className={`flex-shrink-0 w-20 h-20 border-4 rounded-md cursor-pointer overflow-hidden ${
                 selectedRenderIndex === idx
                   ? "border-fuchsia-600"
-                  : "border-transparent hover:fuchsia-600"
+                  : "border-transparent hover:border-fuchsia-500"
               }`}
             >
               <img
@@ -138,23 +143,39 @@ export const ModelView = () => {
         </div>
       </div>
 
-      {/* Right: Sidebar with details and buttons */}
+      {/* Right side: info sidebar */}
       <aside className="w-full lg:w-[360px] bg-bg-surface p-6 rounded-md shadow-lg space-y-6">
-        {/* Artist info */}
-        {uploader && (
+        {/* Uploader info if we have it, otherwise fallback to current user */}
+        {uploader ? (
           <div className="flex items-center space-x-4 border-b pb-4">
             <img
-              src={uploader.photoURL}
-              alt={uploader.displayName}
+              src={uploader.photoURL || "/default-avatar.png"}
+              alt={uploader.displayName || "Unknown User"}
               className="w-16 h-16 rounded-full object-cover"
             />
             <div>
-              <h2 className="text-lg font-semibold">{uploader.displayName}</h2>
+              <h2 className="text-lg font-semibold">
+                {uploader.displayName || "Anonymous"}
+              </h2>
             </div>
           </div>
-        )}
+        ) : user ? (
+          // If no separate uploader doc, fallback to currentUser for display
+          <div className="flex items-center space-x-4 border-b pb-4">
+            <img
+              src={user.photoURL || "/default-avatar.png"}
+              alt={user.displayName || "Anonymous"}
+              className="w-16 h-16 rounded-full object-cover"
+            />
+            <div>
+              <h2 className="text-lg font-semibold">
+                {user.displayName || "Anonymous"}
+              </h2>
+            </div>
+          </div>
+        ) : null}
 
-        {/* Model Info */}
+        {/* Model info */}
         <div>
           <h1 className="text-2xl font-bold">{model.name}</h1>
           <p className="mt-2 text-gray-600">{model.description}</p>
@@ -184,7 +205,7 @@ export const ModelView = () => {
           </div>
         </div>
 
-        {/* Buttons */}
+        {/* Action buttons */}
         <div className="grid grid-cols-2 gap-2">
           <button className="bg-btn-secondary text-txt-primary font-medium py-2 rounded-lg hover:bg-btn-secondary-hover">
             Like
@@ -211,7 +232,7 @@ export const ModelView = () => {
             )}
         </div>
 
-        {/* Edit button for owner */}
+        {/* Edit button if current user is the model's owner */}
         {user && user.uid === model.userId && (
           <Link
             to={`/model/${model.id}/edit`}
@@ -220,6 +241,11 @@ export const ModelView = () => {
             Edit Model
           </Link>
         )}
+
+        {/* Comments Section */}
+        <CommentsProvider modelId={model.id}>
+          <Comments />
+        </CommentsProvider>
       </aside>
     </div>
   );
