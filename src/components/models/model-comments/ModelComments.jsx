@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useComments } from "../../../contexts/CommentsContext";
 import { useAuth } from "../../../contexts/authContext";
+import { FaStar } from "react-icons/fa";
 
 export const Comments = () => {
     const { currentUser } = useAuth();
@@ -10,14 +11,37 @@ export const Comments = () => {
     const [rating, setRating] = useState(0);
     const [error, setError] = useState("");
 
-    // State for editing an existing comment
+    // For editing an existing comment
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editingText, setEditingText] = useState("");
     const [editingRating, setEditingRating] = useState(0);
 
+    // Renders a row of stars for rating
+    const StarRating = ({ value, onChange, disabled = false, size = 20 }) => {
+        return (
+            <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                    <FaStar
+                        key={star}
+                        size={size}
+                        onClick={() => !disabled && onChange(star)}
+                        color={star <= value ? "#ffc107" : "#e4e5e9"}
+                        className={
+                            disabled
+                                ? "cursor-default"
+                                : "cursor-pointer hover:scale-105 transition-transform"
+                        }
+                    />
+                ))}
+            </div>
+        );
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!newComment.trim()) return;
+        // If both comment text and rating are empty, don't submit
+        if (!newComment.trim() && rating === 0) return;
+
         try {
             await submitComment({
                 text: newComment,
@@ -57,7 +81,8 @@ export const Comments = () => {
     };
 
     const saveEditing = async (commentId) => {
-        if (!editingText.trim()) return;
+        if (!editingText.trim() && editingRating === 0) return;
+
         try {
             await updateComment(commentId, {
                 text: editingText,
@@ -71,33 +96,35 @@ export const Comments = () => {
     };
 
     return (
-        <div className="mt-8 bg-bg-surface p-4 rounded shadow">
-            <h3 className="text-xl font-bold mb-4">Comments & Reviews</h3>
+        <div className="mt-8 bg-bg-surface p-5 rounded shadow-md space-y-4">
+            <h3 className="text-2xl font-bold mb-4 text-txt-primary">
+                Comments &amp; Reviews
+            </h3>
+
+            {error && <p className="text-red-600 text-sm">{error}</p>}
+
             {currentUser ? (
-                <form onSubmit={handleSubmit} className="mb-4">
+                <form onSubmit={handleSubmit} className="mb-4 space-y-3">
                     <textarea
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
-                        placeholder="Leave a comment..."
-                        className="w-full border border-br-primary rounded px-3 py-2 mb-2"
+                        placeholder="Leave a comment (optional)..."
+                        className="w-full border border-br-primary rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-accent"
                         rows="3"
                     />
-                    <div className="flex items-center space-x-2">
-                        <label className="text-sm">Rating:</label>
-                        <select
+                    <div className="flex items-center gap-3">
+                        <span className="text-sm text-txt-secondary">
+                            Rating:
+                        </span>
+                        <StarRating
                             value={rating}
-                            onChange={(e) => setRating(Number(e.target.value))}
-                            className="border border-br-primary rounded px-2 py-1"
-                        >
-                            {[0, 1, 2, 3, 4, 5].map((r) => (
-                                <option key={r} value={r}>
-                                    {r}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={setRating}
+                            disabled={!currentUser}
+                            size={20}
+                        />
                         <button
                             type="submit"
-                            className="bg-btn-primary text-white px-4 py-2 rounded"
+                            className="bg-btn-primary text-white px-4 py-2 rounded hover:bg-btn-primary-hover transition-colors"
                         >
                             Submit
                         </button>
@@ -105,14 +132,17 @@ export const Comments = () => {
                 </form>
             ) : (
                 <p className="text-sm text-gray-600 mb-4">
-                    Please sign in to comment.
+                    Please <span className="font-medium">sign in</span> to
+                    comment or rate.
                 </p>
             )}
 
             {loading ? (
-                <p>Loading comments...</p>
+                <p className="text-sm text-gray-500">Loading comments...</p>
             ) : comments.length === 0 ? (
-                <p className="text-sm text-gray-600">No comments yet.</p>
+                <p className="text-sm text-gray-500">
+                    No comments yet. Be the first to review!
+                </p>
             ) : (
                 <ul className="space-y-4">
                     {comments.map((comment) => {
@@ -121,12 +151,13 @@ export const Comments = () => {
                         const isEditing = editingCommentId === comment.id;
 
                         if (isEditing) {
+                            // Edit mode
                             return (
                                 <li
                                     key={comment.id}
-                                    className="border border-gray-300 rounded p-3"
+                                    className="border border-gray-200 rounded p-3"
                                 >
-                                    <div className="mb-2 text-sm font-semibold">
+                                    <div className="mb-2 text-sm font-semibold text-txt-primary">
                                         {comment.userName}
                                     </div>
                                     <textarea
@@ -134,41 +165,32 @@ export const Comments = () => {
                                         onChange={(e) =>
                                             setEditingText(e.target.value)
                                         }
-                                        className="w-full border border-br-primary rounded px-2 py-1 mb-2"
+                                        className="w-full border border-br-primary rounded px-2 py-1 mb-2 focus:outline-none focus:ring-1 focus:ring-accent"
                                         rows="2"
                                     />
-                                    <div className="flex items-center space-x-2 mb-2">
-                                        <label className="text-xs">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <span className="text-xs text-txt-secondary">
                                             Rating:
-                                        </label>
-                                        <select
+                                        </span>
+                                        <StarRating
                                             value={editingRating}
-                                            onChange={(e) =>
-                                                setEditingRating(
-                                                    Number(e.target.value)
-                                                )
-                                            }
-                                            className="border border-br-primary rounded px-1 py-0.5 text-xs"
-                                        >
-                                            {[0, 1, 2, 3, 4, 5].map((r) => (
-                                                <option key={r} value={r}>
-                                                    {r}
-                                                </option>
-                                            ))}
-                                        </select>
+                                            onChange={setEditingRating}
+                                            disabled={false}
+                                            size={16}
+                                        />
                                     </div>
-                                    <div className="flex space-x-2 justify-end">
+                                    <div className="flex justify-end gap-2">
                                         <button
                                             onClick={() =>
                                                 saveEditing(comment.id)
                                             }
-                                            className="bg-green-500 text-white text-xs px-2 py-1 rounded"
+                                            className="bg-green-500 text-white text-xs px-3 py-1 rounded hover:bg-green-600 transition-colors"
                                         >
                                             Save
                                         </button>
                                         <button
                                             onClick={cancelEditing}
-                                            className="bg-gray-300 text-xs px-2 py-1 rounded"
+                                            className="bg-gray-300 text-xs px-3 py-1 rounded hover:bg-gray-400 transition-colors"
                                         >
                                             Cancel
                                         </button>
@@ -177,23 +199,27 @@ export const Comments = () => {
                             );
                         }
 
+                        // Normal display mode
                         return (
                             <li
                                 key={comment.id}
-                                className="border border-gray-300 rounded p-3"
+                                className="border border-gray-200 rounded p-3"
                             >
                                 <div className="flex justify-between items-center mb-2">
-                                    <div className="text-sm font-semibold">
+                                    <div className="text-sm font-semibold text-txt-primary">
                                         {comment.userName}
                                     </div>
                                     <div className="text-xs text-gray-500">
-                                        {comment.rating
+                                        {comment.rating !== undefined &&
+                                        comment.rating !== null
                                             ? `Rating: ${comment.rating}/5`
                                             : ""}
                                     </div>
                                 </div>
-                                <p className="text-sm">{comment.text}</p>
-                                <div className="flex justify-end gap-2 mt-2">
+                                <p className="text-sm text-gray-700 whitespace-pre-line">
+                                    {comment.text}
+                                </p>
+                                <div className="flex justify-end gap-3 mt-2">
                                     {isOwner && (
                                         <>
                                             <button
@@ -220,7 +246,6 @@ export const Comments = () => {
                     })}
                 </ul>
             )}
-            {error && <p className="text-red-600 mt-2 text-sm">{error}</p>}
         </div>
     );
 };
