@@ -59,7 +59,7 @@ export default function App() {
                             <Route path="/business" element={<Business />} />
                             {/* profile */}
                             <Route path="/profile" element={<Profile />} />
-                            <Route path="/profile-settings" element={<ProfileSettings />} />
+                            <Route path="/settings" element={<ProfileSettings />} />
                             {/* models */}
                             <Route path="/upload" element={<ModelUpload />} />
                             <Route path="/model/:id" element={<ModelView />} />
