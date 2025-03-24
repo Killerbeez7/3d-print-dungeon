@@ -3,6 +3,7 @@ import { useAuth } from "../../../contexts/authContext";
 import { useModels } from "../../../contexts/modelsContext";
 import { UploadsSection } from "./UploadsSection";
 import { LikesSection } from "./LikesSection";
+import { AboutSection } from "./AboutSection";
 
 export const Profile = () => {
     const { currentUser } = useAuth();
@@ -13,7 +14,7 @@ export const Profile = () => {
     const tabs = [
         { id: "uploads", label: "Uploads" },
         { id: "likes", label: "Likes" },
-        // { id: "about", label: "About" }
+        { id: "about", label: "About" }
     ];
 
     // Fetch the user's uploads from models
@@ -70,7 +71,7 @@ export const Profile = () => {
             <div className="mt-6">
                 {activeTab === "uploads" && <UploadsSection artworks={userUploads} />}
                 {activeTab === "likes" && <LikesSection />}
-                {/* {activeTab === "about" && <AboutSection />} */}
+                {activeTab === "about" && <AboutSection />}
             </div>
         </div>
     );
