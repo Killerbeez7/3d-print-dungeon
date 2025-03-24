@@ -10,7 +10,7 @@ export async function createAdvancedModel({
     file,
     renderFiles, // now an array of render files
     selectedRenderIndex, // index of the primary render image
-    userId,
+    uploaderId,
     onProgress,
 }) {
     if (!file) throw new Error("No model file provided");
@@ -96,7 +96,7 @@ export async function createAdvancedModel({
         name,
         description,
         tags,
-        userId,
+        uploaderId,
         originalFileUrl,
         convertedFileUrl: convertedFileUrl || originalFileUrl,
         renderFileUrls: renderFileUrls.length > 0 ? renderFileUrls : null,

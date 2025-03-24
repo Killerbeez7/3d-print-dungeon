@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useAuth } from "../../../contexts/authContext";
 import { useModels } from "../../../contexts/modelsContext";
 import { localConvertToGLBForPreview } from "../../../utils/converter";
@@ -127,7 +127,7 @@ export const ModelUpload = () => {
                 // Pass multiple render files and the index of the primary render
                 renderFiles: modelData.renderFiles,
                 selectedRenderIndex: modelData.selectedRenderIndex,
-                userId: currentUser?.uid || "anonymous",
+                uploaderId: currentUser?.uid || "anonymous",
                 onProgress: setUploadProgress,
             });
             alert("Model published successfully!");
