@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useModels } from "../../contexts/modelsContext";
 import { Link } from "react-router-dom";
+import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
 
 export const Gallery = () => {
     const { models, loading } = useModels();
@@ -8,22 +9,44 @@ export const Gallery = () => {
     const [hasMore, setHasMore] = useState(true);
     const [sortBy, setSortBy] = useState("community");
     const [categoryFilter, setCategoryFilter] = useState("all");
+    const db = getFirestore(); // Initialize Firestore
 
     useEffect(() => {
         if (!models) return;
-        const transformed = models.map((m) => ({
-            id: m.id,
-            title: m.name || "Untitled Model",
-            artist: m.userId || "Anonymous",
-            category: m.type || "3D",
-            imageUrl:
-                m.primaryRenderUrl ||
-                "https://via.placeholder.com/400x300?text=No+Render",
-            likes: 0,
-            views: 0,
-        }));
-        setArtworks(transformed);
-    }, [models]);
+
+        const fetchUploaderData = async (model) => {
+            try {
+                const userDocRef = doc(db, "users", model.uploaderId);
+                const userDoc = await getDoc(userDocRef);
+                const uploaderData = userDoc.exists() ? userDoc.data() : null;
+                return uploaderData ? uploaderData.displayName : "Anonymous";
+            } catch (error) {
+                console.error("Error fetching uploader data:", error);
+                return "Anonymous";
+            }
+        };
+
+        const transformed = models.map(async (m) => {
+            const artistName = await fetchUploaderData(m);
+
+            return {
+                id: m.id,
+                title: m.name || "Untitled Model",
+                artist: artistName, // Add uploader's name here
+                category: m.type || "3D",
+                imageUrl:
+                    m.primaryRenderUrl ||
+                    "/image.png",
+                likes: 0,
+                views: 0,
+            };
+        });
+
+        // Resolve the promises and update the state
+        Promise.all(transformed).then((artworksData) => {
+            setArtworks(artworksData);
+        });
+    }, [models, db]);
 
     if (loading) {
         return <p className="p-4">Loading models...</p>;
