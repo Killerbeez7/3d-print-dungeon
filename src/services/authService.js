@@ -10,13 +10,14 @@ import {
     updateProfile,
     signOut,
 } from "firebase/auth";
+import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 
 // upscale profile picture
 export const getHighResPhotoURL = (photoURL) => {
     if (photoURL && photoURL.includes("googleusercontent.com")) {
         return photoURL.replace(/=s\d+-c/, "=s512-c");
     }
-    return photoURL || "https://example.com/default-profile.png";
+    return photoURL || "/user.png";
 };
 
 // add user to DB
@@ -24,7 +25,7 @@ export const addUserToDatabase = async (
     uid,
     email,
     displayName = "Anonymous",
-    photoURL = "https://example.com/default-profile.png"
+    photoURL = "/user.png"
 ) => {
     const userDocRef = doc(db, "users", uid);
     try {
@@ -168,6 +169,22 @@ export const signInWithTwitter = async () => {
         throw new Error(error.message);
     }
 };
+
+// Function to change password
+export const changePassword = async (currentUser, currentPassword, newPassword) => {
+    try {
+        // Reauthenticate the user with their current password
+        const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
+        await reauthenticateWithCredential(currentUser, credential);
+
+        // Update the password
+        await updatePassword(currentUser, newPassword);
+    } catch (error) {
+        console.error("Error updating password:", error);
+        throw new Error(error.message);
+    }
+};
+
 
 // Sign Out
 export const signOutUser = async () => {
