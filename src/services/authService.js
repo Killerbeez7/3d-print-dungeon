@@ -35,6 +35,8 @@ export const addUserToDatabase = async (
                 email,
                 photoURL,
                 createdAt: serverTimestamp(),
+                uploads: [],
+                likes: []
             },
             { merge: true }
         );
@@ -113,7 +115,7 @@ export const signInWithGoogle = async () => {
             user.uid,
             user.email,
             user.displayName || "Annonymous",
-            upscalePhotoURL
+            upscalePhotoURL || "/user.png"
         );
 
         return user;
@@ -135,7 +137,7 @@ export const signInWithFacebook = async () => {
             user.uid,
             user.email,
             user.displayName || "Facebook User",
-            upscalePhotoURL
+            upscalePhotoURL || "/user.png"
         );
 
         return user;
@@ -157,7 +159,7 @@ export const signInWithTwitter = async () => {
             user.uid,
             user.email,
             user.displayName || "Twitter User",
-            upscalePhotoURL
+            upscalePhotoURL || "/user.png"
         );
 
         return user;
