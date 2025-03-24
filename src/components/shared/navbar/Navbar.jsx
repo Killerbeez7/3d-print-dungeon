@@ -223,7 +223,7 @@ export const Navbar = ({ onLoginClick }) => {
 
                                 <li>
                                     <Link
-                                        to="/profile-settings"
+                                        to="/settings"
                                         className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                         aria-label="Profile Settings"
                                     >

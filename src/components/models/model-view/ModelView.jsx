@@ -1,17 +1,39 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useModels } from "../../../contexts/modelsContext";
 import { getAuth } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
 
 export const ModelView = () => {
   const { id } = useParams();
   const { models, loading } = useModels();
   const auth = getAuth();
   const user = auth.currentUser;
+  const db = getFirestore(); // Initialize Firestore
 
+  // State for uploader's information
+  const [uploader, setUploader] = useState(null);
+  
   // -1 means the main preview shows the 3D model
   // 0..N means the main preview shows renderFileUrls[index]
   const [selectedRenderIndex, setSelectedRenderIndex] = useState(-1);
+
+  useEffect(() => {
+    // Get the model based on the ID from the URL params
+    const model = models.find((m) => m.id === id);
+    if (model && model.uploaderId) {
+      // Fetch user data using the uploaderId (this should match the user document name)
+      const fetchUploader = async () => {
+        const userDocRef = doc(db, "users", model.uploaderId);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          setUploader(userDoc.data()); // Set the uploader data to state
+        }
+      };
+
+      fetchUploader();
+    }
+  }, [id, models, db]);
 
   if (loading) {
     return (
@@ -34,8 +56,6 @@ export const ModelView = () => {
   const renderFileUrls = model.renderFileUrls || [];
 
   // MAIN PREVIEW:
-  // If selectedRenderIndex === -1 => show 3D model
-  // Otherwise => show that render image
   const mainPreview =
     selectedRenderIndex === -1 ? (
       model.convertedFileUrl ? (
@@ -63,8 +83,6 @@ export const ModelView = () => {
     );
 
   // THUMBNAILS:
-  // The first thumbnail is a *small* <model-viewer> for the 3D model
-  // The rest are images from renderFileUrls
   return (
     <div className="bg-bg-primary text-txt-primary min-h-screen p-6 flex flex-col lg:flex-row gap-8">
       {/* Left: Main Preview + Thumbnails */}
@@ -89,7 +107,6 @@ export const ModelView = () => {
                 camera-controls
                 auto-rotate
                 style={{ width: "100%", height: "100%" }}
-                // For a small thumbnail, we might disable environment for speed
                 environment-image="neutral"
                 className="object-cover"
               ></model-viewer>
@@ -123,18 +140,16 @@ export const ModelView = () => {
 
       {/* Right: Sidebar with details and buttons */}
       <aside className="w-full lg:w-[360px] bg-bg-surface p-6 rounded-md shadow-lg space-y-6">
-        {/* If user is logged in, show user info */}
-        {user && (
+        {/* Artist info */}
+        {uploader && (
           <div className="flex items-center space-x-4 border-b pb-4">
             <img
-              src={user.photoURL || "/default-avatar.png"}
-              alt={user.displayName || "Anonymous"}
+              src={uploader.photoURL}
+              alt={uploader.displayName}
               className="w-16 h-16 rounded-full object-cover"
             />
             <div>
-              <h2 className="text-lg font-semibold">
-                {user.displayName || "Anonymous"}
-              </h2>
+              <h2 className="text-lg font-semibold">{uploader.displayName}</h2>
             </div>
           </div>
         )}

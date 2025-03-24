@@ -18,8 +18,10 @@ import { ModelEdit } from "./components/models/model-edit/ModelEdit";
 import { AuthProvider } from "./contexts/authContext";
 import { ModelsProvider } from "./contexts/modelsContext";
 import { AuthModal } from "./components/auth-modal/AuthModal";
-import { ProfileSettings } from "./components/user/profile-settings/ProfileSettings";
-import { Profile } from "./components/user/profile/Profile";
+
+
+import { ProfileSettings } from "./components/profile/profile-settings/ProfileSettings";
+import { Profile } from "./components/profile/profile/Profile";
 
 export default function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,19 +57,14 @@ export default function App() {
                             <Route path="/explore" element={<Explore />} />
                             <Route path="/gallery" element={<Gallery />} />
                             <Route path="/business" element={<Business />} />
+                            {/* profile */}
                             <Route path="/profile" element={<Profile />} />
+                            <Route path="/settings" element={<ProfileSettings />} />
                             {/* models */}
                             <Route path="/upload" element={<ModelUpload />} />
                             <Route path="/model/:id" element={<ModelView />} />
-                            <Route
-                                path="/model/:id/edit"
-                                element={<ModelEdit />}
-                            />
-                            {/* auth */}
-                            <Route
-                                path="/profile-settings"
-                                element={<ProfileSettings />}
-                            />
+                            <Route path="/model/:id/edit" element={<ModelEdit />} />
+                           
                         </Routes>
                     </ModelsProvider>
                 </main>
