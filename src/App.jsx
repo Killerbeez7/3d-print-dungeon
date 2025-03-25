@@ -11,7 +11,7 @@ import { Gallery } from "./components/gallery/Gallery";
 import { Explore } from "./components/explore/Explore";
 import { Business } from "./components/business/Business";
 // models
-import { ModelUpload } from "./components/models/model-upload/ModelUploadOld";
+import { ModelUpload } from "./components/models/model-upload/ModelUpload";
 import { ModelView } from "./components/models/model-view/ModelView";
 import { ModelEdit } from "./components/models/model-edit/ModelEdit";
 // contexts
