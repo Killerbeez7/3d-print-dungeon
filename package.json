@@ -18,6 +18,7 @@
         "@google/model-viewer": "^4.0.0",
         "@tailwindcss/vite": "^4.0.9",
         "firebase": "^11.5.0",
+        "lazysizes": "^5.3.2",
         "prop-types": "^15.8.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
