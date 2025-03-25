@@ -105,14 +105,18 @@ export const Gallery = () => {
                     {displayedArtworks.map((art) => (
                         <Link key={art.id} to={`/model/${art.id}`}>
                             <article className="relative bg-bg-surface border border-br-primary rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                                <img
-                                    src={art.imageUrl}
-                                    alt={art.title}
-                                    loading="lazy"
-                                    width="400"
-                                    height="200"
-                                    className="w-full h-[200px] object-cover"
-                                />
+                                <picture>
+                                    <source type="image/webp">
+                                        <img
+                                            src={art.imageUrl}
+                                            alt={art.title}
+                                            loading="lazy"
+                                            width="400"
+                                            height="200"
+                                            className="w-full h-[200px] object-cover"
+                                        />
+                                    </source>
+                                </picture>
                                 <div className="p-3">
                                     <h2 className="text-lg font-semibold mb-1">
                                         {art.title}
