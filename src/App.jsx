@@ -11,7 +11,7 @@ import { Gallery } from "./components/gallery/Gallery";
 import { Explore } from "./components/explore/Explore";
 import { Business } from "./components/business/Business";
 // models
-import { ModelUpload } from "./components/models/model-upload/ModelUpload";
+import { ModelUpload } from "./components/models/model-upload/ModelUploadOld";
 import { ModelView } from "./components/models/model-view/ModelView";
 import { ModelEdit } from "./components/models/model-edit/ModelEdit";
 // auth
@@ -19,9 +19,9 @@ import { AuthProvider } from "./contexts/authContext";
 import { ModelsProvider } from "./contexts/modelsContext";
 import { AuthModal } from "./components/auth-modal/AuthModal";
 
-
-import { ProfileSettings } from "./components/profile/profile-settings/ProfileSettings";
-import { Profile } from "./components/profile/profile/Profile";
+import { ArtistProfile } from "./components/artists/artist-profile/ArtistProfile";
+import { ProfileSettings } from "./components/settings/ProfileSettings";
+import { Artists } from "./components/artists/artists/Artists";
 
 export default function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -55,11 +55,12 @@ export default function App() {
                             <Route path="/" element={<Gallery />} />
                             <Route path="/3dstore" element={<Store />} />
                             <Route path="/explore" element={<Explore />} />
-                            <Route path="/gallery" element={<Gallery />} />
                             <Route path="/business" element={<Business />} />
-                            {/* profile */}
-                            <Route path="/profile" element={<Profile />} />
                             <Route path="/settings" element={<ProfileSettings />} />
+                            {/* artists */}
+
+                            <Route path="/artists" element={<Artists />} />
+                            <Route path="/artist/:uid" element={<ArtistProfile />} />
                             {/* models */}
                             <Route path="/upload" element={<ModelUpload />} />
                             <Route path="/model/:id" element={<ModelView />} />
