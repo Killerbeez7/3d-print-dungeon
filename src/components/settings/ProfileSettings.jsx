@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "../../../contexts/authContext";
+import { useAuth } from "../../contexts/authContext";
 import { AccountSettings } from "./AccountSettings";
 // import { NotificationSettings } from "./NotificationSettings";
 import { SecuritySettings } from "./SecuritySettings";

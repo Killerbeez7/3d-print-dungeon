@@ -55,7 +55,7 @@ export const Navbar = ({ onLoginClick }) => {
                             <ul className="py-2">
                                 <li>
                                     <Link
-                                        to="/gallery"
+                                        to="/"
                                         className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                     >
                                         Gallery
@@ -201,7 +201,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 
                                 <li>
                                     <Link
-                                        to="/profile"
+                                        to={`/artist/${currentUser?.uid}`}
                                         className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                         aria-label="View Profile"
                                     >
@@ -255,64 +255,3 @@ export const Navbar = ({ onLoginClick }) => {
 Navbar.propTypes = {
     onLoginClick: PropTypes.func.isRequired,
 };
-
-
-/*
-
-<div className="flex items-center space-x-4">
-{currentUser ? (
-    <button
-        className="bg-btn-secondary text-txt-primary font-medium px-3 py-1 rounded-lg hover:bg-btn-secondary-hover cursor-pointer"
-        onClick={handleSignOut}
-    >
-        Sign Out
-    </button>
-    
-) : (
-    <button
-        className="bg-btn-secondary text-txt-primary font-medium px-3 py-1 rounded-lg hover:bg-btn-secondary-hover cursor-pointer"
-        onClick={onLoginClick}
-    >
-        Sign In
-    </button>
-)}
-
-<Link
-    to="/upload"
-    className="bg-btn-primary text-white font-medium px-3 py-1 rounded-lg hover:bg-btn-primary-hover"
->
-    Upload
-</Link>
-</div>
-{currentUser ? (<div className="relative group">
-<button className="flex items-center text-txt-secondary group-hover:text-txt-highlighted">
-    <FontAwesomeIcon icon={faUserCircle} className="text-3xl" />
-</button>
-
-<div className="absolute right-[-10px] top-full hidden group-hover:block font-medium bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[150px] z-10">
-    <ul className="py-2">
-        <li>
-            <Link to="/profile" className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary">
-                <FontAwesomeIcon icon={faUser} className="mr-2" />
-                Profile
-            </Link>
-        </li>
-        <li>
-            <Link to="/profile-settings" className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary">
-                <FontAwesomeIcon icon={faCog} className="mr-2" />
-                Settings
-            </Link>
-        </li>
-        <li>
-            <button onClick={handleSignOut} className="block min-w-[150px] cursor-pointer text-left mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary">
-                <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
-                Logout
-            </button>
-        </li>
-    </ul>
-</div>
-</div>)
-:
-null}
-
-*/
