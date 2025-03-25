@@ -14,14 +14,16 @@ import { Business } from "./components/business/Business";
 import { ModelUpload } from "./components/models/model-upload/ModelUploadOld";
 import { ModelView } from "./components/models/model-view/ModelView";
 import { ModelEdit } from "./components/models/model-edit/ModelEdit";
-// auth
+// contexts
 import { AuthProvider } from "./contexts/authContext";
 import { ModelsProvider } from "./contexts/modelsContext";
 import { AuthModal } from "./components/auth-modal/AuthModal";
-
+// profiles
 import { ArtistProfile } from "./components/artists/artist-profile/ArtistProfile";
 import { ProfileSettings } from "./components/settings/ProfileSettings";
 import { Artists } from "./components/artists/artists/Artists";
+// dev
+import { AdminPanel } from "./components/admin-panel/AdminPanel";
 
 export default function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -51,6 +53,8 @@ export default function App() {
                 <main className="flex-grow">
                     <ModelsProvider>
                         <Routes>
+                            {/* admin */}
+                            <Route path="/admin-panel" element={<AdminPanel />} />
                             {/* common */}
                             <Route path="/" element={<Gallery />} />
                             <Route path="/3dstore" element={<Store />} />
@@ -65,7 +69,6 @@ export default function App() {
                             <Route path="/upload" element={<ModelUpload />} />
                             <Route path="/model/:id" element={<ModelView />} />
                             <Route path="/model/:id/edit" element={<ModelEdit />} />
-                           
                         </Routes>
                     </ModelsProvider>
                 </main>
