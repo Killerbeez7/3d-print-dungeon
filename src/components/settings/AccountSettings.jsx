@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTheme } from "../../../utils/theme";
+import { useTheme } from "../../utils/theme";
 
 const themes = [
     { id: "system", label: "OS Default" },

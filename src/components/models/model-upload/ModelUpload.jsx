@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "../../../contexts/authContext";
 import { useModels } from "../../../contexts/modelsContext";
-import { localConvertToGLBForPreview } from "../../../utils/converter";
+import { handleFileChange, handleRenderFilesChange, handleConvertPreview } from "../../../services/modelService";
 
 export const ModelUpload = () => {
     const { currentUser } = useAuth();
     const { createModelInContext } = useModels();
 
-    // Extend state to include multiple render images and the index of the primary one
     const [modelData, setModelData] = useState({
         name: "",
         description: "",
@@ -15,94 +14,14 @@ export const ModelUpload = () => {
         file: null,
         localPreviewUrl: null,
         convertedUrl: null,
-        // New fields for render images:
         renderFiles: [],
         renderPreviewUrls: [],
-        selectedRenderIndex: 0, // default: first render image
+        selectedRenderIndex: 0,
     });
     const [isConverting, setIsConverting] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
-
-    const handleDragOver = (e) => e.preventDefault();
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        const file = e.dataTransfer.files?.[0];
-        if (file) {
-            setModelData((prev) => ({
-                ...prev,
-                file,
-                localPreviewUrl: URL.createObjectURL(file),
-                convertedUrl: null,
-            }));
-        }
-    };
-
-    // Handler for main model file
-    const handleFileChange = (e) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const lower = file.name.toLowerCase();
-            if (lower.endsWith(".gltf") || lower.endsWith(".glb")) {
-                setModelData((prev) => ({
-                    ...prev,
-                    file,
-                    localPreviewUrl: URL.createObjectURL(file),
-                    convertedUrl: URL.createObjectURL(file),
-                }));
-            } else {
-                setModelData((prev) => ({
-                    ...prev,
-                    file,
-                    localPreviewUrl: URL.createObjectURL(file),
-                    convertedUrl: null,
-                }));
-            }
-        }
-    };
-
-    // New handler for multiple render images (allow multiple selection)
-    const handleRenderFilesChange = (e) => {
-        const files = Array.from(e.target.files);
-        const previewUrls = files.map((f) => URL.createObjectURL(f));
-        setModelData((prev) => ({
-            ...prev,
-            renderFiles: files,
-            renderPreviewUrls: previewUrls,
-            selectedRenderIndex: 0, // default to the first image
-        }));
-    };
-
-    const handleConvertPreview = async () => {
-        if (!modelData.file) {
-            setError("No file selected.");
-            return;
-        }
-        const lower = modelData.file.name.toLowerCase();
-        if (lower.endsWith(".gltf") || lower.endsWith(".glb")) {
-            setError("GLTF/GLB files don't require conversion.");
-            return;
-        }
-        if (!lower.endsWith(".stl") && !lower.endsWith(".obj")) {
-            setError("Only .stl/.obj supported for local preview conversion.");
-            return;
-        }
-        setIsConverting(true);
-        setError("");
-        try {
-            const { blobUrl } = await localConvertToGLBForPreview(
-                modelData.file
-            );
-            setModelData((prev) => ({ ...prev, convertedUrl: blobUrl }));
-        } catch (err) {
-            console.error("Convert error:", err);
-            setError("Conversion failed. Check console for details.");
-        } finally {
-            setIsConverting(false);
-        }
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -124,7 +43,6 @@ export const ModelUpload = () => {
                 description: modelData.description,
                 tags: modelData.tags.split(",").map((t) => t.trim()),
                 file: modelData.file,
-                // Pass multiple render files and the index of the primary render
                 renderFiles: modelData.renderFiles,
                 selectedRenderIndex: modelData.selectedRenderIndex,
                 uploaderId: currentUser?.uid || "anonymous",
@@ -153,75 +71,47 @@ export const ModelUpload = () => {
 
     return (
         <div className="min-h-screen p-8 flex flex-col items-center bg-bg-primary">
-            <h1 className="text-3xl font-bold text-txt-primary mb-6">
-                Two-Step Model Upload
-            </h1>
+            <h1 className="text-3xl font-bold text-txt-primary mb-6">Two-Step Model Upload</h1>
             {error && <p className="text-fuchsia-600 mb-4">{error}</p>}
 
-            <form
-                onSubmit={handleSubmit}
-                className="w-full max-w-4xl bg-bg-surface rounded-lg shadow-xl p-6 space-y-6"
-            >
+            <form onSubmit={handleSubmit} className="w-full max-w-4xl bg-bg-surface rounded-lg shadow-xl p-6 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Left column */}
                     <div className="space-y-4">
+                        {/* Model Name, Description, Tags */}
+                        {/* Handle inputs for name, description, tags */}
                         <div>
-                            <label className="block text-txt-secondary font-medium mb-1">
-                                Model Name
-                            </label>
+                            <label className="block text-txt-secondary font-medium mb-1">Model Name</label>
                             <input
                                 type="text"
                                 value={modelData.name}
-                                onChange={(e) =>
-                                    setModelData((prev) => ({
-                                        ...prev,
-                                        name: e.target.value,
-                                    }))
-                                }
+                                onChange={(e) => setModelData((prev) => ({ ...prev, name: e.target.value }))}
                                 className="w-full px-3 py-2 border border-br-primary rounded"
                                 placeholder="e.g. Medieval Castle"
                                 required
                             />
                         </div>
                         <div>
-                            <label className="block text-txt-secondary font-medium mb-1">
-                                Description
-                            </label>
+                            <label className="block text-txt-secondary font-medium mb-1">Description</label>
                             <textarea
                                 value={modelData.description}
-                                onChange={(e) =>
-                                    setModelData((prev) => ({
-                                        ...prev,
-                                        description: e.target.value,
-                                    }))
-                                }
+                                onChange={(e) => setModelData((prev) => ({ ...prev, description: e.target.value }))}
                                 className="w-full px-3 py-2 border border-br-primary rounded"
                                 rows="4"
                             />
                         </div>
                         <div>
-                            <label className="block text-txt-secondary font-medium mb-1">
-                                Tags (comma-separated)
-                            </label>
+                            <label className="block text-txt-secondary font-medium mb-1">Tags (comma-separated)</label>
                             <input
                                 type="text"
                                 value={modelData.tags}
-                                onChange={(e) =>
-                                    setModelData((prev) => ({
-                                        ...prev,
-                                        tags: e.target.value,
-                                    }))
-                                }
+                                onChange={(e) => setModelData((prev) => ({ ...prev, tags: e.target.value }))}
                                 className="w-full px-3 py-2 border border-br-primary rounded"
                             />
                         </div>
 
                         {/* Model file input */}
-                        <div
-                            className="border-2 border-dashed border-br-primary rounded p-4 text-center"
-                            onDragOver={handleDragOver}
-                            onDrop={handleDrop}
-                        >
+                        <div className="border-2 border-dashed border-br-primary rounded p-4 text-center">
                             {modelData.file ? (
                                 <p>Selected file: {modelData.file.name}</p>
                             ) : (
@@ -233,60 +123,33 @@ export const ModelUpload = () => {
                                             type="file"
                                             accept=".stl,.obj,.zip,.gltf,.glb"
                                             className="hidden"
-                                            onChange={handleFileChange}
+                                            onChange={(e) => handleFileChange(e, setModelData)}
                                         />
                                     </label>
                                 </>
                             )}
                         </div>
 
-                        {/* New render images input */}
+                        {/* Render images input */}
                         <div className="border-2 border-dashed border-br-primary rounded p-4 text-center">
                             {modelData.renderFiles.length > 0 ? (
                                 <div>
-                                    <p>
-                                        {modelData.renderFiles.length} render
-                                        file(s) selected.
-                                    </p>
+                                    <p>{modelData.renderFiles.length} render file(s) selected.</p>
                                     <div className="flex space-x-2 mt-2 overflow-auto">
-                                        {modelData.renderPreviewUrls.map(
-                                            (url, index) => (
-                                                <div
-                                                    key={index}
-                                                    className={`cursor-pointer border-4 ${
-                                                        modelData.selectedRenderIndex ===
-                                                        index
-                                                            ? "border-fuchsia-600"
-                                                            : "border-transparent"
-                                                    }`}
-                                                    onClick={() =>
-                                                        setModelData(
-                                                            (prev) => ({
-                                                                ...prev,
-                                                                selectedRenderIndex:
-                                                                    index,
-                                                            })
-                                                        )
-                                                    }
-                                                >
-                                                    <img
-                                                        src={url}
-                                                        alt={`Render ${
-                                                            index + 1
-                                                        }`}
-                                                        className="w-20 h-20 object-cover"
-                                                    />
-                                                </div>
-                                            )
-                                        )}
+                                        {modelData.renderPreviewUrls.map((url, index) => (
+                                            <div
+                                                key={index}
+                                                className={`cursor-pointer border-4 ${modelData.selectedRenderIndex === index ? "border-fuchsia-600" : "border-transparent"}`}
+                                                onClick={() => setModelData((prev) => ({ ...prev, selectedRenderIndex: index }))}
+                                            >
+                                                <img src={url} alt={`Render ${index + 1}`} className="w-20 h-20 object-cover" />
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             ) : (
                                 <>
-                                    <p>
-                                        Upload render images for gallery preview
-                                        (JPEG/PNG, multiple allowed)
-                                    </p>
+                                    <p>Upload render images for gallery preview (JPEG/PNG, multiple allowed)</p>
                                     <label className="mt-2 inline-block bg-btn-primary text-white px-4 py-2 rounded cursor-pointer">
                                         Choose Render Files
                                         <input
@@ -294,7 +157,7 @@ export const ModelUpload = () => {
                                             accept="image/*"
                                             multiple
                                             className="hidden"
-                                            onChange={handleRenderFilesChange}
+                                            onChange={(e) => handleRenderFilesChange(e, setModelData)}
                                         />
                                     </label>
                                 </>
@@ -304,20 +167,15 @@ export const ModelUpload = () => {
                         <button
                             type="button"
                             disabled={!modelData.file || isConverting}
-                            onClick={handleConvertPreview}
+                            onClick={() => handleConvertPreview(modelData.file, setModelData, setIsConverting, setError)}
                             className="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
                         >
-                            {isConverting
-                                ? "Converting..."
-                                : "Convert & Preview"}
+                            {isConverting ? "Converting..." : "Convert & Preview"}
                         </button>
 
                         {isUploading && (
                             <div className="w-full bg-gray-300 rounded h-4 mt-2">
-                                <div
-                                    className="bg-blue-600 h-4 rounded"
-                                    style={{ width: `${uploadProgress}%` }}
-                                />
+                                <div className="bg-blue-600 h-4 rounded" style={{ width: `${uploadProgress}%` }} />
                             </div>
                         )}
 
@@ -332,49 +190,31 @@ export const ModelUpload = () => {
 
                     {/* Right column: local preview */}
                     <div>
-                        <h2 className="text-xl font-bold mb-2">
-                            Local Preview
-                        </h2>
+                        {/* Local Preview */}
+                        <h2 className="text-xl font-bold mb-2">Local Preview</h2>
                         {modelData.localPreviewUrl ? (
-                            <img
-                                src={modelData.localPreviewUrl}
-                                alt="File preview (raw)"
-                                className="w-full h-40 object-cover border"
-                            />
+                            <img src={modelData.localPreviewUrl} alt="File preview (raw)" className="w-full h-40 object-cover border" />
                         ) : (
                             <div className="w-full h-40 border flex items-center justify-center">
                                 <p>No raw preview</p>
                             </div>
                         )}
 
+                        {/* 3D Preview */}
                         <h3 className="mt-4 mb-2">3D Converted Preview</h3>
                         {modelData.convertedUrl ? (
-                            <model-viewer
-                                src={modelData.convertedUrl}
-                                alt="Converted 3D"
-                                camera-controls
-                                auto-rotate
-                                crossOrigin="anonymous"
-                                style={{
-                                    width: "100%",
-                                    height: "300px",
-                                    border: "1px solid #ccc",
-                                }}
-                            />
+                            <model-viewer src={modelData.convertedUrl} alt="Converted 3D" camera-controls auto-rotate crossOrigin="anonymous" style={{ width: "100%", height: "300px", border: "1px solid #ccc" }} />
                         ) : (
                             <div className="w-full h-40 border flex items-center justify-center">
                                 <p>No 3D conversion preview</p>
                             </div>
                         )}
 
+                        {/* Render Image Preview */}
                         <h3 className="mt-4 mb-2">Render Image Preview</h3>
                         {modelData.renderPreviewUrls.length > 0 ? (
                             <img
-                                src={
-                                    modelData.renderPreviewUrls[
-                                        modelData.selectedRenderIndex
-                                    ]
-                                }
+                                src={modelData.renderPreviewUrls[modelData.selectedRenderIndex]}
                                 alt="Primary Render Preview"
                                 className="w-full h-40 object-cover border"
                             />
