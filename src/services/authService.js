@@ -1,4 +1,4 @@
-import { doc, setDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
+import { doc, setDoc, onSnapshot, serverTimestamp, collection, getDocs } from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
 import {
     createUserWithEmailAndPassword,
@@ -20,7 +20,7 @@ export const getHighResPhotoURL = (photoURL) => {
     return photoURL || "/user.png";
 };
 
-// add user to DB
+// Add user to Firestore
 export const addUserToDatabase = async (
     uid,
     email,
@@ -47,7 +47,7 @@ export const addUserToDatabase = async (
     }
 };
 
-// get user from DB
+// Get user from Firestore
 export const getUserFromDatabase = (uid, callback) => {
     const userDocRef = doc(db, "users", uid);
     const unsubscribe = onSnapshot(
@@ -56,7 +56,7 @@ export const getUserFromDatabase = (uid, callback) => {
             if (snapshot.exists()) {
                 callback(snapshot.data());
             } else {
-                callback(null);
+                callback(null); // Return null if user does not exist
             }
         },
         (error) => {
@@ -65,6 +65,31 @@ export const getUserFromDatabase = (uid, callback) => {
         }
     );
     return unsubscribe;
+};
+
+export const getAllArtists = async () => {
+    const usersCollectionRef = collection(db, "users");
+    try {
+        // Fetch all users
+        const userDocs = await getDocs(usersCollectionRef);
+        const artistsWithUploads = [];
+
+        userDocs.forEach((doc) => {
+            const userData = doc.data();
+            // Check if the user has uploads (assuming `uploads` is an array in each user's doc)
+            if (userData.uploads && userData.uploads.length > 0) {
+                artistsWithUploads.push({
+                    id: doc.id,
+                    ...userData,
+                });
+            }
+        });
+
+        return artistsWithUploads;
+    } catch (error) {
+        console.error("Error fetching artists:", error);
+        return []; // Return empty array if something goes wrong
+    }
 };
 
 // Email Sign Up
@@ -115,7 +140,7 @@ export const signInWithGoogle = async () => {
         await addUserToDatabase(
             user.uid,
             user.email,
-            user.displayName || "Annonymous",
+            user.displayName || "Anonymous",
             upscalePhotoURL || "/user.png"
         );
 
