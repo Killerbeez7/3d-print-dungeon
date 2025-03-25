@@ -8,6 +8,8 @@
     2.Gallery/modelView - add low res placeholder then load the actual render,
          add lazy loading, add img dimensions for better SEO and web app structure
 
+    EXAMPLE: <img lowsrc=lo-res.jpg src=hi-res.jpg alt>
+
     3.converter - change the scene options for better view and faster loading
 ```
 
