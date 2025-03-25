@@ -9,7 +9,7 @@ export const Gallery = () => {
     const [hasMore, setHasMore] = useState(true);
     const [sortBy, setSortBy] = useState("community");
     const [categoryFilter, setCategoryFilter] = useState("all");
-    const db = getFirestore(); // Initialize Firestore
+    const db = getFirestore();
 
     useEffect(() => {
         if (!models) return;
@@ -29,20 +29,22 @@ export const Gallery = () => {
         const transformed = models.map(async (m) => {
             const artistName = await fetchUploaderData(m);
 
+            // Fallback logic for older docs that lack 'primaryRenderLowResUrl'
+            const lowResOrPlaceholder =
+                m.primaryRenderLowResUrl || m.primaryRenderUrl || "/placeholder-blur.jpg";
+
             return {
                 id: m.id,
                 title: m.name || "Untitled Model",
-                artist: artistName, // Add uploader's name here
+                artist: artistName,
                 category: m.type || "3D",
-                imageUrl:
-                    m.primaryRenderUrl ||
-                    "/image.png",
-                likes: 0,
-                views: 0,
+                // The gallery image is the best placeholder or low-res
+                imageUrl: lowResOrPlaceholder,
+                likes: m.likes || 0,
+                views: m.views || 0,
             };
         });
 
-        // Resolve the promises and update the state
         Promise.all(transformed).then((artworksData) => {
             setArtworks(artworksData);
         });
@@ -53,10 +55,7 @@ export const Gallery = () => {
     }
 
     const sortedArtworks = applySorting(artworks, sortBy);
-    const displayedArtworks = applyCategoryFilter(
-        sortedArtworks,
-        categoryFilter
-    );
+    const displayedArtworks = applyCategoryFilter(sortedArtworks, categoryFilter);
 
     const handleLoadMore = () => {
         setHasMore(false);
@@ -69,10 +68,7 @@ export const Gallery = () => {
             </section>
             <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center mb-3 md:mb-0 space-x-2">
-                    <label
-                        htmlFor="category"
-                        className="text-txt-secondary font-medium"
-                    >
+                    <label htmlFor="category" className="text-txt-secondary font-medium">
                         Category:
                     </label>
                     <select
@@ -88,10 +84,7 @@ export const Gallery = () => {
                     </select>
                 </div>
                 <div className="flex items-center space-x-2">
-                    <label
-                        htmlFor="sortBy"
-                        className="text-txt-secondary font-medium"
-                    >
+                    <label htmlFor="sortBy" className="text-txt-secondary font-medium">
                         Sort by:
                     </label>
                     <select
@@ -115,11 +108,10 @@ export const Gallery = () => {
                                 <img
                                     src={art.imageUrl}
                                     alt={art.title}
-                                    style={{
-                                        width: "100%",
-                                        height: "200px",
-                                        objectFit: "cover",
-                                    }}
+                                    loading="lazy"
+                                    width="400"
+                                    height="200"
+                                    className="w-full h-[200px] object-cover"
                                 />
                                 <div className="p-3">
                                     <h2 className="text-lg font-semibold mb-1">
@@ -173,7 +165,5 @@ function applySorting(artworks, sortBy) {
 
 function applyCategoryFilter(artworks, category) {
     if (category === "all") return artworks;
-    return artworks.filter(
-        (a) => a.category.toLowerCase() === category.toLowerCase()
-    );
+    return artworks.filter((a) => a.category.toLowerCase() === category.toLowerCase());
 }

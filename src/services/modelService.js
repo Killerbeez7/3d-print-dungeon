@@ -1,5 +1,12 @@
 import { db, storage } from "../firebase/firebaseConfig";
-import { collection, addDoc, serverTimestamp, doc, updateDoc, arrayUnion } from "firebase/firestore";  // <-- Import arrayUnion here
+import {
+    collection,
+    addDoc,
+    serverTimestamp,
+    doc,
+    updateDoc,
+    arrayUnion,
+} from "firebase/firestore"; // <-- Import arrayUnion here
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { finalConvertFileToGLB } from "../utils/converter";
 
@@ -50,16 +57,13 @@ export async function createAdvancedModel({
             convertedTask.on(
                 "state_changed",
                 (snapshot) => {
-                    const ratio =
-                        snapshot.bytesTransferred / snapshot.totalBytes;
+                    const ratio = snapshot.bytesTransferred / snapshot.totalBytes;
                     const offset = 50 + ratio * 50;
                     progressFn(offset);
                 },
                 reject,
                 async () => {
-                    const url = await getDownloadURL(
-                        convertedTask.snapshot.ref
-                    );
+                    const url = await getDownloadURL(convertedTask.snapshot.ref);
                     resolve(url);
                 }
             );
@@ -81,9 +85,7 @@ export async function createAdvancedModel({
                     () => {},
                     reject,
                     async () => {
-                        const url = await getDownloadURL(
-                            renderTask.snapshot.ref
-                        );
+                        const url = await getDownloadURL(renderTask.snapshot.ref);
                         resolve(url);
                     }
                 );
@@ -108,11 +110,11 @@ export async function createAdvancedModel({
     // 5) Update the user’s uploads array with the new model ID
     const userRef = doc(db, "users", uploaderId);
     await updateDoc(userRef, {
-        uploads: arrayUnion(modelDocRef.id),  // <-- Use arrayUnion here
+        uploads: arrayUnion(modelDocRef.id), // <-- Use arrayUnion here
     });
 
     progressFn(100);
-    
+
     return {
         modelId: modelDocRef.id,
         originalFileUrl,
