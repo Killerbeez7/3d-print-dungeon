@@ -1,4 +1,11 @@
-import { doc, setDoc, onSnapshot, serverTimestamp, collection, getDocs } from "firebase/firestore";
+import {
+    doc,
+    setDoc,
+    onSnapshot,
+    serverTimestamp,
+    collection,
+    getDocs,
+} from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
 import {
     createUserWithEmailAndPassword,
@@ -10,7 +17,11 @@ import {
     updateProfile,
     signOut,
 } from "firebase/auth";
-import { updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+import {
+    updatePassword,
+    reauthenticateWithCredential,
+    EmailAuthProvider,
+} from "firebase/auth";
 
 // upscale profile picture
 export const getHighResPhotoURL = (photoURL) => {
@@ -37,7 +48,7 @@ export const addUserToDatabase = async (
                 photoURL,
                 createdAt: serverTimestamp(),
                 uploads: [],
-                likes: []
+                likes: [],
             },
             { merge: true }
         );
@@ -196,10 +207,17 @@ export const signInWithTwitter = async () => {
 };
 
 // Function to change password
-export const changePassword = async (currentUser, currentPassword, newPassword) => {
+export const changePassword = async (
+    currentUser,
+    currentPassword,
+    newPassword
+) => {
     try {
         // Reauthenticate the user with their current password
-        const credential = EmailAuthProvider.credential(currentUser.email, currentPassword);
+        const credential = EmailAuthProvider.credential(
+            currentUser.email,
+            currentPassword
+        );
         await reauthenticateWithCredential(currentUser, credential);
 
         // Update the password

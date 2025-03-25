@@ -1,7 +1,7 @@
 import { db, storage } from "../firebase/firebaseConfig";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { finalConvertFileToGLB } from "../utils/converter";
+import { finalConvertFileToGLB, localConvertToGLBForPreview } from "../utils/converter";
 
 export async function createAdvancedModel({
     name,
@@ -112,4 +112,58 @@ export async function createAdvancedModel({
         renderFileUrls,
         primaryRenderUrl: renderFileUrls[selectedRenderIndex] || null,
     };
+}
+
+// Extracted file handling logic
+export function handleFileChange(e, setModelData) {
+    const file = e.target.files?.[0];
+    if (file) {
+        const lower = file.name.toLowerCase();
+        setModelData((prev) => ({
+            ...prev,
+            file,
+            localPreviewUrl: URL.createObjectURL(file),
+            convertedUrl: lower.endsWith(".gltf") || lower.endsWith(".glb") ? URL.createObjectURL(file) : null,
+        }));
+    }
+}
+
+// Handle render image files
+export function handleRenderFilesChange(e, setModelData) {
+    const files = Array.from(e.target.files);
+    const previewUrls = files.map((f) => URL.createObjectURL(f));
+    setModelData((prev) => ({
+        ...prev,
+        renderFiles: files,
+        renderPreviewUrls: previewUrls,
+        selectedRenderIndex: 0, // default to first
+    }));
+}
+
+// Handle converting preview (stl/obj to glb)
+export async function handleConvertPreview(file, setModelData, setIsConverting, setError) {
+    if (!file) {
+        setError("No file selected.");
+        return;
+    }
+    const lower = file.name.toLowerCase();
+    if (lower.endsWith(".gltf") || lower.endsWith(".glb")) {
+        setError("GLTF/GLB files don't require conversion.");
+        return;
+    }
+    if (!lower.endsWith(".stl") && !lower.endsWith(".obj")) {
+        setError("Only .stl/.obj supported for local preview conversion.");
+        return;
+    }
+    setIsConverting(true);
+    setError("");
+    try {
+        const { blobUrl } = await localConvertToGLBForPreview(file);
+        setModelData((prev) => ({ ...prev, convertedUrl: blobUrl }));
+    } catch (err) {
+        console.error("Convert error:", err);
+        setError("Conversion failed. Check console for details.");
+    } finally {
+        setIsConverting(false);
+    }
 }
