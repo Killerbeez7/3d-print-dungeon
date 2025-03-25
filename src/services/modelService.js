@@ -1,8 +1,9 @@
 import { db, storage } from "../firebase/firebaseConfig";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, doc, updateDoc, arrayUnion } from "firebase/firestore";  // <-- Import arrayUnion here
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { finalConvertFileToGLB, localConvertToGLBForPreview } from "../utils/converter";
+import { finalConvertFileToGLB } from "../utils/converter";
 
+// Function to create a model and update user uploads array
 export async function createAdvancedModel({
     name,
     description,
@@ -91,8 +92,8 @@ export async function createAdvancedModel({
         }
     }
 
-    // 4) Save document in Firestore with both an array and a primary render field
-    const docData = {
+    // 4) Save model document in Firestore
+    const modelDocRef = await addDoc(collection(db, "models"), {
         name,
         description,
         tags,
@@ -102,68 +103,21 @@ export async function createAdvancedModel({
         renderFileUrls: renderFileUrls.length > 0 ? renderFileUrls : null,
         primaryRenderUrl: renderFileUrls[selectedRenderIndex] || null,
         createdAt: serverTimestamp(),
-    };
+    });
 
-    await addDoc(collection(db, "models"), docData);
+    // 5) Update the user’s uploads array with the new model ID
+    const userRef = doc(db, "users", uploaderId);
+    await updateDoc(userRef, {
+        uploads: arrayUnion(modelDocRef.id),  // <-- Use arrayUnion here
+    });
+
     progressFn(100);
+    
     return {
+        modelId: modelDocRef.id,
         originalFileUrl,
         convertedFileUrl: convertedFileUrl || originalFileUrl,
         renderFileUrls,
         primaryRenderUrl: renderFileUrls[selectedRenderIndex] || null,
     };
-}
-
-// Extracted file handling logic
-export function handleFileChange(e, setModelData) {
-    const file = e.target.files?.[0];
-    if (file) {
-        const lower = file.name.toLowerCase();
-        setModelData((prev) => ({
-            ...prev,
-            file,
-            localPreviewUrl: URL.createObjectURL(file),
-            convertedUrl: lower.endsWith(".gltf") || lower.endsWith(".glb") ? URL.createObjectURL(file) : null,
-        }));
-    }
-}
-
-// Handle render image files
-export function handleRenderFilesChange(e, setModelData) {
-    const files = Array.from(e.target.files);
-    const previewUrls = files.map((f) => URL.createObjectURL(f));
-    setModelData((prev) => ({
-        ...prev,
-        renderFiles: files,
-        renderPreviewUrls: previewUrls,
-        selectedRenderIndex: 0, // default to first
-    }));
-}
-
-// Handle converting preview (stl/obj to glb)
-export async function handleConvertPreview(file, setModelData, setIsConverting, setError) {
-    if (!file) {
-        setError("No file selected.");
-        return;
-    }
-    const lower = file.name.toLowerCase();
-    if (lower.endsWith(".gltf") || lower.endsWith(".glb")) {
-        setError("GLTF/GLB files don't require conversion.");
-        return;
-    }
-    if (!lower.endsWith(".stl") && !lower.endsWith(".obj")) {
-        setError("Only .stl/.obj supported for local preview conversion.");
-        return;
-    }
-    setIsConverting(true);
-    setError("");
-    try {
-        const { blobUrl } = await localConvertToGLBForPreview(file);
-        setModelData((prev) => ({ ...prev, convertedUrl: blobUrl }));
-    } catch (err) {
-        console.error("Convert error:", err);
-        setError("Conversion failed. Check console for details.");
-    } finally {
-        setIsConverting(false);
-    }
 }
