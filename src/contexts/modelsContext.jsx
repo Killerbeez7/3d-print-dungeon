@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { db } from "../firebase/firebaseConfig";
 import { collection, query, onSnapshot, orderBy, where } from "firebase/firestore";
-import { createAdvancedModel } from "../services/modelService";
 import PropTypes from "prop-types";
+import { createAdvancedModel } from "../services/modelService";
 
 const ModelsContext = createContext();
 
