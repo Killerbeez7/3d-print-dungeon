@@ -4,7 +4,7 @@ export const AboutSection = () => {
     const { currentUser } = useAuth();
 
     return (
-        <div className="bg-bg-surface p-8 rounded-lg shadow-md mt-8 max-w-4xl mx-auto">
+        <div className="bg-bg-surface p-8 rounded-lg shadow-md mt-8 max-w-6xl mx-auto">
             {/* Bio Section */}
             <div className="space-y-4">
                 <h3 className="text-2xl font-semibold text-txt-primary">About Me</h3>

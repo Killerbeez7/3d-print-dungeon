@@ -31,7 +31,7 @@ export const Gallery = () => {
 
             // Fallback logic for older docs that lack 'primaryRenderLowResUrl'
             const lowResOrPlaceholder =
-                m.primaryRenderLowResUrl || m.primaryRenderUrl || "/placeholder-blur.jpg";
+                m.primaryRenderLowResUrl || m.primaryRenderUrl || "/image.png";
 
             return {
                 id: m.id,

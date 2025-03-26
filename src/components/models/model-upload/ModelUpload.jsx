@@ -171,21 +171,22 @@ export const ModelUpload = () => {
     };
 
     return (
-        <div className="min-h-screen p-8 flex flex-col items-center bg-bg-primary">
-            <h1 className="text-3xl font-bold text-txt-primary mb-6">
+        <div className="min-h-screen p-6 flex flex-col items-center bg-bg-primary">
+            <h1 className="text-2xl font-semibold text-txt-primary mb-6">
                 Two-Step Model Upload
             </h1>
-            {error && <p className="text-fuchsia-600 mb-4">{error}</p>}
+            {error && <p className="text-fuchsia-600 mb-4 text-center">{error}</p>}
 
             <form
                 onSubmit={handleSubmit}
-                className="w-full max-w-4xl bg-bg-surface rounded-lg shadow-xl p-6 space-y-6"
+                className="w-full max-w-6xl bg-bg-surface rounded-lg shadow-xl p-6 space-y-8"
             >
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Left Column */}
-                    <div className="space-y-4">
+                    <div className="space-y-6">
+                        {/* Model Name */}
                         <div>
-                            <label className="block text-txt-secondary font-medium mb-1">
+                            <label className="block text-txt-secondary font-medium mb-2">
                                 Model Name
                             </label>
                             <input
@@ -197,14 +198,15 @@ export const ModelUpload = () => {
                                         name: e.target.value,
                                     }))
                                 }
-                                className="w-full px-3 py-2 border border-br-primary rounded"
+                                className="w-full px-4 py-2 border border-br-primary rounded-md focus:ring-2 focus:ring-btn-primary"
                                 placeholder="e.g. Medieval Castle"
                                 required
                             />
                         </div>
 
+                        {/* Description */}
                         <div>
-                            <label className="block text-txt-secondary font-medium mb-1">
+                            <label className="block text-txt-secondary font-medium mb-2">
                                 Description
                             </label>
                             <textarea
@@ -215,13 +217,13 @@ export const ModelUpload = () => {
                                         description: e.target.value,
                                     }))
                                 }
-                                className="w-full px-3 py-2 border border-br-primary rounded"
+                                className="w-full px-4 py-2 border border-br-primary rounded-md focus:ring-2 focus:ring-btn-primary"
                                 rows="4"
                             />
                         </div>
 
                         {/* Tag Selection */}
-                        <div className="border-2 border-dashed border-br-primary rounded p-4">
+                        <div className="border-2 border-dashed border-br-primary rounded-md p-4">
                             <h4 className="text-lg font-semibold mb-2 text-center">
                                 Select Tags
                             </h4>
@@ -230,11 +232,10 @@ export const ModelUpload = () => {
                                     <span
                                         key={tag}
                                         onClick={() => handleTagClick(tag)}
-                                        className={`cursor-pointer px-3 py-1 rounded-full text-sm transition-colors ${
-                                            modelData.tags.includes(tag)
+                                        className={`cursor-pointer px-4 py-2 rounded-full text-sm transition-colors ${modelData.tags.includes(tag)
                                                 ? "bg-btn-primary text-white border border-btn-primary"
                                                 : "bg-bg-surface text-txt-secondary border border-br-primary"
-                                        }`}
+                                            }`}
                                     >
                                         {tag}
                                     </span>
@@ -245,13 +246,13 @@ export const ModelUpload = () => {
                                 placeholder="Selected Tags"
                                 readOnly
                                 value={modelData.tags.join(", ")}
-                                className="mt-2 w-full px-3 py-2 border border-br-primary rounded bg-gray-100 text-sm"
+                                className="mt-2 w-full px-4 py-2 border border-br-primary rounded-md bg-gray-100 text-sm"
                             />
                         </div>
 
                         {/* Model File Input */}
                         <div
-                            className="border-2 border-dashed border-br-primary rounded p-4 text-center"
+                            className="border-2 border-dashed border-br-primary rounded-md p-4 text-center"
                             onDragOver={handleDragOver}
                             onDrop={handleDrop}
                         >
@@ -274,7 +275,7 @@ export const ModelUpload = () => {
                         </div>
 
                         {/* Render Images Input */}
-                        <div className="border-2 border-dashed border-br-primary rounded p-4 text-center">
+                        <div className="border-2 border-dashed border-br-primary rounded-md p-4 text-center">
                             {modelData.renderFiles.length > 0 ? (
                                 <div>
                                     <p>
@@ -285,12 +286,11 @@ export const ModelUpload = () => {
                                         {modelData.renderPreviewUrls.map((url, index) => (
                                             <div
                                                 key={index}
-                                                className={`cursor-pointer border-4 ${
-                                                    modelData.selectedRenderIndex ===
-                                                    index
+                                                className={`cursor-pointer border-4 ${modelData.selectedRenderIndex ===
+                                                        index
                                                         ? "border-accent"
                                                         : "border-transparent"
-                                                }`}
+                                                    }`}
                                                 onClick={() =>
                                                     setModelData((prev) => ({
                                                         ...prev,
@@ -301,7 +301,7 @@ export const ModelUpload = () => {
                                                 <img
                                                     src={url}
                                                     alt={`Render ${index + 1}`}
-                                                    className="w-20 h-20 object-cover"
+                                                    className="w-16 h-16 object-cover"
                                                 />
                                             </div>
                                         ))}
@@ -327,6 +327,7 @@ export const ModelUpload = () => {
                             )}
                         </div>
 
+                        {/* Buttons */}
                         <button
                             type="button"
                             disabled={!modelData.file || isConverting}
@@ -338,15 +339,15 @@ export const ModelUpload = () => {
                                     setError
                                 )
                             }
-                            className="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
+                            className="w-full bg-blue-600 text-white py-2 rounded-md disabled:opacity-50"
                         >
                             {isConverting ? "Converting..." : "Convert & Preview"}
                         </button>
 
                         {isUploading && (
-                            <div className="w-full bg-gray-300 rounded h-4 mt-2">
+                            <div className="w-full bg-gray-300 rounded-md h-2 mt-2">
                                 <div
-                                    className="bg-blue-600 h-4 rounded"
+                                    className="bg-blue-600 h-2 rounded-md"
                                     style={{ width: `${uploadProgress}%` }}
                                 />
                             </div>
@@ -355,28 +356,15 @@ export const ModelUpload = () => {
                         <button
                             type="submit"
                             disabled={isUploading || isConverting}
-                            className="w-full bg-btn-primary text-white py-2 rounded disabled:opacity-50"
+                            className="w-full bg-btn-primary text-white py-2 rounded-md disabled:opacity-50"
                         >
                             {isUploading ? "Publishing..." : "Publish Model"}
                         </button>
                     </div>
 
                     {/* Right column: Local preview */}
-                    <div>
-                        <h2 className="text-xl font-bold mb-2">Local Preview</h2>
-                        {modelData.localPreviewUrl ? (
-                            <img
-                                src={modelData.localPreviewUrl}
-                                alt="File preview (raw)"
-                                className="w-full h-40 object-cover border"
-                            />
-                        ) : (
-                            <div className="w-full h-40 border flex items-center justify-center">
-                                <p>No raw preview</p>
-                            </div>
-                        )}
-
-                        <h3 className="mt-4 mb-2">3D Converted Preview</h3>
+                    <div className="space-y-4">
+                        <h3 className="mt-4 mb-2 text-center text-xl">3D Model Preview</h3>
                         {modelData.convertedUrl ? (
                             <model-viewer
                                 src={modelData.convertedUrl}
@@ -384,31 +372,23 @@ export const ModelUpload = () => {
                                 camera-controls
                                 auto-rotate
                                 crossOrigin="anonymous"
-                                style={{
-                                    width: "100%",
-                                    height: "300px",
-                                    border: "1px solid #ccc",
-                                }}
+                                className="w-full h-[300px] border rounded-md"
                             />
                         ) : (
-                            <div className="w-full h-40 border flex items-center justify-center">
-                                <p>No 3D conversion preview</p>
+                            <div className="w-full h-[300px] border rounded-md flex items-center justify-center">
+                                <p>No 3D preview</p>
                             </div>
                         )}
 
-                        <h3 className="mt-4 mb-2">Render Image Preview</h3>
+                        <h3 className="mt-4 mb-2 text-center text-xl">Render Image Preview</h3>
                         {modelData.renderPreviewUrls.length > 0 ? (
                             <img
-                                src={
-                                    modelData.renderPreviewUrls[
-                                        modelData.selectedRenderIndex
-                                    ]
-                                }
-                                alt="Primary Render Preview"
-                                className="w-full h-40 object-cover border"
+                                src={modelData.renderPreviewUrls[modelData.selectedRenderIndex]}
+                                alt="Render Image"
+                                className="w-full h-[300px] object-cover border rounded-md"
                             />
                         ) : (
-                            <div className="w-full h-40 border flex items-center justify-center">
+                            <div className="w-full h-[300px] border rounded-md flex items-center justify-center">
                                 <p>No render preview</p>
                             </div>
                         )}
@@ -417,4 +397,5 @@ export const ModelUpload = () => {
             </form>
         </div>
     );
+
 };

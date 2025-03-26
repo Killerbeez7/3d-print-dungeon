@@ -1,40 +1,22 @@
-import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useModels } from "../../../contexts/modelsContext";
-import { getAuth } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { useAuth } from "../../../contexts/authContext";
 import { Comments } from "../model-comments/ModelComments";
 import { CommentsProvider } from "../../../contexts/CommentsContext";
+import { useEffect } from "react";
 
 export const ModelView = () => {
     const { id } = useParams();
-    const { models, loading } = useModels();
-    const auth = getAuth();
+    const { models, loading, uploader, selectedRenderIndex, setSelectedRenderIndex, fetchUploader } = useModels();
+    const auth = useAuth();
     const user = auth.currentUser;
-    const db = getFirestore();
-
-    // State for uploader info
-    const [uploader, setUploader] = useState(null);
-    // -1 means show the 3D model in main preview; 0..N means show that index from renderFileUrls
-    const [selectedRenderIndex, setSelectedRenderIndex] = useState(-1);
 
     useEffect(() => {
         const model = models.find((m) => m.id === id);
         if (model && model.uploaderId) {
-            const fetchUploader = async () => {
-                try {
-                    const userDocRef = doc(db, "users", model.uploaderId);
-                    const userDoc = await getDoc(userDocRef);
-                    if (userDoc.exists()) {
-                        setUploader(userDoc.data());
-                    }
-                } catch (err) {
-                    console.error("Error fetching uploader data:", err);
-                }
-            };
-            fetchUploader();
+            fetchUploader(model.uploaderId);
         }
-    }, [id, models, db]);
+    }, [id, models, fetchUploader]);
 
     if (loading) {
         return (
@@ -53,7 +35,6 @@ export const ModelView = () => {
         );
     }
 
-    // Fallback for older documents: if convertedFileUrl is missing, fallback to originalFileUrl
     const fallback3DUrl = model.convertedFileUrl || model.originalFileUrl || "";
     const renderFileUrls = model.renderFileUrls || [];
 
@@ -67,11 +48,10 @@ export const ModelView = () => {
                     auto-rotate
                     crossOrigin="anonymous"
                     environment-image="neutral"
-                    className="rounded-md shadow-lg"
-                    style={{ width: "100%", height: "400px" }}
+                    className="rounded-md shadow-lg h-[calc(90vh-120px)] w-auto"
                 ></model-viewer>
             ) : (
-                <div className="flex items-center justify-center w-full h-[400px] bg-gray-200 rounded-md">
+                <div className="flex items-center justify-center w-full h-[calc(90vh-120px)] bg-gray-200 rounded-md">
                     No 3D preview available
                 </div>
             )
@@ -80,7 +60,7 @@ export const ModelView = () => {
                 src={renderFileUrls[selectedRenderIndex]}
                 alt={`Render ${selectedRenderIndex + 1}`}
                 loading="lazy"
-                className="w-full h-[400px] object-contain rounded-md shadow-lg"
+                className="w-full m-auto h-[calc(90vh-120px)] object-contain rounded-md shadow-lg"
             />
         );
 
@@ -144,26 +124,13 @@ export const ModelView = () => {
                 {uploader ? (
                     <div className="flex items-center space-x-4 border-b pb-4">
                         <img
-                            src={uploader.photoURL || "/default-avatar.png"}
+                            src={uploader.photoURL || "/user.png"}
                             alt={uploader.displayName || "Unknown User"}
                             className="w-16 h-16 rounded-full object-cover"
                         />
                         <div>
                             <h2 className="text-lg font-semibold">
                                 {uploader.displayName || "Anonymous"}
-                            </h2>
-                        </div>
-                    </div>
-                ) : user ? (
-                    <div className="flex items-center space-x-4 border-b pb-4">
-                        <img
-                            src={user.photoURL || "/default-avatar.png"}
-                            alt={user.displayName || "Anonymous"}
-                            className="w-16 h-16 rounded-full object-cover"
-                        />
-                        <div>
-                            <h2 className="text-lg font-semibold">
-                                {user.displayName || "Anonymous"}
                             </h2>
                         </div>
                     </div>
@@ -228,7 +195,8 @@ export const ModelView = () => {
                     )}
                 </div>
 
-                {user && user.uid === model.userId && (
+                {/* Edit Model Button */}
+                {model.userId && model.userId === user?.uid && (
                     <Link
                         to={`/model/${model.id}/edit`}
                         className="block text-center bg-btn-secondary text-white py-2 px-4 rounded hover:bg-btn-secondary-hover transition-colors"

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { db } from "../firebase/firebaseConfig";
-import { collection, query, onSnapshot, orderBy, where } from "firebase/firestore";
+import { collection, query, onSnapshot, orderBy, where, doc, getDoc } from "firebase/firestore";
 import PropTypes from "prop-types";
 import { createAdvancedModel } from "../services/modelService";
 
@@ -10,8 +10,10 @@ export const useModels = () => useContext(ModelsContext);
 
 export const ModelsProvider = ({ children }) => {
     const [models, setModels] = useState([]);
-    const [userModels, setUserModels] = useState([]); // To store models specific to the current user
+    const [userModels, setUserModels] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [uploader, setUploader] = useState(null);
+    const [selectedRenderIndex, setSelectedRenderIndex] = useState(-1);
 
     // Real-time listener to fetch all models
     useEffect(() => {
@@ -58,6 +60,19 @@ export const ModelsProvider = ({ children }) => {
         return () => unsubscribe();
     };
 
+    // Fetch uploader info
+    const fetchUploader = async (uploaderId) => {
+        try {
+            const userDocRef = doc(db, "users", uploaderId);
+            const userDoc = await getDoc(userDocRef);
+            if (userDoc.exists()) {
+                setUploader(userDoc.data());
+            }
+        } catch (err) {
+            console.error("Error fetching uploader data:", err);
+        }
+    };
+
     // Create a new model and update context
     async function createModelInContext(data) {
         setLoading(true);
@@ -76,8 +91,12 @@ export const ModelsProvider = ({ children }) => {
                 models,
                 userModels,
                 loading,
+                uploader,
+                selectedRenderIndex,
+                setSelectedRenderIndex,
+                fetchUploader,
                 createModelInContext,
-                fetchModelsByUser, // Expose this function for Profile to use
+                fetchModelsByUser,
             }}
         >
             {children}
