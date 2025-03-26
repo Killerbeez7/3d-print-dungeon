@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useModels } from "../../contexts/modelsContext";
 import { Link } from "react-router-dom";
-import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import LazyImage from "../shared/lazy-image/LazyImage";
 
 export const Gallery = () => {
     const { models, loading } = useModels();
@@ -105,18 +106,11 @@ export const Gallery = () => {
                     {displayedArtworks.map((art) => (
                         <Link key={art.id} to={`/model/${art.id}`}>
                             <article className="relative bg-bg-surface border border-br-primary rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                                {/* <picture>
-                                    <source type="image/webp"> */}
-                                        <img
-                                            src={art.imageUrl}
-                                            alt={art.title}
-                                            loading="lazy"
-                                            width="400"
-                                            height="200"
-                                            className="w-full h-[200px] object-cover"
-                                        />
-                                    {/* </source>
-                                </picture> */}
+                                <LazyImage
+                                    src={art.imageUrl}
+                                    alt={art.title}
+                                    className="w-full h-[200px] object-cover"
+                                />
                                 <div className="p-3">
                                     <h2 className="text-lg font-semibold mb-1">
                                         {art.title}
@@ -139,6 +133,7 @@ export const Gallery = () => {
                         </Link>
                     ))}
                 </div>
+
                 {hasMore && (
                     <div className="text-center mt-8">
                         <button
