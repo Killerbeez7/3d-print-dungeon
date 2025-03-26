@@ -4,10 +4,18 @@ import { useAuth } from "../../../contexts/authContext";
 import { Comments } from "../model-comments/ModelComments";
 import { CommentsProvider } from "../../../contexts/CommentsContext";
 import { useEffect } from "react";
+import LazyImage from "../../shared/lazy-image/LazyImage";
 
 export const ModelView = () => {
     const { id } = useParams();
-    const { models, loading, uploader, selectedRenderIndex, setSelectedRenderIndex, fetchUploader } = useModels();
+    const {
+        models,
+        loading,
+        uploader,
+        selectedRenderIndex,
+        setSelectedRenderIndex,
+        fetchUploader,
+    } = useModels();
     const auth = useAuth();
     const user = auth.currentUser;
 
@@ -56,7 +64,7 @@ export const ModelView = () => {
                 </div>
             )
         ) : (
-            <img
+            <LazyImage
                 src={renderFileUrls[selectedRenderIndex]}
                 alt={`Render ${selectedRenderIndex + 1}`}
                 loading="lazy"
@@ -108,7 +116,7 @@ export const ModelView = () => {
                                     : "border-transparent hover:border-fuchsia-500"
                             }`}
                         >
-                            <img
+                            <LazyImage
                                 src={url}
                                 alt={`Render ${idx + 1}`}
                                 loading="lazy"
@@ -123,7 +131,7 @@ export const ModelView = () => {
             <aside className="w-full lg:w-[360px] bg-bg-surface p-6 rounded-md shadow-lg space-y-6">
                 {uploader ? (
                     <div className="flex items-center space-x-4 border-b pb-4">
-                        <img
+                        <LazyImage
                             src={uploader.photoURL || "/user.png"}
                             alt={uploader.displayName || "Unknown User"}
                             className="w-16 h-16 rounded-full object-cover"
