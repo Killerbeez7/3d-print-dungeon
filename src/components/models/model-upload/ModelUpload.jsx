@@ -7,11 +7,10 @@ export const ModelUpload = () => {
     const { currentUser } = useAuth();
     const { createModelInContext } = useModels();
 
-    // Use an array for tags now instead of a string.
     const [modelData, setModelData] = useState({
         name: "",
         description: "",
-        tags: [], // <-- tags as array
+        tags: [],
         file: null,
         convertedUrl: null,
         renderFiles: [],
@@ -24,7 +23,6 @@ export const ModelUpload = () => {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [error, setError] = useState("");
 
-    // Predefined available tags
     const availableTags = [
         "3D",
         "2D",
@@ -52,7 +50,7 @@ export const ModelUpload = () => {
         }
     };
 
-    // Handler for main model file
+    // handle GLTF or GLB files (no convertion)
     const handleFileChange = (e) => {
         const file = e.target.files?.[0];
         if (file) {
@@ -73,7 +71,7 @@ export const ModelUpload = () => {
         }
     };
 
-    // New handler for multiple render images (allow multiple selection)
+    // render files
     const handleRenderFilesChange = (e) => {
         const files = Array.from(e.target.files);
         const previewUrls = files.map((f) => URL.createObjectURL(f));
@@ -81,11 +79,11 @@ export const ModelUpload = () => {
             ...prev,
             renderFiles: files,
             renderPreviewUrls: previewUrls,
-            selectedRenderIndex: 0, // default to the first image
+            selectedRenderIndex: 0,
         }));
     };
 
-    // Toggle tag selection
+    // tag selection
     const handleTagClick = (tag) => {
         setModelData((prev) => {
             const currentTags = prev.tags;
@@ -97,6 +95,7 @@ export const ModelUpload = () => {
         });
     };
 
+    // convert and preview
     const handleConvertPreview = async () => {
         if (!modelData.file) {
             setError("No file selected.");
@@ -142,7 +141,6 @@ export const ModelUpload = () => {
             await createModelInContext({
                 name: modelData.name,
                 description: modelData.description,
-                // Pass tags array directly
                 tags: modelData.tags,
                 file: modelData.file,
                 renderFiles: modelData.renderFiles,
@@ -232,10 +230,11 @@ export const ModelUpload = () => {
                                     <span
                                         key={tag}
                                         onClick={() => handleTagClick(tag)}
-                                        className={`cursor-pointer px-4 py-2 rounded-full text-sm transition-colors ${modelData.tags.includes(tag)
+                                        className={`cursor-pointer px-4 py-2 rounded-full text-sm transition-colors ${
+                                            modelData.tags.includes(tag)
                                                 ? "bg-btn-primary text-white border border-btn-primary"
                                                 : "bg-bg-surface text-txt-secondary border border-br-primary"
-                                            }`}
+                                        }`}
                                     >
                                         {tag}
                                     </span>
@@ -286,11 +285,12 @@ export const ModelUpload = () => {
                                         {modelData.renderPreviewUrls.map((url, index) => (
                                             <div
                                                 key={index}
-                                                className={`cursor-pointer border-4 ${modelData.selectedRenderIndex ===
-                                                        index
+                                                className={`cursor-pointer border-4 ${
+                                                    modelData.selectedRenderIndex ===
+                                                    index
                                                         ? "border-accent"
                                                         : "border-transparent"
-                                                    }`}
+                                                }`}
                                                 onClick={() =>
                                                     setModelData((prev) => ({
                                                         ...prev,
@@ -364,7 +364,9 @@ export const ModelUpload = () => {
 
                     {/* Right column: Local preview */}
                     <div className="space-y-4">
-                        <h3 className="mt-4 mb-2 text-center text-xl">3D Model Preview</h3>
+                        <h3 className="mt-4 mb-2 text-center text-xl">
+                            3D Model Preview
+                        </h3>
                         {modelData.convertedUrl ? (
                             <model-viewer
                                 src={modelData.convertedUrl}
@@ -380,10 +382,16 @@ export const ModelUpload = () => {
                             </div>
                         )}
 
-                        <h3 className="mt-4 mb-2 text-center text-xl">Render Image Preview</h3>
+                        <h3 className="mt-4 mb-2 text-center text-xl">
+                            Render Image Preview
+                        </h3>
                         {modelData.renderPreviewUrls.length > 0 ? (
                             <img
-                                src={modelData.renderPreviewUrls[modelData.selectedRenderIndex]}
+                                src={
+                                    modelData.renderPreviewUrls[
+                                        modelData.selectedRenderIndex
+                                    ]
+                                }
                                 alt="Render Image"
                                 className="w-full h-[300px] object-cover border rounded-md"
                             />

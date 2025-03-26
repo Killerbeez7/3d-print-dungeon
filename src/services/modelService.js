@@ -6,18 +6,18 @@ import {
     doc,
     updateDoc,
     arrayUnion,
-} from "firebase/firestore"; // <-- Import arrayUnion here
+} from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { finalConvertFileToGLB } from "../utils/converter";
 
-// Function to create a model and update user uploads array
+// add model in DB
 export async function createAdvancedModel({
     name,
     description,
     tags,
     file,
-    renderFiles, // now an array of render files
-    selectedRenderIndex, // index of the primary render image
+    renderFiles,
+    selectedRenderIndex,
     uploaderId,
     onProgress,
 }) {
@@ -73,7 +73,7 @@ export async function createAdvancedModel({
         progressFn(100);
     }
 
-    // 3) If render files are provided, upload each one
+    // upload render files in Storage
     let renderFileUrls = [];
     if (renderFiles && renderFiles.length > 0) {
         for (const file of renderFiles) {
@@ -94,7 +94,7 @@ export async function createAdvancedModel({
         }
     }
 
-    // 4) Save model document in Firestore
+    // save model doc in Firestore
     const modelDocRef = await addDoc(collection(db, "models"), {
         name,
         description,
@@ -107,10 +107,10 @@ export async function createAdvancedModel({
         createdAt: serverTimestamp(),
     });
 
-    // 5) Update the user’s uploads array with the new model ID
+    // update the user’s uploads array with the new model ID
     const userRef = doc(db, "users", uploaderId);
     await updateDoc(userRef, {
-        uploads: arrayUnion(modelDocRef.id), // <-- Use arrayUnion here
+        uploads: arrayUnion(modelDocRef.id),
     });
 
     progressFn(100);

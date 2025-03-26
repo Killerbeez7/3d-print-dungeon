@@ -15,7 +15,7 @@ export const ModelsProvider = ({ children }) => {
     const [uploader, setUploader] = useState(null);
     const [selectedRenderIndex, setSelectedRenderIndex] = useState(-1);
 
-    // Real-time listener to fetch all models
+    // listener to fetch all models
     useEffect(() => {
         setLoading(true);
         const q = query(collection(db, "models"), orderBy("createdAt", "desc"));
@@ -37,10 +37,11 @@ export const ModelsProvider = ({ children }) => {
         return () => unsubscribe();
     }, []);
 
-    // Fetch models by a specific userId
+    // fetch models by userId
     const fetchModelsByUser = (userId) => {
         setLoading(true);
-        const q = query(collection(db, "models"), where("userId", "==", userId), orderBy("createdAt", "desc"));
+        const q = query(collection(db, "models"), 
+        where("userId", "==", userId), orderBy("createdAt", "desc"));
         const unsubscribe = onSnapshot(
             q,
             (snapshot) => {
@@ -60,7 +61,7 @@ export const ModelsProvider = ({ children }) => {
         return () => unsubscribe();
     };
 
-    // Fetch uploader info
+    // fetch uploader info
     const fetchUploader = async (uploaderId) => {
         try {
             const userDocRef = doc(db, "users", uploaderId);
@@ -73,7 +74,7 @@ export const ModelsProvider = ({ children }) => {
         }
     };
 
-    // Create a new model and update context
+    // create new model and update context
     async function createModelInContext(data) {
         setLoading(true);
         try {
