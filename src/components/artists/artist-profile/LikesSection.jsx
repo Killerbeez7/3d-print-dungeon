@@ -34,7 +34,7 @@ export const LikesSection = () => {
     }, [currentUser]);
 
     return (
-        <div className="container mx-auto px-4 pb-8 text-txt-primary">
+        <div className="container mx-auto pb-8 text-txt-primary">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {likedArtworks.length === 0 ? (
                     <p className="text-txt-secondary">No liked models yet.</p>

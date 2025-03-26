@@ -9,8 +9,6 @@ export const ProfileSettings = () => {
     const { currentUser } = useAuth();
     const [activeTab, setActiveTab] = useState("account");
 
-
-
     const tabs = [
         { id: "account", label: "Account" },
         { id: "notifications", label: "Notifications" },
