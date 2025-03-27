@@ -35,3 +35,9 @@ Once you're confident everything is working, deploy the latest changes to Fireba
 npm build
 firebase deploy
 ```
+
+#### 6. Sync Local branches with remote ones
+After adding or deleting a branch in git run this command to sync you local repo
+```sh
+git fetch --prune
+```
