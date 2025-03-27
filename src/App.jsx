@@ -5,7 +5,6 @@ import { Routes, Route } from "react-router-dom";
 // common
 import { Navbar } from "./components/shared/navbar/Navbar";
 import { Footer } from "./components/shared/footer/Footer";
-// features
 import { Store } from "./components/store/Store";
 import { Gallery } from "./components/gallery/Gallery";
 import { Explore } from "./components/explore/Explore";
@@ -22,6 +21,8 @@ import { AuthModal } from "./components/auth-modal/AuthModal";
 import { ArtistProfile } from "./components/artists/artist-profile/ArtistProfile";
 import { ProfileSettings } from "./components/settings/ProfileSettings";
 import { Artists } from "./components/artists/artists/Artists";
+//utils
+import { SearchDynamic } from "./components/search/search-dynamic/SearchDynamic";
 // dev
 import { AdminPanel } from "./components/admin-panel/AdminPanel";
 
@@ -37,21 +38,21 @@ export default function App() {
     return (
         <div className="flex flex-col min-h-screen bg-bg-primary">
             <AuthProvider>
-                <Navbar
-                    onLoginClick={() => {
-                        // set sign-in mode
-                        setIsSignUp(false);
-                        setIsModalOpen(true);
-                    }}
-                    onSignUpClick={() => {
-                        // set sign-up mode
-                        setIsSignUp(true);
-                        setIsModalOpen(true);
-                    }}
-                />
+                <ModelsProvider>
+                    <Navbar
+                        onLoginClick={() => {
+                            // set sign-in mode
+                            setIsSignUp(false);
+                            setIsModalOpen(true);
+                        }}
+                        onSignUpClick={() => {
+                            // set sign-up mode
+                            setIsSignUp(true);
+                            setIsModalOpen(true);
+                        }}
+                    />
 
-                <main className="flex-grow">
-                    <ModelsProvider>
+                    <main className="flex-grow">
                         <Routes>
                             {/* admin */}
                             <Route path="/admin-panel" element={<AdminPanel />} />
@@ -62,26 +63,27 @@ export default function App() {
                             <Route path="/business" element={<Business />} />
                             <Route path="/settings" element={<ProfileSettings />} />
                             {/* artists */}
-
                             <Route path="/artists" element={<Artists />} />
                             <Route path="/artist/:uid" element={<ArtistProfile />} />
                             {/* models */}
                             <Route path="/upload" element={<ModelUpload />} />
                             <Route path="/model/:id" element={<ModelView />} />
                             <Route path="/model/:id/edit" element={<ModelEdit />} />
+                            {/* search */}
+                            <Route path="/search" element={<SearchDynamic />} />
                         </Routes>
-                    </ModelsProvider>
-                </main>
+                    </main>
 
-                <Footer />
+                    <Footer />
 
-                {/* Auth Modal for sign-in / sign-up */}
-                <AuthModal
-                    isOpen={isModalOpen}
-                    onClose={handleCloseModal}
-                    isSignUp={isSignUp}
-                    onSwitchMode={handleSwitchMode}
-                />
+                    {/* Auth Modal for sign-in / sign-up */}
+                    <AuthModal
+                        isOpen={isModalOpen}
+                        onClose={handleCloseModal}
+                        isSignUp={isSignUp}
+                        onSwitchMode={handleSwitchMode}
+                    />
+                </ModelsProvider>
             </AuthProvider>
         </div>
     );
