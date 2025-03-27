@@ -42,19 +42,13 @@ export default function LazyImage({ src, alt = "", className = "", ...props }) {
     setLoaded(true); // real image loaded
   };
 
-  // We'll do a fade-in style. 
-  // If the real image isn't in view yet, we do `src=""`. 
-  // Once in view, we do `src={src}`. 
-  // We also do a small CSS transition for the loaded image.
-
   return (
     <div
       ref={imgRef}
       className={`relative overflow-hidden ${className}`}
-      style={{ minHeight: "50px" }} // or your desired fallback size 
       {...props}
     >
-      {/* Optionally: You can place a placeholder or skeleton below */}
+      {/* Placeholder with animated pulse effect while image is loading */}
       {!loaded && (
         <div
           className="absolute inset-0 bg-gray-200 animate-pulse"
@@ -69,10 +63,7 @@ export default function LazyImage({ src, alt = "", className = "", ...props }) {
           alt={alt}
           loading="lazy"
           onLoad={handleLoad}
-          className={`w-full h-auto transition-opacity duration-500 ${
-            loaded ? "opacity-100" : "opacity-0"
-          }`}
-          style={{ display: "block" }}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${loaded ? "opacity-100" : "opacity-0"}`}
         />
       )}
     </div>
