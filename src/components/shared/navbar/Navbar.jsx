@@ -7,8 +7,10 @@ import {
     faSignOutAlt,
     faUser,
     faCog,
-    faList
+    faList,
 } from "@fortawesome/free-solid-svg-icons";
+
+import { SearchWithLinks } from "../../search/search-with-links/SearchWithLinks";
 
 export const Navbar = ({ onLoginClick }) => {
     const { currentUser, handleSignOut } = useAuth();
@@ -21,10 +23,7 @@ export const Navbar = ({ onLoginClick }) => {
     return (
         <header className="flex items-center justify-between bg-bg-primary shadow-sm py-2 px-4">
             {/* Mobile Nav Toggle (icon) */}
-            <button
-                className="text-xl bg-btn-primary md:hidden"
-                aria-label="navigation"
-            >
+            <button className="text-xl bg-btn-primary md:hidden" aria-label="navigation">
                 <i className="fas fa-bars"></i>
             </button>
 
@@ -49,9 +48,7 @@ export const Navbar = ({ onLoginClick }) => {
                         >
                             Explore
                         </Link>
-                        <div
-                            className="absolute left-0 top-full hidden group-hover:block bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[150px] z-10"
-                        >
+                        <div className="absolute left-0 top-full hidden group-hover:block bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[150px] z-10">
                             <ul className="py-2">
                                 <li>
                                     <Link
@@ -82,9 +79,7 @@ export const Navbar = ({ onLoginClick }) => {
                         >
                             Buy 3D Models
                         </Link>
-                        <div
-                            className="absolute left-0 top-full hidden group-hover:block bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[150px] z-10"
-                        >
+                        <div className="absolute left-0 top-full hidden group-hover:block bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[150px] z-10">
                             <ul className="py-2">
                                 <li>
                                     <Link
@@ -123,9 +118,7 @@ export const Navbar = ({ onLoginClick }) => {
                         >
                             For Business
                         </Link>
-                        <div
-                            className="absolute left-0 top-full hidden group-hover:block bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[150px] z-10"
-                        >
+                        <div className="absolute left-0 top-full hidden group-hover:block bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[150px] z-10">
                             <ul className="py-2">
                                 <li>
                                     <Link
@@ -158,14 +151,7 @@ export const Navbar = ({ onLoginClick }) => {
             </nav>
 
             {/* Search Bar */}
-            <div className="hidden md:flex items-center relative mx-4 w-[800px]">
-                <input
-                    type="text"
-                    placeholder="Search 3D models"
-                    className="border-2 border-br-primary text-txt-primary placeholder-txt-muted rounded-full w-full pl-4 py-1 focus:outline-none focus:border-focus focus:ring-focus"
-                />
-                <i className="fas fa-search absolute right-2 text-txt-secondary"></i>
-            </div>
+            <SearchWithLinks />
 
             {/* Right Side: Theme / Auth / Upload */}
             <div className="flex items-center space-x-4">
@@ -195,10 +181,12 @@ export const Navbar = ({ onLoginClick }) => {
                         <div className="absolute right-[-10px] top-full hidden group-hover:block font-medium bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[180px] z-10">
                             <ul className="py-2">
                                 {/* User Name - Not clickable */}
-                                <li className="px-4 py-1 text-txt-muted text-lg">{currentUser?.displayName || "Username"}</li>
+                                <li className="px-4 py-1 text-txt-muted text-lg">
+                                    {currentUser?.displayName || "Username"}
+                                </li>
 
                                 <li className="border-t border-br-secondary mx-4"></li>
-                                
+
                                 <li>
                                     <Link
                                         to={`/artist/${currentUser?.uid}`}
@@ -238,7 +226,10 @@ export const Navbar = ({ onLoginClick }) => {
                                         className="block min-w-[150px] cursor-pointer text-left mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
                                         aria-label="Logout"
                                     >
-                                        <FontAwesomeIcon icon={faSignOutAlt} className="mr-2" />
+                                        <FontAwesomeIcon
+                                            icon={faSignOutAlt}
+                                            className="mr-2"
+                                        />
                                         Logout
                                     </button>
                                 </li>
@@ -247,7 +238,6 @@ export const Navbar = ({ onLoginClick }) => {
                     </div>
                 ) : null}
             </div>
-
         </header>
     );
 };
