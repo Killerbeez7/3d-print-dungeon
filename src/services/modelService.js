@@ -107,10 +107,10 @@ export async function createAdvancedModel({
         createdAt: serverTimestamp(),
     });
 
-    // update the user’s uploads array with the new model ID
     const userRef = doc(db, "users", uploaderId);
     await updateDoc(userRef, {
         uploads: arrayUnion(modelDocRef.id),
+        artist: true 
     });
 
     progressFn(100);
