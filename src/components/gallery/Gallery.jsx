@@ -65,7 +65,9 @@ export const Gallery = () => {
     return (
         <div className="bg-bg-primary text-txt-primary min-h-screen">
             {/* Featured Section - Large clickable images */}
-            <section className="px-4 py-8">
+            <section className="px-4">
+                {/*-------------------------------------------------------------------- fd u add shadow under the nav turn on this paddings */}
+                {/* <section className="px-4 py-8"> */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <Link to="/news">
                         <div className="relative overflow-hidden rounded-lg shadow-lg">
@@ -87,7 +89,9 @@ export const Gallery = () => {
                                 className="w-full h-[300px] object-cover rounded-lg"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-[#0000009e] to-transparent flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                <h3 className="text-white text-2xl font-bold">Featured Models</h3>
+                                <h3 className="text-white text-2xl font-bold">
+                                    Featured Models
+                                </h3>
                             </div>
                         </div>
                     </Link>
@@ -99,7 +103,9 @@ export const Gallery = () => {
                                 className="w-full h-[300px] object-cover rounded-lg"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-[#000000af] to-transparent flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                <h3 className="text-white text-2xl font-bold">For Business</h3>
+                                <h3 className="text-white text-2xl font-bold">
+                                    For Business
+                                </h3>
                             </div>
                         </div>
                     </Link>
@@ -113,31 +119,50 @@ export const Gallery = () => {
                 {/* Category Buttons */}
                 <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2">
                     <div className="flex items-center mb-3 md:mb-0 space-x-2">
-                        <label htmlFor="sortBy" className="text-txt-secondary text-lg font-medium">
+                        <label
+                            htmlFor="sortBy"
+                            className="text-txt-secondary text-lg font-medium"
+                        >
                             Filter by:
                         </label>
                         <div className="flex space-x-2">
                             <button
                                 onClick={() => setCategoryFilter("all")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${categoryFilter === "all" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
+                                    categoryFilter === "all"
+                                        ? "bg-accent text-white"
+                                        : "bg-bg-surface hover:bg-accent-hover"
+                                }`}
                             >
                                 All
                             </button>
                             <button
                                 onClick={() => setCategoryFilter("2D")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${categoryFilter === "2D" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
+                                    categoryFilter === "2D"
+                                        ? "bg-accent text-white"
+                                        : "bg-bg-surface hover:bg-accent-hover"
+                                }`}
                             >
                                 2D
                             </button>
                             <button
                                 onClick={() => setCategoryFilter("3D")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${categoryFilter === "3D" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
+                                    categoryFilter === "3D"
+                                        ? "bg-accent text-white"
+                                        : "bg-bg-surface hover:bg-accent-hover"
+                                }`}
                             >
                                 3D
                             </button>
                             <button
                                 onClick={() => setCategoryFilter("Concept")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${categoryFilter === "Concept" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
+                                    categoryFilter === "Concept"
+                                        ? "bg-accent text-white"
+                                        : "bg-bg-surface hover:bg-accent-hover"
+                                }`}
                             >
                                 Concept
                             </button>
@@ -146,31 +171,50 @@ export const Gallery = () => {
 
                     {/* Sort Menu as Tag Buttons */}
                     <div className="flex items-center space-x-2">
-                        <label htmlFor="sortBy" className="text-txt-secondary text-lg font-medium">
+                        <label
+                            htmlFor="sortBy"
+                            className="text-txt-secondary text-lg font-medium"
+                        >
                             Sort by:
                         </label>
                         <div className="flex space-x-2">
                             <button
                                 onClick={() => setSortBy("community")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${sortBy === "community" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
+                                    sortBy === "community"
+                                        ? "bg-accent text-white"
+                                        : "bg-bg-surface hover:bg-accent-hover"
+                                }`}
                             >
                                 Community
                             </button>
                             <button
                                 onClick={() => setSortBy("popular")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${sortBy === "popular" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
+                                    sortBy === "popular"
+                                        ? "bg-accent text-white"
+                                        : "bg-bg-surface hover:bg-accent-hover"
+                                }`}
                             >
                                 Popular
                             </button>
                             <button
                                 onClick={() => setSortBy("latest")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${sortBy === "latest" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
+                                    sortBy === "latest"
+                                        ? "bg-accent text-white"
+                                        : "bg-bg-surface hover:bg-accent-hover"
+                                }`}
                             >
                                 Latest
                             </button>
                             <button
                                 onClick={() => setSortBy("views")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${sortBy === "views" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
+                                    sortBy === "views"
+                                        ? "bg-accent text-white"
+                                        : "bg-bg-surface hover:bg-accent-hover"
+                                }`}
                             >
                                 Most Viewed
                             </button>
@@ -186,14 +230,15 @@ export const Gallery = () => {
                         <Link key={art.id} to={`/model/${art.id}`}>
                             <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
                                 {/* Container for the image with a fixed aspect ratio */}
-                                <div className="relative w-full aspect-square"> {/* Aspect ratio set here */}
+                                <div className="relative w-full aspect-square">
+                                    {" "}
+                                    {/* Aspect ratio set here */}
                                     {/* LazyImage for the actual image */}
                                     <LazyImage
                                         src={art.imageUrl}
                                         alt={art.title}
                                         className="absolute inset-0 w-full h-full object-cover rounded-lg"
                                     />
-
                                     {/* Gradient and model info */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end justify-start opacity-0 hover:opacity-100 transition-opacity">
                                         <div className="text-white m-2">
