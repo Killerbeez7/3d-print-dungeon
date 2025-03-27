@@ -64,69 +64,142 @@ export const Gallery = () => {
 
     return (
         <div className="bg-bg-primary text-txt-primary min-h-screen">
-            <section className="relative bg-gradient-to-r from-accent to-accent-hover px-4 py-12">
-                {/* Hero banner */}
-            </section>
-            <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between">
-                <div className="flex items-center mb-3 md:mb-0 space-x-2">
-                    <label htmlFor="category" className="text-txt-secondary font-medium">
-                        Category:
-                    </label>
-                    <select
-                        id="category"
-                        className="border border-br-primary bg-bg-surface px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-accent"
-                        value={categoryFilter}
-                        onChange={(e) => setCategoryFilter(e.target.value)}
-                    >
-                        <option value="all">All</option>
-                        <option value="2D">2D</option>
-                        <option value="3D">3D</option>
-                        <option value="Concept">Concept</option>
-                    </select>
+            {/* Featured Section - Large clickable images */}
+            <section className="px-4 py-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <Link to="/news">
+                        <div className="relative overflow-hidden rounded-lg shadow-lg">
+                            <img
+                                src="/image.png" // Replace with an actual image
+                                alt="News"
+                                className="w-full h-[300px] object-cover rounded-lg"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0000009e] to-transparent flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                <h3 className="text-white text-2xl font-bold">News</h3>
+                            </div>
+                        </div>
+                    </Link>
+                    <Link to="/featured">
+                        <div className="relative overflow-hidden rounded-lg shadow-lg">
+                            <img
+                                src="/image.png"
+                                alt="Prints"
+                                className="w-full h-[300px] object-cover rounded-lg"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0000009e] to-transparent flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                <h3 className="text-white text-2xl font-bold">Featured Models</h3>
+                            </div>
+                        </div>
+                    </Link>
+                    <Link to="/business">
+                        <div className="relative overflow-hidden rounded-lg shadow-lg">
+                            <img
+                                src="/image.png" // Replace with an actual image
+                                alt="3D Models"
+                                className="w-full h-[300px] object-cover rounded-lg"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#000000af] to-transparent flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                                <h3 className="text-white text-2xl font-bold">For Business</h3>
+                            </div>
+                        </div>
+                    </Link>
                 </div>
-                <div className="flex items-center space-x-2">
-                    <label htmlFor="sortBy" className="text-txt-secondary font-medium">
-                        Sort by:
-                    </label>
-                    <select
-                        id="sortBy"
-                        className="border border-br-primary bg-bg-surface px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-accent"
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                    >
-                        <option value="community">Community</option>
-                        <option value="popular">Popular</option>
-                        <option value="latest">Latest</option>
-                        <option value="views">Most Viewed</option>
-                    </select>
+            </section>
+
+            {/* Category and Sort Filters */}
+            <div className="mx-auto p-4">
+                <h1 className="mb-4 font-bold">Gallery</h1>
+
+                {/* Category Buttons */}
+                <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2">
+                    <div className="flex items-center mb-3 md:mb-0 space-x-2">
+                        <label htmlFor="sortBy" className="text-txt-secondary text-lg font-medium">
+                            Filter by:
+                        </label>
+                        <div className="flex space-x-2">
+                            <button
+                                onClick={() => setCategoryFilter("all")}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${categoryFilter === "all" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                            >
+                                All
+                            </button>
+                            <button
+                                onClick={() => setCategoryFilter("2D")}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${categoryFilter === "2D" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                            >
+                                2D
+                            </button>
+                            <button
+                                onClick={() => setCategoryFilter("3D")}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${categoryFilter === "3D" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                            >
+                                3D
+                            </button>
+                            <button
+                                onClick={() => setCategoryFilter("Concept")}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${categoryFilter === "Concept" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                            >
+                                Concept
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Sort Menu as Tag Buttons */}
+                    <div className="flex items-center space-x-2">
+                        <label htmlFor="sortBy" className="text-txt-secondary text-lg font-medium">
+                            Sort by:
+                        </label>
+                        <div className="flex space-x-2">
+                            <button
+                                onClick={() => setSortBy("community")}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${sortBy === "community" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                            >
+                                Community
+                            </button>
+                            <button
+                                onClick={() => setSortBy("popular")}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${sortBy === "popular" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                            >
+                                Popular
+                            </button>
+                            <button
+                                onClick={() => setSortBy("latest")}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${sortBy === "latest" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                            >
+                                Latest
+                            </button>
+                            <button
+                                onClick={() => setSortBy("views")}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${sortBy === "views" ? "bg-accent text-white" : "bg-bg-surface hover:bg-accent-hover"}`}
+                            >
+                                Most Viewed
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div className="container mx-auto px-4 pb-8">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+
+            {/* Gallery Section */}
+            <div className="mx-auto px-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2">
                     {displayedArtworks.map((art) => (
                         <Link key={art.id} to={`/model/${art.id}`}>
-                            <article className="relative bg-bg-surface border border-br-primary rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                                <LazyImage
-                                    src={art.imageUrl}
-                                    alt={art.title}
-                                    className="w-full h-[200px] object-cover"
-                                />
-                                <div className="p-3">
-                                    <h2 className="text-lg font-semibold mb-1">
-                                        {art.title}
-                                    </h2>
-                                    <p className="text-txt-secondary text-sm mb-2">
-                                        By {art.artist}
-                                    </p>
-                                    <div className="flex items-center justify-between text-sm">
-                                        <span className="text-txt-secondary">
-                                            <i className="fas fa-heart text-error mr-1"></i>
-                                            {art.likes}
-                                        </span>
-                                        <span className="text-txt-secondary">
-                                            <i className="fas fa-eye text-txt-highlight mr-1"></i>
-                                            {art.views}
-                                        </span>
+                            <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
+                                {/* Container for the image with a fixed aspect ratio */}
+                                <div className="relative w-full aspect-square"> {/* Aspect ratio set here */}
+                                    {/* LazyImage for the actual image */}
+                                    <LazyImage
+                                        src={art.imageUrl}
+                                        alt={art.title}
+                                        className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                                    />
+
+                                    {/* Gradient and model info */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end justify-start opacity-0 hover:opacity-100 transition-opacity">
+                                        <div className="text-white m-2">
+                                            <h4 className="font-semibold">{art.title}</h4>
+                                            <p className="text-sm">{art.artist}</p>
+                                        </div>
                                     </div>
                                 </div>
                             </article>
