@@ -21,7 +21,8 @@ export const Navbar = ({ onLoginClick }) => {
     };
 
     return (
-        <header className="flex items-center justify-between bg-bg-primary shadow-sm py-2 px-4">
+        // -------------------------------------------------------------------------- shadow-sm add it fo slight shadow under the navbar
+        <header className="sticky top-0 z-50 bg-bg-primary  py-5 px-4 flex items-center justify-between">
             {/* Mobile Nav Toggle (icon) */}
             <button className="text-xl bg-btn-primary md:hidden" aria-label="navigation">
                 <i className="fas fa-bars"></i>
