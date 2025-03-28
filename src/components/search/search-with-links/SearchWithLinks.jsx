@@ -1,3 +1,6 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -31,17 +34,11 @@ export function SearchWithLinks() {
         { label: "Search Prints", category: "prints" },
     ];
 
-    /**
-     * Whenever the dropdown is shown and the user has typed something in searchTerm,
-     * we run a small "debounced" local + Firestore search.
-     */
+    // Debounced fetch logic when dropdown is shown + user typed something
     useEffect(() => {
-        if (!showDropdown) {
-            // No need to search if dropdown is hidden
-            return;
-        }
+        if (!showDropdown) return;
+
         if (!searchTerm.trim()) {
-            // Clear if empty
             setArtistResults([]);
             setModelResults([]);
             return;
@@ -49,7 +46,7 @@ export function SearchWithLinks() {
 
         const timer = setTimeout(async () => {
             try {
-                // 1) fetch top 50 artists from Firestore
+                // 1) Fetch top 50 artists from Firestore
                 const colRef = collection(db, "users");
                 const snap = await getDocs(
                     firestoreQuery(colRef, orderBy("displayName"), limit(50))
@@ -59,7 +56,7 @@ export function SearchWithLinks() {
                     ...doc.data(),
                 }));
 
-                // Filter locally by substring
+                // Filter them locally
                 const filteredArtists = allArtists.filter((a) =>
                     a.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
                 );
@@ -69,7 +66,7 @@ export function SearchWithLinks() {
                 setArtistResults([]);
             }
 
-            // 2) local filter for models
+            // 2) Local filter for models from context
             const filteredModels = models.filter((m) =>
                 m.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
@@ -79,56 +76,45 @@ export function SearchWithLinks() {
         return () => clearTimeout(timer);
     }, [showDropdown, searchTerm, db, models]);
 
-    /** Pressing Enter => go to /search?category=all&query=... */
-    const handleKeyDown = (e) => {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            const queryValue = searchTerm.trim();
-            if (queryValue) {
-                navigate(`/search?category=all&query=${encodeURIComponent(queryValue)}`);
-            }
-            setShowDropdown(false);
-        }
+    // onSubmit => go to /search
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const queryValue = searchTerm.trim(); // if empty => user typed nothing
+        // Navigate to /search?category=all&query=<text or empty>
+        navigate(`/search?category=all&query=${encodeURIComponent(queryValue)}`);
+        setSearchTerm("")
+        setShowDropdown(false);
     };
 
-    /** On focus, show the dropdown (unless the user has clicked outside) */
+    // Focus => show dropdown
     const handleFocus = () => {
         setShowDropdown(true);
     };
 
-    /**
-     * "See all" row => if typed something, pass it to query=;
-     * if user typed nothing, we'll pass "all" or simply do an empty string
-     */
+    // "See all" => same logic as form submission
     const handleSeeAll = () => {
-        const queryValue = searchTerm.trim() || "all";
+        const queryValue = searchTerm.trim();
         navigate(`/search?category=all&query=${encodeURIComponent(queryValue)}`);
         setShowDropdown(false);
     };
 
-    // Clicking an artist
     const handleArtistSelect = (uid) => {
         navigate(`/artist/${uid}`);
         setShowDropdown(false);
     };
 
-    // Clicking a model
     const handleModelSelect = (id) => {
         navigate(`/model/${id}`);
         setShowDropdown(false);
     };
 
-    /**
-     * Clicking a preset category link => pass the typed searchTerm (if any).
-     * If user typed nothing, we can just pass "all" or an empty string.
-     */
     const handlePresetClick = (cat) => {
-        const queryValue = searchTerm.trim() || "all";
+        const queryValue = searchTerm.trim();
         navigate(`/search?category=${cat}&query=${encodeURIComponent(queryValue)}`);
         setShowDropdown(false);
     };
 
-    /** Hide dropdown on outside click (but do NOT reset the text input). */
+    // Hide dropdown if user clicks outside
     useEffect(() => {
         function handleClickOutside(e) {
             if (containerRef.current && !containerRef.current.contains(e.target)) {
@@ -139,31 +125,66 @@ export function SearchWithLinks() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    // Clear input
+    const handleClearInput = () => {
+        setSearchTerm("");
+    };
+
     return (
-        <div className="relative w-full max-w-[800px]" ref={containerRef}>
-            {/* Always visible search input */}
+        <form
+            onSubmit={handleSubmit}
+            className="relative w-full max-w-[800px]"
+            ref={containerRef}
+        >
+            {/* Search icon (left) */}
+            <span
+                className="
+          absolute left-3 top-1/2 -translate-y-1/2
+          text-gray-400 pointer-events-none
+        "
+            >
+                <FontAwesomeIcon icon={faSearch} />
+            </span>
+
+            {/* Text input with extra left & right padding for icons */}
             <input
                 type="text"
-                className="border-2 border-gray-300 text-sm rounded-full w-full py-2 px-4 focus:outline-none focus:border-blue-500"
+                className="
+          border-2 border-gray-300 rounded-full w-full
+          text-sm focus:outline-none focus:border-blue-500
+          py-2 pl-10 pr-10
+        "
                 placeholder="Search 3D models..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onFocus={handleFocus}
-                onKeyDown={handleKeyDown}
             />
+
+            {/* Clear icon (right), only if there's input */}
+            {searchTerm && (
+                <button
+                    type="button"
+                    onClick={handleClearInput}
+                    className="
+            absolute right-3 top-1/2 -translate-y-1/2
+            text-gray-400 hover:text-gray-600
+          "
+                >
+                    <FontAwesomeIcon icon={faTimes} />
+                </button>
+            )}
 
             {showDropdown && (
                 <div className="absolute top-[110%] left-0 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-50">
                     <ul className="py-2 max-h-80 overflow-auto text-sm">
-                        {/* Dynamic results if user typed something */}
                         {searchTerm.trim() &&
                             (artistResults.length > 0 || modelResults.length > 0) && (
                                 <>
-                                    {/* Up to 5 artist results */}
+                                    {/* Artist Results */}
                                     {artistResults.map((a) => (
                                         <li
                                             key={`artist-${a.uid}`}
-                                            onClick={() => handleArtistSelect(a.uid)}
+                                            onMouseDown={() => handleArtistSelect(a.uid)}
                                             className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
                                         >
                                             <div className="font-medium">
@@ -175,11 +196,11 @@ export function SearchWithLinks() {
                                         </li>
                                     ))}
 
-                                    {/* Up to 5 model results */}
+                                    {/* Model Results */}
                                     {modelResults.map((m) => (
                                         <li
                                             key={`model-${m.id}`}
-                                            onClick={() => handleModelSelect(m.id)}
+                                            onMouseDown={() => handleModelSelect(m.id)}
                                             className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
                                         >
                                             <div className="font-medium">{m.name}</div>
@@ -191,7 +212,7 @@ export function SearchWithLinks() {
 
                                     {/* "See all" row */}
                                     <li
-                                        onClick={handleSeeAll}
+                                        onMouseDown={handleSeeAll}
                                         className="px-3 py-2 hover:bg-gray-100 cursor-pointer font-medium"
                                     >
                                         See all results for <strong>{searchTerm}</strong>
@@ -202,11 +223,11 @@ export function SearchWithLinks() {
                                 </>
                             )}
 
-                        {/* Preset links (categories) */}
+                        {/* Preset links */}
                         {presetLinks.map((link) => (
                             <li
                                 key={link.category}
-                                onClick={() => handlePresetClick(link.category)}
+                                onMouseDown={() => handlePresetClick(link.category)}
                                 className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
                             >
                                 <span>{link.label}</span>
@@ -228,6 +249,6 @@ export function SearchWithLinks() {
                     </ul>
                 </div>
             )}
-        </div>
+        </form>
     );
 }
