@@ -25,7 +25,7 @@ export function SearchWithLinks() {
     const db = getFirestore();
     const { models } = useModels();
 
-    // Example preset categories
+    // search links
     const presetLinks = [
         { label: "Search Artworks", category: "artworks" },
         { label: "Search Artists", category: "artists" },
@@ -46,7 +46,7 @@ export function SearchWithLinks() {
 
         const timer = setTimeout(async () => {
             try {
-                // 1) Fetch top 50 artists from Firestore
+                // fetch top 50 artists from DB
                 const colRef = collection(db, "users");
                 const snap = await getDocs(
                     firestoreQuery(colRef, orderBy("displayName"), limit(50))
@@ -56,7 +56,7 @@ export function SearchWithLinks() {
                     ...doc.data(),
                 }));
 
-                // Filter them locally
+                // local filter for artists from fetch
                 const filteredArtists = allArtists.filter((a) =>
                     a.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
                 );
@@ -66,7 +66,7 @@ export function SearchWithLinks() {
                 setArtistResults([]);
             }
 
-            // 2) Local filter for models from context
+            //  local filter for models from context
             const filteredModels = models.filter((m) =>
                 m.name.toLowerCase().includes(searchTerm.toLowerCase())
             );
@@ -79,19 +79,19 @@ export function SearchWithLinks() {
     // onSubmit => go to /search
     const handleSubmit = (e) => {
         e.preventDefault();
-        const queryValue = searchTerm.trim(); // if empty => user typed nothing
-        // Navigate to /search?category=all&query=<text or empty>
+        const queryValue = searchTerm.trim();
         navigate(`/search?category=all&query=${encodeURIComponent(queryValue)}`);
-        setSearchTerm("")
+        setSearchTerm("");
         setShowDropdown(false);
+        document.activeElement.blur()
     };
 
-    // Focus => show dropdown
+    // on focus show dropdown
     const handleFocus = () => {
         setShowDropdown(true);
     };
 
-    // "See all" => same logic as form submission
+    // "See all" same logic as form submission
     const handleSeeAll = () => {
         const queryValue = searchTerm.trim();
         navigate(`/search?category=all&query=${encodeURIComponent(queryValue)}`);
@@ -114,7 +114,7 @@ export function SearchWithLinks() {
         setShowDropdown(false);
     };
 
-    // Hide dropdown if user clicks outside
+    // close dropdown if user clicks outside, while keeping the input
     useEffect(() => {
         function handleClickOutside(e) {
             if (containerRef.current && !containerRef.current.contains(e.target)) {
@@ -125,9 +125,11 @@ export function SearchWithLinks() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Clear input
+    // clear input
     const handleClearInput = () => {
         setSearchTerm("");
+        setShowDropdown(false);
+        document.activeElement.blur()
     };
 
     return (
