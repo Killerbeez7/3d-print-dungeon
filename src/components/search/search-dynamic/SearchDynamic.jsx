@@ -1,5 +1,5 @@
-// src/components/search/search-dynamic/SearchDynamic.jsx
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { useModels } from "../../../contexts/modelsContext";
 
-// Example advanced filter options
+// filter options
 const sortOptions = [
     { value: "relevance", label: "Relevance" },
     { value: "likes", label: "Most Liked" },
@@ -35,38 +35,38 @@ export function SearchDynamic() {
     const db = getFirestore();
     const { models, loading: modelsLoading } = useModels();
 
-    // 1) Read the URL param "?query=..."
+    // read the URL param "?query=..."
     const [searchParams] = useSearchParams();
     const urlQuery = searchParams.get("query") || "";
 
-    // 2) Local state for the typed input, defaulting to the param
+    // local state for the typed input, defaulting to the param
     const [searchTerm, setSearchTerm] = useState(urlQuery);
 
-    // If the URL changes while on this page, update local searchTerm
+    // if the URL changes while on this page, update local searchTerm
     useEffect(() => {
         setSearchTerm(urlQuery);
     }, [urlQuery]);
 
-    // 3) Tabs: "artworks" (default) or "artists"
+    // artists / artworks tabs
     const [activeTab, setActiveTab] = useState("artworks");
 
-    // 4) Advanced filter states (applies to Artworks only)
+    // artworks filters states
     const [sortBy, setSortBy] = useState("relevance");
     const [selectedMedia, setSelectedMedia] = useState([]); // multi-select
     const [selectedSubjects, setSelectedSubjects] = useState([]); // multi-select
     const [hideAI, setHideAI] = useState(false);
 
-    // 5) Result arrays
+    // results
     const [modelResults, setModelResults] = useState([]);
     const [artistResults, setArtistResults] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // 6) Debounced effect: if user types in searchTerm, do real-time search
+    // debounced effect: if user types in searchTerm, do real-time search
     useEffect(() => {
         let canceled = false;
         setLoading(true);
 
-        // If user typed nothing => show no results
+        // if user typed nothing show no results
         if (!searchTerm.trim()) {
             setModelResults([]);
             setArtistResults([]);
@@ -77,11 +77,11 @@ export function SearchDynamic() {
         const timer = setTimeout(async () => {
             try {
                 if (activeTab === "artworks") {
-                    // Filter local "models" by name
+                    // filter local "models" by name
                     let matched = models.filter((m) =>
                         m.name.toLowerCase().includes(searchTerm.toLowerCase())
                     );
-                    // Then apply advanced filters (sort, medium, subject, hideAI)
+                    // apply filters
                     matched = applyAdvancedFilters(matched);
 
                     if (!canceled) {
@@ -101,7 +101,7 @@ export function SearchDynamic() {
                         ...doc.data(),
                     }));
 
-                    // Filter them locally
+                    // ilter locally
                     const matchedArtists = allArtists.filter((a) =>
                         a.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
                     );
@@ -200,17 +200,26 @@ export function SearchDynamic() {
     return (
         <div className="min-h-screen bg-bg-primary text-txt-primary p-6">
             {/* Search input at top (real-time) */}
-            <div className="max-w-xl mx-auto mb-4">
+            <div className="max-w-xl mx-auto mb-4 relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                    <FontAwesomeIcon icon={faSearch} />
+                </span>
                 <input
                     type="text"
                     placeholder="Search..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="
-            w-full border border-br-primary rounded px-4 py-2
-            focus:outline-none focus:border-accent
-          "
+                    className="w-full border border-br-primary rounded-full px-4 py-2 pl-10 pr-10 focus:outline-none focus:border-accent"
                 />
+                {searchTerm && (
+                    <button
+                        type="button"
+                        onClick={() => setSearchTerm("")}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                        <FontAwesomeIcon icon={faTimes} />
+                    </button>
+                )}
             </div>
 
             {/* Tab buttons (Artworks / Artists) */}
