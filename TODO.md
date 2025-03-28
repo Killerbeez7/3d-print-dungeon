@@ -34,3 +34,15 @@
 ```
 
 ```
+
+
+
+### search engine
+
+1. rename search with links to GlobalSearch and DynamicSearch
+
+2. if GlobalSearch have input in it and the user change the path 
+Example: click on gallery the search should reset, 
+if clicked on link inside the search input should be passed
+
+3. make the criteria work
