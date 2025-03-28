@@ -1,59 +1,29 @@
 import { useState, useEffect } from "react";
 import { useModels } from "../../contexts/modelsContext";
 import { Link } from "react-router-dom";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
 import LazyImage from "../shared/lazy-image/LazyImage";
 
 export const Gallery = () => {
     const { models, loading } = useModels();
-    const [artworks, setArtworks] = useState([]);
     const [hasMore, setHasMore] = useState(true);
     const [sortBy, setSortBy] = useState("community");
     const [categoryFilter, setCategoryFilter] = useState("all");
-    const db = getFirestore();
-
-    useEffect(() => {
-        if (!models) return;
-
-        const fetchUploaderData = async (model) => {
-            try {
-                const userDocRef = doc(db, "users", model.uploaderId);
-                const userDoc = await getDoc(userDocRef);
-                const uploaderData = userDoc.exists() ? userDoc.data() : null;
-                return uploaderData ? uploaderData.displayName : "Anonymous";
-            } catch (error) {
-                console.error("Error fetching uploader data:", error);
-                return "Anonymous";
-            }
-        };
-
-        const transformed = models.map(async (m) => {
-            const artistName = await fetchUploaderData(m);
-
-            // Fallback logic for older docs that lack 'primaryRenderLowResUrl'
-            const lowResOrPlaceholder =
-                m.primaryRenderLowResUrl || m.primaryRenderUrl || "/image.png";
-
-            return {
-                id: m.id,
-                title: m.name || "Untitled Model",
-                artist: artistName,
-                category: m.type || "3D",
-                // The gallery image is the best placeholder or low-res
-                imageUrl: lowResOrPlaceholder,
-                likes: m.likes || 0,
-                views: m.views || 0,
-            };
-        });
-
-        Promise.all(transformed).then((artworksData) => {
-            setArtworks(artworksData);
-        });
-    }, [models, db]);
 
     if (loading) {
         return <p className="p-4">Loading models...</p>;
     }
+
+    const artworks = models.map((m) => {
+        return {
+            id: m.id,
+            title: m.name || "Untitled Model",
+            artist: m.uploaderDisplayName || "Anonymous",
+            tags: Array.isArray(m.tags) ? m.tags : ["3D"],
+            imageUrl: m.primaryRenderLowResUrl || m.primaryRenderUrl || "/image.png",
+            likes: m.likes || 0,
+            views: m.views || 0,
+        };
+    });
 
     const sortedArtworks = applySorting(artworks, sortBy);
     const displayedArtworks = applyCategoryFilter(sortedArtworks, categoryFilter);
@@ -64,10 +34,8 @@ export const Gallery = () => {
 
     return (
         <div className="bg-bg-primary text-txt-primary min-h-screen">
-            {/* Featured Section - Large clickable images */}
+            {/* Featured Section */}
             <section className="px-4">
-                {/*-------------------------------------------------------------------- fd u add shadow under the nav turn on this paddings */}
-                {/* <section className="px-4 py-8"> */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     <Link to="/news">
                         <div className="relative overflow-hidden rounded-lg shadow-lg">
@@ -112,7 +80,6 @@ export const Gallery = () => {
                 </div>
             </section>
 
-            {/* Category and Sort Filters */}
             <div className="mx-auto p-4">
                 <h1 className="mb-4 font-bold">Gallery</h1>
 
@@ -166,10 +133,20 @@ export const Gallery = () => {
                             >
                                 Concept
                             </button>
+                            <button
+                                onClick={() => setCategoryFilter("Fantasy")}
+                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
+                                    categoryFilter === "Fantasy"
+                                        ? "bg-accent text-white"
+                                        : "bg-bg-surface hover:bg-accent-hover"
+                                }`}
+                            >
+                                Fantasy
+                            </button>
                         </div>
                     </div>
 
-                    {/* Sort Menu as Tag Buttons */}
+                    {/* Sort Menu */}
                     <div className="flex items-center space-x-2">
                         <label
                             htmlFor="sortBy"
@@ -223,17 +200,14 @@ export const Gallery = () => {
                 </div>
             </div>
 
-            {/* Gallery Section */}
+            {/* Gallery Grid */}
             <div className="mx-auto px-4">
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2">
                     {displayedArtworks.map((art) => (
                         <Link key={art.id} to={`/model/${art.id}`}>
                             <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
-                                {/* Container for the image with a fixed aspect ratio */}
                                 <div className="relative w-full aspect-square">
                                     {" "}
-                                    {/* Aspect ratio set here */}
-                                    {/* LazyImage for the actual image */}
                                     <LazyImage
                                         src={art.imageUrl}
                                         alt={art.title}
@@ -272,7 +246,9 @@ function applySorting(artworks, sortBy) {
         case "popular":
             return [...artworks].sort((a, b) => b.likes - a.likes);
         case "latest":
-            return [...artworks];
+            return [...artworks].sort(
+                (a, b) => b.createdAt?.seconds - a.createdAt?.toMillis()
+            );
         case "views":
             return [...artworks].sort((a, b) => b.views - a.views);
         default:
@@ -282,5 +258,7 @@ function applySorting(artworks, sortBy) {
 
 function applyCategoryFilter(artworks, category) {
     if (category === "all") return artworks;
-    return artworks.filter((a) => a.category.toLowerCase() === category.toLowerCase());
+    return artworks.filter((a) =>
+        a.tags.some((tag) => tag.toLowerCase() === category.toLowerCase())
+    );
 }

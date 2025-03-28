@@ -21,12 +21,24 @@ export async function createAdvancedModel({
     uploaderId,
     onProgress,
 }) {
+    // fetch uploaders display name
+    let uploaderDisplayName = "Anonymous";
+    try {
+        const userDoc = await getDoc(doc(db, "users", uploaderId));
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            uploaderDisplayName = userData.displayName || "Anonymous";
+        }
+    } catch (err) {
+        console.error("Error fetching uploader displayName:", err);
+    }
+
     if (!file) throw new Error("No model file provided");
     const progressFn = onProgress || (() => {});
     let progress = 0;
     progressFn(progress);
 
-    // 1) Upload original model file (0 -> 50%)
+    // upload original model file (0 -> 50%)
     const originalRef = ref(storage, `models/original/${file.name}`);
     const originalTask = uploadBytesResumable(originalRef, file);
     const originalFileUrl = await new Promise((resolve, reject) => {
@@ -45,7 +57,7 @@ export async function createAdvancedModel({
         );
     });
 
-    // 2) Convert to .glb if needed (50 -> 100%)
+    // Convert to .glb if needed (50 -> 100%)
     let convertedFileUrl = null;
     const lower = file.name.toLowerCase();
     if (lower.endsWith(".stl") || lower.endsWith(".obj")) {
@@ -100,6 +112,7 @@ export async function createAdvancedModel({
         description,
         tags,
         uploaderId,
+        uploaderDisplayName,
         originalFileUrl,
         convertedFileUrl: convertedFileUrl || originalFileUrl,
         renderFileUrls: renderFileUrls.length > 0 ? renderFileUrls : null,
@@ -110,7 +123,7 @@ export async function createAdvancedModel({
     const userRef = doc(db, "users", uploaderId);
     await updateDoc(userRef, {
         uploads: arrayUnion(modelDocRef.id),
-        artist: true 
+        artist: true,
     });
 
     progressFn(100);
