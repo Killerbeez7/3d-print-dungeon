@@ -128,67 +128,71 @@ export const ModelView = () => {
             </div>
 
             {/* Right side: Info sidebar */}
-            <aside className="w-full lg:w-[360px] bg-bg-surface p-6 rounded-md shadow-lg space-y-6">
-                {uploader ? (
-                    <div className="flex items-center space-x-4 border-b pb-4">
-                        <LazyImage
-                            src={uploader.photoURL || "/user.png"}
+            <aside className="w-full lg:w-[360px] bg-bg-surface p-6 rounded-md shadow-md space-y-6">
+                {/* Uploader info */}
+                {uploader && (
+                    <div className="flex items-center pb-4 border-b border-br-primary">
+                        <img
+                            src={uploader.photoURL || "/default-avatar.png"}
                             alt={uploader.displayName || "Unknown User"}
                             className="w-16 h-16 rounded-full object-cover"
                         />
-                        <div>
+                        <div className="ml-3">
                             <h2 className="text-lg font-semibold">
                                 {uploader.displayName || "Anonymous"}
                             </h2>
+                            {/* optional tagline or data */}
                         </div>
                     </div>
-                ) : null}
+                )}
 
-                {/* Model info */}
+                {/* Model Title / Description */}
                 <div>
-                    <h1 className="text-2xl font-bold">{model.name}</h1>
-                    <p className="mt-2 text-gray-600">{model.description}</p>
+                    <h1 className="text-2xl font-bold mb-1">{model.name}</h1>
+                    <p className="text-sm text-txt-secondary">{model.description}</p>
                 </div>
 
-                {/* Likes / Views */}
-                <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-1">
+                {/* Stats row */}
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-1 text-sm">
                         <i className="fas fa-heart text-red-500"></i>
                         <span>{model.likes || 0} Likes</span>
                     </div>
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 text-sm">
                         <i className="fas fa-eye text-blue-500"></i>
                         <span>{model.views || 0} Views</span>
                     </div>
                 </div>
 
-                {/* Tags Section */}
-                <div>
-                    <h3 className="text-lg font-semibold">Tags</h3>
-                    <div className="flex flex-wrap gap-2 mt-2">
-                        {(model.tags || []).map((tag, index) => (
-                            <span
-                                key={index}
-                                className="px-3 py-1 rounded-full bg-gray-200 text-sm font-medium"
-                            >
-                                {tag}
-                            </span>
-                        ))}
+                {/* Tags */}
+                {model.tags && model.tags.length > 0 && (
+                    <div>
+                        <h3 className="text-lg font-semibold mb-2">Tags</h3>
+                        <div className="flex flex-wrap gap-2">
+                            {model.tags.map((tag, i) => (
+                                <span
+                                    key={i}
+                                    className="px-3 py-1 text-sm rounded-full bg-gray-200"
+                                >
+                                    {tag}
+                                </span>
+                            ))}
+                        </div>
                     </div>
-                </div>
+                )}
 
-                {/* Action Buttons */}
+                {/* Actions */}
                 <div className="grid grid-cols-2 gap-2">
-                    <button className="bg-btn-secondary text-txt-primary font-medium py-2 rounded-lg hover:bg-btn-secondary-hover">
+                    <button className="bg-btn-secondary text-txt-primary py-2 rounded hover:bg-btn-secondary-hover">
                         Like
                     </button>
-                    <button className="bg-btn-secondary text-txt-primary font-medium py-2 rounded-lg hover:bg-btn-secondary-hover">
+                    <button className="bg-btn-secondary text-txt-primary py-2 rounded hover:bg-btn-secondary-hover">
                         Save
                     </button>
                     {model.originalFileUrl && (
                         <button
                             onClick={() => window.open(model.originalFileUrl, "_blank")}
-                            className="bg-btn-primary text-white font-medium py-2 rounded-lg hover:bg-btn-primary-hover"
+                            className="bg-btn-primary text-white py-2 rounded hover:bg-btn-primary-hover"
                         >
                             Download Original
                         </button>
@@ -196,15 +200,15 @@ export const ModelView = () => {
                     {fallback3DUrl && fallback3DUrl !== model.originalFileUrl && (
                         <button
                             onClick={() => window.open(fallback3DUrl, "_blank")}
-                            className="bg-btn-primary text-white font-medium py-2 rounded-lg hover:bg-btn-primary-hover"
+                            className="bg-btn-primary text-white py-2 rounded hover:bg-btn-primary-hover"
                         >
-                            Download Converted (glTF)
+                            Download (glTF)
                         </button>
                     )}
                 </div>
 
-                {/* Edit Model Button */}
-                {model.userId && model.userId === user?.uid && (
+                {/* Edit if user is the owner */}
+                {user && user.uid === model.userId && (
                     <Link
                         to={`/model/${model.id}/edit`}
                         className="block text-center bg-btn-secondary text-white py-2 px-4 rounded hover:bg-btn-secondary-hover transition-colors"
@@ -213,7 +217,7 @@ export const ModelView = () => {
                     </Link>
                 )}
 
-                {/* Comments Section */}
+                {/* Comments */}
                 <CommentsProvider modelId={model.id}>
                     <Comments />
                 </CommentsProvider>
