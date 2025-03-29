@@ -17,7 +17,7 @@
 
 ```sh
     1. comments/rating - Add better UI/UX
-    2. choose how they should work
+    2. choose how they should work      #DONE
     EXAMPLE: sumbit rating only, rating and comment, only comment...
     3. 
 ```
@@ -31,18 +31,12 @@
 9.
 10.
 
-```
-
-```
-
-
-
 ### search engine
+```sh
+1. rename search with links to GlobalSearch and DynamicSearch  #DONE
 
-1. rename search with links to GlobalSearch and DynamicSearch
-
-2. if GlobalSearch have input in it and the user change the path 
-Example: click on gallery the search should reset, 
-if clicked on link inside the search input should be passed
+2. if GlobalSearch have input in it and the user change the path #DONE
+Example: click on gallery the search should reset, if clicked on link inside the search input should be passed 
 
 3. make the criteria work
+```
