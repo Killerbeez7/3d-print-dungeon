@@ -21,7 +21,7 @@ import { AuthModal } from "./components/auth-modal/AuthModal";
 import { ArtistProfile } from "./components/artists/artist-profile/ArtistProfile";
 import { ProfileSettings } from "./components/settings/ProfileSettings";
 import { Artists } from "./components/artists/artists/Artists";
-//utils
+// utils
 import { SearchDynamic } from "./components/search/search-dynamic/SearchDynamic";
 // dev
 import { AdminPanel } from "./components/admin-panel/AdminPanel";
@@ -31,6 +31,7 @@ export default function App() {
     const [isSignUp, setIsSignUp] = useState(false);
 
     const handleCloseModal = () => setIsModalOpen(false);
+    const handleOpenModal = () => setIsModalOpen(true);
 
     // switch between signUp/signIn
     const handleSwitchMode = () => setIsSignUp((prev) => !prev);
@@ -43,12 +44,12 @@ export default function App() {
                         onLoginClick={() => {
                             // set sign-in mode
                             setIsSignUp(false);
-                            setIsModalOpen(true);
+                            handleOpenModal();
                         }}
                         onSignUpClick={() => {
                             // set sign-up mode
                             setIsSignUp(true);
-                            setIsModalOpen(true);
+                            handleOpenModal();
                         }}
                     />
 
@@ -67,7 +68,11 @@ export default function App() {
                             <Route path="/artist/:uid" element={<ArtistProfile />} />
                             {/* models */}
                             <Route path="/upload" element={<ModelUpload />} />
-                            <Route path="/model/:id" element={<ModelView />} />
+                            {/* Pass openAuthModal prop to ModelView */}
+                            <Route
+                                path="/model/:id"
+                                element={<ModelView openAuthModal={handleOpenModal} />}
+                            />
                             <Route path="/model/:id/edit" element={<ModelEdit />} />
                             {/* search */}
                             <Route path="/search" element={<SearchDynamic />} />
