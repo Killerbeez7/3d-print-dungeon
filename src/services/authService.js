@@ -1,11 +1,4 @@
-import {
-    doc,
-    setDoc,
-    onSnapshot,
-    serverTimestamp,
-    collection,
-    getDocs,
-} from "firebase/firestore";
+import { doc, setDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebase/firebaseConfig";
 import {
     createUserWithEmailAndPassword,
@@ -78,31 +71,6 @@ export const getUserFromDatabase = (uid, callback) => {
     return unsubscribe;
 };
 
-export const getAllArtists = async () => {
-    const usersCollectionRef = collection(db, "users");
-    try {
-        // Fetch all users
-        const userDocs = await getDocs(usersCollectionRef);
-        const artistsWithUploads = [];
-
-        userDocs.forEach((doc) => {
-            const userData = doc.data();
-            // Check if the user has uploads (assuming `uploads` is an array in each user's doc)
-            if (userData.uploads && userData.uploads.length > 0) {
-                artistsWithUploads.push({
-                    id: doc.id,
-                    ...userData,
-                });
-            }
-        });
-
-        return artistsWithUploads;
-    } catch (error) {
-        console.error("Error fetching artists:", error);
-        return []; // Return empty array if something goes wrong
-    }
-};
-
 // Email Sign Up
 export const signUpWithEmail = async (email, password) => {
     try {
@@ -128,11 +96,7 @@ export const signUpWithEmail = async (email, password) => {
 // Email Sign In
 export const signInWithEmail = async (email, password) => {
     try {
-        const userCredential = await signInWithEmailAndPassword(
-            auth,
-            email,
-            password
-        );
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
         return userCredential.user;
     } catch (error) {
         console.error("Error signing in with email:", error);
@@ -207,11 +171,7 @@ export const signInWithTwitter = async () => {
 };
 
 // Function to change password
-export const changePassword = async (
-    currentUser,
-    currentPassword,
-    newPassword
-) => {
+export const changePassword = async (currentUser, currentPassword, newPassword) => {
     try {
         // Reauthenticate the user with their current password
         const credential = EmailAuthProvider.credential(
@@ -227,7 +187,6 @@ export const changePassword = async (
         throw new Error(error.message);
     }
 };
-
 
 // Sign Out
 export const signOutUser = async () => {
