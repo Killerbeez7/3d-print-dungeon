@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useModels } from "../../contexts/modelsContext";
 import { Link } from "react-router-dom";
 import LazyImage from "../shared/lazy-image/LazyImage";
+import { FeaturedCarousel } from "./FeaturedCarousel";
 
 export const Gallery = () => {
     const { models, loading } = useModels();
@@ -13,17 +14,16 @@ export const Gallery = () => {
         return <p className="p-4">Loading models...</p>;
     }
 
-    const artworks = models.map((m) => {
-        return {
-            id: m.id,
-            title: m.name || "Untitled Model",
-            artist: m.uploaderDisplayName || "Anonymous",
-            tags: Array.isArray(m.tags) ? m.tags : ["3D"],
-            imageUrl: m.primaryRenderLowResUrl || m.primaryRenderUrl || "/image.png",
-            likes: m.likes || 0,
-            views: m.views || 0,
-        };
-    });
+    const artworks = models.map((m) => ({
+        id: m.id,
+        title: m.name || "Untitled Model",
+        artist: m.uploaderDisplayName || "Anonymous",
+        tags: Array.isArray(m.tags) ? m.tags : ["3D"],
+        imageUrl: m.primaryRenderLowResUrl || m.primaryRenderUrl || "/image.png",
+        likes: m.likes || 0,
+        views: m.views || 0,
+        createdAt: m.createdAt,
+    }));
 
     const sortedArtworks = applySorting(artworks, sortBy);
     const displayedArtworks = applyCategoryFilter(sortedArtworks, categoryFilter);
@@ -34,51 +34,8 @@ export const Gallery = () => {
 
     return (
         <div className="bg-bg-primary text-txt-primary min-h-screen">
-            {/* Featured Section */}
-            <section className="px-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <Link to="/news">
-                        <div className="relative overflow-hidden rounded-lg shadow-lg">
-                            <img
-                                src="/image.png" // Replace with an actual image
-                                alt="News"
-                                className="w-full h-[300px] object-cover rounded-lg"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0000009e] to-transparent flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                <h3 className="text-white text-2xl font-bold">News</h3>
-                            </div>
-                        </div>
-                    </Link>
-                    <Link to="/featured">
-                        <div className="relative overflow-hidden rounded-lg shadow-lg">
-                            <img
-                                src="/image.png"
-                                alt="Prints"
-                                className="w-full h-[300px] object-cover rounded-lg"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0000009e] to-transparent flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                <h3 className="text-white text-2xl font-bold">
-                                    Featured Models
-                                </h3>
-                            </div>
-                        </div>
-                    </Link>
-                    <Link to="/business">
-                        <div className="relative overflow-hidden rounded-lg shadow-lg">
-                            <img
-                                src="/image.png" // Replace with an actual image
-                                alt="3D Models"
-                                className="w-full h-[300px] object-cover rounded-lg"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#000000af] to-transparent flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                <h3 className="text-white text-2xl font-bold">
-                                    For Business
-                                </h3>
-                            </div>
-                        </div>
-                    </Link>
-                </div>
-            </section>
+            {/* Featured Carousel Section */}
+            <FeaturedCarousel />
 
             <div className="mx-auto p-4">
                 <h1 className="mb-4 font-bold">Gallery</h1>
@@ -207,13 +164,11 @@ export const Gallery = () => {
                         <Link key={art.id} to={`/model/${art.id}`}>
                             <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
                                 <div className="relative w-full aspect-square">
-                                    {" "}
                                     <LazyImage
                                         src={art.imageUrl}
                                         alt={art.title}
                                         className="absolute inset-0 w-full h-full object-cover rounded-lg"
                                     />
-                                    {/* Gradient and model info */}
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end justify-start opacity-0 hover:opacity-100 transition-opacity">
                                         <div className="text-white m-2">
                                             <h4 className="font-semibold">{art.title}</h4>
@@ -247,7 +202,7 @@ function applySorting(artworks, sortBy) {
             return [...artworks].sort((a, b) => b.likes - a.likes);
         case "latest":
             return [...artworks].sort(
-                (a, b) => b.createdAt?.seconds - a.createdAt?.toMillis()
+                (a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)
             );
         case "views":
             return [...artworks].sort((a, b) => b.views - a.views);
