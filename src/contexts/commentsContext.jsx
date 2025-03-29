@@ -1,10 +1,17 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { db } from "../firebase/firebaseConfig";
 import {
-    fetchComments,
-    addComment,
-    deleteComment,
-    editComment,
-} from "../services/commentsService";
+    collection,
+    query,
+    where,
+    orderBy,
+    onSnapshot,
+    serverTimestamp,
+    addDoc,
+    deleteDoc,
+    doc,
+    updateDoc,
+} from "firebase/firestore";
 
 const CommentsContext = createContext();
 
@@ -14,27 +21,39 @@ export const CommentsProvider = ({ modelId, children }) => {
     const [comments, setComments] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const loadComments = async () => {
-        setLoading(true);
-        try {
-            const fetched = await fetchComments(modelId);
-            setComments(fetched);
-        } catch (error) {
-            console.error("Error fetching comments:", error);
-        }
-        setLoading(false);
-    };
-
     useEffect(() => {
-        if (modelId) {
-            loadComments();
-        }
+        if (!modelId) return;
+        // Set up real-time subscription
+        const q = query(
+            collection(db, "comments"),
+            where("modelId", "==", modelId),
+            orderBy("createdAt", "desc")
+        );
+        const unsubscribe = onSnapshot(
+            q,
+            (snapshot) => {
+                const fetched = snapshot.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
+                setComments(fetched);
+                setLoading(false);
+            },
+            (error) => {
+                console.error("Error listening to comments:", error);
+                setLoading(false);
+            }
+        );
+        return () => unsubscribe();
     }, [modelId]);
 
     const submitComment = async (commentData) => {
         try {
-            await addComment(modelId, commentData);
-            await loadComments();
+            await addDoc(collection(db, "comments"), {
+                ...commentData,
+                modelId,
+                createdAt: serverTimestamp(),
+            });
         } catch (error) {
             console.error("Error adding comment:", error);
             throw error;
@@ -43,8 +62,7 @@ export const CommentsProvider = ({ modelId, children }) => {
 
     const removeComment = async (commentId) => {
         try {
-            await deleteComment(commentId);
-            await loadComments();
+            await deleteDoc(doc(db, "comments", commentId));
         } catch (error) {
             console.error("Error deleting comment:", error);
             throw error;
@@ -53,10 +71,9 @@ export const CommentsProvider = ({ modelId, children }) => {
 
     const updateComment = async (commentId, newData) => {
         try {
-            await editComment(commentId, newData);
-            await loadComments();
+            await updateDoc(doc(db, "comments", commentId), newData);
         } catch (error) {
-            console.error("Error editing comment:", error);
+            console.error("Error updating comment:", error);
             throw error;
         }
     };
@@ -69,7 +86,6 @@ export const CommentsProvider = ({ modelId, children }) => {
                 submitComment,
                 removeComment,
                 updateComment,
-                reload: loadComments,
             }}
         >
             {children}
