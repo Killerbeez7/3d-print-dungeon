@@ -9,7 +9,7 @@ import {
     query as firestoreQuery,
     orderBy,
 } from "firebase/firestore";
-import { useModels } from "../../../contexts/modelsContext";
+import { useModels } from "../../contexts/modelsContext";
 
 const sortOptions = [
     { value: "relevance", label: "Relevance" },
