@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useModels } from "../../contexts/modelsContext";
+import { useModels } from "@/contexts/modelsContext";
 import { Link } from "react-router-dom";
 import LazyImage from "../shared/lazy-image/LazyImage";
 import { FeaturedCarousel } from "./FeaturedCarousel";
