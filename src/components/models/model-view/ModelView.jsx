@@ -7,8 +7,7 @@ import { useEffect } from "react";
 import LazyImage from "../../shared/lazy-image/LazyImage";
 import LikeButton from "../model-actions/likeButton";
 import FavoritesButton from "../model-actions/favoritesButton";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
+
 
 export const ModelView = ({ openAuthModal }) => {
     const { id } = useParams();
@@ -221,7 +220,7 @@ export const ModelView = ({ openAuthModal }) => {
                 )}
 
                 <CommentsProvider modelId={model.id}>
-                    <Comments />
+                    <Comments  openAuthModal={openAuthModal} />
                 </CommentsProvider>
             </aside>
         </div>
