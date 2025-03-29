@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { getAllArtists } from "../../../services/authService";
+import { getAllArtists } from "../../../services/artistsService";
 
 export const Artists = () => {
     const [artists, setArtists] = useState([]);
