@@ -12,7 +12,7 @@ import {
     faList,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { SearchWithLinks } from "../../search/search-with-links/SearchWithLinks";
+import { SearchGlobal } from "../../search/SearchGlobal";
 
 export const Navbar = ({ onLoginClick }) => {
     const { currentUser, handleSignOut } = useAuth();
@@ -170,7 +170,7 @@ export const Navbar = ({ onLoginClick }) => {
 
             {/* MIDDLE COLUMN: Search Bar */}
             <div className="flex justify-center">
-                <SearchWithLinks />
+                <SearchGlobal />
             </div>
 
             {/* RIGHT COLUMN: Auth Buttons, Profile, etc. */}

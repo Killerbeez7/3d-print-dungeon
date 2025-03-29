@@ -22,7 +22,7 @@ import { ArtistProfile } from "./components/artists/artist-profile/ArtistProfile
 import { ProfileSettings } from "./components/settings/ProfileSettings";
 import { Artists } from "./components/artists/artists/Artists";
 // utils
-import { SearchDynamic } from "./components/search/search-dynamic/SearchDynamic";
+import { SearchDynamic } from "./components/search/SearchDynamic";
 // dev
 import { AdminPanel } from "./components/admin-panel/AdminPanel";
 

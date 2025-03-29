@@ -11,9 +11,9 @@ import {
     limit,
     getDocs,
 } from "firebase/firestore";
-import { useModels } from "../../../contexts/modelsContext";
+import { useModels } from "../../contexts/modelsContext";
 
-export function SearchWithLinks() {
+export function SearchGlobal() {
     const [searchTerm, setSearchTerm] = useState("");
     const [showDropdown, setShowDropdown] = useState(false);
 
