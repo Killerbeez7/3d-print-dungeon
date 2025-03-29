@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import LazyImage from "../shared/lazy-image/LazyImage";
 import { FeaturedCarousel } from "./FeaturedCarousel";
 
-export const Gallery = () => {
+export const Home = () => {
     const { models, loading } = useModels();
     const [hasMore, setHasMore] = useState(true);
     const [sortBy, setSortBy] = useState("community");
@@ -38,7 +38,7 @@ export const Gallery = () => {
             <FeaturedCarousel />
 
             <div className="mx-auto p-4">
-                <h1 className="mb-4 font-bold">Gallery</h1>
+                <h1 className="mb-4 font-bold">Models</h1>
 
                 {/* Category Buttons */}
                 <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2">

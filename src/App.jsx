@@ -6,7 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import { Navbar } from "./components/shared/navbar/Navbar";
 import { Footer } from "./components/shared/footer/Footer";
 import { Store } from "./components/store/Store";
-import { Gallery } from "./components/gallery/Gallery";
+import { Home } from "./components/home/Home";
 import { Explore } from "./components/explore/Explore";
 import { Business } from "./components/business/Business";
 // models
@@ -58,7 +58,7 @@ export default function App() {
                             {/* admin */}
                             <Route path="/admin-panel" element={<AdminPanel />} />
                             {/* common */}
-                            <Route path="/" element={<Gallery />} />
+                            <Route path="/" element={<Home />} />
                             <Route path="/3dstore" element={<Store />} />
                             <Route path="/explore" element={<Explore />} />
                             <Route path="/business" element={<Business />} />
