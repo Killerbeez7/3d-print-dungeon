@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../../../contexts/authContext";
 import { useModels } from "../../../contexts/modelsContext";
-import { localConvertToGLBForPreview } from "../../../utils/converter";
+import { localConvertToGLBForPreview } from "../../../utils/models/converter";
 
 export const ModelUpload = () => {
     const { currentUser } = useAuth();

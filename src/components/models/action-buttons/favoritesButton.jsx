@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
 
-const FavoritesButton = ({ modelId, currentUser, openAuthModal }) => {
+export const FavoritesButton = ({ modelId, currentUser, openAuthModal }) => {
     const [favorited, setFavorited] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -42,7 +42,6 @@ const FavoritesButton = ({ modelId, currentUser, openAuthModal }) => {
 
     return (
         <div className="flex items-center space-x-2">
-            {/* Only the star icon is clickable */}
             <div onClick={handleToggle} className="cursor-pointer">
                 <FontAwesomeIcon
                     icon={favorited ? solidStar : regularStar}
@@ -55,5 +54,3 @@ const FavoritesButton = ({ modelId, currentUser, openAuthModal }) => {
         </div>
     );
 };
-
-export default FavoritesButton;

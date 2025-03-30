@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { useModels } from "../../contexts/modelsContext";
 import { Link } from "react-router-dom";
-// Example: import your "deleteAllButFirstModel" function
-import { deleteAllButFirstModel } from "../../utils/modelsCleanup";
+import { useModels } from "../../contexts/modelsContext";
+import { deleteAllButFirstModel } from "../../utils/admin/modelsCleanup";
 
 export const AdminPanel = () => {
     const { models, loading } = useModels();
@@ -10,7 +9,7 @@ export const AdminPanel = () => {
     const [success, setSuccess] = useState(false);
     const [isClearing, setIsClearing] = useState(false);
 
-    // Clears all models except the very first, as previously discussed
+    // Clears all models except the first
     const handleClearModels = async () => {
         if (
             !window.confirm(
@@ -67,7 +66,6 @@ export const AdminPanel = () => {
                     >
                         <Link to={`/model/${model.id}`}>
                             <img
-                                // If you have a low-res field, fallback to the main field or a placeholder
                                 src={
                                     model.primaryRenderLowResUrl ||
                                     model.primaryRenderUrl ||

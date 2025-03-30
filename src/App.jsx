@@ -3,28 +3,29 @@ import "@google/model-viewer";
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 // common
-import { Navbar } from "./components/shared/navbar/Navbar";
-import { Footer } from "./components/shared/footer/Footer";
-import { Store } from "./components/store/Store";
 import { Home } from "./components/home/Home";
+import { Store } from "./components/store/Store";
 import { Explore } from "./components/explore/Explore";
 import { Business } from "./components/business/Business";
+import { Navbar } from "./components/shared/navbar/Navbar";
+import { Footer } from "./components/shared/footer/Footer";
 // models
-import { ModelUpload } from "./components/models/model-upload/ModelUpload";
 import { ModelView } from "./components/models/model-view/ModelView";
 import { ModelEdit } from "./components/models/model-edit/ModelEdit";
+import { ModelUpload } from "./components/models/model-upload/ModelUpload";
 // contexts
 import { AuthProvider } from "./contexts/authContext";
 import { ModelsProvider } from "./contexts/modelsContext";
-import { AuthModal } from "./components/auth-modal/AuthModal";
+import { AuthModal } from "./components/shared/auth-modal/AuthModal";
 // profiles
-import { ArtistProfile } from "./components/artists/artist-profile/ArtistProfile";
-import { ProfileSettings } from "./components/settings/ProfileSettings";
 import { Artists } from "./components/artists/artists/Artists";
+import { ProfileSettings } from "./components/settings/ProfileSettings";
+import { ArtistProfile } from "./components/artists/artist-profile/ArtistProfile";
 // utils
 import { SearchDynamic } from "./components/search/SearchDynamic";
+import { ScrollToTopButton } from "./components/shared/ScrollToTopButton";
 // dev
-import { AdminPanel } from "./components/admin-panel/AdminPanel";
+import { AdminPanel } from "./components/admin/AdminPanel";
 
 export default function App() {
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -88,6 +89,7 @@ export default function App() {
                         isSignUp={isSignUp}
                         onSwitchMode={handleSwitchMode}
                     />
+                    <ScrollToTopButton />
                 </ModelsProvider>
             </AuthProvider>
         </div>
