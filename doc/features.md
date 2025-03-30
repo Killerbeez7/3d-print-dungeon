@@ -1,7 +1,18 @@
 # Features which need improvements
 
+- [ ] Content Moderation
+- [ ] User Management
+
+### Search engine
+- [ ] Search Suggestions/Autocomplete:
+
 ### General
 - [ ] Fill other pages with content (Buy 3D models, For Business)
+- [ ] Analytics Dashboard
+- [ ] Monitor Analytics
+- [ ] Digital Purchases & Licensing
+- [ ] Community Forums or Q&A
+- [ ] Messaging & Notifications
 
 ### Gallery
 - [ ] Overall gallery design (better cards, with hover effects, similar to Artstation)
@@ -14,8 +25,8 @@
 ### ModelView
 - [ ] Fix styles
 - [ ] Create likes functionality
-   - [ ] Display number of likes and downloads
-   - [ ] Display liked models in user's profile
+- [ ] Display number of likes and downloads
+- [ ] Display liked models in user's profile
 - [ ] Review comment / ratings
 
 ### UploadModel
@@ -24,6 +35,7 @@
 
 ### Profile
 - [ ] Order history?
+- [ ] Detailed Portfolios
 
 ### Settings
 - [ ] Fill all sections with content
