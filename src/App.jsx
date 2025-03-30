@@ -89,9 +89,10 @@ export default function App() {
                         isSignUp={isSignUp}
                         onSwitchMode={handleSwitchMode}
                     />
-                    <ScrollToTopButton />
                 </ModelsProvider>
             </AuthProvider>
+            {/* utils */}
+            <ScrollToTopButton />
         </div>
     );
 }
