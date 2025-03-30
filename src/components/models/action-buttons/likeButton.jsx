@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as solidHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons";
 
-const LikeButton = ({ modelId, initialLikes, currentUser, openAuthModal }) => {
+export const LikeButton = ({ modelId, initialLikes, currentUser, openAuthModal }) => {
     const [liked, setLiked] = useState(false);
     const [likeCount, setLikeCount] = useState(initialLikes || 0);
     const [loading, setLoading] = useState(false);
@@ -26,10 +26,8 @@ const LikeButton = ({ modelId, initialLikes, currentUser, openAuthModal }) => {
         checkLikeStatus();
     }, [modelId, currentUser]);
 
-    // Format like count text with proper singular/plural form
     const formatLikeCount = (count) => (count === 1 ? "1 Like" : `${count} Likes`);
 
-    // Handle like toggle on the heart icon click
     const handleToggle = async () => {
         if (!currentUser) {
             openAuthModal && openAuthModal();
@@ -48,7 +46,6 @@ const LikeButton = ({ modelId, initialLikes, currentUser, openAuthModal }) => {
 
     return (
         <div className="flex items-center space-x-2">
-            {/* Only the heart icon is clickable */}
             <div onClick={handleToggle} className="cursor-pointer">
                 <FontAwesomeIcon
                     icon={liked ? solidHeart : regularHeart}
@@ -59,5 +56,3 @@ const LikeButton = ({ modelId, initialLikes, currentUser, openAuthModal }) => {
         </div>
     );
 };
-
-export default LikeButton;

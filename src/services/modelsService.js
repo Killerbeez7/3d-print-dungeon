@@ -8,7 +8,7 @@ import {
     arrayUnion,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { finalConvertFileToGLB } from "../utils/converter";
+import { finalConvertFileToGLB } from "../utils/models/converter";
 
 // add model in DB
 export async function createAdvancedModel({

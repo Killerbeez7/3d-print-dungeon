@@ -2,25 +2,6 @@ import React, { useState } from "react";
 import { useComments } from "../../../contexts/CommentsContext";
 import { useAuth } from "../../../contexts/authContext";
 
-const StarRating = ({ value, onChange, disabled = false, size = 20 }) => {
-    return (
-        <div className="flex items-center space-x-1">
-            {[1, 2, 3, 4, 5].map((star) => (
-                <span
-                    key={star}
-                    onClick={() => {
-                        if (!disabled) onChange(star);
-                    }}
-                    className={disabled ? "cursor-default" : "cursor-pointer"}
-                >
-                    {/* Simple non-interactive stars if needed; otherwise remove */}
-                    {star <= value ? "★" : "☆"}
-                </span>
-            ))}
-        </div>
-    );
-};
-
 export const Comments = ({ openAuthModal }) => {
     const { currentUser } = useAuth();
     const { comments, loading, submitComment, removeComment, updateComment } =

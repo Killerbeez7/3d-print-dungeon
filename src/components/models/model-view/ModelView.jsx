@@ -1,13 +1,12 @@
 import { useParams, Link } from "react-router-dom";
 import { useModels } from "../../../contexts/modelsContext";
 import { useAuth } from "../../../contexts/authContext";
-import { Comments } from "../model-comments/ModelComments";
+import { Comments } from "./Comments";
 import { CommentsProvider } from "../../../contexts/CommentsContext";
 import { useEffect } from "react";
-import LazyImage from "../../shared/lazy-image/LazyImage";
-import LikeButton from "../model-actions/likeButton";
-import FavoritesButton from "../model-actions/favoritesButton";
-
+import { LazyImage } from "../../shared/lazy-image/LazyImage";
+import { LikeButton } from "../action-buttons/likeButton";
+import { FavoritesButton } from "../action-buttons/favoritesButton";
 
 export const ModelView = ({ openAuthModal }) => {
     const { id } = useParams();
@@ -220,7 +219,7 @@ export const ModelView = ({ openAuthModal }) => {
                 )}
 
                 <CommentsProvider modelId={model.id}>
-                    <Comments  openAuthModal={openAuthModal} />
+                    <Comments openAuthModal={openAuthModal} />
                 </CommentsProvider>
             </aside>
         </div>
