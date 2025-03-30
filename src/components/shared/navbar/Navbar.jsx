@@ -85,6 +85,14 @@ export const Navbar = ({ onLoginClick }) => {
                                             Artists
                                         </Link>
                                     </li>
+                                    <li>
+                                        <Link
+                                            to="/forum"
+                                            className="block mx-2 px-2 my-1 py-1 text-txt-secondary rounded hover:bg-bg-secondary hover:text-txt-primary"
+                                        >
+                                            Forum
+                                        </Link>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
