@@ -1,37 +1,63 @@
-// Separate sections for first step, second step, and buttons
-
-import React, { useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
+import { useAuth } from "../../../contexts/authContext";
+import { useModels } from "../../../contexts/modelsContext";
+
 
 // Main Upload Flow Component
 export const ModelUploadTest = () => {
-    const [files, setFiles] = useState([]);
+    const [files, setFiles] = useState([]); // Raw model files
+    const [images, setImages] = useState([]); // Model images
     const [step, setStep] = useState(1); // Track the step (1: Upload, 2: Information)
+
+    const [modelData, setModelData] = useState({
+        name: "",
+        description: "",
+        tags: [],
+        file: null,
+        convertedUrl: null,
+        renderFiles: [],
+        renderPreviewUrls: [],
+        selectedRenderIndex: 0,
+    });
 
     // Handler for when files are dropped or selected
     const onDrop = useCallback((acceptedFiles) => {
         setFiles((prev) => [...prev, ...acceptedFiles]);
     }, []);
 
+    // Handler for when images are dropped or selected
+    const onDropImages = useCallback((acceptedFiles) => {
+        setImages((prev) => [...prev, ...acceptedFiles]);
+    }, []);
+
     // Remove file by name
-    const removeFile = (fileName) => {
-        setFiles((prev) => prev.filter((file) => file.name !== fileName));
+    const removeFile = (fileName, type) => {
+        if (type === 'file') {
+            setFiles((prev) => prev.filter((file) => file.name !== fileName));
+        } else if (type === 'image') {
+            setImages((prev) => prev.filter((file) => file.name !== fileName));
+        }
     };
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+
+
+    const { getRootProps: getRootPropsForFiles, getInputProps: getInputPropsForFiles, isDragActive: isDragActiveForFiles } = useDropzone({ onDrop });
+    const { getRootProps: getRootPropsForImages, getInputProps: getInputPropsForImages, isDragActive: isDragActiveForImages } = useDropzone({ onDrop: onDropImages });
 
     return (
-        <div className="container mx-auto p-4 space-y-4">
+        <div className="container mx-auto p-4 space-y-2">
             {/* Step Indicator */}
             <StepIndicator currentStep={step} />
 
-            <section className="bg-bg-secondary rounded-md p-4">
+            <section className="bg-bg-secondary rounded-md py-4 px-8">
+                <h4 className="font-medium text-txt-primary">Raw Model Files</h4>
                 {/* File Upload Section (Step 1) */}
                 {step === 1 && (
                     <FileUploadSection
-                        getRootProps={getRootProps}
-                        getInputProps={getInputProps}
-                        isDragActive={isDragActive}
+                        getRootProps={getRootPropsForFiles}
+                        getInputProps={getInputPropsForFiles}
+                        isDragActive={isDragActiveForFiles}
                         files={files}
                         removeFile={removeFile}
                         onNextStep={() => setStep(2)} // Move to the next step
@@ -40,13 +66,25 @@ export const ModelUploadTest = () => {
 
                 {/* Uploaded Files List */}
                 {files.length > 0 && (
-                    <UploadedFilesList files={files} removeFile={removeFile} />
+                    <UploadedFilesList files={files} removeFile={(name) => removeFile(name, 'file')} />
                 )}
             </section>
 
             {/* Model Information Section (Step 2) */}
-            {step === 2 && <ModelInformationStep onPreviousStep={() => setStep(1)} />}
-            
+
+            {step === 2 && (
+
+                <ModelInformationStep
+                    onPreviousStep={() => setStep(1)}
+                    images={images}
+                    removeImage={removeFile}
+                    getRootProps={getRootPropsForImages}
+                    getInputProps={getInputPropsForImages}
+                    isDragActive={isDragActiveForImages}
+                />
+
+            )}
+
             {/* Buttons Section */}
             <ButtonsSection
                 step={step}
@@ -84,11 +122,12 @@ const StepIndicatorItem = ({ step, label, currentStep }) => {
 // File Upload Section Component
 const FileUploadSection = ({ getRootProps, getInputProps, isDragActive, files, removeFile, onNextStep }) => {
     return (
+
         <div>
             {/* Drag-and-drop zone */}
             <div
                 {...getRootProps()}
-                className={`border-2 border-dashed rounded-md p-8 text-center cursor-pointer transition-colors
+                className={`border-2 mb-4 border-dashed rounded-md p-8 text-center cursor-pointer transition-colors
           ${isDragActive ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}
             >
                 <input {...getInputProps()} />
@@ -115,16 +154,15 @@ const FileUploadSection = ({ getRootProps, getInputProps, isDragActive, files, r
 // Uploaded Files List Component
 const UploadedFilesList = ({ files, removeFile }) => {
     return (
-        <div>
-            <h2 className="font-semibold text-lg pb-2">Uploaded Files:</h2>
-            <ul>
+        <div className="border-2 border-br-secondary rounded-md p-4">
+            <ul className="flex flex-col gap-2">
                 {files.map((file) => (
-                    <li key={file.name} className="flex items-center justify-between bg-gray-100 p-2 rounded-md mb-2">
-                        <div className="flex items-center space-x-2">
+                    <li key={file.name} className="flex items-center justify-between bg-gray-100 p-2 rounded-md px-2">
+                        <div className="flex items-center gap-2">
                             <FileIcon />
                             <span className="text-gray-800">{file.name}</span>
                         </div>
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center gap-2">
                             <span className="text-gray-600">{(file.size / 1024).toFixed(2)} KB</span>
                             <button
                                 onClick={() => removeFile(file.name)}
@@ -234,40 +272,143 @@ const DeleteIcon = () => (
 );
 
 // Model Information Step Component
-const ModelInformationStep = ({ onPreviousStep }) => {
+const ModelInformationStep = ({ onPreviousStep, images, removeImage, getRootProps, getInputProps, isDragActive }) => {
+
+    const handleTagClick = (tag) => {
+        setModelData((prev) => {
+            const currentTags = prev.tags;
+            if (currentTags.includes(tag)) {
+                return { ...prev, tags: currentTags.filter((t) => t !== tag) };
+            } else {
+                return { ...prev, tags: [...currentTags, tag] };
+            }
+        });
+    };
+
+    const { currentUser } = useAuth();
+    const { createModelInContext } = useModels();
+
+    const [modelData, setModelData] = useState({
+        name: "",
+        description: "",
+        tags: [],
+        file: null,
+        convertedUrl: null,
+        renderFiles: [],
+        renderPreviewUrls: [],
+        selectedRenderIndex: 0,
+    });
+
+    const availableTags = [
+        "3D",
+        "2D",
+        "Concept Art",
+        "Anime",
+        "Realistic",
+        "Cartoon",
+        "Abstract",
+        "Sculpture",
+        "Industrial",
+        "Fantasy",
+    ];
+
     return (
-        <div>
-            <h2 className="text-xl font-semibold mb-4">Enter Model Information</h2>
-            <form className="space-y-4">
-                <div>
-                    <label htmlFor="modelName" className="block text-gray-700 font-semibold">Model Name</label>
-                    <input
-                        type="text"
-                        id="modelName"
-                        className="w-full p-2 border border-gray-300 rounded-md"
-                        placeholder="Enter model name"
-                    />
+        <section className="flex flex-col gap-2">
+            {/* Model Pictures Section */}
+            <section className="bg-bg-secondary rounded-md py-4 px-8">
+                <h4 className="text-lg font-semibold">Upload Model Pictures</h4>
+                <div
+                    {...getRootProps()}
+                    className={`border-2 mb-4 border-dashed rounded-md p-8 text-center cursor-pointer transition-colors
+                        ${isDragActive ? "border-green-500 bg-green-50" : "border-gray-300 bg-white"}`}
+                >
+                    <input {...getInputProps()} />
+                    <p className="font-semibold mb-2">Drag your images here</p>
+                    <p className="text-gray-500 text-sm mb-4">Supported formats: .jpg, .jpeg, .png</p>
+                    <div className="flex justify-center space-x-4">
+                        <button className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Browse</button>
+                    </div>
                 </div>
 
-                <div>
-                    <label htmlFor="modelDescription" className="block text-gray-700 font-semibold">Description</label>
-                    <textarea
-                        id="modelDescription"
-                        className="w-full p-2 border border-gray-300 rounded-md"
-                        placeholder="Enter model description"
-                    />
+                {/* Image Previews */}
+                <div className="flex gap-4 flex-wrap">
+                    {images.map((image) => (
+                        <div key={image.name} className="relative">
+                            <img
+                                src={URL.createObjectURL(image)}
+                                alt={image.name}
+                                className="w-24 h-24 object-cover rounded-md"
+                            />
+                            <button
+                                onClick={() => removeImage(image.name, 'image')}
+                                className="absolute top-0 right-0 text-red-500 hover:text-red-600"
+                            >
+                                <DeleteIcon />
+                            </button>
+                        </div>
+                    ))}
                 </div>
+            </section>
 
-                <div>
-                    <label htmlFor="category" className="block text-gray-700 font-semibold">Category</label>
-                    <input
-                        type="text"
-                        id="category"
-                        className="w-full p-2 border border-gray-300 rounded-md"
-                        placeholder="Enter category (optional)"
-                    />
-                </div>
-            </form>
-        </div>
+            <section className="bg-bg-secondary rounded-md py-4 px-8">
+                <h4 className="text-xl font-semibold mb-4">Enter Model Information</h4>
+                <form className="space-y-4">
+                    <div>
+                        <label htmlFor="modelName" className="block text-txt-secondary font-semibold">Model Name</label>
+                        <input
+                            type="text"
+                            id="modelName"
+                            className="w-full p-2 border border-br-primary rounded-md"
+                            placeholder="Enter model name"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="modelDescription" className="block text-txt-secondary font-semibold">Description</label>
+                        <textarea
+                            id="modelDescription"
+                            className="w-full p-2 border border-br-primary rounded-md"
+                            placeholder="Enter model description"
+                        />
+                    </div>
+
+                    <div>
+                        <label htmlFor="category" className="block text-txt-secondary font-semibold">Category</label>
+                        <input
+                            type="text"
+                            id="category"
+                            className="w-full p-2 border border-br-primary rounded-md"
+                            placeholder="Enter category (optional)"
+                        />
+                    </div>
+
+                    <div className="border border-br-primary rounded p-4">
+                        <h4 className="font-semibold mb-2">Select Tags</h4>
+                        <div className="flex flex-wrap gap-2 mb-2">
+                            {availableTags.map((tag) => (
+                                <button
+                                    type="button"
+                                    key={tag}
+                                    onClick={() => handleTagClick(tag)}
+                                    className={`px-3 py-1 text-sm rounded-full border transition-all ${modelData.tags.includes(tag)
+                                        ? "bg-accent text-white border-accent"
+                                        : "bg-bg-surface text-txt-secondary border-br-primary hover:bg-accent hover:text-white"
+                                        }`}
+                                >
+                                    {tag}
+                                </button>
+                            ))}
+                        </div>
+                        <input
+                            type="text"
+                            readOnly
+                            value={modelData.tags.join(", ")}
+                            className="w-full px-4 py-2 text-sm border border-br-primary bg-bg-primary rounded"
+                        />
+                    </div>
+
+                </form>
+            </section>
+        </section>
     );
 };
