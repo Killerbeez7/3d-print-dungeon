@@ -40,3 +40,11 @@ Example: click on gallery the search should reset, if clicked on link inside the
 
 3. make the criteria work
 ```
+
+### Todays list
+```sh
+1. when user press search artists from global search, dynamic search opens but the tab is artwork instead of artists..
+2. make the carousel tabs smaller fit at least 6 - #DONE
+3. add competitions tab in carousel menu
+4. style comment delete pop up
+```
