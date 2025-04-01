@@ -40,3 +40,8 @@ Example: click on gallery the search should reset, if clicked on link inside the
 
 3. make the criteria work
 ```
+
+
+
+
+--------------------------------------------------

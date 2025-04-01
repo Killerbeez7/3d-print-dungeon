@@ -8,13 +8,16 @@ main: git pull origin main
 #### 2.Create new branch
 ```sh
 main: git checkout -b [branch-name]
+branch-name: git add .
+branch-name: git commit -am "new branch"
+branch-name: git push --set-upstream origin [branch-name]
 ```
 
 #### 3.When job is done.. add, commit, push
 ```sh
 branch: git add .
 branch: git commit -am "message"
-branch: git push origin [branch-name]
+branch: git push
 
 NOTE!
 #push the branch to remote repo, so others can see it
