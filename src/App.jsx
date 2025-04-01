@@ -16,13 +16,14 @@ import { ModelUpload } from "./components/models/model-upload/ModelUpload";
 // contexts
 import { AuthProvider } from "./contexts/authContext";
 import { ModelsProvider } from "./contexts/modelsContext";
-import { AuthModal } from "./components/shared/auth-modal/AuthModal";
+import { SearchProvider } from "./contexts/searchContext";
 // profiles
+import { AuthModal } from "./components/shared/auth-modal/AuthModal";
 import { Artists } from "./components/artists/artists/Artists";
 import { ProfileSettings } from "./components/settings/ProfileSettings";
 import { ArtistProfile } from "./components/artists/artist-profile/ArtistProfile";
 // utils
-import { SearchDynamic } from "./components/search/SearchDynamic";
+import { DynamicSearch } from "./components/search/DynamicSearch";
 import { ScrollToTopButton } from "./components/shared/ScrollToTopButton";
 // dev
 import { AdminPanel } from "./components/admin/AdminPanel";
@@ -41,54 +42,58 @@ export default function App() {
         <div className="flex flex-col min-h-screen bg-bg-primary">
             <AuthProvider>
                 <ModelsProvider>
-                    <Navbar
-                        onLoginClick={() => {
-                            // set sign-in mode
-                            setIsSignUp(false);
-                            handleOpenModal();
-                        }}
-                        onSignUpClick={() => {
-                            // set sign-up mode
-                            setIsSignUp(true);
-                            handleOpenModal();
-                        }}
-                    />
+                    <SearchProvider>
+                        <Navbar
+                            onLoginClick={() => {
+                                // set sign-in mode
+                                setIsSignUp(false);
+                                handleOpenModal();
+                            }}
+                            onSignUpClick={() => {
+                                // set sign-up mode
+                                setIsSignUp(true);
+                                handleOpenModal();
+                            }}
+                        />
 
-                    <main className="flex-grow">
-                        <Routes>
-                            {/* admin */}
-                            <Route path="/admin-panel" element={<AdminPanel />} />
-                            {/* common */}
-                            <Route path="/" element={<Home />} />
-                            <Route path="/3dstore" element={<Store />} />
-                            <Route path="/explore" element={<Explore />} />
-                            <Route path="/business" element={<Business />} />
-                            <Route path="/settings" element={<ProfileSettings />} />
-                            {/* artists */}
-                            <Route path="/artists" element={<Artists />} />
-                            <Route path="/artist/:uid" element={<ArtistProfile />} />
-                            {/* models */}
-                            <Route path="/upload" element={<ModelUpload />} />
-                            {/* Pass openAuthModal prop to ModelView */}
-                            <Route
-                                path="/model/:id"
-                                element={<ModelView openAuthModal={handleOpenModal} />}
-                            />
-                            <Route path="/model/:id/edit" element={<ModelEdit />} />
-                            {/* search */}
-                            <Route path="/search" element={<SearchDynamic />} />
-                        </Routes>
-                    </main>
+                        <main className="flex-grow">
+                            <Routes>
+                                {/* admin */}
+                                <Route path="/admin-panel" element={<AdminPanel />} />
+                                {/* common */}
+                                <Route path="/" element={<Home />} />
+                                <Route path="/3dstore" element={<Store />} />
+                                <Route path="/explore" element={<Explore />} />
+                                <Route path="/business" element={<Business />} />
+                                <Route path="/settings" element={<ProfileSettings />} />
+                                {/* artists */}
+                                <Route path="/artists" element={<Artists />} />
+                                <Route path="/artist/:uid" element={<ArtistProfile />} />
+                                {/* models */}
+                                <Route path="/upload" element={<ModelUpload />} />
+                                {/* Pass openAuthModal prop to ModelView */}
+                                <Route
+                                    path="/model/:id"
+                                    element={
+                                        <ModelView openAuthModal={handleOpenModal} />
+                                    }
+                                />
+                                <Route path="/model/:id/edit" element={<ModelEdit />} />
+                                {/* search */}
+                                <Route path="/search" element={<DynamicSearch />} />
+                            </Routes>
+                        </main>
 
-                    <Footer />
+                        <Footer />
 
-                    {/* Auth Modal for sign-in / sign-up */}
-                    <AuthModal
-                        isOpen={isModalOpen}
-                        onClose={handleCloseModal}
-                        isSignUp={isSignUp}
-                        onSwitchMode={handleSwitchMode}
-                    />
+                        {/* Auth Modal for sign-in / sign-up */}
+                        <AuthModal
+                            isOpen={isModalOpen}
+                            onClose={handleCloseModal}
+                            isSignUp={isSignUp}
+                            onSwitchMode={handleSwitchMode}
+                        />
+                    </SearchProvider>
                 </ModelsProvider>
             </AuthProvider>
             {/* utils */}
