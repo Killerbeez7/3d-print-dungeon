@@ -37,11 +37,11 @@ export const addUserToDatabase = async (
             userDocRef,
             {
                 displayName,
+                searchableName: displayName.toLowerCase(),
                 email,
                 photoURL,
                 createdAt: serverTimestamp(),
                 uploads: [],
-                likes: [],
             },
             { merge: true }
         );
