@@ -59,10 +59,10 @@ const PrevArrow = (props) => {
 
 export const FeaturedCarousel = () => {
     const settings = {
-        infinite: true,
+        infinite: false,
         speed: 500,
-        slidesToShow: 3,
-        slidesToScroll: 3,
+        slidesToShow: 4,
+        slidesToScroll: 4,
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
         select: false,
@@ -129,6 +129,54 @@ export const FeaturedCarousel = () => {
             image: "https://cdna.artstation.com/p/top_row_items/images/000/002/710/20250328093732/original/artstation-marketplace-spring-sale-toprow-890x500.png?1743172652",
             link: "https://www.artstation.com/marketplace",
         },
+        {
+            id: "marketplace",
+            title: "Spring Sale",
+            subtitle: "Shop up to 70% off",
+            badge: "MARKETPLACE",
+            image: "https://cdna.artstation.com/p/top_row_items/images/000/002/710/20250328093732/original/artstation-marketplace-spring-sale-toprow-890x500.png?1743172652",
+            link: "https://www.artstation.com/marketplace",
+        },
+        {
+            id: "news",
+            title: "Scheduled Projects",
+            subtitle: "Development Update",
+            badge: "NEWS",
+            image: "https://cdnb.artstation.com/p/top_row_items/images/000/002/711/20250328132708/original/magazine-cover-1920x1080-pd.jpg?1743186428",
+            link: "https://magazine.artstation.com/2025/03/scheduled-projects/",
+        },
+        {
+            id: "artblast",
+            title: "Ubisoft Assassin’s Creed Shadows Art Blast",
+            subtitle: "Discover the Art of Assassin's Creed Shadows",
+            badge: "ART BLAST",
+            image: "https://cdnb.artstation.com/p/top_row_items/images/000/002/709/20250327120422/original/ac-artblast-magazinearticle-1280x720-notext.jpg?1743095062",
+            link: "https://magazine.artstation.com/2025/03/ubisoft-assassins-creed-shadows-art-blast/",
+        },
+        {
+            id: "news",
+            title: "Scheduled Projects",
+            subtitle: "Development Update",
+            badge: "NEWS",
+            image: "https://cdnb.artstation.com/p/top_row_items/images/000/002/711/20250328132708/original/magazine-cover-1920x1080-pd.jpg?1743186428",
+            link: "https://magazine.artstation.com/2025/03/scheduled-projects/",
+        },
+        {
+            id: "marketplace",
+            title: "Spring Sale",
+            subtitle: "Shop up to 70% off",
+            badge: "MARKETPLACE",
+            image: "https://cdna.artstation.com/p/top_row_items/images/000/002/710/20250328093732/original/artstation-marketplace-spring-sale-toprow-890x500.png?1743172652",
+            link: "https://www.artstation.com/marketplace",
+        },
+        {
+            id: "news",
+            title: "Scheduled Projects",
+            subtitle: "Development Update",
+            badge: "NEWS",
+            image: "https://cdnb.artstation.com/p/top_row_items/images/000/002/711/20250328132708/original/magazine-cover-1920x1080-pd.jpg?1743186428",
+            link: "https://magazine.artstation.com/2025/03/scheduled-projects/",
+        },
     ];
 
     return (
@@ -137,11 +185,11 @@ export const FeaturedCarousel = () => {
                 {featuredItems.map((item) => (
                     <div key={item.id} className="px-2">
                         <Link to={item.link} target="_blank" rel="noopener noreferrer">
-                            <div className="relative overflow-hidden rounded-lg shadow-lg group">
+                            <div className="relative overflow-hidden rounded-xl group">
                                 <img
                                     src={item.image}
                                     alt={item.title}
-                                    className="w-full h-[300px] object-cover rounded-lg"
+                                    className="w-full h-[250px] object-cover rounded-xl"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                     <div className="text-center">
