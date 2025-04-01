@@ -17,38 +17,44 @@ export async function localConvertToGLBForPreview(file) {
                 const arrayBuffer = event.target.result;
                 const lowerExt = file.name.toLowerCase();
 
-                // Build a scene with the geometry
-                let scene;
+                // Create a new scene and set a light gray background.
+                let scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x222222);
+
+                // Load the file and add its object to the scene.
                 if (lowerExt.endsWith(".stl")) {
                     const stlLoader = new STLLoader();
                     const geometry = stlLoader.parse(arrayBuffer);
                     const mesh = centerMesh(geometry);
-                    scene = new THREE.Scene();
                     scene.add(mesh);
                 } else if (lowerExt.endsWith(".obj")) {
                     const objText = new TextDecoder().decode(arrayBuffer);
                     const objLoader = new OBJLoader();
                     const obj = objLoader.parse(objText);
-                    scene = new THREE.Scene();
                     scene.add(obj);
                 } else {
-                    reject(
-                        new Error("Unsupported file type for local preview")
-                    );
+                    reject(new Error("Unsupported file type for local preview"));
                     return;
                 }
 
-                // minimal light
-                const light = new THREE.DirectionalLight(0xffffff, 1);
-                light.position.set(10, 10, 10);
-                scene.add(light);
+                // Add a directional light.
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                directionalLight.position.set(10, 10, 10);
+                scene.add(directionalLight);
 
-                // Export as .glb (binary)
+                // Add an ambient light for softer illumination.
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                scene.add(ambientLight);
+
+                // Add a grid helper to give context of scale.
+                // const gridHelper = new THREE.GridHelper(200, 20);
+                // scene.add(gridHelper);
+
+                // Export the scene as a binary .glb.
                 const exporter = new GLTFExporter();
                 exporter.parse(
                     scene,
                     (result) => {
-                        // result is an ArrayBuffer in binary mode
                         const blob = new Blob([result], {
                             type: "model/gltf-binary",
                         });
@@ -80,48 +86,51 @@ export async function finalConvertFileToGLB(file) {
                 const arrayBuffer = reader.result;
                 const lowerExt = file.name.toLowerCase();
 
-                let scene;
+                // Create a new scene and set a light gray background.
+                let scene = new THREE.Scene();
+                scene.background = new THREE.Color(0x222222);
+
+                // Load the file and add its object to the scene.
                 if (lowerExt.endsWith(".stl")) {
-                    // parse STL
                     const stlLoader = new STLLoader();
                     const geometry = stlLoader.parse(arrayBuffer);
                     const mesh = centerMesh(geometry);
-                    scene = new THREE.Scene();
                     scene.add(mesh);
                 } else if (lowerExt.endsWith(".obj")) {
-                    // parse OBJ
                     const objText = new TextDecoder().decode(arrayBuffer);
                     const objLoader = new OBJLoader();
                     const obj = objLoader.parse(objText);
-                    scene = new THREE.Scene();
                     scene.add(obj);
                 } else {
-                    reject(
-                        new Error(
-                            "Unsupported file type for final .glb conversion"
-                        )
-                    );
+                    reject(new Error("Unsupported file type for final .glb conversion"));
                     return;
                 }
 
-                // minimal light
-                const light = new THREE.DirectionalLight(0xffffff, 1);
-                light.position.set(10, 10, 10);
-                scene.add(light);
+                // Add a directional light.
+                const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+                directionalLight.position.set(10, 10, 10);
+                scene.add(directionalLight);
 
-                // Export as .glb (binary)
+                // Add an ambient light for softer illumination.
+                const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                scene.add(ambientLight);
+
+                // Add a grid helper to give context of scale.
+                // const gridHelper = new THREE.GridHelper(200, 20);
+                // scene.add(gridHelper);
+
+                // Export the scene as a binary .glb.
                 const exporter = new GLTFExporter();
                 exporter.parse(
                     scene,
                     (binaryResult) => {
-                        // binaryResult is an ArrayBuffer
                         const blob = new Blob([binaryResult], {
                             type: "model/gltf-binary",
                         });
                         resolve({ blob });
                     },
                     (err) => reject(err),
-                    { binary: true } // important for .glb
+                    { binary: true }
                 );
             } catch (err) {
                 reject(err);
@@ -133,19 +142,16 @@ export async function finalConvertFileToGLB(file) {
 }
 
 /**
- * Helper: create a Mesh from geometry, center it, return the mesh.
+ * Helper: create a Mesh from geometry, center it, and return the mesh.
  */
 function centerMesh(geometry) {
     const material = new THREE.MeshStandardMaterial({ color: 0xcccccc });
     const mesh = new THREE.Mesh(geometry, material);
 
     geometry.computeBoundingBox();
-    const centerX =
-        (geometry.boundingBox.max.x + geometry.boundingBox.min.x) / 2;
-    const centerY =
-        (geometry.boundingBox.max.y + geometry.boundingBox.min.y) / 2;
-    const centerZ =
-        (geometry.boundingBox.max.z + geometry.boundingBox.min.z) / 2;
+    const centerX = (geometry.boundingBox.max.x + geometry.boundingBox.min.x) / 2;
+    const centerY = (geometry.boundingBox.max.y + geometry.boundingBox.min.y) / 2;
+    const centerZ = (geometry.boundingBox.max.z + geometry.boundingBox.min.z) / 2;
     mesh.position.set(-centerX, -centerY, -centerZ);
 
     return mesh;
