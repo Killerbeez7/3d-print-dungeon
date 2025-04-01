@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { LazyImage } from "../shared/lazy-image/LazyImage";
 
 const toggleArrayValue = (arr, value) =>
     arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
@@ -168,25 +169,26 @@ export const ArtworksTab = ({ searchTerm, models }) => {
                         : "Start typing to search for artworks."}
                 </p>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2">
                     {filteredModels.map((m) => (
-                        <Link
-                            key={m.id}
-                            to={`/model/${m.id}`}
-                            className="border border-br-primary rounded-md overflow-hidden hover:shadow-md transition-shadow"
-                        >
-                            <img
-                                src={m.primaryRenderUrl || "/placeholder.jpg"}
-                                alt={m.name}
-                                className="w-full h-40 object-cover"
-                                loading="lazy"
-                            />
-                            <div className="p-2">
-                                <h3 className="font-medium">{m.name}</h3>
-                                <p className="text-xs text-txt-secondary">
-                                    {m.description?.slice(0, 60)}...
-                                </p>
-                            </div>
+                        <Link key={m.id} to={`/model/${m.id}`}>
+                            <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
+                                <div className="relative w-full aspect-square">
+                                    <LazyImage
+                                        src={m.primaryRenderUrl}
+                                        alt={m.name}
+                                        className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end justify-start opacity-0 hover:opacity-100 transition-opacity">
+                                        <div className="text-white m-2">
+                                            <h4 className="font-semibold">{m.name}</h4>
+                                            <p className="text-sm">
+                                                {m.uploaderDisplayName}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
                         </Link>
                     ))}
                 </div>
