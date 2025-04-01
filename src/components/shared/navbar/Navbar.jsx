@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useAuth } from "../../../contexts/authContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { MdFileUpload, MdAccountCircle } from "react-icons/md";
+
 import {
     faUserCircle,
     faSignOutAlt,
@@ -191,18 +193,24 @@ export const Navbar = ({ onLoginClick }) => {
                         Sign In
                     </button>
                 ) : null}
-
                 <Link
+                    to="/upload"
+                    className=" text-txt-secondary font-medium px-3 py-1 rounded-lg hover:bg-btn-primary-hover"
+                >
+                    <MdFileUpload className="w-8 h-auto" />
+                </Link>
+                {/* <Link
                     to="/upload"
                     className="bg-btn-primary text-white font-medium px-3 py-1 rounded-lg hover:bg-btn-primary-hover"
                 >
                     Upload
-                </Link>
+                </Link> */}
 
                 {currentUser && (
                     <div className="relative group">
                         <button className="flex items-center text-btn-secondary group-hover:text-btn-secondary-hover">
-                            <FontAwesomeIcon icon={faUserCircle} className="text-3xl" />
+                            {/* <FontAwesomeIcon icon={faUserCircle} className="text-3xl" /> */}
+                            <MdAccountCircle className="w-8 h-auto" />
                         </button>
 
                         <div className="absolute right-[-10px] top-full hidden group-hover:block font-medium bg-bg-surface border border-br-primary rounded-md shadow-lg min-w-[180px] z-10">
