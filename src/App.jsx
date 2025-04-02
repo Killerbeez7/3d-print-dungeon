@@ -12,8 +12,8 @@ import { Footer } from "./components/shared/footer/Footer";
 // models
 import { ModelView } from "./components/models/model-view/ModelView";
 import { ModelEdit } from "./components/models/model-edit/ModelEdit";
+// import { ModelUpload } from "./components/models/model-upload/ModelUpload";
 import { ModelUpload } from "./components/models/model-upload/ModelUpload";
-import { ModelUploadTest } from "./components/models/model-upload/ModelUploadTest"; // TEST
 // contexts
 import { AuthProvider } from "./contexts/authContext";
 import { ModelsProvider } from "./contexts/modelsContext";
@@ -69,7 +69,7 @@ export default function App() {
                             <Route path="/artists" element={<Artists />} />
                             <Route path="/artist/:uid" element={<ArtistProfile />} />
                             {/* models */}
-                            <Route path="/upload" element={<ModelUploadTest />} />             {/*Test*/}
+                            <Route path="/upload" element={<ModelUpload />} />
                             {/* Pass openAuthModal prop to ModelView */}
                             <Route
                                 path="/model/:id"
