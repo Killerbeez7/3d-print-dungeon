@@ -2,7 +2,6 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { db } from "../firebase/firebaseConfig";
 import { collection, query, onSnapshot, orderBy, where, doc, getDoc } from "firebase/firestore";
 import PropTypes from "prop-types";
-import { createAdvancedModel } from "../services/modelsService";
 
 const ModelsContext = createContext();
 
@@ -74,18 +73,6 @@ export const ModelsProvider = ({ children }) => {
         }
     };
 
-    // create new model and update context
-    async function createModelInContext(data) {
-        setLoading(true);
-        try {
-            await createAdvancedModel(data);
-            setLoading(false);
-        } catch (err) {
-            setLoading(false);
-            throw err;
-        }
-    }
-
     return (
         <ModelsContext.Provider
             value={{
@@ -96,7 +83,6 @@ export const ModelsProvider = ({ children }) => {
                 selectedRenderIndex,
                 setSelectedRenderIndex,
                 fetchUploader,
-                createModelInContext,
                 fetchModelsByUser,
             }}
         >
