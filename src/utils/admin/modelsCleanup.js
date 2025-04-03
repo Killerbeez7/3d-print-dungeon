@@ -27,7 +27,11 @@ export async function deleteAllButFirstModel() {
 
     // Keep the first model, delete the rest
     const [firstModel, ...modelsToDelete] = allModels;
-    console.log("Keeping first model:", firstModel.id, firstModel.name || "Unnamed");
+    console.log(
+        "Keeping first model:",
+        firstModel.id,
+        firstModel.name || "Unnamed"
+    );
     console.log(
         "Deleting these models:",
         modelsToDelete.map((m) => m.id)
@@ -64,10 +68,12 @@ async function deleteModelAndFiles(model) {
     }
 
     // Delete render files
-    for (const fileUrl of renderFileUrls) {
-        await deleteFileByUrl(fileUrl);
+    if (renderFileUrls != null) {
+        for (const fileUrl of renderFileUrls) {
+            await deleteFileByUrl(fileUrl);
+        }
     }
-
+    
     // Delete low-res files
     for (const lowResUrl of renderLowResUrls) {
         await deleteFileByUrl(lowResUrl);
@@ -84,7 +90,9 @@ async function removeModelFromUserUploads(uploaderId, modelId) {
         await updateDoc(userRef, {
             uploads: arrayRemove(modelId),
         });
-        console.log(`Removed model ${modelId} from user ${uploaderId} uploads array.`);
+        console.log(
+            `Removed model ${modelId} from user ${uploaderId} uploads array.`
+        );
     } catch (err) {
         console.warn("Error removing model from user uploads array:", err);
     }
