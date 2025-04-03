@@ -189,7 +189,6 @@ export const FeaturedCarousel = () => {
                     >
                         <Link to={item.link} target="_blank" rel="noopener noreferrer">
                             <div className="relative overflow-hidden rounded-xl group">
-                            <div className="relative overflow-hidden rounded-xl group">
                                 <img
                                     src={item.image}
                                     alt={item.title}
