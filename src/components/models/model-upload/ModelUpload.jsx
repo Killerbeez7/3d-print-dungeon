@@ -24,13 +24,26 @@ const ModelUploadContent = () => {
         setError("");
         setUploadProgress(0);
 
+        // Form Validation
+
         if (files.length === 0) {
-            console.log("The issue is in the files array");
             setError("Please select a model file first.");
             return;
         }
         if (!modelData.name.trim()) {
             setError("Please enter a model name.");
+            return;
+        }
+        if (!modelData.category.trim()) {
+            setError("Please enter a category.");
+            return;
+        }
+        if (!modelData.description.trim()) {
+            setError("Please enter a model description.");
+            return;
+        }
+        if (modelData.renderFiles.length === 0) {
+            setError("Please upload at least one render of your model.");
             return;
         }
 
@@ -83,16 +96,6 @@ const ModelUploadContent = () => {
 
     return (
         <div className="container mx-auto p-4 space-y-2">
-            {/* Upload Progress Bar */}
-            {isUploading && (
-                <div className="w-full bg-gray-200 rounded-md overflow-hidden">
-                    <div
-                        className="bg-green-500 h-4 transition-all"
-                        style={{ width: `${uploadProgress}%` }}
-                    ></div>
-                </div>
-            )}
-
             {/* Step Indicator */}
             <div className="flex items-center w-full max-w-md mx-auto mb-6">
                 <StepIndicatorItem step={1} label="Upload" currentStep={step} />
@@ -105,6 +108,16 @@ const ModelUploadContent = () => {
 
             {/* Render ModelInfoStep only in step 2 */}
             {step === 2 && <ModelInfoStep />}
+
+            {/* Upload Progress Bar */}
+            {isUploading && (
+                <div className="w-full bg-gray-200 rounded-md overflow-hidden">
+                    <div
+                        className="bg-green-500 h-4 transition-all"
+                        style={{ width: `${uploadProgress}%` }}
+                    ></div>
+                </div>
+            )}
 
             {/* Navigation Buttons */}
             <section className="bg-bg-secondary rounded-md p-4">
