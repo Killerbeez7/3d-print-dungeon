@@ -12,6 +12,7 @@ import { Footer } from "./components/shared/footer/Footer";
 // models
 import { ModelView } from "./components/models/model-view/ModelView";
 import { ModelEdit } from "./components/models/model-edit/ModelEdit";
+// import { ModelUpload } from "./components/models/model-upload/ModelUpload";
 import { ModelUpload } from "./components/models/model-upload/ModelUpload";
 // contexts
 import { AuthProvider } from "./contexts/authContext";

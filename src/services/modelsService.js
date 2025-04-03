@@ -14,31 +14,21 @@ import { finalConvertFileToGLB } from "../utils/models/converter";
 export async function createAdvancedModel({
     name,
     description,
+    category,
     tags,
     file,
     renderFiles,
     selectedRenderIndex,
     uploaderId,
+    uploaderDisplayName = "Anonymous", // Default value if not provided
     onProgress,
 }) {
-    // fetch uploaders display name
-    let uploaderDisplayName = "Anonymous";
-    try {
-        const userDoc = await getDoc(doc(db, "users", uploaderId));
-        if (userDoc.exists()) {
-            const userData = userDoc.data();
-            uploaderDisplayName = userData.displayName || "Anonymous";
-        }
-    } catch (err) {
-        console.error("Error fetching uploader displayName:", err);
-    }
-
     if (!file) throw new Error("No model file provided");
     const progressFn = onProgress || (() => {});
     let progress = 0;
     progressFn(progress);
 
-    // upload original model file (0 -> 50%)
+    // Upload original model file (0 -> 50%)
     const originalRef = ref(storage, `models/original/${file.name}`);
     const originalTask = uploadBytesResumable(originalRef, file);
     const originalFileUrl = await new Promise((resolve, reject) => {
@@ -69,13 +59,16 @@ export async function createAdvancedModel({
             convertedTask.on(
                 "state_changed",
                 (snapshot) => {
-                    const ratio = snapshot.bytesTransferred / snapshot.totalBytes;
+                    const ratio =
+                        snapshot.bytesTransferred / snapshot.totalBytes;
                     const offset = 50 + ratio * 50;
                     progressFn(offset);
                 },
                 reject,
                 async () => {
-                    const url = await getDownloadURL(convertedTask.snapshot.ref);
+                    const url = await getDownloadURL(
+                        convertedTask.snapshot.ref
+                    );
                     resolve(url);
                 }
             );
@@ -85,7 +78,7 @@ export async function createAdvancedModel({
         progressFn(100);
     }
 
-    // upload render files in Storage
+    // Upload render files in Storage
     let renderFileUrls = [];
     if (renderFiles && renderFiles.length > 0) {
         for (const file of renderFiles) {
@@ -97,7 +90,9 @@ export async function createAdvancedModel({
                     () => {},
                     reject,
                     async () => {
-                        const url = await getDownloadURL(renderTask.snapshot.ref);
+                        const url = await getDownloadURL(
+                            renderTask.snapshot.ref
+                        );
                         resolve(url);
                     }
                 );
@@ -106,13 +101,14 @@ export async function createAdvancedModel({
         }
     }
 
-    // save model doc in Firestore
+    // Save model doc in Firestore
     const modelDocRef = await addDoc(collection(db, "models"), {
         name,
         description,
+        category,
         tags,
         uploaderId,
-        uploaderDisplayName,
+        uploaderDisplayName, // Now passed as a prop or defaults to "Anonymous"
         originalFileUrl,
         convertedFileUrl: convertedFileUrl || originalFileUrl,
         renderFileUrls: renderFileUrls.length > 0 ? renderFileUrls : null,

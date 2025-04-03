@@ -183,8 +183,12 @@ export const FeaturedCarousel = () => {
         <section className="px-4 mb-8">
             <Slider {...settings}>
                 {featuredItems.map((item) => (
-                    <div key={item.id} className="px-2">
+                    <div
+                        key={item.id}
+                        className="inline-block px-2 w-full sm:w-1/2 md:w-1/3 lg:w-1/6"
+                    >
                         <Link to={item.link} target="_blank" rel="noopener noreferrer">
+                            <div className="relative overflow-hidden rounded-xl group">
                             <div className="relative overflow-hidden rounded-xl group">
                                 <img
                                     src={item.image}
@@ -193,10 +197,10 @@ export const FeaturedCarousel = () => {
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                                     <div className="text-center">
-                                        <h3 className="text-white text-2xl font-bold mb-1">
+                                        <h3 className="text-white text-xl font-bold mb-1">
                                             {item.title}
                                         </h3>
-                                        <p className="text-white text-sm mb-2">
+                                        <p className="text-white text-xs mb-2">
                                             {item.subtitle}
                                         </p>
                                         {item.badge && (
