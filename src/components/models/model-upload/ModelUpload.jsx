@@ -1,31 +1,39 @@
-import { ModelUploadProvider, useModelUpload } from "../../../contexts/modelUploadContext";
-import { FileUploadStep } from "./FileUploadStep";
-import { ModelInfoStep } from "./ModelInfoStep";
+import React, { useState } from "react";
 import { useAuth } from "../../../contexts/authContext";
-import { useState } from "react";
+import { createAdvancedModel } from "../../../services/modelsService";
+// components
+import { FilesUpload } from "./sections/FilesUpload";
+import { InfoForm } from "./sections/InfoForm";
 
-export const ModelUpload = () => {
-    return (
-        <ModelUploadProvider>
-            <ModelUploadContent />
-        </ModelUploadProvider>
-    );
-};
+export function ModelUpload() {
+    const [step, setStep] = useState(1);
 
-const ModelUploadContent = () => {
-    const { step, setStep, files, modelData, setModelData, createModelInContext } = useModelUpload();
+    // Array for 3d model files
+    const [files, setFiles] = useState([]);
+    // Object for all other model data
+    const [modelData, setModelData] = useState({
+        name: "",
+        description: "",
+        category: "",
+        tags: [],
+        convertedUrl: null,
+        renderFiles: [],
+        renderPreviewUrls: [],
+        selectedRenderIndex: 0,
+    });
+
     const [error, setError] = useState("");
     const [uploadProgress, setUploadProgress] = useState(0);
     const [isUploading, setIsUploading] = useState(false);
     const { currentUser } = useAuth();
 
+    // Final submit
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
         setUploadProgress(0);
 
-        // Form Validation
-
+        // Validation checks
         if (files.length === 0) {
             setError("Please select a model file first.");
             return;
@@ -52,19 +60,21 @@ const ModelUploadContent = () => {
         try {
             const firstFile = files[0];
             const lower = firstFile.name.toLowerCase();
-            const convertedUrl = lower.endsWith(".gltf") || lower.endsWith(".glb")
-                ? URL.createObjectURL(firstFile)
-                : null;
+            ////////////////////////////////////////////////////////////////// check if needed
+            // const convertedUrl =
+            //     lower.endsWith(".gltf") || lower.endsWith(".glb")
+            //         ? URL.createObjectURL(firstFile)
+            //         : null;
+            ////////////////////////////////////////////////////////////////////
 
-            // Pass firstFile directly instead of relying on modelData.file
-            await createModelInContext({
+            // call createAdvancedModel to update the DB
+            await createAdvancedModel({
                 name: modelData.name,
                 description: modelData.description,
                 category: modelData.category,
                 tags: modelData.tags,
-                file: firstFile, // Ensure file is passed correctly
+                file: firstFile,
                 renderFiles: modelData.renderFiles,
-                convertedUrl,
                 selectedRenderIndex: modelData.selectedRenderIndex,
                 uploaderId: currentUser?.uid || "anonymous",
                 onProgress: setUploadProgress,
@@ -72,20 +82,22 @@ const ModelUploadContent = () => {
 
             alert("Model published successfully!");
 
-            // Reset state after successful upload
+            /////////////////////////////////////////////////////////////
+            // TODO: add another logic when the upload is done
+            /////////////////////////////////////////////////////////////
+            // Reset everything on successfull upload
+            setFiles([]);
             setModelData({
                 name: "",
                 description: "",
                 category: "",
                 tags: [],
-                file: null,
                 convertedUrl: null,
                 renderFiles: [],
                 renderPreviewUrls: [],
                 selectedRenderIndex: 0,
             });
-
-            setTimeout(() => setUploadProgress(0), 500); // Delay reset slightly to prevent flickering
+            setTimeout(() => setUploadProgress(0), 500);
         } catch (err) {
             console.error("Publish error:", err);
             setError("Upload failed. Check console for details.");
@@ -98,18 +110,27 @@ const ModelUploadContent = () => {
         <div className="container mx-auto p-4 space-y-2">
             {/* Step Indicator */}
             <div className="flex items-center w-full max-w-md mx-auto mb-6">
-                <StepIndicatorItem step={1} label="Upload" currentStep={step} />
+                <StepIndicator stepNumber={1} label="Upload" currentStep={step} />
                 <div className="flex-1 mx-4 border-t border-dashed border-gray-300"></div>
-                <StepIndicatorItem step={2} label="Model Information" currentStep={step} />
+                <StepIndicator
+                    stepNumber={2}
+                    label="Model Information"
+                    currentStep={step}
+                />
             </div>
 
-            {/* Step Content */}
-            <FileUploadStep />
+            {/* Display errors */}
+            {error && (
+                <div className="text-red-600 font-semibold text-center">{error}</div>
+            )}
 
-            {/* Render ModelInfoStep only in step 2 */}
-            {step === 2 && <ModelInfoStep />}
+            {/* STEP 1 */}
+            <FilesUpload step={step} files={files} setFiles={setFiles} />
 
-            {/* Upload Progress Bar */}
+            {/* STEP 2 */}
+            {step === 2 && <InfoForm modelData={modelData} setModelData={setModelData} />}
+
+            {/* upload progress bar */}
             {isUploading && (
                 <div className="w-full bg-gray-200 rounded-md overflow-hidden">
                     <div
@@ -125,10 +146,11 @@ const ModelUploadContent = () => {
                     <div className="flex justify-center">
                         <button
                             onClick={() => setStep(2)}
-                            className={`px-4 py-2 rounded-md ${files.length === 0
-                                ? "bg-btn-disabled"
-                                : "bg-green-500 text-white px-4 py-2 hover:bg-green-600"
-                                }`}
+                            className={`px-4 py-2 rounded-md ${
+                                files.length === 0
+                                    ? "bg-btn-disabled"
+                                    : "bg-green-500 text-white px-4 py-2 hover:bg-green-600"
+                            }`}
                             disabled={files.length === 0}
                         >
                             Next Step
@@ -148,7 +170,7 @@ const ModelUploadContent = () => {
                         <button
                             onClick={handleSubmit}
                             className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
-                            disabled={isUploading} // Prevent multiple clicks
+                            disabled={isUploading}
                         >
                             {isUploading ? "Uploading..." : "Submit"}
                         </button>
@@ -157,16 +179,24 @@ const ModelUploadContent = () => {
             </section>
         </div>
     );
-};
+}
 
-const StepIndicatorItem = ({ step, label, currentStep }) => {
-    const isActive = currentStep === step;
+function StepIndicator({ stepNumber, label, currentStep }) {
+    const isActive = currentStep === stepNumber;
     return (
-        <div className={`flex items-center space-x-2 ${isActive ? 'text-green-600' : 'text-gray-600'}`}>
-            <div className={`w-6 h-6 flex items-center justify-center rounded-full ${isActive ? 'bg-green-500' : 'bg-gray-300'} text-white font-bold`}>
-                {step}
+        <div
+            className={`flex items-center space-x-2 ${
+                isActive ? "text-green-600" : "text-gray-600"
+            }`}
+        >
+            <div
+                className={`w-6 h-6 flex items-center justify-center rounded-full ${
+                    isActive ? "bg-green-500" : "bg-gray-300"
+                } text-white font-bold`}
+            >
+                {stepNumber}
             </div>
             <span className="font-semibold">{label}</span>
         </div>
     );
-};
+}
