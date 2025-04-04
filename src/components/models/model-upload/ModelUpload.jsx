@@ -1,16 +1,23 @@
-import React, { useState } from "react";
+import "@google/model-viewer";
+import React, { useRef, useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/authContext";
 import { createAdvancedModel } from "../../../services/modelsService";
+import { finalConvertFileToGLB } from "../../../utils/models/converter";
 // components
 import { FilesUpload } from "./sections/FilesUpload";
 import { InfoForm } from "./sections/InfoForm";
 
 export function ModelUpload() {
-    const [step, setStep] = useState(1);
+    const { currentUser } = useAuth();
 
-    // Array for 3d model files
+    const [step, setStep] = useState(1);
+    const [error, setError] = useState("");
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(0);
     const [files, setFiles] = useState([]);
-    // Object for all other model data
+    const [posterDataUrl, setPosterDataUrl] = useState(null);
+    const [convertedBlob, setConvertedBlob] = useState(null);
+
     const [modelData, setModelData] = useState({
         name: "",
         description: "",
@@ -22,19 +29,69 @@ export function ModelUpload() {
         selectedRenderIndex: 0,
     });
 
-    const [error, setError] = useState("");
-    const [uploadProgress, setUploadProgress] = useState(0);
-    const [isUploading, setIsUploading] = useState(false);
-    const { currentUser } = useAuth();
+    const modelViewerRef = useRef();
 
-    // Final submit
+    useEffect(() => {
+        if (!files || files.length === 0) return;
+        const firstFile = files[0];
+        const lower = firstFile.name.toLowerCase();
+
+        async function loadIntoModelViewer() {
+            let blobToLoad = firstFile;
+            if (lower.endsWith(".stl") || lower.endsWith(".obj")) {
+                try {
+                    const { blob } = await finalConvertFileToGLB(firstFile);
+                    blobToLoad = blob;
+                    setConvertedBlob(blob);
+                } catch (err) {
+                    console.error("Conversion to .glb failed:", err);
+                    return;
+                }
+            } else {
+                setConvertedBlob(null);
+            }
+
+            const objUrl = URL.createObjectURL(blobToLoad);
+            const mv = modelViewerRef.current;
+            mv.src = objUrl;
+
+            // Use the "load" event rather than "model-visibility"
+            const handleModelLoad = async () => {
+                console.log("Model loaded");
+                // If available, wait for updateComplete to ensure rendering is done.
+                if (mv.updateComplete) {
+                    await mv.updateComplete;
+                }
+                // Pause to lock the frame
+                mv.pause();
+                // Wait a bit for the render to stabilize
+                setTimeout(() => {
+                    const dataUrl = mv.toDataURL("image/webp");
+                    console.log("Captured poster data URL", dataUrl);
+                    setPosterDataUrl(dataUrl);
+                }, 300);
+            };
+
+            mv.addEventListener("load", handleModelLoad);
+
+            return () => {
+                mv.removeEventListener("load", handleModelLoad);
+                URL.revokeObjectURL(objUrl);
+            };
+        }
+
+        const cleanupFn = loadIntoModelViewer();
+        return () => {
+            if (typeof cleanupFn === "function") cleanupFn();
+        };
+    }, [files]);
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError("");
         setUploadProgress(0);
 
-        // Validation checks
-        if (files.length === 0) {
+        if (!files || files.length === 0) {
             setError("Please select a model file first.");
             return;
         }
@@ -58,17 +115,17 @@ export function ModelUpload() {
         setIsUploading(true);
 
         try {
-            const firstFile = files[0];
-            const lower = firstFile.name.toLowerCase();
-            ////////////////////////////////////////////////////////////////// check if needed
-            // const convertedUrl =
-            //     lower.endsWith(".gltf") || lower.endsWith(".glb")
-            //         ? URL.createObjectURL(firstFile)
-            //         : null;
-            ////////////////////////////////////////////////////////////////////
+            let posterBlob = null;
+            if (posterDataUrl) {
+                const response = await fetch(posterDataUrl);
+                posterBlob = await response.blob();
+            } else {
+                console.warn("Poster data URL is null.");
+            }
 
-            // call createAdvancedModel to update the DB
-            await createAdvancedModel({
+            const firstFile = files[0];
+
+            const result = await createAdvancedModel({
                 name: modelData.name,
                 description: modelData.description,
                 category: modelData.category,
@@ -78,14 +135,12 @@ export function ModelUpload() {
                 selectedRenderIndex: modelData.selectedRenderIndex,
                 uploaderId: currentUser?.uid || "anonymous",
                 onProgress: setUploadProgress,
+                posterBlob,
+                preConvertedFile: convertedBlob,
             });
 
-            alert("Model published successfully!");
+            alert("Model + Poster uploaded!\nDoc ID: " + result.modelId);
 
-            /////////////////////////////////////////////////////////////
-            // TODO: add another logic when the upload is done
-            /////////////////////////////////////////////////////////////
-            // Reset everything on successfull upload
             setFiles([]);
             setModelData({
                 name: "",
@@ -119,28 +174,23 @@ export function ModelUpload() {
                 />
             </div>
 
-            {/* Display errors */}
             {error && (
                 <div className="text-red-600 font-semibold text-center">{error}</div>
             )}
 
-            {/* STEP 1 */}
             <FilesUpload step={step} files={files} setFiles={setFiles} />
 
-            {/* STEP 2 */}
             {step === 2 && <InfoForm modelData={modelData} setModelData={setModelData} />}
 
-            {/* upload progress bar */}
             {isUploading && (
                 <div className="w-full bg-gray-200 rounded-md overflow-hidden">
                     <div
                         className="bg-green-500 h-4 transition-all"
                         style={{ width: `${uploadProgress}%` }}
-                    ></div>
+                    />
                 </div>
             )}
 
-            {/* Navigation Buttons */}
             <section className="bg-bg-secondary rounded-md p-4">
                 {step === 1 && (
                     <div className="flex justify-center">
@@ -149,7 +199,7 @@ export function ModelUpload() {
                             className={`px-4 py-2 rounded-md ${
                                 files.length === 0
                                     ? "bg-btn-disabled"
-                                    : "bg-green-500 text-white px-4 py-2 hover:bg-green-600"
+                                    : "bg-green-500 text-white hover:bg-green-600"
                             }`}
                             disabled={files.length === 0}
                         >
@@ -166,7 +216,6 @@ export function ModelUpload() {
                         >
                             Previous Step
                         </button>
-
                         <button
                             onClick={handleSubmit}
                             className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
@@ -177,6 +226,25 @@ export function ModelUpload() {
                     </div>
                 )}
             </section>
+
+            {/* HIDDEN model-viewer for capturing the screenshot */}
+            <model-viewer
+                ref={modelViewerRef}
+                style={{
+                    width: "1000px",
+                    height: "400px",
+                    opacity: 0, // Keep rendered but invisible
+                    position: "absolute",
+                    top: "0px",
+                    left: "0px",
+                    pointerEvents: "none",
+                    zIndex: -1,
+                    // delete bg color //old
+                    backgroundColor: "#616161",
+                }}
+                camera-controls
+                environment-image="neutral"
+            />
         </div>
     );
 }
