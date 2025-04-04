@@ -46,18 +46,25 @@ export const ModelView = ({ openAuthModal }) => {
 
     const fallback3DUrl = model.convertedFileUrl || model.originalFileUrl || "";
     const renderFileUrls = model.renderFileUrls || [];
+    const posterUrl = model.posterUrl;
 
     const mainPreview =
         selectedRenderIndex === -1 ? (
             fallback3DUrl ? (
                 <model-viewer
+                    poster={posterUrl}
                     src={fallback3DUrl}
                     alt="3D Model"
                     camera-controls
-                    auto-rotate
                     crossOrigin="anonymous"
                     environment-image="neutral"
                     className="rounded-md shadow-lg h-[calc(90vh-120px)] w-auto"
+                    // style={{ width: "1000px", height: "400px"} //old
+                    style={{
+                        width: "1000px",
+                        height: "400px",
+                        backgroundColor: "#616161",
+                    }}
                 ></model-viewer>
             ) : (
                 <div className="flex items-center justify-center w-full h-[calc(90vh-120px)] bg-gray-200 rounded-md">
@@ -93,9 +100,13 @@ export const ModelView = ({ openAuthModal }) => {
                                 src={fallback3DUrl}
                                 alt="3D thumb"
                                 camera-controls
-                                auto-rotate
                                 loading="lazy"
-                                style={{ width: "100%", height: "100%" }}
+                                // style={{ width: "100%", height: "100%" }} // old
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    backgroundColor: "#616161",
+                                }}
                                 environment-image="neutral"
                                 className="object-cover"
                             ></model-viewer>
@@ -129,7 +140,6 @@ export const ModelView = ({ openAuthModal }) => {
 
             {/* Right Side: Info Sidebar */}
             <aside className="w-full lg:w-96 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl space-y-8">
-                {/* Uploader Info */}
                 {uploader && (
                     <div className="flex items-center space-x-4 border-b pb-4">
                         <img
@@ -145,7 +155,6 @@ export const ModelView = ({ openAuthModal }) => {
                     </div>
                 )}
 
-                {/* Model Title & Description */}
                 <div>
                     <h1 className="text-2xl font-bold text-txt-primary mb-2">
                         {model.name}
@@ -153,7 +162,6 @@ export const ModelView = ({ openAuthModal }) => {
                     <p className="text-sm text-txt-secondary">{model.description}</p>
                 </div>
 
-                {/* Tags */}
                 {model.tags && model.tags.length > 0 && (
                     <div>
                         <h3 className="text-lg font-semibold text-txt-primary mb-2">
@@ -172,7 +180,6 @@ export const ModelView = ({ openAuthModal }) => {
                     </div>
                 )}
 
-                {/* Actions */}
                 <div className="grid grid-cols-1 gap-4">
                     <div className="flex flex-col gap-4">
                         <LikeButton
