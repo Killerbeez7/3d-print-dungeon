@@ -108,10 +108,10 @@ export async function createAdvancedModel({
         category,
         tags,
         uploaderId,
-        uploaderDisplayName, // Now passed as a prop or defaults to "Anonymous"
+        uploaderDisplayName,
         originalFileUrl,
         convertedFileUrl: convertedFileUrl || originalFileUrl,
-        renderFileUrls: renderFileUrls.length > 0 ? renderFileUrls : null,
+        renderFilesUrls: renderFileUrls.length > 0 ? renderFileUrls : null,
         primaryRenderUrl: renderFileUrls[selectedRenderIndex] || null,
         createdAt: serverTimestamp(),
     });

@@ -1,9 +1,7 @@
+import React from "react";
 import { TiDelete } from "react-icons/ti";
-import { useModelUpload } from "../../../contexts/modelUploadContext";
 
-export const ImageUploadSection = () => {
-    const { modelData, setModelData } = useModelUpload();
-
+export function ImagesUpload({ modelData, setModelData }) {
     const handleImageUpload = (e, type) => {
         const files = Array.from(e.target.files);
         if (!files.length) return;
@@ -27,7 +25,11 @@ export const ImageUploadSection = () => {
                 });
             }
 
-            return { ...prev, renderFiles: updatedFiles, renderPreviewUrls: updatedPreviews };
+            return {
+                ...prev,
+                renderFiles: updatedFiles,
+                renderPreviewUrls: updatedPreviews,
+            };
         });
     };
 
@@ -43,7 +45,8 @@ export const ImageUploadSection = () => {
         <div className="border rounded p-4 mb-2">
             <h4 className="font-semibold mb-2">Model Covers</h4>
             <p className="text-sm text-gray-400">
-                jpg/gif/png, ≤ 30MB. Please use <span className="text-primary">real print photos</span>
+                jpg/gif/png, ≤ 30MB. Please use{" "}
+                <span className="text-primary">real print photos</span>
             </p>
 
             <div className="flex gap-4 mt-3">
@@ -69,9 +72,12 @@ export const ImageUploadSection = () => {
             </div>
 
             {/* Additional Model Images */}
-            <h4 className="font-semibold mt-4 mb-2">Model Pictures ({modelData.renderPreviewUrls.length} / 16)</h4>
+            <h4 className="font-semibold mt-4 mb-2">
+                Model Pictures ({modelData.renderPreviewUrls.length} / 16)
+            </h4>
             <p className="text-sm text-gray-400">
-                Photos of the printed model, png/jpg/webp/gif, ≤ 30MB/piece, 4:3 ratio recommended
+                Photos of the printed model, png/jpg/webp/gif, ≤ 30MB/piece, 4:3 ratio
+                recommended
             </p>
 
             <input
@@ -91,49 +97,74 @@ export const ImageUploadSection = () => {
 
             <div className="flex flex-wrap gap-2 mt-3">
                 {modelData.renderPreviewUrls.slice(2).map((url, index) => (
-                    <ImagePreview key={index + 2} url={url} onRemove={() => handleRemoveImage(index + 2)} />
+                    <ImagePreview
+                        key={index + 2}
+                        url={url}
+                        onRemove={() => handleRemoveImage(index + 2)}
+                    />
                 ))}
             </div>
         </div>
     );
-};
+}
 
-// Image upload box with aspect ratio enforcement
-const ImageUploadBox = ({ label, image, onUpload, onRemove, id, aspectRatio }) => (
-    <div className="flex flex-col items-center border rounded p-2 h-full w-[150px]">
-        <label className="mb-2 text-sm font-medium">{label}</label>
-        <input type="file" accept="image/*" className="hidden" id={id} onChange={onUpload} />
-        <div
-            className={`relative border-dashed border-2 flex items-center justify-center cursor-pointer rounded-md`}
-            style={{ aspectRatio, width: "100%" }}
-            onClick={() => document.getElementById(id)?.click()}
-        >
-            {image ? (
-                <>
-                    <img src={image} alt={label} className="w-full h-auto object-cover rounded-md" />
-                    <button
-                        type="button"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onRemove();
-                        }}
-                        className="absolute top-1 right-1 bg-error text-white rounded-full p-1"
-                    >
-                        <TiDelete size={18} />
-                    </button>
-                </>
-            ) : (
-                <span className="text-primary text-lg">+</span>
-            )}
+function ImageUploadBox({ label, image, onUpload, onRemove, id, aspectRatio }) {
+    return (
+        <div className="flex flex-col items-center border rounded p-2 h-full w-[150px]">
+            <label className="mb-2 text-sm font-medium">{label}</label>
+            <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                id={id}
+                onChange={onUpload}
+            />
+            <div
+                className={`relative border-dashed border-2 flex items-center justify-center cursor-pointer rounded-md`}
+                style={{ aspectRatio, width: "100%" }}
+                onClick={() => document.getElementById(id)?.click()}
+            >
+                {image ? (
+                    <>
+                        <img
+                            src={image}
+                            alt={label}
+                            className="w-full h-auto object-cover rounded-md"
+                        />
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                onRemove();
+                            }}
+                            className="absolute top-1 right-1 bg-error text-white rounded-full p-1"
+                        >
+                            <TiDelete size={18} />
+                        </button>
+                    </>
+                ) : (
+                    <span className="text-primary text-lg">+</span>
+                )}
+            </div>
         </div>
-    </div>
-);
+    );
+}
 
-const ImagePreview = ({ url, onRemove }) => (
-    <div className="relative w-24 h-24">
-        <img src={url} alt="Model Preview" className="w-full h-full object-cover rounded-md" />
-        <button type="button" onClick={onRemove} className="absolute top-1 right-1 bg-error text-white rounded-full p-1">
-            <TiDelete size={18} />
-        </button>
-    </div>
-);
+function ImagePreview({ url, onRemove }) {
+    return (
+        <div className="relative w-24 h-24">
+            <img
+                src={url}
+                alt="Model Preview"
+                className="w-full h-full object-cover rounded-md"
+            />
+            <button
+                type="button"
+                onClick={onRemove}
+                className="absolute top-1 right-1 bg-error text-white rounded-full p-1"
+            >
+                <TiDelete size={18} />
+            </button>
+        </div>
+    );
+}
