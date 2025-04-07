@@ -3,12 +3,19 @@ import { useModels } from "../../../contexts/modelsContext";
 import { useAuth } from "../../../contexts/authContext";
 import { Comments } from "./Comments";
 import { CommentsProvider } from "../../../contexts/CommentsContext";
-import { useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { LazyImage } from "../../shared/lazy-image/LazyImage";
 import { LikeButton } from "../action-buttons/likeButton";
 import { FavoritesButton } from "../action-buttons/favoritesButton";
 
 export const ModelView = ({ openAuthModal }) => {
+    const [shadowIntensity, setShadowIntensity] = useState(0.5);
+    const [exposure, setExposure] = useState(1.0);
+    const [modelLoaded, setModelLoaded] = useState(false);
+    const [loadProgress, setLoadProgress] = useState(0);
+
+    const modelViewerRef = useRef(null);
+
     const { id } = useParams();
     const {
         models,
@@ -27,6 +34,34 @@ export const ModelView = ({ openAuthModal }) => {
         }
     }, [id, models, fetchUploader]);
 
+    const model = models.find((m) => m.id === id);
+
+    const fallback3DUrl = model?.convertedFileUrl || model?.originalFileUrl || "";
+    const renderFileUrls = model?.renderFileUrls || [];
+    const posterUrl = model?.posterUrl;
+
+    // Attach model-viewer event listeners
+    useEffect(() => {
+        const viewer = modelViewerRef.current;
+        if (!viewer) return;
+
+        const handleProgress = (event) => {
+            setLoadProgress(event.detail.totalProgress);
+        };
+
+        const handleLoad = () => {
+            setModelLoaded(true);
+        };
+
+        viewer.addEventListener("progress", handleProgress);
+        viewer.addEventListener("load", handleLoad);
+
+        return () => {
+            viewer.removeEventListener("progress", handleProgress);
+            viewer.removeEventListener("load", handleLoad);
+        };
+    }, [fallback3DUrl]);
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center text-xl text-txt-primary">
@@ -35,7 +70,6 @@ export const ModelView = ({ openAuthModal }) => {
         );
     }
 
-    const model = models.find((m) => m.id === id);
     if (!model) {
         return (
             <div className="min-h-screen flex items-center justify-center text-xl text-txt-primary">
@@ -44,28 +78,41 @@ export const ModelView = ({ openAuthModal }) => {
         );
     }
 
-    const fallback3DUrl = model.convertedFileUrl || model.originalFileUrl || "";
-    const renderFileUrls = model.renderFileUrls || [];
-    const posterUrl = model.posterUrl;
-
     const mainPreview =
         selectedRenderIndex === -1 ? (
             fallback3DUrl ? (
-                <model-viewer
-                    poster={posterUrl}
-                    src={fallback3DUrl}
-                    alt="3D Model"
-                    camera-controls
-                    crossOrigin="anonymous"
-                    environment-image="neutral"
-                    className="rounded-md shadow-lg h-[calc(90vh-120px)] w-auto"
-                    // style={{ width: "1000px", height: "400px"} //old
-                    style={{
-                        width: "1000px",
-                        height: "400px",
-                        backgroundColor: "#616161",
-                    }}
-                ></model-viewer>
+                <div className="relative w-full h-[calc(90vh-120px)]">
+                    <model-viewer
+                        ref={modelViewerRef}
+                        poster={posterUrl}
+                        src={fallback3DUrl}
+                        alt="3D Model"
+                        camera-controls
+                        interaction-prompt="none"
+                        crossOrigin="anonymous"
+                        environment-image="neutral"
+                        shadow-intensity={shadowIntensity}
+                        exposure={exposure}
+                        className="rounded-md shadow-lg h-[calc(90vh-120px)] w-auto"
+                        // style={{
+                        //     width: "1000px",
+                        //     height: "400px",
+                        //     backgroundColor: "#616161",
+                        // }}
+                    ></model-viewer>
+
+                    {!modelLoaded && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-radial from-black/80 to-transparent z-10 text-white">
+                            <p className="text-lg animate-pulse">Loading 3D model</p>
+                            <div className="w-52 h-2 mt-4 bg-white/20 rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-cyan-300 transition-all duration-300"
+                                    style={{ width: `${loadProgress * 100}%` }}
+                                ></div>
+                            </div>
+                        </div>
+                    )}
+                </div>
             ) : (
                 <div className="flex items-center justify-center w-full h-[calc(90vh-120px)] bg-gray-200 rounded-md">
                     No 3D preview available
@@ -82,11 +129,56 @@ export const ModelView = ({ openAuthModal }) => {
 
     return (
         <div className="bg-bg-primary text-txt-primary min-h-screen p-6 flex flex-col lg:flex-row gap-8">
-            {/* Left Side: Main preview & thumbnails */}
+            {/* Left Side */}
             <div className="flex-1">
                 <div className="relative">{mainPreview}</div>
+
+                {/* Shadow Intensity */}
+                <div>
+                    <label
+                        htmlFor="shadowSlider"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Shadow Intensity
+                    </label>
+                    <input
+                        id="shadowSlider"
+                        type="range"
+                        min="0"
+                        max="1"
+                        step="0.01"
+                        value={shadowIntensity}
+                        onChange={(e) => setShadowIntensity(parseFloat(e.target.value))}
+                        className="w-full"
+                    />
+                    <p className="text-sm text-gray-600">
+                        Current intensity: {shadowIntensity}
+                    </p>
+                </div>
+
+                {/* Exposure */}
+                <div>
+                    <label
+                        htmlFor="exposureSlider"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Exposure
+                    </label>
+                    <input
+                        id="exposureSlider"
+                        type="range"
+                        min="0"
+                        max="2"
+                        step="0.1"
+                        value={exposure}
+                        onChange={(e) => setExposure(parseFloat(e.target.value))}
+                        className="w-full"
+                    />
+                    <p className="text-sm text-gray-600">Current exposure: {exposure}</p>
+                </div>
+
+                {/* Thumbnails */}
                 <div className="mt-4 flex space-x-4 overflow-x-auto pb-2">
-                    {/* 3D Model Thumbnail */}
                     <div
                         onClick={() => setSelectedRenderIndex(-1)}
                         className={`flex-shrink-0 w-20 h-20 border-4 rounded-md cursor-pointer overflow-hidden ${
@@ -101,7 +193,7 @@ export const ModelView = ({ openAuthModal }) => {
                                 alt="3D thumb"
                                 camera-controls
                                 loading="lazy"
-                                // style={{ width: "100%", height: "100%" }} // old
+                                interaction-prompt="none"
                                 style={{
                                     width: "100%",
                                     height: "100%",
@@ -116,7 +208,7 @@ export const ModelView = ({ openAuthModal }) => {
                             </div>
                         )}
                     </div>
-                    {/* Render Images Thumbnails */}
+
                     {renderFileUrls.map((url, idx) => (
                         <div
                             key={idx}
@@ -138,7 +230,7 @@ export const ModelView = ({ openAuthModal }) => {
                 </div>
             </div>
 
-            {/* Right Side: Info Sidebar */}
+            {/* Right Side */}
             <aside className="w-full lg:w-96 bg-white dark:bg-gray-800 p-8 rounded-lg shadow-xl space-y-8">
                 {uploader && (
                     <div className="flex items-center space-x-4 border-b pb-4">
@@ -162,7 +254,7 @@ export const ModelView = ({ openAuthModal }) => {
                     <p className="text-sm text-txt-secondary">{model.description}</p>
                 </div>
 
-                {model.tags && model.tags.length > 0 && (
+                {model.tags?.length > 0 && (
                     <div>
                         <h3 className="text-lg font-semibold text-txt-primary mb-2">
                             Tags
