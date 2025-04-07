@@ -231,15 +231,16 @@ export function ModelUpload() {
             <model-viewer
                 ref={modelViewerRef}
                 style={{
-                    width: "1000px",
-                    height: "400px",
-                    opacity: 0, // Keep rendered but invisible
+                    width: "100%",
+                    height: "100%",
+                    aspectRatio: "2.5 / 1",
+                    maxWidth: "1000px",
+                    opacity: 0,
                     position: "absolute",
                     top: "0px",
                     left: "0px",
                     pointerEvents: "none",
                     zIndex: -1,
-                    // delete bg color //old
                     backgroundColor: "#616161",
                 }}
                 camera-controls
