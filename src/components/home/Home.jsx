@@ -3,6 +3,7 @@ import { useModels } from "@/contexts/modelsContext";
 import { Link } from "react-router-dom";
 import { LazyImage } from "../shared/lazy-image/LazyImage";
 import { FeaturedCarousel } from "./FeaturedCarousel";
+import Spinner from "../shared/spinner/Spinner"
 
 export const Home = () => {
     const { models, loading } = useModels();
@@ -11,7 +12,11 @@ export const Home = () => {
     const [categoryFilter, setCategoryFilter] = useState("all");
 
     if (loading) {
-        return <p className="p-4">Loading models...</p>;
+        return (
+            <div className="flex justify-center items-center min-h-screen">
+                <Spinner />
+            </div>
+        );
     }
 
     const artworks = models.map((m) => ({
