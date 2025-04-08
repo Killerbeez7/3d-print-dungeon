@@ -1,6 +1,14 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { db } from "../firebase/firebaseConfig";
-import { collection, query, onSnapshot, orderBy, where, doc, getDoc } from "firebase/firestore";
+import {
+    collection,
+    query,
+    onSnapshot,
+    orderBy,
+    where,
+    doc,
+    getDoc,
+} from "firebase/firestore";
 import PropTypes from "prop-types";
 
 const ModelsContext = createContext();
@@ -39,8 +47,11 @@ export const ModelsProvider = ({ children }) => {
     // fetch models by userId
     const fetchModelsByUser = (userId) => {
         setLoading(true);
-        const q = query(collection(db, "models"), 
-        where("userId", "==", userId), orderBy("createdAt", "desc"));
+        const q = query(
+            collection(db, "models"),
+            where("userId", "==", userId),
+            orderBy("createdAt", "desc")
+        );
         const unsubscribe = onSnapshot(
             q,
             (snapshot) => {
@@ -61,7 +72,10 @@ export const ModelsProvider = ({ children }) => {
     };
 
     // fetch uploader info
-    const fetchUploader = async (uploaderId) => {
+
+    // ...
+
+    const fetchUploader = useCallback(async (uploaderId) => {
         try {
             const userDocRef = doc(db, "users", uploaderId);
             const userDoc = await getDoc(userDocRef);
@@ -71,7 +85,7 @@ export const ModelsProvider = ({ children }) => {
         } catch (err) {
             console.error("Error fetching uploader data:", err);
         }
-    };
+    }, []);
 
     return (
         <ModelsContext.Provider
