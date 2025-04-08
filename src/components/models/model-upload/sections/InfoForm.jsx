@@ -1,23 +1,32 @@
-import { useState } from "react";
-import { useModelUpload } from "../../../contexts/modelUploadContext";
+import React, { useState } from "react";
 import { TiDelete } from "react-icons/ti";
-import { ImageUploadSection } from "./imageUploadSection";
+// components
+import { ImagesUpload } from "./ImagesUpload";
 
-export const ModelInfoStep = () => {
-    const { modelData, setModelData } = useModelUpload();
+export function InfoForm({ modelData, setModelData }) {
     const [newTag, setNewTag] = useState("");
 
     const handleTagInputChange = (e) => setNewTag(e.target.value);
 
     const handleTagAdd = (e) => {
-        if (e.key === "Enter" && newTag.trim() !== "" && !modelData.tags.includes(newTag.trim())) {
-            setModelData((prev) => ({ ...prev, tags: [...prev.tags, newTag.trim()] }));
+        if (
+            e.key === "Enter" &&
+            newTag.trim() !== "" &&
+            !modelData.tags.includes(newTag.trim())
+        ) {
+            setModelData((prev) => ({
+                ...prev,
+                tags: [...prev.tags, newTag.trim()],
+            }));
             setNewTag("");
         }
     };
 
     const handleTagRemove = (tagToRemove) => {
-        setModelData((prev) => ({ ...prev, tags: prev.tags.filter((tag) => tag !== tagToRemove) }));
+        setModelData((prev) => ({
+            ...prev,
+            tags: prev.tags.filter((tag) => tag !== tagToRemove),
+        }));
     };
 
     const handleModelDataChange = (e) => {
@@ -30,12 +39,14 @@ export const ModelInfoStep = () => {
             <section className="bg-bg-secondary rounded-md py-4 px-8">
                 <div>
                     {/* Image Upload Section */}
-                    <ImageUploadSection />
+                    <ImagesUpload modelData={modelData} setModelData={setModelData} />
                 </div>
 
                 <form className="space-y-4">
                     <div>
-                        <label className="block text-txt-secondary font-semibold">Model Name <span className="text-error">*</span></label>
+                        <label className="block text-txt-secondary font-semibold">
+                            Model Name <span className="text-error">*</span>
+                        </label>
                         <input
                             type="text"
                             name="name"
@@ -48,7 +59,9 @@ export const ModelInfoStep = () => {
                     </div>
 
                     <div>
-                        <label className="block text-txt-secondary font-semibold">Category <span className="text-error">*</span></label>
+                        <label className="block text-txt-secondary font-semibold">
+                            Category <span className="text-error">*</span>
+                        </label>
                         <input
                             name="category"
                             value={modelData.category}
@@ -60,7 +73,9 @@ export const ModelInfoStep = () => {
                     </div>
 
                     <div>
-                        <label className="block text-txt-secondary font-semibold">Description <span className="text-error">*</span></label>
+                        <label className="block text-txt-secondary font-semibold">
+                            Description <span className="text-error">*</span>
+                        </label>
                         <textarea
                             name="description"
                             value={modelData.description}
@@ -84,9 +99,16 @@ export const ModelInfoStep = () => {
                         />
                         <div className="flex flex-wrap gap-2">
                             {modelData.tags.map((tag) => (
-                                <div key={tag} className="flex items-center bg-accent text-white px-3 py-1 rounded-full">
+                                <div
+                                    key={tag}
+                                    className="flex items-center bg-accent text-white px-3 py-1 rounded-full"
+                                >
                                     <span>{tag}</span>
-                                    <button type="button" onClick={() => handleTagRemove(tag)} className="ml-2 text-white">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleTagRemove(tag)}
+                                        className="ml-2 text-white"
+                                    >
                                         <TiDelete size={18} />
                                     </button>
                                 </div>
@@ -97,4 +119,4 @@ export const ModelInfoStep = () => {
             </section>
         </section>
     );
-};
+}
