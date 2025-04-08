@@ -14,6 +14,16 @@ export const ModelView = ({ openAuthModal }) => {
     const [modelLoaded, setModelLoaded] = useState(false);
     const [loadProgress, setLoadProgress] = useState(0);
 
+    const [yOffset, setYOffset] = useState(0);
+
+    useEffect(() => {
+        const viewer = modelViewerRef.current;
+        if (!viewer || !viewer.model || !viewer.model.scene) return;
+
+        viewer.model.scene.position.y = yOffset;
+        viewer.requestRender?.();
+    }, [yOffset, modelLoaded]);
+
     const modelViewerRef = useRef(null);
 
     const { id } = useParams();
@@ -94,11 +104,9 @@ export const ModelView = ({ openAuthModal }) => {
                         shadow-intensity={shadowIntensity}
                         exposure={exposure}
                         className="rounded-md shadow-lg h-[calc(90vh-120px)] w-auto"
-                        // style={{
-                        //     width: "1000px",
-                        //     height: "400px",
-                        //     backgroundColor: "#616161",
-                        // }}
+                        style={{
+                            backgroundColor: "#616161",
+                        }}
                     ></model-viewer>
 
                     {!modelLoaded && (
@@ -132,6 +140,26 @@ export const ModelView = ({ openAuthModal }) => {
             {/* Left Side */}
             <div className="flex-1">
                 <div className="relative">{mainPreview}</div>
+
+                <div>
+                    <label
+                        htmlFor="yOffsetSlider"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Model Y Offset
+                    </label>
+                    <input
+                        id="yOffsetSlider"
+                        type="range"
+                        min="-1"
+                        max="1"
+                        step="0.01"
+                        value={yOffset}
+                        onChange={(e) => setYOffset(parseFloat(e.target.value))}
+                        className="w-full"
+                    />
+                    <p className="text-sm text-gray-600">Current offset: {yOffset}</p>
+                </div>
 
                 {/* Shadow Intensity */}
                 <div>
