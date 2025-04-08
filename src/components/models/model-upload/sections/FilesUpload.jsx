@@ -3,18 +3,62 @@ import { useDropzone } from "react-dropzone";
 import { MdDelete } from "react-icons/md";
 
 export function FilesUpload({ step, files, setFiles }) {
-    const onDrop = useCallback(
-        (acceptedFiles) => {
-            setFiles((prev) => [...prev, ...acceptedFiles]);
-        },
-        [setFiles]
-    );
-
     const removeFile = (fileName) => {
         setFiles((prev) => prev.filter((file) => file.name !== fileName));
     };
 
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+    const allowedExtensions = [
+        ".3ds",
+        ".amt",
+        ".blend",
+        ".dwg",
+        ".dxf",
+        ".fbx",
+        ".factory",
+        ".fsd",
+        ".iges",
+        ".obj",
+        ".ply",
+        ".pro",
+        ".rsdoc",
+        ".scad",
+        ".shape",
+        ".shapr",
+        ".skp",
+        ".sldasm",
+        ".sldprt",
+        ".slc",
+        ".step",
+        ".stl",
+        ".stp",
+        ".studio3",
+        ".svg",
+        ".tcw",
+        ".x_t",
+        ".x_b",
+    ];
+
+    const onDrop = useCallback(
+        (acceptedFiles) => {
+            const validFiles = acceptedFiles.filter((file) => {
+                const lower = file.name.toLowerCase();
+                return allowedExtensions.some((ext) => lower.endsWith(ext));
+            });
+
+            if (validFiles.length !== acceptedFiles.length) {
+                alert("Some files were skipped due to unsupported file formats.");
+            }
+
+            setFiles((prev) => [...prev, ...validFiles]);
+        },
+        [setFiles]
+    );
+
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+        onDrop,
+        // Don't pass accept for unknown MIME types
+        // You can optionally pass `accept: '*/*'` if needed
+    });
 
     return (
         <section>
