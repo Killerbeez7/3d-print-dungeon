@@ -18,7 +18,7 @@ export const ArtistProfile = () => {
     const tabs = [
         { id: "uploads", label: "Uploads" },
         { id: "likes", label: "Likes" },
-        { id: "about", label: "About" }
+        { id: "about", label: "About" },
     ];
 
     // Fetch user data based on ID
@@ -56,9 +56,7 @@ export const ArtistProfile = () => {
     if (error) {
         return (
             <div className="text-center p-8">
-                <h2 className="text-2xl font-semibold text-txt-primary mb-4">
-                    {error}
-                </h2>
+                <h2 className="text-2xl font-semibold text-txt-primary mb-4">{error}</h2>
                 <button
                     onClick={() => navigate(-1)}
                     className="text-accent hover:text-accent-hover"
@@ -86,7 +84,9 @@ export const ArtistProfile = () => {
                     <h1 className="text-xl sm:text-2xl font-semibold text-txt-primary">
                         {userData?.displayName || "Anonymous"}
                     </h1>
-                    <p className="text-sm sm:text-base text-txt-secondary">{userData?.bio || "No bio available"}</p>
+                    <p className="text-sm sm:text-base text-txt-secondary">
+                        {userData?.bio || "No bio available"}
+                    </p>
                 </div>
             </div>
 
