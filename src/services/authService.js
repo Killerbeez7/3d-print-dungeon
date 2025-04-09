@@ -1,5 +1,5 @@
 import { doc, setDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../firebase/firebaseConfig";
+import { auth, db } from "../config/firebase";
 import {
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
@@ -53,6 +53,12 @@ export const addUserToDatabase = async (
 
 // Get user from Firestore
 export const getUserFromDatabase = (uid, callback) => {
+    if (!uid) {
+        console.error("No uid provided to getUserFromDatabase");
+        callback(null);
+        return () => {}; // Return empty cleanup function
+    }
+
     const userDocRef = doc(db, "users", uid);
     const unsubscribe = onSnapshot(
         userDocRef,
@@ -60,7 +66,8 @@ export const getUserFromDatabase = (uid, callback) => {
             if (snapshot.exists()) {
                 callback(snapshot.data());
             } else {
-                callback(null); // Return null if user does not exist
+                console.log(`No user document found for uid: ${uid}`);
+                callback(null);
             }
         },
         (error) => {
@@ -68,6 +75,7 @@ export const getUserFromDatabase = (uid, callback) => {
             callback(null);
         }
     );
+
     return unsubscribe;
 };
 

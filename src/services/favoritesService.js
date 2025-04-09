@@ -1,4 +1,4 @@
-import { db } from "../firebase/firebaseConfig";
+import { db } from "../config/firebase";
 import { doc, getDoc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
 
 // Toggle a model in the user's favorites (star icon action)
