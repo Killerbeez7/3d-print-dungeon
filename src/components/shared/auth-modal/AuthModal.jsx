@@ -63,6 +63,14 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
 
   if (!isOpen) return null;
 
+  const handleClose = () => {
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setError(null);
+    onClose();
+  };
+
   const handleAuth = async (e) => {
     e.preventDefault();
     setError(null);
@@ -80,7 +88,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
       } else {
         await handleEmailSignIn(email, password);
       }
-      onClose();
+      handleClose();
     } catch (err) {
       setError(err.message);
     }
@@ -92,7 +100,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
       setError(null);
       setLoading(true);
       await handleGoogleSignIn();
-      onClose();
+      handleClose();
     } catch (err) {
       setError(err.message);
     }
@@ -104,7 +112,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
       setError(null);
       setLoading(true);
       await handleFacebookSignIn();
-      onClose();
+      handleClose();
     } catch (err) {
       setError(err.message);
     }
@@ -116,7 +124,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
       setError(null);
       setLoading(true);
       await handleTwitterSignIn();
-      onClose();
+      handleClose();
     } catch (err) {
       setError(err.message);
     }
@@ -127,9 +135,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
   return (
     <div
       className="fixed inset-0 z-50"
-      onClick={onClose}
-      // 'pointer-events-auto' so it can catch scroll/click events
-      // 'bg-black/60' for the backdrop
+      onClick={handleClose}
       style={{ pointerEvents: "auto" }}
     >
       <div className="absolute inset-0 bg-black/60" />
@@ -148,7 +154,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
         {/* CLOSE BUTTON */}
         <button
           className="absolute top-3 right-3 text-txt-secondary hover:text-error"
-          onClick={onClose}
+          onClick={handleClose}
         >
           <FontAwesomeIcon icon={faXmark} size="lg" />
         </button>
@@ -310,7 +316,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
             </>
           ) : (
             <>
-              Don’t have an account?{" "}
+              Don't have an account?{" "}
               <button
                 onClick={onSwitchMode}
                 className="text-accent hover:underline ml-1 font-medium"
