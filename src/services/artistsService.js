@@ -1,5 +1,5 @@
 import { collection, getDocs } from "firebase/firestore";
-import { db } from "../firebase/firebaseConfig";
+import { db } from "../config/firebase";
 
 export const getAllArtists = async () => {
     const usersCollectionRef = collection(db, "users");

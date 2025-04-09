@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../../../firebase/firebaseConfig";
+import { db } from "../../../config/firebase";
 import { useModels } from "../../../contexts/modelsContext";
 
 export const ModelEdit = () => {

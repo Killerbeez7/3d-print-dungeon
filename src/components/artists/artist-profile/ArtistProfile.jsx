@@ -1,72 +1,102 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // To access URL params
-import { getUserFromDatabase } from "../../../services/authService"; // The function to get user data
+import { useParams, useNavigate } from "react-router-dom";
+import { getUserFromDatabase } from "../../../services/authService";
 import { useModels } from "../../../contexts/modelsContext";
 import { UploadsSection } from "./UploadsSection";
 import { LikesSection } from "./LikesSection";
 import { AboutSection } from "./AboutSection";
 
 export const ArtistProfile = () => {
-    const { uid } = useParams(); // Get UID from the URL
+    const { id } = useParams();
+    const navigate = useNavigate();
     const { models, loading: modelsLoading } = useModels();
     const [userData, setUserData] = useState(null);
     const [userUploads, setUserUploads] = useState([]);
     const [activeTab, setActiveTab] = useState("uploads");
+    const [error, setError] = useState(null);
 
     const tabs = [
         { id: "uploads", label: "Uploads" },
         { id: "likes", label: "Likes" },
-        { id: "about", label: "About" }
+        { id: "about", label: "About" },
     ];
 
-    // Fetch user data based on UID
+    // Fetch user data based on ID
     useEffect(() => {
-        const fetchUserData = async () => {
-            getUserFromDatabase(uid, (data) => {
-                setUserData(data);
-            });
-        };
+        if (!id) {
+            setError("No user ID provided");
+            return;
+        }
 
-        fetchUserData();
-    }, [uid]);
+        const unsubscribe = getUserFromDatabase(id, (data) => {
+            if (data) {
+                setUserData(data);
+                setError(null);
+            } else {
+                setError("User not found");
+                setUserData(null);
+            }
+        });
+
+        return () => {
+            if (unsubscribe) {
+                unsubscribe();
+            }
+        };
+    }, [id]);
 
     // Fetch the user's uploads from models
     useEffect(() => {
         if (!userData || modelsLoading) return;
 
-        // Use the UID directly here instead of userData.uid
-        const userModels = models.filter((model) => model.uploaderId === uid); // `uid` is the document ID
+        const userModels = models.filter((model) => model.uploaderId === id);
         setUserUploads(userModels);
-    }, [models, userData, modelsLoading, uid]);
+    }, [models, userData, modelsLoading, id]);
+
+    if (error) {
+        return (
+            <div className="text-center p-8">
+                <h2 className="text-2xl font-semibold text-txt-primary mb-4">{error}</h2>
+                <button
+                    onClick={() => navigate(-1)}
+                    className="text-accent hover:text-accent-hover"
+                >
+                    Go Back
+                </button>
+            </div>
+        );
+    }
 
     if (!userData) {
-        return <div className="text-center">Loading user profile...</div>;
+        return <div className="text-center p-8">Loading user profile...</div>;
     }
 
     return (
-        <div className="max-w-6xl mx-auto p-4">
+        <div className="max-w-6xl mx-auto p-2 sm:p-4">
             {/* Profile Header */}
-            <div className="flex items-center space-x-4 p-6 bg-bg-surface shadow-md rounded-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 sm:p-6 bg-bg-surface shadow-md rounded-lg">
                 <img
                     src={userData?.photoURL || "/user.png"}
                     alt="User Avatar"
-                    className="w-20 h-20 rounded-full border-2 border-br-primary"
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-br-primary mx-auto sm:mx-0"
                 />
-                <div>
-                    <h1 className="text-2xl font-semibold text-txt-primary">
+                <div className="text-center sm:text-left">
+                    <h1 className="text-xl sm:text-2xl font-semibold text-txt-primary">
                         {userData?.displayName || "Anonymous"}
                     </h1>
-                    <p className="text-txt-secondary">{userData?.bio || "No bio available"}</p>
+                    <p className="text-sm sm:text-base text-txt-secondary">
+                        {userData?.bio || "No bio available"}
+                    </p>
                 </div>
             </div>
 
             {/* Tabs Navigation */}
-            <div className="flex mt-6 border-b border-br-primary">
+            <div className="flex mt-6 border-b border-br-primary overflow-x-auto">
                 {tabs.map((tab) => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`px-4 py-2 font-medium text-lg ${
+                        className={`px-3 sm:px-4 py-2 font-medium text-base sm:text-lg whitespace-nowrap ${
                             activeTab === tab.id
                                 ? "border-b-2 border-accent text-txt-primary"
                                 : "text-txt-secondary hover:text-txt-highlighted"
@@ -78,10 +108,10 @@ export const ArtistProfile = () => {
             </div>
 
             {/* Content Section */}
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
                 {activeTab === "uploads" && <UploadsSection artworks={userUploads} />}
-                {activeTab === "likes" && <LikesSection />}
-                {activeTab === "about" && <AboutSection />}
+                {activeTab === "likes" && <LikesSection userId={id} />}
+                {activeTab === "about" && <AboutSection userData={userData} />}
             </div>
         </div>
     );
