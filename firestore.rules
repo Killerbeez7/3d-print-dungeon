@@ -1,0 +1,75 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is admin
+    function isAdmin() {
+      return request.auth != null && 
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+    
+    // Helper function to check if user is admin or super admin
+    function isSuperAdmin() {
+      return request.auth != null && 
+        (request.auth.uid == 'yhxP3gGtqSUFkM6FUdDQrqZD5lm2' || // Plamen
+         request.auth.uid == '11wWKqMO3pQFaL48zciLrnMkFzd2');  // Vlado
+    }
+
+    // Admins collection - only readable by admins
+    match /admins/{userId} {
+      allow read: if isAdmin() || isSuperAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if true;  // Public profiles
+      allow write: if request.auth != null && 
+        (request.auth.uid == userId || isAdmin() || isSuperAdmin());
+    }
+
+    // Models collection
+    match /models/{modelId} {
+      allow read: if true;  // Public models
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && 
+        (resource.data.uploaderId == request.auth.uid || isAdmin() || isSuperAdmin());
+    }
+
+    // Likes collection
+    match /likes/{likeId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    // Comments collection
+    match /comments/{commentId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && 
+        (resource.data.userId == request.auth.uid || isAdmin() || isSuperAdmin());
+    }
+
+    // Site Settings collection
+    match /settings/{settingId} {
+      allow read: if true;  // Allow everyone to read settings
+      allow write: if isAdmin() || isSuperAdmin();  // Only admins can modify settings
+    }
+
+    // Reports collection - admin only
+    match /reports/{reportId} {
+      allow read, write: if isAdmin() || isSuperAdmin();
+      allow create: if request.auth != null;  // Allow users to create reports
+    }
+
+    // Analytics collection - admin only
+    match /analytics/{analyticsId} {
+      allow read, write: if isAdmin() || isSuperAdmin();
+    }
+
+    // Analytics subcollections
+    match /analytics/{analyticsId}/{subcollection}/{subDocId} {
+      allow read, write: if isAdmin() || isSuperAdmin();
+    }
+  }
+} 
