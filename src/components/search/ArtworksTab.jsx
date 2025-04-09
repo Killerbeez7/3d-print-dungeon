@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import PropTypes from 'prop-types';
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { LazyImage } from "../shared/lazy-image/LazyImage";
+import { LazyImage } from '../shared/lazy-image/LazyImage';
 
 const toggleArrayValue = (arr, value) =>
     arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
@@ -169,7 +170,7 @@ export const ArtworksTab = ({ searchTerm, models }) => {
                         : "Start typing to search for artworks."}
                 </p>
             ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2">
+                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4">
                     {filteredModels.map((m) => (
                         <Link key={m.id} to={`/model/${m.id}`}>
                             <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
@@ -179,10 +180,10 @@ export const ArtworksTab = ({ searchTerm, models }) => {
                                         alt={m.name}
                                         className="absolute inset-0 w-full h-full object-cover rounded-lg"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end justify-start opacity-0 hover:opacity-100 transition-opacity">
-                                        <div className="text-white m-2">
-                                            <h4 className="font-semibold">{m.name}</h4>
-                                            <p className="text-sm">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end justify-start opacity-100 sm:opacity-0 sm:hover:opacity-100 transition-opacity">
+                                        <div className="text-white p-2 sm:m-2">
+                                            <h4 className="font-semibold text-sm sm:text-base truncate">{m.name}</h4>
+                                            <p className="text-xs sm:text-sm truncate">
                                                 {m.uploaderDisplayName}
                                             </p>
                                         </div>
@@ -195,4 +196,16 @@ export const ArtworksTab = ({ searchTerm, models }) => {
             )}
         </div>
     );
+};
+
+ArtworksTab.propTypes = {
+    searchTerm: PropTypes.string.isRequired,
+    models: PropTypes.arrayOf(
+        PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            name: PropTypes.string.isRequired,
+            primaryRenderUrl: PropTypes.string.isRequired,
+            uploaderDisplayName: PropTypes.string.isRequired,
+        })
+    ).isRequired,
 };
