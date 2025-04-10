@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getUserFromDatabase } from "../../../services/authService";
-import { useModels } from "../../../contexts/modelsContext";
 import { UploadsSection } from "./UploadsSection";
 import { LikesSection } from "./LikesSection";
 import { AboutSection } from "./AboutSection";
@@ -9,9 +8,7 @@ import { AboutSection } from "./AboutSection";
 export const ArtistProfile = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { models, loading: modelsLoading } = useModels();
     const [userData, setUserData] = useState(null);
-    const [userUploads, setUserUploads] = useState([]);
     const [activeTab, setActiveTab] = useState("uploads");
     const [error, setError] = useState(null);
 
@@ -44,14 +41,6 @@ export const ArtistProfile = () => {
             }
         };
     }, [id]);
-
-    // Fetch the user's uploads from models
-    useEffect(() => {
-        if (!userData || modelsLoading) return;
-
-        const userModels = models.filter((model) => model.uploaderId === id);
-        setUserUploads(userModels);
-    }, [models, userData, modelsLoading, id]);
 
     if (error) {
         return (
@@ -109,7 +98,7 @@ export const ArtistProfile = () => {
 
             {/* Content Section */}
             <div className="mt-4 sm:mt-6">
-                {activeTab === "uploads" && <UploadsSection artworks={userUploads} />}
+                {activeTab === "uploads" && <UploadsSection userId={id} />}
                 {activeTab === "likes" && <LikesSection userId={id} />}
                 {activeTab === "about" && <AboutSection userData={userData} />}
             </div>
