@@ -41,15 +41,15 @@ export const Home = () => {
                 <h1 className="mb-4 font-bold">Models</h1>
 
                 {/* Category Buttons */}
-                <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-2">
-                    <div className="flex items-center mb-3 md:mb-0 space-x-2">
+                <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                    <div className="flex flex-col md:flex-row md:items-center gap-2">
                         <label
                             htmlFor="sortBy"
-                            className="text-txt-secondary text-lg font-medium"
+                            className="text-txt-secondary text-lg font-medium whitespace-nowrap"
                         >
                             Filter by:
                         </label>
-                        <div className="flex space-x-2">
+                        <div className="flex flex-wrap gap-2">
                             <button
                                 onClick={() => setCategoryFilter("all")}
                                 className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
@@ -104,14 +104,14 @@ export const Home = () => {
                     </div>
 
                     {/* Sort Menu */}
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-col md:flex-row md:items-center gap-2">
                         <label
                             htmlFor="sortBy"
-                            className="text-txt-secondary text-lg font-medium"
+                            className="text-txt-secondary text-lg font-medium whitespace-nowrap"
                         >
                             Sort by:
                         </label>
-                        <div className="flex space-x-2">
+                        <div className="flex flex-wrap gap-2">
                             <button
                                 onClick={() => setSortBy("community")}
                                 className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
