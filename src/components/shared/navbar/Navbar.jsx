@@ -1,11 +1,10 @@
-// src/components/shared/navbar/Navbar.jsx
-
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useAuth } from "../../../contexts/authContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { MdFileUpload, MdAccountCircle, MdMenu, MdClose } from "react-icons/md";
+import { useClickOutside } from "../../../hooks/useClickOutside";
 
 import {
     faSignOutAlt,
@@ -20,7 +19,28 @@ export const Navbar = ({ onLoginClick }) => {
     const { currentUser, handleSignOut } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
+    const [mobileDropdown, setMobileDropdown] = useState(null);
     const navigate = useNavigate();
+    const location = useLocation();
+    const dropdownRef = useRef(null);
+    const mobileDropdownRef = useRef(null);
+
+    // Close desktop dropdown when clicking outside
+    useClickOutside(dropdownRef, () => {
+        setActiveDropdown(null);
+    });
+
+    // Close mobile dropdown when clicking outside
+    useClickOutside(mobileDropdownRef, () => {
+        setMobileDropdown(null);
+    });
+
+    // Close dropdowns and mobile menu on route change
+    useEffect(() => {
+        setActiveDropdown(null);
+        setMobileDropdown(null);
+        setIsMobileMenuOpen(false);
+    }, [location.pathname]);
 
     const handleLogout = async () => {
         try {
@@ -33,14 +53,22 @@ export const Navbar = ({ onLoginClick }) => {
 
     const toggleMobileMenu = () => {
         setIsMobileMenuOpen(!isMobileMenuOpen);
-        // When closing mobile menu, also close any open dropdowns
         if (isMobileMenuOpen) {
-            setActiveDropdown(null);
+            setMobileDropdown(null);
         }
     };
 
     const toggleDropdown = (dropdownName) => {
-        setActiveDropdown(activeDropdown === dropdownName ? null : dropdownName);
+        if (activeDropdown === dropdownName) {
+            setActiveDropdown(null);
+        } else {
+            setActiveDropdown(dropdownName);
+        }
+    };
+
+    const toggleMobileDropdown = (dropdownName, e) => {
+        e.stopPropagation();
+        setMobileDropdown((prev) => (prev === dropdownName ? null : dropdownName));
     };
 
     const navItems = [
@@ -49,8 +77,8 @@ export const Navbar = ({ onLoginClick }) => {
             path: "/explore",
             dropdownItems: [
                 { name: "Models", path: "/" },
-                { name: "Artists", path: "/artists" },
-                { name: "Forum", path: "/forum" },
+                { name: "Artists", path: "/explore/artists" },
+                { name: "Forum", path: "/explore/forum" },
             ],
         },
         {
@@ -77,7 +105,7 @@ export const Navbar = ({ onLoginClick }) => {
         <header className="sticky top-0 z-50 bg-bg-primary shadow-md">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 <div className="flex items-center h-14">
-                    {/* Left section - Logo and Navigation */}
+                    {/* Left Section: Logo and Navigation */}
                     <div className="flex items-center space-x-4">
                         {/* Mobile menu button */}
                         <button
@@ -86,20 +114,20 @@ export const Navbar = ({ onLoginClick }) => {
                             aria-label="Toggle mobile menu"
                             aria-expanded={isMobileMenuOpen}
                         >
-                            {isMobileMenuOpen ? <MdClose size={24} /> : <MdMenu size={24} />}
+                            {isMobileMenuOpen ? (
+                                <MdClose size={24} />
+                            ) : (
+                                <MdMenu size={24} />
+                            )}
                         </button>
 
                         {/* Logo */}
                         <Link
                             to="/"
-                            className="flex items-center space-x-2"
+                            className="flex items-center space-x-2 flex-shrink-0 ml-2 [&>*]:hidden [@media(min-width:378px)]:block [@media(min-width:378px)]:flex [@media(min-width:378px)]:items-center"
                         >
-                            <img
-                                src="/logo.png"
-                                alt="Site Logo"
-                                className="h-7 w-auto"
-                            />
-                            <span className="hidden sm:block font-semibold text-base text-txt-primary whitespace-nowrap">
+                            <img src="/logo.png" alt="Site Logo" className="h-7 w-auto" />
+                            <span className="hidden sm:block font-semibold text-base text-txt-primary">
                                 3D PRINT DUNGEON
                             </span>
                         </Link>
@@ -110,6 +138,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 <div
                                     key={item.name}
                                     className="relative group"
+                                    ref={dropdownRef}
                                     onMouseEnter={() => setActiveDropdown(item.name)}
                                     onMouseLeave={() => setActiveDropdown(null)}
                                 >
@@ -138,6 +167,9 @@ export const Navbar = ({ onLoginClick }) => {
                                                     key={dropdownItem.path}
                                                     to={dropdownItem.path}
                                                     className="block px-4 py-2 text-sm text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
+                                                    onClick={() =>
+                                                        setActiveDropdown(null)
+                                                    }
                                                 >
                                                     {dropdownItem.name}
                                                 </Link>
@@ -149,14 +181,14 @@ export const Navbar = ({ onLoginClick }) => {
                         </nav>
                     </div>
 
-                    {/* Center section - Search */}
+                    {/* Center Section: Global Search */}
                     <div className="flex-1 flex justify-center px-4 max-w-2xl mx-auto">
                         <div className="w-full">
                             <GlobalSearch />
                         </div>
                     </div>
 
-                    {/* Right section - Auth & Profile */}
+                    {/* Right Section: Auth & Profile */}
                     <div className="flex items-center space-x-4">
                         {!currentUser ? (
                             <button
@@ -168,20 +200,19 @@ export const Navbar = ({ onLoginClick }) => {
                         ) : (
                             <>
                                 <Link
-                                    to="/upload"
+                                    to="/model/upload"
                                     className="text-txt-secondary hover:text-txt-primary"
                                 >
                                     <MdFileUpload className="h-5 w-5" />
                                 </Link>
 
-                                <div className="relative">
+                                <div className="relative" ref={dropdownRef}>
                                     <button
                                         onClick={() => toggleDropdown("profile")}
                                         className="flex items-center text-txt-secondary hover:text-txt-primary"
                                     >
                                         <MdAccountCircle className="h-7 w-7" />
                                     </button>
-
                                     {/* Profile Dropdown */}
                                     <div
                                         className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-bg-surface ring-1 ring-black ring-opacity-5 transition-all duration-200 ${
@@ -197,6 +228,7 @@ export const Navbar = ({ onLoginClick }) => {
                                             <Link
                                                 to={`/artist/${currentUser?.uid}`}
                                                 className="block px-4 py-2 text-sm text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
+                                                onClick={() => setActiveDropdown(null)}
                                             >
                                                 <FontAwesomeIcon
                                                     icon={faUser}
@@ -207,6 +239,7 @@ export const Navbar = ({ onLoginClick }) => {
                                             <Link
                                                 to="/settings"
                                                 className="block px-4 py-2 text-sm text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
+                                                onClick={() => setActiveDropdown(null)}
                                             >
                                                 <FontAwesomeIcon
                                                     icon={faCog}
@@ -215,8 +248,11 @@ export const Navbar = ({ onLoginClick }) => {
                                                 Settings
                                             </Link>
                                             <button
-                                                onClick={handleLogout}
-                                                className="block w-full text-left px-4 py-2 text-sm text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
+                                                onClick={() => {
+                                                    setActiveDropdown(null);
+                                                    handleLogout();
+                                                }}
+                                                className="w-full text-left px-4 py-2 text-sm text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
                                             >
                                                 <FontAwesomeIcon
                                                     icon={faSignOutAlt}
@@ -234,35 +270,39 @@ export const Navbar = ({ onLoginClick }) => {
 
                 {/* Mobile Navigation Menu */}
                 <div
-                    className={`md:hidden fixed inset-x-0 bg-bg-primary transition-all duration-200 ease-in-out ${
-                        isMobileMenuOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+                    className={`md:hidden shadow-md absolute inset-x-0 bg-bg-primary transition-all duration-300 ease-out transform ${
+                        isMobileMenuOpen
+                            ? "translate-y-0 opacity-100 pointer-events-auto"
+                            : "-translate-y-full opacity-0 pointer-events-none"
                     }`}
-                    style={{ top: "64px" }}
+                    style={{ top: "100%" }}
                 >
-                    {/* Mobile Search - Only visible when menu is open */}
+                    {/* Mobile Search */}
                     <div className="p-4 border-b border-br-secondary">
                         <GlobalSearch />
                     </div>
 
-                    <div className="px-2 pt-2 pb-3 space-y-1">
+                    <div className="px-2 pt-2 pb-3 space-y-1" ref={mobileDropdownRef}>
                         {navItems.map((item) => (
                             <div key={item.name}>
                                 <button
                                     className="w-full text-left px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary flex items-center justify-between"
-                                    onClick={() => toggleDropdown(item.name)}
+                                    onClick={(e) => toggleMobileDropdown(item.name, e)}
                                 >
                                     {item.name}
                                     <FontAwesomeIcon
                                         icon={faChevronDown}
                                         className={`ml-2 transform transition-transform duration-200 ${
-                                            activeDropdown === item.name ? "rotate-180" : ""
+                                            mobileDropdown === item.name
+                                                ? "rotate-180"
+                                                : ""
                                         }`}
                                     />
                                 </button>
                                 <div
                                     className={`bg-bg-secondary transition-all duration-200 ${
-                                        activeDropdown === item.name
-                                            ? "max-h-48"
+                                        mobileDropdown === item.name
+                                            ? "max-h-48 overflow-y-auto"
                                             : "max-h-0 overflow-hidden"
                                     }`}
                                 >
@@ -273,7 +313,7 @@ export const Navbar = ({ onLoginClick }) => {
                                             className="block px-6 py-2 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary"
                                             onClick={() => {
                                                 setIsMobileMenuOpen(false);
-                                                setActiveDropdown(null);
+                                                setMobileDropdown(null);
                                             }}
                                         >
                                             {dropdownItem.name}
