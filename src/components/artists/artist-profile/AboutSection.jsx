@@ -6,12 +6,16 @@ export const AboutSection = ({ userData }) => {
             {/* Bio Section */}
             <div className="space-y-4">
                 <h3 className="text-2xl font-semibold text-txt-primary">About Me</h3>
-                <p className="text-txt-secondary text-lg">{userData?.bio || "This user has not updated their bio yet."}</p>
+                <p className="text-txt-secondary text-lg">
+                    {userData?.bio || "This user has not updated their bio yet."}
+                </p>
             </div>
 
             {/* Social Links Section */}
             <div className="mt-8">
-                <h3 className="text-2xl font-semibold text-txt-primary">Connect with Me</h3>
+                <h3 className="text-2xl font-semibold text-txt-primary">
+                    Connect with Me
+                </h3>
                 <div className="flex space-x-6 mt-3">
                     {userData?.socialLinks?.twitter && (
                         <a
@@ -86,7 +90,7 @@ AboutSection.propTypes = {
         socialLinks: PropTypes.shape({
             twitter: PropTypes.string,
             instagram: PropTypes.string,
-            website: PropTypes.string
-        })
-    })
+            website: PropTypes.string,
+        }),
+    }),
 };
