@@ -103,7 +103,7 @@ export function GlobalSearch() {
     return (
         <form
             onSubmit={handleSubmit}
-            className="relative w-full max-w-[800px]"
+            className="relative w-full max-w-[1000px]"
             ref={containerRef}
         >
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
