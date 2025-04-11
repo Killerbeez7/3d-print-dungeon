@@ -17,14 +17,29 @@ export function GlobalSearch() {
         searchTerm,
         setSearchTerm,
         setActiveTab,
+        activeTab,
         showDropdown,
         setShowDropdown,
         handleClearSearch,
     } = useSearch();
     const [artistResults, setArtistResults] = useState([]);
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const containerRef = useRef(null);
     const navigate = useNavigate();
     const db = getFirestore();
+
+    // Check for mobile screen size
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+            if (window.innerWidth < 768) {
+                setShowDropdown(false);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [setShowDropdown]);
 
     // Update global search term as the user types.
     const handleInputChange = (e) => {
@@ -91,7 +106,9 @@ export function GlobalSearch() {
     }, [setShowDropdown]);
 
     const handleFocus = () => {
-        setShowDropdown(true);
+        if (!isMobile) {
+            setShowDropdown(true);
+        }
     };
 
     // Clicking on an artist in the dropdown navigates to their profile.
@@ -126,7 +143,7 @@ export function GlobalSearch() {
                     <FontAwesomeIcon icon={faTimes} />
                 </button>
             )}
-            {showDropdown && (
+            {!isMobile && showDropdown && (
                 <div className="absolute top-[110%] left-0 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-50">
                     <ul className="py-2 max-h-80 overflow-auto text-sm">
                         {searchTerm.trim() && artistResults.length > 0 && (
@@ -149,13 +166,17 @@ export function GlobalSearch() {
                         {/* Preset links */}
                         <li
                             onMouseDown={() => handlePresetClick("artworks")}
-                            className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                            className={`px-3 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center ${
+                                activeTab === "artworks" ? "bg-gray-100" : ""
+                            }`}
                         >
                             <span>Search Artworks</span>
                         </li>
                         <li
                             onMouseDown={() => handlePresetClick("artists")}
-                            className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                            className={`px-3 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center ${
+                                activeTab === "artists" ? "bg-gray-100" : ""
+                            }`}
                         >
                             <span>Search Artists</span>
                         </li>

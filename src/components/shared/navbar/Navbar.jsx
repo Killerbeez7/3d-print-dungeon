@@ -21,6 +21,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { GlobalSearch } from "../../search/GlobalSearch";
+import { useSearch } from "../../../contexts/searchContext";
 
 export const Navbar = ({ onLoginClick }) => {
     const { currentUser, handleSignOut } = useAuth();
@@ -33,6 +34,7 @@ export const Navbar = ({ onLoginClick }) => {
     const dropdownRef = useRef(null);
     const mobileDropdownRef = useRef(null);
     const searchOverlayRef = useRef(null);
+    const { setShowDropdown } = useSearch();
 
     // Close desktop dropdown when clicking outside
     useClickOutside(dropdownRef, () => {
@@ -55,7 +57,8 @@ export const Navbar = ({ onLoginClick }) => {
         setMobileDropdown(null);
         setIsMobileMenuOpen(false);
         setIsSearchVisible(false);
-    }, [location.pathname]);
+        setShowDropdown(false);
+    }, [location.pathname, setShowDropdown]);
 
     const handleLogout = async () => {
         try {
@@ -121,8 +124,8 @@ export const Navbar = ({ onLoginClick }) => {
     ];
 
     return (
-        <div className="relative">
-            <nav className="sticky top-0 z-50 bg-bg-primary">
+        <div className="sticky top-0 z-50">
+            <nav className="bg-bg-primary shadow-md">
                 <div className="mx-auto px-4 sm:px-6 py-5">
                     <div className="flex items-center h-10">
                         {/* Left Section: Logo and Navigation */}
@@ -376,7 +379,8 @@ export const Navbar = ({ onLoginClick }) => {
                 )}
 
                 {/* Mobile Search */}
-                <div className="p-4 border-b border-br-secondary">
+                <div className="p-4 border-b border-br-secondary" 
+                     onClick={() => setShowDropdown(false)}>
                     <GlobalSearch />
                 </div>
 

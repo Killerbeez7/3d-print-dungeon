@@ -1,8 +1,15 @@
-import React, { createContext, useContext, useState } from "react";
+import { createContext, useState, useContext } from "react";
+import PropTypes from "prop-types";
 
 const SearchContext = createContext();
 
-export const useSearch = () => useContext(SearchContext);
+export const useSearch = () => {
+    const context = useContext(SearchContext);
+    if (!context) {
+        throw new Error("useSearch must be used within a SearchProvider");
+    }
+    return context;
+};
 
 export const SearchProvider = ({ children }) => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -31,4 +38,8 @@ export const SearchProvider = ({ children }) => {
             {children}
         </SearchContext.Provider>
     );
+};
+
+SearchProvider.propTypes = {
+    children: PropTypes.node.isRequired,
 };
