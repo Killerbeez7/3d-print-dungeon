@@ -116,13 +116,17 @@ export const ModelView = ({ openAuthModal }) => {
                     ></model-viewer>
 
                     {!modelLoaded && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-radial from-black/80 to-transparent z-10 text-white">
-                            <p className="text-lg animate-pulse">Loading 3D model</p>
-                            <div className="w-52 h-2 mt-4 bg-white/20 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-cyan-300 transition-all duration-300"
-                                    style={{ width: `${loadProgress * 100}%` }}
-                                ></div>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-10">
+                            <div className="bg-black/40 p-6 rounded-lg backdrop-blur-md">
+                                <p className="text-lg text-white animate-pulse mb-3">
+                                    Loading 3D model
+                                </p>
+                                <div className="w-52 h-2 bg-white/20 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-cyan-300 transition-all duration-300"
+                                        style={{ width: `${loadProgress * 100}%` }}
+                                    ></div>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -208,14 +212,27 @@ export const ModelView = ({ openAuthModal }) => {
                     <details className="group lg:hidden">
                         <summary className="list-none flex justify-between items-center cursor-pointer py-2 font-medium">
                             Model Controls
-                            <svg className="w-5 h-5 transform transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            <svg
+                                className="w-5 h-5 transform transition-transform group-open:rotate-180"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M19 9l-7 7-7-7"
+                                />
                             </svg>
                         </summary>
                         <div className="pt-4 space-y-4">
                             {/* Y Offset Control */}
                             <div>
-                                <label htmlFor="yOffsetSlider" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label
+                                    htmlFor="yOffsetSlider"
+                                    className="block text-sm font-medium text-gray-700 mb-2"
+                                >
                                     Model Y Offset
                                 </label>
                                 <input
@@ -225,15 +242,22 @@ export const ModelView = ({ openAuthModal }) => {
                                     max="1"
                                     step="0.01"
                                     value={yOffset}
-                                    onChange={(e) => setYOffset(parseFloat(e.target.value))}
+                                    onChange={(e) =>
+                                        setYOffset(parseFloat(e.target.value))
+                                    }
                                     className="w-full accent-fuchsia-600"
                                 />
-                                <p className="text-sm text-gray-600 mt-1">Current offset: {yOffset}</p>
+                                <p className="text-sm text-gray-600 mt-1">
+                                    Current offset: {yOffset}
+                                </p>
                             </div>
 
                             {/* Shadow Intensity Control */}
                             <div>
-                                <label htmlFor="shadowSlider" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label
+                                    htmlFor="shadowSlider"
+                                    className="block text-sm font-medium text-gray-700 mb-2"
+                                >
                                     Shadow Intensity
                                 </label>
                                 <input
@@ -243,15 +267,22 @@ export const ModelView = ({ openAuthModal }) => {
                                     max="1"
                                     step="0.01"
                                     value={shadowIntensity}
-                                    onChange={(e) => setShadowIntensity(parseFloat(e.target.value))}
+                                    onChange={(e) =>
+                                        setShadowIntensity(parseFloat(e.target.value))
+                                    }
                                     className="w-full accent-fuchsia-600"
                                 />
-                                <p className="text-sm text-gray-600 mt-1">Current intensity: {shadowIntensity}</p>
+                                <p className="text-sm text-gray-600 mt-1">
+                                    Current intensity: {shadowIntensity}
+                                </p>
                             </div>
 
                             {/* Exposure Control */}
                             <div>
-                                <label htmlFor="exposureSlider" className="block text-sm font-medium text-gray-700 mb-2">
+                                <label
+                                    htmlFor="exposureSlider"
+                                    className="block text-sm font-medium text-gray-700 mb-2"
+                                >
                                     Exposure
                                 </label>
                                 <input
@@ -261,10 +292,14 @@ export const ModelView = ({ openAuthModal }) => {
                                     max="2"
                                     step="0.1"
                                     value={exposure}
-                                    onChange={(e) => setExposure(parseFloat(e.target.value))}
+                                    onChange={(e) =>
+                                        setExposure(parseFloat(e.target.value))
+                                    }
                                     className="w-full accent-fuchsia-600"
                                 />
-                                <p className="text-sm text-gray-600 mt-1">Current exposure: {exposure}</p>
+                                <p className="text-sm text-gray-600 mt-1">
+                                    Current exposure: {exposure}
+                                </p>
                             </div>
                         </div>
                     </details>
@@ -273,7 +308,10 @@ export const ModelView = ({ openAuthModal }) => {
                     <div className="hidden lg:block space-y-6">
                         {/* Y Offset Control */}
                         <div>
-                            <label htmlFor="yOffsetSlider" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label
+                                htmlFor="yOffsetSlider"
+                                className="block text-sm font-medium text-gray-700 mb-2"
+                            >
                                 Model Y Offset
                             </label>
                             <input
@@ -286,12 +324,17 @@ export const ModelView = ({ openAuthModal }) => {
                                 onChange={(e) => setYOffset(parseFloat(e.target.value))}
                                 className="w-full accent-fuchsia-600"
                             />
-                            <p className="text-sm text-gray-600 mt-1">Current offset: {yOffset}</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                                Current offset: {yOffset}
+                            </p>
                         </div>
 
                         {/* Shadow Intensity Control */}
                         <div>
-                            <label htmlFor="shadowSlider" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label
+                                htmlFor="shadowSlider"
+                                className="block text-sm font-medium text-gray-700 mb-2"
+                            >
                                 Shadow Intensity
                             </label>
                             <input
@@ -301,15 +344,22 @@ export const ModelView = ({ openAuthModal }) => {
                                 max="1"
                                 step="0.01"
                                 value={shadowIntensity}
-                                onChange={(e) => setShadowIntensity(parseFloat(e.target.value))}
+                                onChange={(e) =>
+                                    setShadowIntensity(parseFloat(e.target.value))
+                                }
                                 className="w-full accent-fuchsia-600"
                             />
-                            <p className="text-sm text-gray-600 mt-1">Current intensity: {shadowIntensity}</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                                Current intensity: {shadowIntensity}
+                            </p>
                         </div>
 
                         {/* Exposure Control */}
                         <div>
-                            <label htmlFor="exposureSlider" className="block text-sm font-medium text-gray-700 mb-2">
+                            <label
+                                htmlFor="exposureSlider"
+                                className="block text-sm font-medium text-gray-700 mb-2"
+                            >
                                 Exposure
                             </label>
                             <input
@@ -322,7 +372,9 @@ export const ModelView = ({ openAuthModal }) => {
                                 onChange={(e) => setExposure(parseFloat(e.target.value))}
                                 className="w-full accent-fuchsia-600"
                             />
-                            <p className="text-sm text-gray-600 mt-1">Current exposure: {exposure}</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                                Current exposure: {exposure}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -391,7 +443,9 @@ export const ModelView = ({ openAuthModal }) => {
                     <div className="grid grid-cols-2 gap-2">
                         {model.originalFileUrl && (
                             <button
-                                onClick={() => window.open(model.originalFileUrl, "_blank")}
+                                onClick={() =>
+                                    window.open(model.originalFileUrl, "_blank")
+                                }
                                 className="bg-btn-primary text-white py-2 px-4 rounded-lg hover:bg-btn-primary-hover transition-colors text-sm lg:text-base"
                             >
                                 Download Original
