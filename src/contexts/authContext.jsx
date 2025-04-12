@@ -2,10 +2,10 @@ import { createContext, useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../config/firebase";
-import { getFirestore, doc, getDoc } from "firebase/firestore"; // Added Firestore for user data fetching
-import { isAdmin as checkIsAdmin } from "../services/adminService";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { isAdmin } from "../services/adminService";
 
-// Auth service functions (as in your original code)
+// Auth service functions
 import {
     signOutUser,
     signUpWithEmail,
@@ -13,6 +13,7 @@ import {
     signInWithGoogle,
     signInWithTwitter,
     signInWithFacebook,
+    getUserFromDatabase
 } from "../services/authService";
 
 const AuthContext = createContext();
@@ -21,17 +22,15 @@ export const useAuth = () => {
     return useContext(AuthContext);
 };
 
-const db = getFirestore(); // Firestore instance
+const db = getFirestore();
 
 export const AuthProvider = ({ children }) => {
     const [currentUser, setCurrentUser] = useState(null);
-    const [userData, setUserData] = useState(null); // Store additional user data (photoURL, bio, etc.)
+    const [userData, setUserData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [authError, setAuthError] = useState("");
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [isSuperAdmin, setIsSuperAdmin] = useState(false);
     const [maintenanceMode, setMaintenanceMode] = useState(false);
-    const [isAuthorized, setIsAuthorized] = useState(false);
+    const [isAdminUser, setIsAdminUser] = useState(false);
 
     // Check maintenance mode
     const checkMaintenanceMode = async () => {
@@ -41,53 +40,48 @@ export const AuthProvider = ({ children }) => {
             if (settingsDoc.exists()) {
                 const maintenance = settingsDoc.data().siteMaintenanceMode || false;
                 setMaintenanceMode(maintenance);
-                
-                // If maintenance mode is off, everyone is authorized
-                // If maintenance mode is on, only super admins are authorized
-                setIsAuthorized(!maintenance || isSuperAdmin);
             }
         } catch (error) {
             console.error("Error checking maintenance mode:", error);
             setMaintenanceMode(false);
-            setIsAuthorized(true); // Default to authorized if we can't check maintenance mode
+        }
+    };
+
+    // Check if user is admin using adminService
+    const checkAdminStatus = async (uid) => {
+        try {
+            const adminStatus = await isAdmin(uid);
+            setIsAdminUser(adminStatus);
+            return adminStatus;
+        } catch (error) {
+            console.error("Error checking admin status:", error);
+            setIsAdminUser(false);
+            return false;
         }
     };
 
     // Fetch user data from Firestore
     const fetchUserData = async (uid) => {
         try {
-            const userDocRef = doc(db, "users", uid);
-            const userDoc = await getDoc(userDocRef);
+            const userRef = doc(db, "users", uid);
+            const userDoc = await getDoc(userRef);
+            
             if (userDoc.exists()) {
                 const data = userDoc.data();
                 setUserData(data);
-                
-                // Check admin and super admin status
-                const adminStatus = await checkIsAdmin(uid);
-                const superAdminStatus = data.isSuperAdmin || false;
-                
-                setIsAdmin(adminStatus);
-                setIsSuperAdmin(superAdminStatus);
-                
-                // Check if user should be authorized based on maintenance mode
-                await checkMaintenanceMode();
+                await checkAdminStatus(uid);
             } else {
-                console.error("No user data found in Firestore");
                 setUserData({});
-                setIsAdmin(false);
-                setIsSuperAdmin(false);
-                setIsAuthorized(false);
+                setIsAdminUser(false);
             }
         } catch (error) {
             console.error("Error fetching user data:", error);
             setUserData({});
-            setIsAdmin(false);
-            setIsSuperAdmin(false);
-            setIsAuthorized(false);
+            setIsAdminUser(false);
         }
     };
 
-    // Listen for auth state changes (user login/logout)
+    // Listen for auth state changes
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             setLoading(true);
@@ -97,10 +91,9 @@ export const AuthProvider = ({ children }) => {
             } else {
                 setCurrentUser(null);
                 setUserData(null);
-                setIsAdmin(false);
-                setIsSuperAdmin(false);
-                await checkMaintenanceMode(); // Still check maintenance mode for non-authenticated users
+                setIsAdminUser(false);
             }
+            await checkMaintenanceMode();
             setLoading(false);
         });
         return () => unsubscribe();
@@ -113,13 +106,13 @@ export const AuthProvider = ({ children }) => {
         throw error;
     };
 
-    // Auth methods (with refactored error handling)
+    // Auth methods with error handling
     const handleEmailSignUp = async (email, password) => {
         try {
             setAuthError("");
             const user = await signUpWithEmail(email, password);
             setCurrentUser(user);
-            await fetchUserData(user.uid); // Fetch additional user data
+            await fetchUserData(user.uid);
         } catch (error) {
             handleAuthError(error, "Email Sign-up");
         }
@@ -174,9 +167,8 @@ export const AuthProvider = ({ children }) => {
             setAuthError("");
             await signOutUser();
             setCurrentUser(null);
-            setUserData(null); // Clear user data on sign-out
-            setIsAdmin(false);
-            setIsSuperAdmin(false);
+            setUserData(null);
+            setIsAdminUser(false);
         } catch (error) {
             handleAuthError(error, "Sign-out");
         }
@@ -184,12 +176,10 @@ export const AuthProvider = ({ children }) => {
 
     const value = {
         currentUser,
-        userData, // Providing user data (photoURL, bio, etc.) to components
+        userData,
         authError,
-        isAdmin,
-        isSuperAdmin,
         maintenanceMode,
-        isAuthorized,
+        isAdmin: isAdminUser,
         handleEmailSignUp,
         handleEmailSignIn,
         handleGoogleSignIn,
@@ -200,7 +190,7 @@ export const AuthProvider = ({ children }) => {
 
     return (
         <AuthContext.Provider value={value}>
-            {!loading && children} {/* Render children only when data is loaded */}
+            {!loading && children}
         </AuthContext.Provider>
     );
 };
