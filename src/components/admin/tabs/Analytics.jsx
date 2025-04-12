@@ -34,30 +34,33 @@ export const Analytics = () => {
                         break;
                 }
 
-                // Fetch users count
+                // Fetch users with their uploads array
                 const usersRef = collection(db, "users");
                 const usersSnapshot = await getDocs(usersRef);
                 const totalUsers = usersSnapshot.size;
 
-                // Fetch models with views and likes
+                // Fetch models with views
                 const modelsRef = collection(db, "models");
                 const modelsQuery = query(modelsRef, where("createdAt", ">=", startDate));
                 const modelsSnapshot = await getDocs(modelsQuery);
                 
                 let totalModels = 0;
                 let totalViews = 0;
-                let totalLikes = 0;
                 const models = [];
 
                 modelsSnapshot.forEach(doc => {
                     const model = { id: doc.id, ...doc.data() };
                     totalModels++;
                     totalViews += model.views || 0;
-                    totalLikes += model.likes || 0;
                     models.push(model);
                 });
 
-                // Get recent uploads
+                // Get total likes from likes collection
+                const likesRef = collection(db, "likes");
+                const likesSnapshot = await getDocs(likesRef);
+                const totalLikes = likesSnapshot.size;
+
+                // Get recent uploads with thumbnails
                 const recentUploadsQuery = query(
                     modelsRef,
                     orderBy("createdAt", "desc"),
@@ -66,18 +69,28 @@ export const Analytics = () => {
                 const recentUploadsSnapshot = await getDocs(recentUploadsQuery);
                 const recentUploads = recentUploadsSnapshot.docs.map(doc => ({
                     id: doc.id,
-                    ...doc.data()
+                    ...doc.data(),
+                    thumbnail: doc.data().primaryRenderUrl || doc.data().posterUrl || "/placeholder.png"
                 }));
 
-                // Get popular models
+                // Get popular models with thumbnails
                 const popularModels = [...models]
                     .sort((a, b) => (b.views || 0) - (a.views || 0))
-                    .slice(0, 5);
+                    .slice(0, 5)
+                    .map(model => ({
+                        ...model,
+                        thumbnail: model.primaryRenderUrl || model.posterUrl || "/placeholder.png"
+                    }));
 
-                // Get most active users
+                // Get most active users based on uploads array length
                 const activeUsers = [...usersSnapshot.docs]
-                    .map(doc => ({ id: doc.id, ...doc.data() }))
-                    .sort((a, b) => (b.uploadCount || 0) - (a.uploadCount || 0))
+                    .map(doc => ({ 
+                        id: doc.id, 
+                        ...doc.data(),
+                        uploadCount: doc.data().uploads?.length || 0
+                    }))
+                    .filter(user => user.uploads && user.uploads.length > 0)
+                    .sort((a, b) => b.uploadCount - a.uploadCount)
                     .slice(0, 5);
 
                 setStats({
@@ -174,14 +187,17 @@ export const Analytics = () => {
                         {stats.recentUploads.map((model) => (
                             <div key={model.id} className="flex items-center space-x-3">
                                 <img
-                                    src={model.primaryRenderLowResUrl || "/placeholder.png"}
+                                    src={model.thumbnail}
                                     alt={model.name}
-                                    className="w-10 h-10 rounded object-cover"
+                                    className="w-16 h-16 rounded object-cover bg-bg-surface"
                                 />
                                 <div>
                                     <p className="text-txt-primary font-medium">{model.name}</p>
                                     <p className="text-sm text-txt-secondary">
                                         {new Date(model.createdAt?.seconds * 1000).toLocaleDateString()}
+                                    </p>
+                                    <p className="text-xs text-txt-secondary">
+                                        {model.views || 0} views
                                     </p>
                                 </div>
                             </div>
@@ -197,15 +213,20 @@ export const Analytics = () => {
                             <div key={model.id} className="flex items-center justify-between">
                                 <div className="flex items-center space-x-3">
                                     <img
-                                        src={model.primaryRenderLowResUrl || "/placeholder.png"}
+                                        src={model.thumbnail}
                                         alt={model.name}
-                                        className="w-10 h-10 rounded object-cover"
+                                        className="w-16 h-16 rounded object-cover bg-bg-surface"
                                     />
-                                    <p className="text-txt-primary font-medium">{model.name}</p>
-                                </div>
-                                <div className="flex items-center space-x-2 text-txt-secondary">
-                                    <MdRemoveRedEye />
-                                    <span>{model.views || 0}</span>
+                                    <div>
+                                        <p className="text-txt-primary font-medium">{model.name}</p>
+                                        <p className="text-sm text-txt-secondary">
+                                            By {model.uploaderDisplayName || "Anonymous"}
+                                        </p>
+                                        <div className="flex items-center space-x-2 text-txt-secondary text-sm">
+                                            <MdRemoveRedEye className="w-4 h-4" />
+                                            <span>{model.views || 0}</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -222,7 +243,7 @@ export const Analytics = () => {
                                     <img
                                         src={user.photoURL || "/default-avatar.png"}
                                         alt={user.displayName}
-                                        className="w-10 h-10 rounded-full"
+                                        className="w-10 h-10 rounded-full bg-bg-surface"
                                     />
                                     <div>
                                         <p className="text-txt-primary font-medium">
