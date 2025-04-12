@@ -4,6 +4,7 @@ import { UserManagement } from "./tabs/UserManagement";
 import { ContentModeration } from "./tabs/ContentModeration";
 import { SiteSettings } from "./tabs/SiteSettings";
 import { Analytics } from "./tabs/Analytics";
+import { MaintenanceSettings } from "./tabs/MaintenanceSettings";
 import { useAuth } from "../../contexts/authContext";
 import { Navigate } from "react-router-dom";
 import { isAdmin } from "../../services/adminService";
@@ -50,6 +51,7 @@ export const AdminPanel = () => {
         { name: "Content Moderation", component: ContentModeration },
         { name: "Site Settings", component: SiteSettings },
         { name: "Analytics", component: Analytics },
+        { name: "Maintenance", component: MaintenanceSettings },
     ];
 
     return (
