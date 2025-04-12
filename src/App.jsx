@@ -1,6 +1,6 @@
 import "@google/model-viewer";
 import { useState } from "react";
-import { useRoutes } from "react-router-dom";
+import { useRoutes, Navigate } from "react-router-dom";
 // routes
 import { publicRoutes } from "./routes/publicRoutes";
 import { modelRoutes } from "./routes/modelRoutes";
@@ -44,6 +44,11 @@ const MainApp = () => {
         ...userRoutes,
         // Admin Routes
         ...adminRoutes,
+        // Catch all route
+        {
+            path: "*",
+            element: <Navigate to="/" replace />,
+        },
     ]);
 
     return (
