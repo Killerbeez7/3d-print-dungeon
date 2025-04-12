@@ -24,7 +24,7 @@ import { GlobalSearch } from "../../search/GlobalSearch";
 import { useSearch } from "../../../contexts/searchContext";
 
 export const Navbar = ({ onLoginClick }) => {
-    const { currentUser, handleSignOut } = useAuth();
+    const { currentUser, handleSignOut, isAdmin } = useAuth();
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [mobileDropdown, setMobileDropdown] = useState(null);
@@ -88,7 +88,7 @@ export const Navbar = ({ onLoginClick }) => {
         e.stopPropagation();
         setMobileDropdown((prev) => (prev === dropdownName ? null : dropdownName));
     };
- 
+
     const handleSearchClick = () => {
         navigate("/search?query=");
     };
@@ -168,7 +168,7 @@ export const Navbar = ({ onLoginClick }) => {
                             </div>
 
                             {/* Desktop Navigation */}
-                            <nav className="hidden md:flex items-center space-x-6">
+                            <nav className="hidden md:flex items-center space-x-6 ">
                                 {navItems.map((item) => (
                                     <div
                                         key={item.name}
@@ -283,6 +283,21 @@ export const Navbar = ({ onLoginClick }) => {
                                                     {currentUser?.displayName ||
                                                         "Username"}
                                                 </div>
+                                                {isAdmin && (
+                                                    <Link
+                                                        to={`/admin-panel`}
+                                                        className="block px-4 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
+                                                        onClick={() =>
+                                                            setActiveDropdown(null)
+                                                        }
+                                                    >
+                                                        <FontAwesomeIcon
+                                                            icon={faUser}
+                                                            className="mr-2"
+                                                        />
+                                                        Admin Dashboard
+                                                    </Link>
+                                                )}
                                                 <Link
                                                     to={`/artist/${currentUser?.uid}`}
                                                     className="block px-4 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
@@ -379,8 +394,10 @@ export const Navbar = ({ onLoginClick }) => {
                 )}
 
                 {/* Mobile Search */}
-                <div className="p-4 border-b border-br-secondary" 
-                     onClick={() => setShowDropdown(false)}>
+                <div
+                    className="p-4 border-b border-br-secondary"
+                    onClick={() => setShowDropdown(false)}
+                >
                     <GlobalSearch />
                 </div>
 
