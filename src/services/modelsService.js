@@ -6,6 +6,7 @@ import {
     doc,
     updateDoc,
     arrayUnion,
+    increment,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { finalConvertFileToGLB } from "../utils/models/converter";
@@ -153,6 +154,8 @@ export async function createAdvancedModel({
         primaryRenderUrl: renderFileUrls[selectedRenderIndex] || null,
         posterUrl: posterUrl || null,
         createdAt: serverTimestamp(),
+        views: 0,
+        likes: 0
     });
 
     // ============= 6) Update user doc =============
@@ -173,3 +176,16 @@ export async function createAdvancedModel({
         posterUrl,
     };
 }
+
+// Function to increment view count
+export const incrementModelViews = async (modelId) => {
+    try {
+        const modelRef = doc(db, "models", modelId);
+        await updateDoc(modelRef, {
+            views: increment(1),
+            lastViewed: serverTimestamp()
+        });
+    } catch (error) {
+        console.error("Error incrementing views:", error);
+    }
+};
