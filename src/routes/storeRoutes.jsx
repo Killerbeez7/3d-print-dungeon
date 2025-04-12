@@ -1,8 +1,13 @@
 import { Store } from "../components/store/Store";
+import { MaintenanceRoute } from "../routes/MaintenanceRoute";
 
 export const storeRoutes = {
     path: "/store",
-    element: <Store />,
+    element: (
+        <MaintenanceRoute>
+            <Store />
+        </MaintenanceRoute>
+    ),
     children: [
         {
             path: "",
@@ -17,4 +22,4 @@ export const storeRoutes = {
             element: <Store />,
         },
     ],
-}; 
+};
