@@ -7,6 +7,7 @@ import { useState, useEffect, useRef } from "react";
 import { LazyImage } from "../../shared/lazy-image/LazyImage";
 import { LikeButton } from "../action-buttons/likeButton";
 import { FavoritesButton } from "../action-buttons/favoritesButton";
+import PropTypes from "prop-types";
 
 export const ModelView = ({ openAuthModal }) => {
     const [shadowIntensity, setShadowIntensity] = useState(0.5);
@@ -479,4 +480,8 @@ export const ModelView = ({ openAuthModal }) => {
             </aside>
         </div>
     );
+};
+
+ModelView.propTypes = {
+    openAuthModal: PropTypes.func.isRequired,
 };
