@@ -5,7 +5,6 @@ import { MdSave } from "react-icons/md";
 
 export const SiteSettings = () => {
     const [settings, setSettings] = useState({
-        siteMaintenanceMode: false,
         allowNewRegistrations: true,
         maxUploadSizeMB: 50,
         defaultUserQuotaMB: 500,
@@ -30,7 +29,6 @@ export const SiteSettings = () => {
                 } else {
                     // Create initial settings document if it doesn't exist
                     await setDoc(settingsRef, {
-                        siteMaintenanceMode: settings.siteMaintenanceMode,
                         allowNewRegistrations: settings.allowNewRegistrations,
                         maxUploadSizeMB: settings.maxUploadSizeMB,
                         defaultUserQuotaMB: settings.defaultUserQuotaMB,
@@ -54,14 +52,12 @@ export const SiteSettings = () => {
         try {
             const settingsRef = doc(db, "settings", "global");
             const settingsToSave = {
-                siteMaintenanceMode: settings.siteMaintenanceMode,
                 allowNewRegistrations: settings.allowNewRegistrations,
                 maxUploadSizeMB: Number(settings.maxUploadSizeMB),
                 defaultUserQuotaMB: Number(settings.defaultUserQuotaMB),
                 featuredCategories: settings.featuredCategories,
             };
 
-            // Use setDoc with merge option instead of updateDoc
             await setDoc(settingsRef, settingsToSave, { merge: true });
             setSaveStatus({ type: "success", message: "Settings saved successfully!" });
         } catch (error) {
@@ -100,25 +96,6 @@ export const SiteSettings = () => {
                 <div className="bg-bg-secondary rounded-lg p-6">
                     <h3 className="text-lg font-medium mb-4">Site Status</h3>
                     <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <label className="font-medium text-txt-primary">Maintenance Mode</label>
-                                <p className="text-sm text-txt-secondary">Enable to show maintenance page to all users</p>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    checked={settings.siteMaintenanceMode}
-                                    onChange={(e) => setSettings(current => ({
-                                        ...current,
-                                        siteMaintenanceMode: e.target.checked
-                                    }))}
-                                    className="sr-only peer"
-                                />
-                                <div className="w-11 h-6 bg-bg-surface peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
-                            </label>
-                        </div>
-
                         <div className="flex items-center justify-between">
                             <div>
                                 <label className="font-medium text-txt-primary">New Registrations</label>
