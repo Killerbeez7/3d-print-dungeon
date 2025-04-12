@@ -1,7 +1,7 @@
 import { Home } from "../components/home/Home";
 import { MaintenancePage } from "../components/shared/MaintenancePage";
 import { DynamicSearch } from "../components/search/DynamicSearch";
-
+import { MaintenanceRoute } from "../routes/MaintenanceRoute";
 export const publicRoutes = [
     {
         path: "/maintenance",
@@ -9,10 +9,18 @@ export const publicRoutes = [
     },
     {
         path: "/",
-        element: <Home />,
+        element: (
+            <MaintenanceRoute>
+                <Home />
+            </MaintenanceRoute>
+        ),
     },
     {
         path: "/search",
-        element: <DynamicSearch />,
+        element: (
+            <MaintenanceRoute>
+                <DynamicSearch />
+            </MaintenanceRoute>
+        ),
     },
 ];

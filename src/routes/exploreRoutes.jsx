@@ -1,10 +1,15 @@
 import { Explore } from "../components/explore/Explore";
 import { ArtistsList } from "../components/artists/ArtistsList";
 import { ArtistProfile } from "../components/artists/artist-profile/ArtistProfile";
+import { MaintenanceRoute } from "../routes/MaintenanceRoute";
 
 export const exploreRoutes = {
     path: "/explore",
-    element: <Explore />,
+    element: (
+        <MaintenanceRoute>
+            <Explore />
+        </MaintenanceRoute>
+    ),
     children: [
         {
             path: "",
@@ -23,4 +28,4 @@ export const exploreRoutes = {
             element: <Explore />,
         },
     ],
-}; 
+};
