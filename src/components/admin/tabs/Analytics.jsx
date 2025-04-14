@@ -1,7 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { collection, query, getDocs, where, orderBy, limit } from "firebase/firestore";
 import { db } from "../../../config/firebase";
 import { MdPeople, MdFileUpload, MdRemoveRedEye, MdThumbUp } from "react-icons/md";
+
+// Cache duration in milliseconds (5 minutes)
+const CACHE_DURATION = 5 * 60 * 1000;
+let statsCache = {
+    data: null,
+    timestamp: 0,
+    timeRange: null
+};
 
 export const Analytics = () => {
     const [stats, setStats] = useState({
@@ -16,101 +24,125 @@ export const Analytics = () => {
     const [loading, setLoading] = useState(true);
     const [timeRange, setTimeRange] = useState("week"); // week, month, year
 
-    useEffect(() => {
-        const fetchAnalytics = async () => {
-            try {
-                // Get date for time range filter
-                const now = new Date();
-                let startDate = new Date();
-                switch (timeRange) {
-                    case "week":
-                        startDate.setDate(now.getDate() - 7);
-                        break;
-                    case "month":
-                        startDate.setMonth(now.getMonth() - 1);
-                        break;
-                    case "year":
-                        startDate.setFullYear(now.getFullYear() - 1);
-                        break;
-                }
+    // Memoize the date calculation
+    const startDate = useMemo(() => {
+        const now = new Date();
+        const date = new Date();
+        switch (timeRange) {
+            case "week":
+                date.setDate(now.getDate() - 7);
+                break;
+            case "month":
+                date.setMonth(now.getMonth() - 1);
+                break;
+            case "year":
+                date.setFullYear(now.getFullYear() - 1);
+                break;
+        }
+        return date;
+    }, [timeRange]);
 
-                // Fetch users with their uploads array
-                const usersRef = collection(db, "users");
-                const usersSnapshot = await getDocs(usersRef);
-                const totalUsers = usersSnapshot.size;
+    const fetchAnalytics = useCallback(async () => {
+        try {
+            // Check cache
+            const now = Date.now();
+            if (
+                statsCache.data &&
+                statsCache.timeRange === timeRange &&
+                now - statsCache.timestamp < CACHE_DURATION
+            ) {
+                setStats(statsCache.data);
+                setLoading(false);
+                return;
+            }
 
-                // Fetch models with views
-                const modelsRef = collection(db, "models");
-                const modelsQuery = query(modelsRef, where("createdAt", ">=", startDate));
-                const modelsSnapshot = await getDocs(modelsQuery);
-                
-                let totalModels = 0;
-                let totalViews = 0;
-                const models = [];
+            // Fetch users with their uploads array
+            const usersRef = collection(db, "users");
+            const usersSnapshot = await getDocs(usersRef);
+            const totalUsers = usersSnapshot.size;
 
-                modelsSnapshot.forEach(doc => {
-                    const model = { id: doc.id, ...doc.data() };
-                    totalModels++;
-                    totalViews += model.views || 0;
-                    models.push(model);
-                });
+            // Fetch models with views
+            const modelsRef = collection(db, "models");
+            const modelsQuery = query(modelsRef, where("createdAt", ">=", startDate));
+            const modelsSnapshot = await getDocs(modelsQuery);
+            
+            let totalModels = 0;
+            let totalViews = 0;
+            const models = [];
 
-                // Get total likes from likes collection
-                const likesRef = collection(db, "likes");
-                const likesSnapshot = await getDocs(likesRef);
-                const totalLikes = likesSnapshot.size;
+            modelsSnapshot.forEach(doc => {
+                const model = { id: doc.id, ...doc.data() };
+                totalModels++;
+                totalViews += model.views || 0;
+                models.push(model);
+            });
 
-                // Get recent uploads with thumbnails
-                const recentUploadsQuery = query(
-                    modelsRef,
-                    orderBy("createdAt", "desc"),
-                    limit(5)
-                );
-                const recentUploadsSnapshot = await getDocs(recentUploadsQuery);
-                const recentUploads = recentUploadsSnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data(),
-                    thumbnail: doc.data().primaryRenderUrl || doc.data().posterUrl || "/placeholder.png"
+            // Get total likes from likes collection
+            const likesRef = collection(db, "likes");
+            const likesSnapshot = await getDocs(likesRef);
+            const totalLikes = likesSnapshot.size;
+
+            // Get recent uploads with thumbnails
+            const recentUploadsQuery = query(
+                modelsRef,
+                orderBy("createdAt", "desc"),
+                limit(5)
+            );
+            const recentUploadsSnapshot = await getDocs(recentUploadsQuery);
+            const recentUploads = recentUploadsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+                thumbnail: doc.data().primaryRenderUrl || doc.data().posterUrl || "/placeholder.png"
+            }));
+
+            // Get popular models with thumbnails
+            const popularModels = [...models]
+                .sort((a, b) => (b.views || 0) - (a.views || 0))
+                .slice(0, 5)
+                .map(model => ({
+                    ...model,
+                    thumbnail: model.primaryRenderUrl || model.posterUrl || "/placeholder.png"
                 }));
 
-                // Get popular models with thumbnails
-                const popularModels = [...models]
-                    .sort((a, b) => (b.views || 0) - (a.views || 0))
-                    .slice(0, 5)
-                    .map(model => ({
-                        ...model,
-                        thumbnail: model.primaryRenderUrl || model.posterUrl || "/placeholder.png"
-                    }));
+            // Get most active users based on uploads array length
+            const activeUsers = [...usersSnapshot.docs]
+                .map(doc => ({ 
+                    id: doc.id, 
+                    ...doc.data(),
+                    uploadCount: doc.data().uploads?.length || 0
+                }))
+                .filter(user => user.uploads && user.uploads.length > 0)
+                .sort((a, b) => b.uploadCount - a.uploadCount)
+                .slice(0, 5);
 
-                // Get most active users based on uploads array length
-                const activeUsers = [...usersSnapshot.docs]
-                    .map(doc => ({ 
-                        id: doc.id, 
-                        ...doc.data(),
-                        uploadCount: doc.data().uploads?.length || 0
-                    }))
-                    .filter(user => user.uploads && user.uploads.length > 0)
-                    .sort((a, b) => b.uploadCount - a.uploadCount)
-                    .slice(0, 5);
+            const newStats = {
+                totalUsers,
+                totalModels,
+                totalViews,
+                totalLikes,
+                recentUploads,
+                popularModels,
+                activeUsers,
+            };
 
-                setStats({
-                    totalUsers,
-                    totalModels,
-                    totalViews,
-                    totalLikes,
-                    recentUploads,
-                    popularModels,
-                    activeUsers,
-                });
-            } catch (error) {
-                console.error("Error fetching analytics:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
+            // Update cache
+            statsCache = {
+                data: newStats,
+                timestamp: now,
+                timeRange
+            };
 
+            setStats(newStats);
+        } catch (error) {
+            console.error("Error fetching analytics:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [timeRange, startDate]);
+
+    useEffect(() => {
         fetchAnalytics();
-    }, [timeRange]);
+    }, [fetchAnalytics]);
 
     if (loading) {
         return <div className="text-center py-4">Loading analytics...</div>;
@@ -261,4 +293,4 @@ export const Analytics = () => {
             </div>
         </div>
     );
-}; 
+};
