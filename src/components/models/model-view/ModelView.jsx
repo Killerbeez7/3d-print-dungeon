@@ -7,6 +7,9 @@ import { useState, useEffect, useRef } from "react";
 import { LazyImage } from "../../shared/lazy-image/LazyImage";
 import { LikeButton } from "../action-buttons/likeButton";
 import { FavoritesButton } from "../action-buttons/favoritesButton";
+import { useViewTracker } from "../../../services/viewService";
+import { doc, onSnapshot } from "firebase/firestore";
+import { db } from "../../../config/firebase";
 import PropTypes from "prop-types";
 
 export const ModelView = ({ openAuthModal }) => {
@@ -14,6 +17,7 @@ export const ModelView = ({ openAuthModal }) => {
     const [exposure, setExposure] = useState(1.0);
     const [modelLoaded, setModelLoaded] = useState(false);
     const [loadProgress, setLoadProgress] = useState(0);
+    const [viewCount, setViewCount] = useState(0);
 
     const [yOffset, setYOffset] = useState(0);
 
@@ -37,6 +41,23 @@ export const ModelView = ({ openAuthModal }) => {
         fetchUploader,
     } = useModels();
     const { currentUser } = useAuth();
+    
+    // Use the hook directly - it will handle the view tracking internally
+    useViewTracker(id);
+
+    // Listen to view count changes in real-time
+    useEffect(() => {
+        if (!id) return;
+
+        const modelRef = doc(db, 'models', id);
+        const unsubscribe = onSnapshot(modelRef, (doc) => {
+            if (doc.exists()) {
+                setViewCount(doc.data().views || 0); // Changed viewCount to views to match the field name
+            }
+        });
+
+        return () => unsubscribe();
+    }, [id]);
 
     useEffect(() => {
         const model = models.find((m) => m.id === id);
@@ -395,6 +416,9 @@ export const ModelView = ({ openAuthModal }) => {
                             <h2 className="text-lg font-bold text-txt-primary">
                                 {uploader.displayName || "Anonymous"}
                             </h2>
+                            <p className="text-sm text-txt-secondary">
+                                {viewCount} views
+                            </p>
                         </div>
                     </div>
                 )}
