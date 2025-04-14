@@ -63,17 +63,16 @@ export const AuthProvider = ({ children }) => {
     // Fetch user data from Firestore
     const fetchUserData = async (uid) => {
         try {
-            const userRef = doc(db, "users", uid);
-            const userDoc = await getDoc(userRef);
-            
-            if (userDoc.exists()) {
-                const data = userDoc.data();
-                setUserData(data);
-                await checkAdminStatus(uid);
-            } else {
-                setUserData({});
-                setIsAdminUser(false);
-            }
+            const unsubscribe = getUserFromDatabase(uid, (data) => {
+                if (data) {
+                    setUserData(data);
+                    checkAdminStatus(uid);
+                } else {
+                    setUserData({});
+                    setIsAdminUser(false);
+                }
+            });
+            return unsubscribe;
         } catch (error) {
             console.error("Error fetching user data:", error);
             setUserData({});
@@ -83,11 +82,12 @@ export const AuthProvider = ({ children }) => {
 
     // Listen for auth state changes
     useEffect(() => {
+        let userDataUnsubscribe;
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             setLoading(true);
             if (user) {
                 setCurrentUser(user);
-                await fetchUserData(user.uid);
+                userDataUnsubscribe = await fetchUserData(user.uid);
             } else {
                 setCurrentUser(null);
                 setUserData(null);
@@ -96,7 +96,12 @@ export const AuthProvider = ({ children }) => {
             await checkMaintenanceMode();
             setLoading(false);
         });
-        return () => unsubscribe();
+        return () => {
+            unsubscribe();
+            if (userDataUnsubscribe) {
+                userDataUnsubscribe();
+            }
+        };
     }, []);
 
     // Common error handling for auth methods
