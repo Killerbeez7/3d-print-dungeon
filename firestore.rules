@@ -71,5 +71,12 @@ service cloud.firestore {
     match /analytics/{analyticsId}/{subcollection}/{subDocId} {
       allow read, write: if isAdmin() || isSuperAdmin();
     }
+
+    // ViewTrackers collection - allow creation and updates
+    match /viewTrackers/{viewId} {
+      allow read: if isAdmin() || isSuperAdmin();
+      allow create, update: if true;  // Allow both authenticated and anonymous users
+      allow delete: if false;  // Prevent deletions
+    }
   }
 } 
