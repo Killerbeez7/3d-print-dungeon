@@ -2,25 +2,33 @@ import { defineConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { fileURLToPath } from "url";
 
-// https://vite.dev/config/
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            return 'vendor'; // Bundle all node_modules into a "vendor" chunk
-          }
+    plugins: [react(), tailwindcss()],
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, "./src"),
         },
-      },
     },
-    chunkSizeWarningLimit: 1000, // Adjust to your desired limit (e.g., 1000 KB)
-  },
+    build: {
+        chunkSizeWarningLimit: 1500,
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes("firebase")) {
+                        return "firebase";
+                    }
+                    if (id.includes("three") || id.includes("@google/model-viewer")) {
+                        return "3d-libs";
+                    }
+                    if (id.includes("node_modules")) {
+                        return "vendor";
+                    }
+                },
+            },
+        },
+    },
 });
