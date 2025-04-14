@@ -5,13 +5,13 @@ import { useState, useEffect } from "react";
 import { subscribeToMaintenanceStatus } from "../services/maintenanceService";
 
 export const MaintenanceRoute = ({ children }) => {
-    const { currentUser } = useAuth();
-    const [maintenanceState, setMaintenanceState] = useState({ inMaintenance: false, isAdmin: false });
+    const { currentUser, isAdmin } = useAuth();
+    const [maintenanceState, setMaintenanceState] = useState({ inMaintenance: false });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const unsubscribe = subscribeToMaintenanceStatus((state) => {
-            setMaintenanceState(state);
+            setMaintenanceState({ inMaintenance: state.inMaintenance });
             setLoading(false);
         }, currentUser?.uid);
 
@@ -23,7 +23,7 @@ export const MaintenanceRoute = ({ children }) => {
     }
 
     // If maintenance is on and user is not admin, redirect to maintenance page
-    if (maintenanceState.inMaintenance && !maintenanceState.isAdmin) {
+    if (maintenanceState.inMaintenance && !isAdmin) {
         return <Navigate to="/maintenance" replace />;
     }
 
