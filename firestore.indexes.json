@@ -4,42 +4,42 @@
       "collectionGroup": "users",
       "queryScope": "COLLECTION",
       "fields": [
-        {
-          "fieldPath": "isArtist",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "createdAt",
-          "order": "DESCENDING"
-        }
+        { "fieldPath": "isArtist", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
     {
       "collectionGroup": "models",
       "queryScope": "COLLECTION",
       "fields": [
-        {
-          "fieldPath": "status",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "createdAt",
-          "order": "DESCENDING"
-        }
+        { "fieldPath": "createdAt", "order": "ASCENDING" },
+        { "fieldPath": "views", "order": "DESCENDING" }
+      ]
+    },
+
+    {
+      "collectionGroup": "models",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
     {
       "collectionGroup": "comments",
       "queryScope": "COLLECTION",
       "fields": [
-        {
-          "fieldPath": "modelId",
-          "order": "ASCENDING"
-        },
-        {
-          "fieldPath": "createdAt",
-          "order": "DESCENDING"
-        }
+        { "fieldPath": "modelId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "viewTrackers",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "modelId", "order": "ASCENDING" },
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "timestamp", "order": "DESCENDING" }
       ]
     }
   ],
