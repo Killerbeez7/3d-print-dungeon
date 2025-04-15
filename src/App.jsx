@@ -31,24 +31,15 @@ const MainApp = () => {
     const handleSwitchMode = () => setIsSignUp((prev) => !prev);
 
     const routes = useRoutes([
-        // Public Routes
         ...publicRoutes,
-        // Feature Routes
-        businessRoutes,
-        storeRoutes,
-        exploreRoutes,
+        ...businessRoutes,
+        ...storeRoutes,
+        ...exploreRoutes,
         ...forumRoutes,
-        // Model Routes
         ...modelRoutes,
-        // User Routes
         ...userRoutes,
-        // Admin Routes
         ...adminRoutes,
-        // Catch all route
-        {
-            path: "*",
-            element: <Navigate to="/" replace />,
-        },
+        { path: "*", element: <Navigate to="/" replace /> },
     ]);
 
     return (
