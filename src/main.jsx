@@ -1,8 +1,8 @@
 import "@google/model-viewer";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import App from "./App.jsx";
-import { ScrollToTop } from "../src/utils/ScrollToTop.js";
+import { App } from "./App.jsx";
+import { ScrollToTop } from "./utils/ScrollToTop.js";
 
 console.log("Starting app initialization");
 
