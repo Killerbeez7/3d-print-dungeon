@@ -1,13 +1,14 @@
 import { AdminPanel } from "../components/admin/AdminPanel";
-import { ProtectedRoute } from "../components/shared/ProtectedRoute";
+import { withProtectedMaintenance } from "../helpers/routeHelpers";
 
 export const adminRoutes = [
     {
         path: "/admin-panel",
-        element: (
-            <ProtectedRoute>
-                <AdminPanel />
-            </ProtectedRoute>
-        ),
+        element: withProtectedMaintenance(<AdminPanel />, {
+            requireAdmin: true,
+            authRedirect: "/login",
+            maintenanceRedirect: "/maintenance",
+            fallback: null,
+        }),
     },
 ];
