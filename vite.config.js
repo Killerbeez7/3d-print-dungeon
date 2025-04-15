@@ -18,11 +18,14 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 manualChunks(id) {
+                    if (id.includes("@google/model-viewer")) {
+                        return "model-viewer";
+                    }
+                    if (id.includes("three")) {
+                        return "three-js";
+                    }
                     if (id.includes("firebase")) {
                         return "firebase";
-                    }
-                    if (id.includes("three") || id.includes("@google/model-viewer")) {
-                        return "3d-libs";
                     }
                     if (id.includes("node_modules")) {
                         return "vendor";
