@@ -1,6 +1,8 @@
-# models optimization
+# code optimization
 
-## As you complete tasks and reference relevant files update this file as our memory to help with future tasks.
+1-since we have a daily cleanup function for viewTrackers, 
+we can potentially simplify by only keeping userViews and 
+the view count on the model documents themselves.
 
 
 ### Update the styles of this components while keeping all the existing functionality the same!
