@@ -1,7 +1,7 @@
 import { ModelView } from "../components/models/model-view/ModelView";
 import { ModelEdit } from "../components/models/model-edit/ModelEdit";
 import { ModelUpload } from "../components/models/model-upload/ModelUpload";
-import { withProtectedMaintenance } from "../helpers/routeHelpers";
+import { withMaintenance, withProtectedMaintenance } from "../helpers/routeHelpers";
 
 export const modelRoutes = [
     {
@@ -10,7 +10,7 @@ export const modelRoutes = [
     },
     {
         path: "/model/:id",
-        element: withProtectedMaintenance(<ModelView />),
+        element: withMaintenance(<ModelView />),
     },
     {
         path: "/model/:id/edit",
