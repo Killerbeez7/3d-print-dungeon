@@ -1,120 +1,142 @@
-import { doc, setDoc, serverTimestamp, collection, query, where, getDocs, Timestamp, increment } from "firebase/firestore";
+import { doc, setDoc, collection, query, where, getDocs, getDoc, writeBatch } from "firebase/firestore";
 import { db, auth } from "../config/firebase";
-import { useEffect } from 'react';
+import { useEffect } from "react";
 import { useAuth } from "../contexts/authContext";
 
-const VIEW_COOLDOWN_MINUTES = 30; // Cooldown period in minutes
-const ANONYMOUS_USER_KEY = 'anonymous_user_id';
-const ANONYMOUS_DOC_ID = 'anonymous_views';
+// 30 minutes
+const VIEW_COOLDOWN_MS = 30 * 60_000;
 
 /**
- * Get or create a unique anonymous user ID
- * @returns {string} The anonymous user ID
+ * Generate or get a stable localStorage-based ID.
+ * This is how we differentiate truly anonymous users.
  */
-const getAnonymousUserId = () => {
-    let anonymousId = localStorage.getItem(ANONYMOUS_USER_KEY);
-    if (!anonymousId) {
-        // Generate a new UUID v4
-        anonymousId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            const r = Math.random() * 16 | 0;
-            const v = c === 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-        localStorage.setItem(ANONYMOUS_USER_KEY, anonymousId);
+function getAnonymousId() {
+    const key = "anon_user_id";
+    let anonId = localStorage.getItem(key);
+    if (!anonId) {
+        anonId = crypto.randomUUID(); // or any UUID generator
+        localStorage.setItem(key, anonId);
     }
-    return anonymousId;
-};
+    return anonId;
+}
 
 /**
- * Check if user has recently viewed the model
+ * Check if there's a recent doc in viewTrackers for this (modelId,userId) within the past 30 minutes
  */
-const hasRecentView = async (modelId, userId) => {
-    try {
-        const viewsRef = collection(db, 'viewTrackers');
-        const timeThreshold = Timestamp.fromDate(new Date(Date.now() - VIEW_COOLDOWN_MINUTES * 60 * 1000));
+async function hasRecentView(modelId, userId) {
+    // 1) Compute the cutoff time
+    const cutoffTime = Date.now() - VIEW_COOLDOWN_MS;
 
-        const q = query(
-            viewsRef,
-            where('modelId', '==', modelId),
-            where('userId', '==', userId)
-        );
+    // 2) Query Firestore for docs with modelId,userId & timestamp >= cutoff
+    const viewTrackersRef = collection(db, "viewTrackers");
+    const q = query(
+        viewTrackersRef,
+        where("modelId", "==", modelId),
+        where("userId", "==", userId),
+        where("createdAt", ">=", new Date(cutoffTime))
+    );
 
-        const querySnapshot = await getDocs(q);
-        if (querySnapshot.empty) return false;
+    const snapshot = await getDocs(q);
+    // If any doc is found, it means we already recorded a view in the last 30 mins
+    return !snapshot.empty;
+}
 
-        // Check if any of the views are within the cooldown period
-        return querySnapshot.docs.some(doc => {
-            const data = doc.data();
-            const viewTimestamp = data.timestamp;
-            if (!viewTimestamp) return false;
-            return viewTimestamp.toMillis() > timeThreshold.toMillis();
-        });
-    } catch (error) {
-        console.error('Error checking recent views:', error);
+/**
+ * Track a view for a specific model if the user hasn't viewed it in the last 30 mins
+ */
+export async function trackView(modelId) {
+    if (!modelId) return;
+
+    const currentUser = auth.currentUser;
+
+    // 1) Use real UID if logged in, else use stable "anon" ID from localStorage
+    const userId = currentUser ? currentUser.uid : getAnonymousId();
+    // Just for display. Could store displayName or "Anonymous" – up to you.
+    const userDisplayName = currentUser
+        ? currentUser.displayName || currentUser.email || "User"
+        : "Anonymous";
+
+    // 2) Check if there's a recent view doc
+    const recentlyViewed = await hasRecentView(modelId, userId);
+    if (recentlyViewed) {
+        console.log("Skipping: user still in cooldown for this model.");
         return false;
     }
-};
+
+    // 3) Not in cooldown, create a doc (this triggers your Cloud Function to increment `views`)
+    const docId = `${modelId}_${userId}_${Date.now()}`;
+    await setDoc(doc(db, "viewTrackers", docId), {
+        modelId,
+        userId,
+        userDisplayName,
+        createdAt: new Date(), // or serverTimestamp() if you prefer
+    });
+
+    console.log("View tracked:", docId);
+    return true;
+}
 
 /**
- * Track a view for a specific model
- * @param {string} modelId - The ID of the model being viewed
+ * React Hook: automatically track a view whenever the user visits the component
  */
-export const trackView = async (modelId) => {
+export function useViewTracker(modelId) {
+    const { user } = useAuth();
+
+    useEffect(() => {
+        if (!modelId) return;
+        trackView(modelId).catch(console.error);
+    }, [modelId, user]);
+}
+
+// Check if the current user is an admin
+const checkAdminStatus = async (userId) => {
+    if (!userId) return false;
+    const adminDoc = await getDoc(doc(db, "admins", userId));
+    return adminDoc.exists();
+};
+
+//  Clean up all view tracking data (for testing purposes only)
+export const cleanupAllViews = async () => {
     try {
         const user = auth.currentUser;
-        const userId = user ? user.uid : ANONYMOUS_DOC_ID;
-        const userDisplayName = user ? (user.displayName || user.email || 'Unknown User') : 'Anonymous';
-        const timestamp = new Date().getTime();
-        const viewId = `${modelId}_${userId}_${timestamp}`;
-
-        // Check for recent views
-        const hasRecent = await hasRecentView(modelId, userId);
-        if (hasRecent) {
-            console.log('Recent view exists, skipping...');
-            return false;
-        }
-
-        // For anonymous users, we'll use a single document with a counter
         if (!user) {
-            const anonymousRef = doc(db, 'viewTrackers', ANONYMOUS_DOC_ID);
-            await setDoc(anonymousRef, {
-                modelId,
-                userId: ANONYMOUS_DOC_ID,
-                userDisplayName: 'Anonymous',
-                timestamp: serverTimestamp(),
-                isAnonymous: true,
-                viewCount: increment(1),
-                lastViewerId: getAnonymousUserId() // Store the last viewer's ID for reference
-            }, { merge: true });
-        } else {
-            // For logged-in users, create individual documents
-            await setDoc(doc(db, 'viewTrackers', viewId), {
-                modelId,
-                userId,
-                userDisplayName,
-                timestamp: serverTimestamp(),
-                isAnonymous: false
-            });
+            throw new Error("You must be logged in to perform this action");
         }
-        
-        console.log(`View tracked for model ${modelId} by user ${userDisplayName}`);
+        const isAdmin = await checkAdminStatus(user.uid);
+        if (!isAdmin) {
+            throw new Error("You must be an admin to perform this action");
+        }
+        // Delete all documents in viewTrackers collection
+        const viewTrackersRef = collection(db, "viewTrackers");
+        const viewTrackersSnapshot = await getDocs(viewTrackersRef);
+        // Delete all documents in userViews collection
+        const userViewsRef = collection(db, "userViews");
+        const userViewsSnapshot = await getDocs(userViewsRef);
+        // Get all models to reset their view counts
+        const modelsRef = collection(db, "models");
+        const modelsSnapshot = await getDocs(modelsRef);
+        // Use batched writes for better performance
+        const batch = writeBatch(db);
+
+        // Delete view trackers
+        viewTrackersSnapshot.docs.forEach((doc) => {
+            batch.delete(doc.ref);
+        });
+
+        // Delete user views
+        userViewsSnapshot.docs.forEach((doc) => {
+            batch.delete(doc.ref);
+        });
+
+        // Reset view counts in models
+        modelsSnapshot.docs.forEach((doc) => {
+            batch.update(doc.ref, { views: 0 });
+        });
+        await batch.commit();
+        console.log("Successfully cleaned up all view data");
         return true;
     } catch (error) {
-        console.error('Error tracking view:', error);
+        console.error("Error cleaning up views:", error);
         throw error;
     }
 };
-
-/**
- * Hook to track views of a model
- * @param {string} modelId - The ID of the model to track
- */
-export const useViewTracker = (modelId) => {
-    const { user } = useAuth();
-    
-    useEffect(() => {
-        if (modelId) {
-            trackView(modelId).catch(console.error);
-        }
-    }, [modelId, user]);
-}; 
