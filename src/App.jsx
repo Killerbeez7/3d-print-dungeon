@@ -1,4 +1,3 @@
-import "@google/model-viewer";
 import { useState } from "react";
 import { useRoutes, Navigate } from "react-router-dom";
 // routes
