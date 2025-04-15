@@ -1,6 +1,6 @@
+import "@google/model-viewer";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { StrictMode } from "react";
 import App from "./App.jsx";
 import { ScrollToTop } from "../src/utils/ScrollToTop.js";
 
@@ -14,12 +14,10 @@ try {
     console.log("Root created");
 
     root.render(
-        <StrictMode>
-            <BrowserRouter>
-                <ScrollToTop />
-                <App />
-            </BrowserRouter>
-        </StrictMode>
+        <BrowserRouter>
+            <ScrollToTop />
+            <App />
+        </BrowserRouter>
     );
     console.log("Initial render called");
 } catch (error) {
