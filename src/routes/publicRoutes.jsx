@@ -1,7 +1,8 @@
 import { Home } from "../components/home/Home";
 import { MaintenancePage } from "../components/shared/MaintenancePage";
 import { DynamicSearch } from "../components/search/DynamicSearch";
-import { MaintenanceRoute } from "../routes/MaintenanceRoute";
+import { withMaintenance } from "../helpers/routeHelpers";
+
 export const publicRoutes = [
     {
         path: "/maintenance",
@@ -9,18 +10,10 @@ export const publicRoutes = [
     },
     {
         path: "/",
-        element: (
-            <MaintenanceRoute>
-                <Home />
-            </MaintenanceRoute>
-        ),
+        element: withMaintenance(<Home />),
     },
     {
         path: "/search",
-        element: (
-            <MaintenanceRoute>
-                <DynamicSearch />
-            </MaintenanceRoute>
-        ),
+        element: withMaintenance(<DynamicSearch />),
     },
 ];

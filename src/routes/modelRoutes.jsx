@@ -1,30 +1,19 @@
 import { ModelView } from "../components/models/model-view/ModelView";
 import { ModelEdit } from "../components/models/model-edit/ModelEdit";
 import { ModelUpload } from "../components/models/model-upload/ModelUpload";
-import { ProtectedRoute } from "../components/shared/ProtectedRoute";
-import { MaintenanceRoute } from "../routes/MaintenanceRoute";
+import { withProtectedMaintenance } from "../helpers/routeHelpers";
 
 export const modelRoutes = [
     {
         path: "/model/upload",
-        element: (
-            <MaintenanceRoute>
-                <ProtectedRoute>
-                    <ModelUpload />
-                </ProtectedRoute>
-            </MaintenanceRoute>
-        ),
+        element: withProtectedMaintenance(<ModelUpload />),
     },
     {
         path: "/model/:id",
-        element: <ModelView />,
+        element: withProtectedMaintenance(<ModelView />),
     },
     {
         path: "/model/:id/edit",
-        element: (
-            <ProtectedRoute>
-                <ModelEdit />
-            </ProtectedRoute>
-        ),
+        element: withProtectedMaintenance(<ModelEdit />),
     },
 ];
