@@ -2,14 +2,17 @@ import { ModelView } from "../components/models/model-view/ModelView";
 import { ModelEdit } from "../components/models/model-edit/ModelEdit";
 import { ModelUpload } from "../components/models/model-upload/ModelUpload";
 import { ProtectedRoute } from "../components/shared/ProtectedRoute";
+import { MaintenanceRoute } from "../routes/MaintenanceRoute";
 
 export const modelRoutes = [
     {
         path: "/model/upload",
         element: (
-            <ProtectedRoute>
-                <ModelUpload />
-            </ProtectedRoute>
+            <MaintenanceRoute>
+                <ProtectedRoute>
+                    <ModelUpload />
+                </ProtectedRoute>
+            </MaintenanceRoute>
         ),
     },
     {
