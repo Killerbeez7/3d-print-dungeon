@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { collection, query, getDocs, where, orderBy, limit } from "firebase/firestore";
 import { db } from "../../../config/firebase";
-import { MdPeople, MdFileUpload, MdRemoveRedEye, MdThumbUp } from "react-icons/md";
+import { MdPeople, MdFileUpload, MdRemoveRedEye, MdThumbUp, MdDelete } from "react-icons/md";
+import { cleanupAllViews } from "../../../services/viewService";
 
 // Cache duration in milliseconds (5 minutes)
 const CACHE_DURATION = 5 * 60 * 1000;
@@ -23,6 +24,7 @@ export const Analytics = () => {
     });
     const [loading, setLoading] = useState(true);
     const [timeRange, setTimeRange] = useState("week"); // week, month, year
+    const [isCleaningViews, setIsCleaningViews] = useState(false);
 
     // Memoize the date calculation
     const startDate = useMemo(() => {
@@ -144,27 +146,56 @@ export const Analytics = () => {
         fetchAnalytics();
     }, [fetchAnalytics]);
 
+    const handleCleanupViews = async () => {
+        if (!window.confirm('Are you sure you want to reset all view counts? This action cannot be undone.')) {
+            return;
+        }
+
+        setIsCleaningViews(true);
+        try {
+            await cleanupAllViews();
+            // Refresh stats after cleanup
+            await fetchAnalytics();
+            alert('Successfully reset all view counts!');
+        } catch (error) {
+            console.error('Error cleaning up views:', error);
+            alert('Failed to reset view counts. Check console for details.');
+        } finally {
+            setIsCleaningViews(false);
+        }
+    };
+
     if (loading) {
         return <div className="text-center py-4">Loading analytics...</div>;
     }
 
     return (
         <div className="space-y-8">
-            {/* Time Range Selector */}
-            <div className="flex space-x-2">
-                {["week", "month", "year"].map((range) => (
-                    <button
-                        key={range}
-                        onClick={() => setTimeRange(range)}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                            timeRange === range
-                                ? "bg-accent text-white"
-                                : "bg-bg-secondary text-txt-secondary hover:text-txt-primary"
-                        }`}
-                    >
-                        Last {range}
-                    </button>
-                ))}
+            {/* Time Range Selector and Cleanup Button */}
+            <div className="flex justify-between items-center">
+                <div className="flex space-x-2">
+                    {["week", "month", "year"].map((range) => (
+                        <button
+                            key={range}
+                            onClick={() => setTimeRange(range)}
+                            className={`px-4 py-2 rounded-lg text-sm font-medium ${
+                                timeRange === range
+                                    ? "bg-accent text-white"
+                                    : "bg-bg-secondary text-txt-secondary hover:text-txt-primary"
+                            }`}
+                        >
+                            Last {range}
+                        </button>
+                    ))}
+                </div>
+                <button
+                    onClick={handleCleanupViews}
+                    disabled={isCleaningViews}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <MdDelete className="w-5 h-5" />
+                    {isCleaningViews ? 'Cleaning...' : 'Reset All Views'}
+                </button>
             </div>
 
             {/* Stats Overview */}
