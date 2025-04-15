@@ -1,5 +1,4 @@
-import "@google/model-viewer";
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/authContext";
 import { createAdvancedModel } from "../../../services/modelsService";
 import { finalConvertFileToGLB } from "../../../utils/models/converter";
