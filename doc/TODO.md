@@ -1,5 +1,17 @@
 # code optimization
 
+
+- [ ] Fix carousel on mobile to scroll only 1 tile not 4
+- [ ] add username is taken check - https://www.youtube.com/watch?v=_l5Q5kKHtR8
+
+
+
+
+
+
+
+
+
 1-since we have a daily cleanup function for viewTrackers, 
 we can potentially simplify by only keeping userViews and 
 the view count on the model documents themselves.
