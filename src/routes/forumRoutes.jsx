@@ -5,10 +5,9 @@ import { withProtectedMaintenance } from "../helpers/routeHelpers";
 
 export const forumRoutes = [
     {
-        path: "/forum",
+        path: "community/forum",
         element: withProtectedMaintenance(<ForumHome />),
         children: [
-            { path: "", element: <ForumHome /> },
             { path: "category/:categoryId", element: <ForumCategory /> },
             { path: "thread/:threadId", element: <ForumThread /> },
             { path: "new-thread", element: <ForumThread isNew={true} /> },

@@ -96,18 +96,25 @@ export const Navbar = ({ onLoginClick }) => {
     const navItems = [
         {
             name: "Explore",
-            path: "/explore",
+            path: "/",
             dropdownItems: [
                 { name: "Models", path: "/" },
                 { name: "Artists", path: "/explore/artists" },
-                { name: "Forum", path: "/explore/forum" },
             ],
         },
         {
-            name: "Shop",
+            name: "Community",
+            path: "/community",
+            dropdownItems: [
+                { name: "Forum", path: "/community/forum" },
+                { name: "New Thread", path: "/community/forum/new-thread" },
+            ],
+        },
+        {
+            name: "Store",
             path: "/store",
             dropdownItems: [
-                { name: "All Models", path: "/store" },
+                { name: "Buy Models", path: "/store" },
                 { name: "Featured", path: "/store/featured" },
                 { name: "New Arrivals", path: "/store/new" },
             ],
