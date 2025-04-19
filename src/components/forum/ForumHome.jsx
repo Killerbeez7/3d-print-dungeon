@@ -1,33 +1,107 @@
 import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useForum } from "../../contexts/forumContext";
+import { MdMessage, MdRemoveRedEye } from "react-icons/md";
 
 export const ForumHome = () => {
-    // This is a placeholder for forum categories - in a real app, you'd fetch these from your backend
-    const categories = [
-        { id: 1, name: "General Discussion", description: "General topics about 3D printing", threadCount: 150 },
-        { id: 2, name: "Technical Support", description: "Get help with technical issues", threadCount: 89 },
-        { id: 3, name: "Showcase", description: "Show off your 3D prints", threadCount: 234 },
-    ];
+    const [activeTab, setActiveTab] = useState("recent");
+    const { 
+        recentThreads, 
+        popularThreads, 
+        unansweredThreads, 
+        loading, 
+        error 
+    } = useForum();
+
+    const threads = {
+        recent: recentThreads,
+        popular: popularThreads,
+        unanswered: unansweredThreads,
+    };
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="text-center p-4 text-red-600">
+                Error loading threads: {error}
+            </div>
+        );
+    }
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-6">Community Forum</h1>
-            
+        <div className="space-y-6">
+            {/* Tabs */}
+            <div className="flex space-x-4 border-b border-gray-200 dark:border-gray-700">
+                {["recent", "popular", "unanswered"].map((tab) => (
+                    <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`px-4 py-2 font-medium capitalize ${
+                            activeTab === tab
+                                ? "text-primary-600 border-b-2 border-primary-600"
+                                : "text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+                        }`}
+                    >
+                        {tab}
+                    </button>
+                ))}
+            </div>
+
+            {/* Threads List */}
             <div className="space-y-4">
-                {categories.map((category) => (
-                    <div key={category.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                        <Link 
-                            to={`/forum/category/${category.id}`}
-                            className="text-xl font-semibold hover:text-primary-600 dark:hover:text-primary-400"
-                        >
-                            {category.name}
-                        </Link>
-                        <p className="text-gray-600 dark:text-gray-300 mt-2">{category.description}</p>
-                        <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
-                            {category.threadCount} threads
+                {threads[activeTab]?.map((thread) => (
+                    <div
+                        key={thread.id}
+                        className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-md transition-shadow"
+                    >
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <Link
+                                    to={`thread/${thread.id}`}
+                                    className="text-xl font-semibold hover:text-primary-600 dark:hover:text-primary-400"
+                                >
+                                    {thread.title}
+                                </Link>
+                                <div className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                    in{" "}
+                                    <Link
+                                        to={`category/${thread.categoryId}`}
+                                        className="hover:text-primary-600 dark:hover:text-primary-400"
+                                    >
+                                        {thread.categoryName}
+                                    </Link>{" "}
+                                    by {thread.authorName}
+                                </div>
+                            </div>
+                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                {new Date(thread.lastActivity?.toDate() || thread.createdAt?.toDate()).toLocaleDateString()}
+                            </div>
+                        </div>
+                        <div className="mt-3 flex gap-4 text-sm text-gray-500 dark:text-gray-400">
+                            <span className="flex items-center gap-1">
+                                <MdMessage className="w-4 h-4" />
+                                {thread.replyCount || 0} replies
+                            </span>
+                            <span className="flex items-center gap-1">
+                                <MdRemoveRedEye className="w-4 h-4" />
+                                {thread.views || 0} views
+                            </span>
                         </div>
                     </div>
                 ))}
+                {(!threads[activeTab] || threads[activeTab].length === 0) && (
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                        No threads found
+                    </div>
+                )}
             </div>
         </div>
     );
-}; 
+};
