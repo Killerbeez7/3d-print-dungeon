@@ -1,8 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
+
 import { useAuth } from "../../../contexts/authContext";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useSearch } from "../../../contexts/searchContext";
+import { useClickOutside } from "../../../hooks/useClickOutside";
+
+import { NAV_SECTIONS } from "../../../config/navConfig";
+
 import {
     MdFileUpload,
     MdAccountCircle,
@@ -11,8 +16,7 @@ import {
     MdNotifications,
     MdSearch,
 } from "react-icons/md";
-import { useClickOutside } from "../../../hooks/useClickOutside";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faSignOutAlt,
     faUser,
@@ -21,59 +25,30 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import { GlobalSearch } from "../../search/GlobalSearch";
-import { useSearch } from "../../../contexts/searchContext";
 
-export const Navbar = ({ onLoginClick }) => {
+export const Navbar = ({ onLoginClick, onSignUpClick }) => {
     const { currentUser, handleSignOut, isAdmin } = useAuth();
+    const { setShowDropdown } = useSearch();
+
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
     const [mobileDropdown, setMobileDropdown] = useState(null);
     const [isSearchVisible, setIsSearchVisible] = useState(false);
+
     const navigate = useNavigate();
     const location = useLocation();
     const dropdownRef = useRef(null);
     const mobileDropdownRef = useRef(null);
     const searchOverlayRef = useRef(null);
-    const { setShowDropdown } = useSearch();
 
-    // Close desktop dropdown when clicking outside
-    useClickOutside(dropdownRef, () => {
-        setActiveDropdown(null);
-    });
+    /* ---------- helpers ---------- */
 
-    // Close mobile dropdown when clicking outside
-    useClickOutside(mobileDropdownRef, () => {
-        setMobileDropdown(null);
-    });
-
-    // Close search overlay when clicking outside
-    useClickOutside(searchOverlayRef, () => {
-        setIsSearchVisible(false);
-    });
-
-    // Close dropdowns and mobile menu and search on route change
-    useEffect(() => {
+    const closeAll = () => {
         setActiveDropdown(null);
         setMobileDropdown(null);
         setIsMobileMenuOpen(false);
         setIsSearchVisible(false);
         setShowDropdown(false);
-    }, [location.pathname, setShowDropdown]);
-
-    const handleLogout = async () => {
-        try {
-            await handleSignOut();
-            navigate("/");
-        } catch (error) {
-            console.error("Failed to log out", error);
-        }
-    };
-
-    const toggleMobileMenu = () => {
-        setIsMobileMenuOpen(!isMobileMenuOpen);
-        if (isMobileMenuOpen) {
-            setMobileDropdown(null);
-        }
     };
 
     const toggleDropdown = (dropdownName) => {
@@ -84,60 +59,59 @@ export const Navbar = ({ onLoginClick }) => {
         }
     };
 
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen(!isMobileMenuOpen);
+        if (isMobileMenuOpen) {
+            setMobileDropdown(null);
+        }
+    };
+
     const toggleMobileDropdown = (dropdownName, e) => {
         e.stopPropagation();
         setMobileDropdown((prev) => (prev === dropdownName ? null : dropdownName));
+    };
+
+    const handleLogout = async () => {
+        try {
+            await handleSignOut();
+            navigate("/");
+        } catch (error) {
+            console.error("Failed to log out", error);
+        }
     };
 
     const handleSearchClick = () => {
         navigate("/search?query=");
     };
 
-    const navItems = [
-        {
-            name: "Explore",
-            path: "/",
-            dropdownItems: [
-                { name: "Models", path: "/" },
-                { name: "Artists", path: "/explore/artists" },
-            ],
-        },
-        {
-            name: "Community",
-            path: "/community",
-            dropdownItems: [
-                { name: "Forum", path: "/community/forum" },
-                { name: "New Thread", path: "/community/forum/new-thread" },
-            ],
-        },
-        {
-            name: "Store",
-            path: "/store",
-            dropdownItems: [
-                { name: "Buy Models", path: "/store" },
-                { name: "Featured", path: "/store/featured" },
-                { name: "New Arrivals", path: "/store/new" },
-            ],
-        },
-        {
-            name: "Business",
-            path: "/business",
-            dropdownItems: [
-                { name: "Bulk Orders", path: "/business/bulk-orders" },
-                { name: "Custom Solutions", path: "/business/custom-solutions" },
-                { name: "Enterprise", path: "/business/enterprise" },
-            ],
-        },
-    ];
+    /* ---------- outside‑click & route‑change ---------- */
+
+    useClickOutside(dropdownRef, () => {
+        setActiveDropdown(null);
+    });
+
+    useClickOutside(mobileDropdownRef, () => {
+        setMobileDropdown(null);
+    });
+
+    useClickOutside(searchOverlayRef, () => {
+        setIsSearchVisible(false);
+    });
+
+    useEffect(() => {
+        closeAll();
+    }, [location.pathname, setShowDropdown]);
+
+    /* ---------- render ---------- */
 
     return (
         <div className="sticky top-0 z-50">
             <nav className="bg-bg-primary shadow-md">
                 <div className="mx-auto px-4 sm:px-6 py-5">
                     <div className="flex items-center h-10">
-                        {/* Left Section: Logo and Navigation */}
-                        <div className="flex items-center space-x-4 w-1/4">
-                            {/* Mobile menu button */}
+                        {/* ---------- LEFT: logo & desktop nav ---------- */}
+                        <div className="flex items-center space-x-4 min-w-fit">
+                            {/* mobile hamburger */}
                             <button
                                 id="hamburger-button"
                                 className="md:hidden p-2 rounded-lg hover:bg-gray-100"
@@ -152,7 +126,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 )}
                             </button>
 
-                            {/* Logo - Mobile (Centered) */}
+                            {/* logo mobile */}
                             <div className="md:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap flex-shrink-0">
                                 <Link to="/" className="flex items-center">
                                     <img
@@ -163,7 +137,7 @@ export const Navbar = ({ onLoginClick }) => {
                                 </Link>
                             </div>
 
-                            {/* Logo - Desktop (Left-aligned) */}
+                            {/* logo desktop */}
                             <div className="hidden md:block whitespace-nowrap flex-shrink-0">
                                 <Link to="/" className="flex items-center space-x-2 ml-2">
                                     <img
@@ -174,50 +148,45 @@ export const Navbar = ({ onLoginClick }) => {
                                 </Link>
                             </div>
 
-                            {/* Desktop Navigation */}
-                            <nav className="hidden md:flex items-center space-x-6 ">
-                                {navItems.map((item) => (
+                            {/* desktop nav */}
+                            <nav className="hidden md:flex items-center space-x-6">
+                                {NAV_SECTIONS.map((section) => (
                                     <div
-                                        key={item.name}
+                                        key={section.label}
                                         className="relative group"
                                         ref={dropdownRef}
-                                        onMouseEnter={() => setActiveDropdown(item.name)}
+                                        onMouseEnter={() =>
+                                            setActiveDropdown(section.label)
+                                        }
                                         onMouseLeave={() => setActiveDropdown(null)}
                                     >
                                         <button
-                                            className="inline-flex items-center text-md text-txt-secondary hover:text-txt-primary group-hover:text-txt-highlighted"
-                                            onClick={() => toggleDropdown(item.name)}
+                                            className="inline-flex items-center text-md text-txt-secondary hover:text-txt-primary group-hover:text-txt-highlighted whitespace-nowrap"
+                                            onClick={() => toggleDropdown(section.label)}
                                         >
-                                            {item.name}
-                                            {/* <FontAwesomeIcon
-                                                icon={faChevronDown}
-                                                className="ml-1 h-3 w-3"
-                                            /> */}
+                                            {section.label}
                                         </button>
-
                                         {/* Desktop Dropdown */}
                                         <div
                                             className={`absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-bg-surface ring-1 ring-black ring-opacity-5 transition-all duration-200 ${
-                                                activeDropdown === item.name
+                                                activeDropdown === section.label
                                                     ? "opacity-100 visible"
                                                     : "opacity-0 invisible"
                                             }`}
                                         >
                                             <div className="py-1">
-                                                {item.dropdownItems.map(
-                                                    (dropdownItem) => (
-                                                        <Link
-                                                            key={dropdownItem.path}
-                                                            to={dropdownItem.path}
-                                                            className="block px-4 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
-                                                            onClick={() =>
-                                                                setActiveDropdown(null)
-                                                            }
-                                                        >
-                                                            {dropdownItem.name}
-                                                        </Link>
-                                                    )
-                                                )}
+                                                {section.items.map((item) => (
+                                                    <Link
+                                                        key={item.to}
+                                                        to={item.to}
+                                                        className="block px-4 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
+                                                        onClick={() =>
+                                                            setActiveDropdown(null)
+                                                        }
+                                                    >
+                                                        {item.label}
+                                                    </Link>
+                                                ))}
                                             </div>
                                         </div>
                                     </div>
@@ -225,32 +194,41 @@ export const Navbar = ({ onLoginClick }) => {
                             </nav>
                         </div>
 
-                        {/* Center Section: Global Search */}
-                        <div className="flex-1 flex justify-center px-4 max-w-5xl mx-auto w-1/2">
-                            <div className="w-full hidden xl:block">
+                        {/* ---------- CENTER: global search ---------- */}
+                        <div className="flex-1 flex justify-center px-4 max-w-6xl mx-auto w-1/2">
+                            <div className="w-full hidden lg:block">
                                 <GlobalSearch />
                             </div>
                         </div>
 
-                        {/* Right Section: Auth & Profile */}
-                        <div className="flex items-center space-x-4 justify-end w-1/4">
+                        {/* ---------- RIGHT: auth & icons ---------- */}
+                        <div className="flex items-center space-x-4 justify-end min-w-fit">
+                            {/* Quick search icon */}
+                            <button
+                                onClick={handleSearchClick}
+                                className="hidden md:block lg:hidden text-txt-secondary hover:text-txt-primary"
+                                title="Search"
+                            >
+                                <MdSearch className="h-7 w-7" />
+                            </button>
+
                             {!currentUser ? (
-                                <button
-                                    className="bg-btn-secondary text-txt-primary font-medium px-4 py-1.5 rounded-lg hover:bg-btn-secondary-hover text-md"
-                                    onClick={onLoginClick}
-                                >
-                                    Sign In
-                                </button>
-                            ) : (
                                 <>
                                     <button
-                                        onClick={handleSearchClick}
-                                        className="hidden md:block xl:hidden text-txt-secondary hover:text-txt-primary"
-                                        title="Search"
+                                        className="bg-btn-secondary text-txt-primary font-medium px-4 py-1.5 rounded-lg hover:bg-btn-secondary-hover text-md"
+                                        onClick={onSignUpClick}
                                     >
-                                        <MdSearch className="h-7 w-7" />
+                                        Sign Up
                                     </button>
-
+                                    <button
+                                        className="bg-accent text-txt-primary font-medium px-4 py-1.5 rounded-lg hover:bg-btn-primary-hover text-md"
+                                        onClick={onLoginClick}
+                                    >
+                                        Sign In
+                                    </button>
+                                </>
+                            ) : (
+                                <>
                                     {/* Desktop buttons */}
                                     <div className="hidden md:flex items-center space-x-4">
                                         <Link
@@ -270,6 +248,7 @@ export const Navbar = ({ onLoginClick }) => {
                                         </Link>
                                     </div>
 
+                                    {/* Profile Dropdown */}
                                     <div className="relative" ref={dropdownRef}>
                                         <button
                                             onClick={() => toggleDropdown("profile")}
@@ -277,7 +256,7 @@ export const Navbar = ({ onLoginClick }) => {
                                         >
                                             <MdAccountCircle className="h-7 w-7" />
                                         </button>
-                                        {/* Profile Dropdown */}
+
                                         <div
                                             className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-bg-surface ring-1 ring-black ring-opacity-5 transition-all duration-200 ${
                                                 activeDropdown === "profile"
@@ -352,7 +331,7 @@ export const Navbar = ({ onLoginClick }) => {
                         </div>
                     </div>
 
-                    {/* Search Overlay */}
+                    {/* ---------- Search overlay (mobile) ---------- */}
                     <div
                         ref={searchOverlayRef}
                         className={`fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-200 ${
@@ -370,7 +349,7 @@ export const Navbar = ({ onLoginClick }) => {
                 </div>
             </nav>
 
-            {/* Mobile Navigation Menu */}
+            {/* ---------- Mobile drawer ---------- */}
             <div
                 className={`md:hidden shadow-md absolute inset-x-0 bg-bg-primary transition-all duration-100 ease-out transform z-40 ${
                     isMobileMenuOpen
@@ -409,38 +388,40 @@ export const Navbar = ({ onLoginClick }) => {
                 </div>
 
                 <div className="px-2 pt-2 h-auto pb-3 space-y-1" ref={mobileDropdownRef}>
-                    {navItems.map((item) => (
-                        <div key={item.name}>
+                    {NAV_SECTIONS.map((section) => (
+                        <div key={section.label}>
                             <button
                                 className="w-full text-left px-4 py-2 text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary flex items-center justify-between"
-                                onClick={(e) => toggleMobileDropdown(item.name, e)}
+                                onClick={(e) => toggleMobileDropdown(section.label, e)}
                             >
-                                {item.name}
+                                {section.label}
                                 <FontAwesomeIcon
                                     icon={faChevronDown}
                                     className={`ml-2 transform transition-transform duration-200 ${
-                                        mobileDropdown === item.name ? "rotate-180" : ""
+                                        mobileDropdown === section.label
+                                            ? "rotate-180"
+                                            : ""
                                     }`}
                                 />
                             </button>
                             <div
                                 className={`bg-bg-secondary transition-all duration-200 ${
-                                    mobileDropdown === item.name
+                                    mobileDropdown === section.label
                                         ? "max-h-48 overflow-y-auto"
                                         : "max-h-0 overflow-hidden"
                                 }`}
                             >
-                                {item.dropdownItems.map((dropdownItem) => (
+                                {section.items.map((item) => (
                                     <Link
-                                        key={dropdownItem.path}
-                                        to={dropdownItem.path}
+                                        key={item.to}
+                                        to={item.to}
                                         className="block px-6 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary"
                                         onClick={() => {
                                             setIsMobileMenuOpen(false);
                                             setMobileDropdown(null);
                                         }}
                                     >
-                                        {dropdownItem.name}
+                                        {item.label}
                                     </Link>
                                 ))}
                             </div>
