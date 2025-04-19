@@ -101,5 +101,31 @@ service cloud.firestore {
       allow update: if isAdmin() || 
         (request.auth != null && resource.data.userId == request.auth.uid);
     }
+
+    // Forum Categories collection
+    match /forumCategories/{categoryId} {
+      allow read: if true;  // Public read access
+      allow write: if isAdmin() || isSuperAdmin();  // Only admins can modify categories
+    }
+
+    // Forum Threads collection
+    match /forumThreads/{threadId} {
+      allow read: if true;  // Public read access
+      allow create: if isSignedIn();  // Any signed-in user can create threads
+      allow update: if isSignedIn() && 
+        (resource.data.authorId == request.auth.uid || isAdmin() || isSuperAdmin());  // Author or admin can update
+      allow delete: if isSignedIn() && 
+        (resource.data.authorId == request.auth.uid || isAdmin() || isSuperAdmin());  // Author or admin can delete
+    }
+
+    // Forum Replies collection
+    match /forumThreads/{threadId}/replies/{replyId} {
+      allow read: if true;  // Public read access
+      allow create: if isSignedIn();  // Any signed-in user can create replies
+      allow update: if isSignedIn() && 
+        (resource.data.authorId == request.auth.uid || isAdmin() || isSuperAdmin());  // Author or admin can update
+      allow delete: if isSignedIn() && 
+        (resource.data.authorId == request.auth.uid || isAdmin() || isSuperAdmin());  // Author or admin can delete
+    }
   }
 }
