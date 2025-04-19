@@ -4,16 +4,16 @@ import { useAuth } from "../../contexts/authContext";
 import { useState, useEffect } from "react";
 import { subscribeToMaintenanceStatus } from "../../services/maintenanceService";
 
-export const MaintenanceRoute = ({ 
-    children, 
+export const MaintenanceRoute = ({
+    children,
     fallback = null,
-    redirectTo = "/maintenance" 
+    redirectTo = "/maintenance",
 }) => {
     const { isAdmin } = useAuth();
-    const [maintenanceState, setMaintenanceState] = useState({ 
+    const [maintenanceState, setMaintenanceState] = useState({
         inMaintenance: false,
         message: null,
-        endTime: null 
+        endTime: null,
     });
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -63,15 +63,13 @@ export const MaintenanceRoute = ({
 };
 
 MaintenanceRoute.propTypes = {
-    children: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.node),
-        PropTypes.node
-    ]).isRequired,
+    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node])
+        .isRequired,
     fallback: PropTypes.node,
-    redirectTo: PropTypes.string
+    redirectTo: PropTypes.string,
 };
 
 MaintenanceRoute.defaultProps = {
     fallback: null,
-    redirectTo: "/maintenance"
-}; 
+    redirectTo: "/maintenance",
+};
