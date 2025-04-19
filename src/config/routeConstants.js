@@ -36,4 +36,4 @@ export const ROUTES = {
 
     // Admin routes
     ADMIN_PANEL: "/admin-panel",
-}; 
+};
