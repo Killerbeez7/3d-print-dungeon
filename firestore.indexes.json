@@ -9,6 +9,14 @@
       ]
     },
     {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isArtist", "order": "ASCENDING" },
+        { "fieldPath": "uploadCount", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "models",
       "queryScope": "COLLECTION",
       "fields": [
@@ -16,7 +24,6 @@
         { "fieldPath": "views", "order": "DESCENDING" }
       ]
     },
-
     {
       "collectionGroup": "models",
       "queryScope": "COLLECTION",
@@ -55,14 +62,6 @@
       "collectionGroup": "forumThreads",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "replyCount", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "forumThreads",
-      "queryScope": "COLLECTION",
-      "fields": [
         { "fieldPath": "categoryId", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
@@ -80,16 +79,6 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "categoryId", "order": "ASCENDING" },
-        { "fieldPath": "isPinned", "order": "DESCENDING" },
-        { "fieldPath": "lastActivity", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "forumThreads",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "categoryId", "order": "ASCENDING" },
-        { "fieldPath": "views", "order": "DESCENDING" },
         { "fieldPath": "lastActivity", "order": "DESCENDING" }
       ]
     },
@@ -99,15 +88,15 @@
       "fields": [
         { "fieldPath": "categoryId", "order": "ASCENDING" },
         { "fieldPath": "replyCount", "order": "ASCENDING" },
-        { "fieldPath": "lastActivity", "order": "DESCENDING" }
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
     {
       "collectionGroup": "forumThreads",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "lastActivity", "order": "DESCENDING" },
-        { "fieldPath": "views", "order": "DESCENDING" }
+        { "fieldPath": "replyCount", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
     {
@@ -119,5 +108,16 @@
       ]
     }
   ],
-  "fieldOverrides": []
+  "fieldOverrides": [
+    {
+      "collectionGroup": "forumCategories",
+      "fieldPath": "order",
+      "indexes": [
+        {
+          "order": "ASCENDING",
+          "queryScope": "COLLECTION"
+        }
+      ]
+    }
+  ]
 } 
