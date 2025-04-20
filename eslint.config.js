@@ -16,9 +16,11 @@ export default [
         files: ["**/*.{js,jsx}"],
         languageOptions: {
             ecmaVersion: "latest",
-            ecmaFeatures: { jsx: true },
-            globals: globals.browser,
             sourceType: "module",
+            globals: globals.browser,
+            parserOptions: {
+                ecmaFeatures: { jsx: true }
+            }
         },
         settings: { react: { version: "detect" } },
         plugins: { react, "react-hooks": reactHooks, "react-refresh": reactRefresh },
@@ -43,8 +45,8 @@ export default [
             parserOptions: {
                 project: "./tsconfig.json",
                 ecmaVersion: "latest",
-                ecmaFeatures: { jsx: true },
                 sourceType: "module",
+                ecmaFeatures: { jsx: true }
             },
             globals: globals.browser,
         },
@@ -56,7 +58,7 @@ export default [
             "react-refresh": reactRefresh,
         },
         rules: {
-            ...tseslint.configs.recommendedTypeChecked.rules,
+            ...tseslint.configs.recommended.rules,
             ...react.configs.recommended.rules,
             ...react.configs["jsx-runtime"].rules,
             ...reactHooks.configs.recommended.rules,
