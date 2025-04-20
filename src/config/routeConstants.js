@@ -9,13 +9,16 @@ export const ROUTES = {
     COLLECTIONS: "/collections",
 
     /* Community */
-    FORUM: "/community/forum",
     COMMUNITY_EVENTS: "/community/events",
     COMMUNITY_BLOG: "/community/blog",
-    // Forum children (relative to /community/forum)
-    FORUM_CATEGORY: "category/:categoryId",
-    FORUM_THREAD: "thread/:threadId",
-    FORUM_NEW_THREAD: "new-thread",
+
+    /* Forum */
+    FORUM: "/forum",
+    FORUM_CATEGORY: "/forum/category/:categoryId",
+    FORUM_THREAD: "/forum/thread/:threadId",
+    FORUM_NEW_THREAD: "/forum/new-thread",
+    FORUM_THREAD_EDIT: "/forum/thread/:threadId/edit",
+    FORUM_REPLY_EDIT: "/forum/reply/:replyId/edit",
 
     /* Marketplace */
     MARKETPLACE_FEATURED: "/marketplace/featured",
