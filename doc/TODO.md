@@ -97,3 +97,8 @@ Firestore Rules:
 - [x] Public read access where needed
 
 - [ ] adding charts for view tracking -- https://recharts.org/en-US/
+
+
+
+
+on desktop mobile view nav doesnt detect clicks in nav links with hover and press on the carouse; insted of the nav links
