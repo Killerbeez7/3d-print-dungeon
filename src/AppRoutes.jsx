@@ -7,6 +7,7 @@ import { communityRoutes } from "./routes/communityRoutes";
 import { storeRoutes } from "./routes/storeRoutes";
 import { businessRoutes } from "./routes/businessRoutes";
 import { forumRoutes } from "./routes/forumRoutes";
+
 import { modelsRoutes } from "./routes/modelsRoutes";
 import { userRoutes } from "./routes/userRoutes";
 import { adminRoutes } from "./routes/adminRoutes";
@@ -25,6 +26,7 @@ export const AppRoutes = () => {
                 ...storeRoutes,
                 ...businessRoutes,
                 ...forumRoutes,
+
                 ...modelsRoutes,
                 ...userRoutes,
                 ...adminRoutes,
