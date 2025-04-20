@@ -96,40 +96,49 @@ service cloud.firestore {
       allow delete: if isAdmin() || isSuperAdmin();
     }
     
+    // FORUM COLLECTIONS
+
+    // Forum Categories
+    match /forumCategories/{categoryId} {
+      allow read: if true;  // Public categories
+      allow create, update, delete: if isAdmin() || isSuperAdmin();
+    }
+
+    // Forum Threads
+    match /forumThreads/{threadId} {
+      allow read: if true;  // Public threads
+      allow create: if isSignedIn();
+      // Only thread author, moderators or admins can update/delete
+      allow update, delete: if isSignedIn() && 
+        (resource.data.authorId == request.auth.uid || isAdmin() || isSuperAdmin());
+    }
+
+    // Forum Replies
+    match /forumReplies/{replyId} {
+      allow read: if true;  // Public replies
+      allow create: if isSignedIn();
+      // Only reply author, moderators or admins can update/delete
+      allow update, delete: if isSignedIn() && 
+        (resource.data.authorId == request.auth.uid || isAdmin() || isSuperAdmin());
+    }
+
+    // Thread Likes
+    match /forumThreadLikes/{likeId} {
+      allow read: if true;
+      allow create, delete: if isSignedIn();
+    }
+
+    // Forum User Profiles (Forum-specific user data)
+    match /forumUserProfiles/{userId} {
+      allow read: if true;
+      allow write: if isSignedIn() && 
+        (request.auth.uid == userId || isAdmin() || isSuperAdmin());
+    }
+    
     // Models collection - allow admin to update view counts
     match /models/{modelId} {
       allow update: if isAdmin() || 
         (request.auth != null && resource.data.userId == request.auth.uid);
-    }
-
-    // Forum Categories collection
-    match /forumCategories/{categoryId} {
-      allow read:  if true;
-      allow create, update, delete: if isAdmin() || isSuperAdmin();
-    }
-
-
-    // Forum Threads collection
-    match /forumThreads/{threadId} {
-      // anyone can list/get
-      allow read:   if true;
-      // only signed‑in can create
-      allow create: if isSignedIn();
-      // authors or admins can modify
-      allow update, delete:
-        if isSignedIn() &&
-           (resource.data.authorId == request.auth.uid ||
-            isAdmin() || isSuperAdmin());
-    }
-
-    // Forum Replies collection
-    match /forumReplies/{replyId} {
-      allow read:   if true;
-      allow create: if isSignedIn();
-      allow update, delete:
-        if isSignedIn() &&
-           (resource.data.authorId == request.auth.uid ||
-            isAdmin() || isSuperAdmin());
     }
   }
 }
