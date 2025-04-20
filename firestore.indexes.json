@@ -1,123 +1,154 @@
 {
-  "indexes": [
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "isArtist", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "users",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "isArtist", "order": "ASCENDING" },
-        { "fieldPath": "uploadCount", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "models",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "createdAt", "order": "ASCENDING" },
-        { "fieldPath": "views", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "models",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "comments",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "modelId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "viewTrackers",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "modelId", "order": "ASCENDING" },
-        { "fieldPath": "userId", "order": "ASCENDING" },
-        { "fieldPath": "timestamp", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "viewTrackers",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "modelId", "order": "ASCENDING" },
-        { "fieldPath": "userId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "forumThreads",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "categoryId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "forumThreads",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "views", "order": "DESCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "forumThreads",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "categoryId", "order": "ASCENDING" },
-        { "fieldPath": "lastActivity", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "forumThreads",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "categoryId", "order": "ASCENDING" },
-        { "fieldPath": "replyCount", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "forumThreads",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "replyCount", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "forumReplies",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "threadId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "ASCENDING" }
-      ]
-    }
-  ],
-  "fieldOverrides": [
-    {
-      "collectionGroup": "forumCategories",
-      "fieldPath": "order",
-      "indexes": [
+    "indexes": [
         {
-          "order": "ASCENDING",
-          "queryScope": "COLLECTION"
+            "collectionGroup": "users",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "isArtist", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "users",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "isArtist", "order": "ASCENDING" },
+                { "fieldPath": "uploadCount", "order": "ASCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "models",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "createdAt", "order": "ASCENDING" },
+                { "fieldPath": "views", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "models",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "status", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "comments",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "modelId", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "viewTrackers",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "modelId", "order": "ASCENDING" },
+                { "fieldPath": "userId", "order": "ASCENDING" },
+                { "fieldPath": "timestamp", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "viewTrackers",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "modelId", "order": "ASCENDING" },
+                { "fieldPath": "userId", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "ASCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "forumThreads",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "categoryId", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "forumThreads",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "categoryId", "order": "ASCENDING" },
+                { "fieldPath": "lastActivity", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "forumThreads",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "categoryId", "order": "ASCENDING" },
+                { "fieldPath": "views", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "forumThreads",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "categoryId", "order": "ASCENDING" },
+                { "fieldPath": "replyCount", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "forumThreads",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "replyCount", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "forumThreads",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "views", "order": "DESCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "forumThreads",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "lastActivity", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "forumThreads",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "authorId", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "forumReplies",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "threadId", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "ASCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "forumReplies",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "authorId", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
         }
-      ]
-    }
-  ]
-} 
+    ],
+    "fieldOverrides": [
+        {
+            "collectionGroup": "forumCategories",
+            "fieldPath": "order",
+            "indexes": [
+                {
+                    "order": "ASCENDING",
+                    "queryScope": "COLLECTION"
+                }
+            ]
+        }
+    ]
+}
