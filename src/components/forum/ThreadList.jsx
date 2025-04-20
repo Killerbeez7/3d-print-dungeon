@@ -1,0 +1,194 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { useForum } from "../../contexts/forumContext";
+import { formatDistanceToNow } from "date-fns";
+import { FaComment, FaEye, FaTag, FaUser, FaCalendar } from "react-icons/fa";
+import Skeleton from "../shared/Skeleton";
+
+export const ThreadList = ({ 
+  categoryId, 
+  sortBy = "lastActivity", 
+  limit = 10, 
+  showCategory = false,
+  isCompact = false 
+}) => {
+  const { 
+    getThreadsByCategory, 
+    loadMoreThreads,
+    threads, 
+    pagination, 
+    loading, 
+    error 
+  } = useForum();
+
+  const [localThreads, setLocalThreads] = useState([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  useEffect(() => {
+    const fetchThreads = async () => {
+      try {
+        await getThreadsByCategory(categoryId, sortBy);
+      } catch (error) {
+        console.error("Error fetching threads:", error);
+      }
+    };
+
+    fetchThreads();
+  }, [categoryId, sortBy, getThreadsByCategory]);
+
+  useEffect(() => {
+    if (categoryId && threads.byCategory && threads.byCategory[categoryId]) {
+      setLocalThreads(threads.byCategory[categoryId]);
+    }
+  }, [categoryId, threads.byCategory]);
+
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    try {
+      await loadMoreThreads(categoryId, sortBy);
+    } catch (error) {
+      console.error("Error loading more threads:", error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const formatDate = (timestamp) => {
+    if (!timestamp) return "Unknown date";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return formatDistanceToNow(date, { addSuffix: true });
+  };
+
+  if (loading && !loadingMore) {
+    return (
+      <div className="space-y-4">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+            <Skeleton className="h-6 w-3/4 mb-2" />
+            <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-lg">
+        Error loading threads: {error}
+      </div>
+    );
+  }
+
+  if (localThreads?.length === 0) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
+        <p className="text-gray-500 dark:text-gray-400">
+          No threads found in this category. Be the first to start a discussion!
+        </p>
+        <Link 
+          to="/forum/new-thread" 
+          className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Create New Thread
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {localThreads?.map((thread) => (
+        <div 
+          key={thread.id} 
+          className={`bg-white dark:bg-gray-800 rounded-lg shadow ${
+            thread.isPinned 
+              ? "border-l-4 border-yellow-400" 
+              : ""
+          } ${
+            isCompact 
+              ? "p-3" 
+              : "p-4"
+          }`}
+        >
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <Link
+                to={`/forum/thread/${thread.id}`}
+                className="text-lg font-medium hover:text-blue-600 dark:hover:text-blue-400 transition"
+              >
+                {thread.title}
+              </Link>
+              
+              {!isCompact && thread.tags && thread.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {thread.tags.map(tag => (
+                    <span 
+                      key={tag} 
+                      className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 rounded-full"
+                    >
+                      <FaTag className="mr-1 text-gray-400" size={10} />
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {thread.isLocked && (
+              <span className="inline-flex items-center px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full ml-2">
+                Locked
+              </span>
+            )}
+          </div>
+          
+          <div className={`flex flex-wrap ${isCompact ? "mt-1" : "mt-2"} gap-x-4 text-sm text-gray-500 dark:text-gray-400`}>
+            <span className="inline-flex items-center">
+              <FaUser className="mr-1" size={12} />
+              {thread.authorName}
+            </span>
+            
+            <span className="inline-flex items-center">
+              <FaComment className="mr-1" size={12} />
+              {thread.replyCount || 0} replies
+            </span>
+            
+            <span className="inline-flex items-center">
+              <FaEye className="mr-1" size={12} />
+              {thread.views || 0} views
+            </span>
+            
+            <span className="inline-flex items-center">
+              <FaCalendar className="mr-1" size={12} />
+              {formatDate(thread.lastActivity || thread.createdAt)}
+            </span>
+            
+            {showCategory && (
+              <span className="inline-flex items-center ml-auto text-blue-600 dark:text-blue-400">
+                <Link to={`/forum/category/${thread.categoryId}`}>
+                  {thread.categoryName || "Category"}
+                </Link>
+              </span>
+            )}
+          </div>
+        </div>
+      ))}
+      
+      {pagination.threads.hasMore && (
+        <div className="flex justify-center mt-4">
+          <button
+            onClick={handleLoadMore}
+            disabled={loadingMore}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition"
+          >
+            {loadingMore ? "Loading..." : "Load More"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}; 
