@@ -134,11 +134,5 @@ service cloud.firestore {
       allow write: if isSignedIn() && 
         (request.auth.uid == userId || isAdmin() || isSuperAdmin());
     }
-    
-    // Models collection - allow admin to update view counts
-    match /models/{modelId} {
-      allow update: if isAdmin() || 
-        (request.auth != null && resource.data.userId == request.auth.uid);
-    }
   }
 }
