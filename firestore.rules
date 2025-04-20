@@ -104,28 +104,32 @@ service cloud.firestore {
 
     // Forum Categories collection
     match /forumCategories/{categoryId} {
-      allow read: if true;  // Public read access
-      allow write: if isAdmin() || isSuperAdmin();  // Only admins can modify categories
+      allow read:  if true;
+      allow create, update, delete: if isAdmin() || isSuperAdmin();
     }
+
 
     // Forum Threads collection
     match /forumThreads/{threadId} {
-      allow read: if true;  // Public read access
-      allow create: if isSignedIn();  // Any signed-in user can create threads
-      allow update: if isSignedIn() && 
-        (resource.data.authorId == request.auth.uid || isAdmin() || isSuperAdmin());  // Author or admin can update
-      allow delete: if isSignedIn() && 
-        (resource.data.authorId == request.auth.uid || isAdmin() || isSuperAdmin());  // Author or admin can delete
+      // anyone can list/get
+      allow read:   if true;
+      // only signed‑in can create
+      allow create: if isSignedIn();
+      // authors or admins can modify
+      allow update, delete:
+        if isSignedIn() &&
+           (resource.data.authorId == request.auth.uid ||
+            isAdmin() || isSuperAdmin());
     }
 
     // Forum Replies collection
-    match /forumThreads/{threadId}/replies/{replyId} {
-      allow read: if true;  // Public read access
-      allow create: if isSignedIn();  // Any signed-in user can create replies
-      allow update: if isSignedIn() && 
-        (resource.data.authorId == request.auth.uid || isAdmin() || isSuperAdmin());  // Author or admin can update
-      allow delete: if isSignedIn() && 
-        (resource.data.authorId == request.auth.uid || isAdmin() || isSuperAdmin());  // Author or admin can delete
+    match /forumReplies/{replyId} {
+      allow read:   if true;
+      allow create: if isSignedIn();
+      allow update, delete:
+        if isSignedIn() &&
+           (resource.data.authorId == request.auth.uid ||
+            isAdmin() || isSuperAdmin());
     }
   }
 }
