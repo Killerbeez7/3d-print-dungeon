@@ -1,226 +1,352 @@
-import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useForum } from "../../contexts/forumContext";
 import { useAuth } from "../../contexts/authContext";
-import { MdMessage, MdRemoveRedEye } from "react-icons/md";
+import { formatDistanceToNow } from "date-fns";
+import { 
+  FaEdit, 
+  FaTrash, 
+  FaReply, 
+  FaEye, 
+  FaCalendar, 
+  FaUser
+} from "react-icons/fa";
+import Skeleton from "../shared/Skeleton";
+import { ThreadEditor } from "./ThreadEditor";
+import { ReplyEditor } from "./ReplyEditor";
 
 export const ForumThread = ({ isNew = false }) => {
-    const { threadId } = useParams();
-    const navigate = useNavigate();
-    const { currentUser } = useAuth();
-    const { 
-        getThreadById, 
-        createThread, 
-        addReply, 
-        getThreadReplies,
-        incrementThreadViews,
-        loading,
-        error
-    } = useForum();
+  const { threadId } = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  
+  const { currentUser } = useAuth();
+  const { 
+    loadThread, 
+    loadMoreReplies,
+    currentThread, 
+    categories, 
+    createThread,
+    deleteThread,
+    pagination,
+    loading, 
+    error 
+  } = useForum();
+  
+  const [newThreadData, setNewThreadData] = useState({
+    title: "",
+    content: "",
+    categoryId: searchParams.get("category") || "",
+  });
+  
+  const [isReplying, setIsReplying] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  useEffect(() => {
+    if (!isNew && threadId) {
+      loadThread(threadId);
+    }
+  }, [isNew, threadId, loadThread]);
+
+  const handleNewThreadSubmit = async (data) => {
+    try {
+      const threadId = await createThread(data);
+      navigate(`/forum/thread/${threadId}`);
+    } catch (error) {
+      console.error("Error creating thread:", error);
+    }
+  };
+
+  const handleThreadDelete = async () => {
+    if (!currentThread) return;
     
-    const [thread, setThread] = useState(null);
-    const [replies, setReplies] = useState([]);
-    const [replyText, setReplyText] = useState("");
-    const [formData, setFormData] = useState({
-        title: "",
-        content: "",
-        categoryId: "1" // Default to General Discussion
-    });
-
-    useEffect(() => {
-        if (!isNew && threadId) {
-            const fetchThread = async () => {
-                try {
-                    const threadData = await getThreadById(threadId);
-                    setThread(threadData);
-                    const threadReplies = await getThreadReplies(threadId);
-                    setReplies(threadReplies);
-                    await incrementThreadViews(threadId);
-                } catch (err) {
-                    console.error("Error fetching thread:", err);
-                }
-            };
-            fetchThread();
-        }
-    }, [threadId, isNew, getThreadById, getThreadReplies, incrementThreadViews]);
-
-    const handleCreateThread = async (e) => {
-        e.preventDefault();
-        if (!currentUser) {
-            navigate("/login");
-            return;
-        }
-
-        try {
-            const newThread = {
-                ...formData,
-                authorId: currentUser.uid,
-                authorName: currentUser.displayName || "Anonymous",
-                authorPhotoURL: currentUser.photoURL || "/user.png"
-            };
-            const threadId = await createThread(newThread);
-            navigate(`/community/forum/thread/${threadId}`);
-        } catch (err) {
-            console.error("Error creating thread:", err);
-        }
-    };
-
-    const handleReply = async (e) => {
-        e.preventDefault();
-        if (!currentUser) {
-            navigate("/login");
-            return;
-        }
-
-        try {
-            const replyData = {
-                content: replyText,
-                authorId: currentUser.uid,
-                authorName: currentUser.displayName || "Anonymous",
-                authorPhotoURL: currentUser.photoURL || "/user.png"
-            };
-            await addReply(threadId, replyData);
-            setReplyText("");
-            // Refresh replies
-            const updatedReplies = await getThreadReplies(threadId);
-            setReplies(updatedReplies);
-        } catch (err) {
-            console.error("Error adding reply:", err);
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary-600"></div>
-            </div>
-        );
+    if (window.confirm("Are you sure you want to delete this thread? This action cannot be undone.")) {
+      try {
+        await deleteThread(threadId, currentThread.categoryId);
+        navigate("/forum");
+      } catch (error) {
+        console.error("Error deleting thread:", error);
+      }
     }
+  };
 
-    if (error) {
-        return (
-            <div className="text-center p-4 text-red-600">
-                Error: {error}
-            </div>
-        );
+  const handleLoadMoreReplies = async () => {
+    if (!threadId) return;
+    
+    setLoadingMore(true);
+    try {
+      await loadMoreReplies(threadId);
+    } catch (error) {
+      console.error("Error loading more replies:", error);
+    } finally {
+      setLoadingMore(false);
     }
+  };
 
+  const formatDate = (timestamp) => {
+    if (!timestamp) return "Unknown date";
+    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+    return formatDistanceToNow(date, { addSuffix: true });
+  };
+
+  // Render new thread form
+  if (isNew) {
     return (
-        <div className="container mx-auto px-4 py-8">
-            {isNew ? (
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                    <h1 className="text-3xl font-bold mb-6">Create New Thread</h1>
-                    <form onSubmit={handleCreateThread} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-2">Title</label>
-                            <input
-                                type="text"
-                                required
-                                value={formData.title}
-                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full p-2 border rounded-lg dark:bg-gray-700"
-                                placeholder="Thread title"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-2">Category</label>
-                            <select
-                                value={formData.categoryId}
-                                onChange={(e) => setFormData({ ...formData, categoryId: e.target.value })}
-                                className="w-full p-2 border rounded-lg dark:bg-gray-700"
-                            >
-                                <option value="1">General Discussion</option>
-                                <option value="2">Technical Support</option>
-                                <option value="3">Showcase</option>
-                                <option value="4">Marketplace</option>
-                                <option value="5">Events</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-2">Content</label>
-                            <textarea
-                                required
-                                value={formData.content}
-                                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                                className="w-full p-2 border rounded-lg min-h-[200px] dark:bg-gray-700"
-                                placeholder="Write your post..."
-                            />
-                        </div>
-                        <div className="flex justify-end">
-                            <button
-                                type="submit"
-                                className="bg-primary-600 hover:bg-primary-700 bg-gray-600 text-white px-6 py-2 rounded-lg font-medium transition-colors"
-                            >
-                                Create Thread
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            ) : (
-                <>
-                    <h1 className="text-3xl font-bold mb-6">{thread?.title}</h1>
-                    
-                    {/* Original post */}
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 mb-4">
-                        <div className="flex justify-between items-start mb-4">
-                            <div className="flex items-center gap-2">
-                                <img 
-                                    src={thread?.authorPhotoURL} 
-                                    alt={thread?.authorName}
-                                    className="w-8 h-8 rounded-full"
-                                />
-                                <span className="font-semibold">{thread?.authorName}</span>
-                            </div>
-                            <span className="text-sm text-gray-500">
-                                {thread?.createdAt?.toDate().toLocaleDateString()}
-                            </span>
-                        </div>
-                        <p className="text-gray-700 dark:text-gray-300">{thread?.content}</p>
-                    </div>
-
-                    {/* Replies */}
-                    <div className="space-y-4 mb-6">
-                        {replies.map((reply) => (
-                            <div key={reply.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                                <div className="flex justify-between items-start mb-4">
-                                    <div className="flex items-center gap-2">
-                                        <img 
-                                            src={reply.authorPhotoURL} 
-                                            alt={reply.authorName}
-                                            className="w-8 h-8 rounded-full"
-                                        />
-                                        <span className="font-semibold">{reply.authorName}</span>
-                                    </div>
-                                    <span className="text-sm text-gray-500">
-                                        {reply.createdAt?.toDate().toLocaleDateString()}
-                                    </span>
-                                </div>
-                                <p className="text-gray-700 dark:text-gray-300">{reply.content}</p>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Reply form */}
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-                        <h3 className="text-xl font-semibold mb-4">Post a Reply</h3>
-                        <form onSubmit={handleReply}>
-                            <textarea
-                                required
-                                value={replyText}
-                                onChange={(e) => setReplyText(e.target.value)}
-                                className="w-full p-2 border rounded-lg min-h-[100px] mb-4 dark:bg-gray-700"
-                                placeholder="Write your reply..."
-                            />
-                            <button
-                                type="submit"
-                                className="bg-primary-600 hover:bg-primary-700 text-white px-4 py-2 rounded-lg"
-                            >
-                                Post Reply
-                            </button>
-                        </form>
-                    </div>
-                </>
-            )}
-        </div>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h1 className="text-2xl font-bold mb-6">Create New Thread</h1>
+        <ThreadEditor 
+          initialData={newThreadData}
+          categories={categories}
+          onSubmit={handleNewThreadSubmit}
+          isLoading={loading}
+        />
+      </div>
     );
+  }
+
+  // Loading state
+  if (loading && !currentThread) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <Skeleton className="h-8 w-3/4 mb-4" />
+          <Skeleton className="h-5 w-full mb-2" />
+          <Skeleton className="h-5 w-full mb-2" />
+          <Skeleton className="h-5 w-3/4 mb-4" />
+          <div className="flex gap-4 text-sm text-gray-500">
+            <Skeleton className="h-4 w-24" />
+            <Skeleton className="h-4 w-32" />
+          </div>
+        </div>
+        
+        {[...Array(2)].map((_, i) => (
+          <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <Skeleton className="h-5 w-full mb-2" />
+            <Skeleton className="h-5 w-full mb-2" />
+            <Skeleton className="h-5 w-2/3 mb-4" />
+            <div className="flex gap-4 text-sm text-gray-500">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg text-red-700 dark:text-red-400">
+        <h2 className="text-lg font-semibold mb-2">Error Loading Thread</h2>
+        <p>{error}</p>
+        <Link 
+          to="/forum" 
+          className="mt-4 inline-block text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          Return to Forum
+        </Link>
+      </div>
+    );
+  }
+
+  // No thread found
+  if (!currentThread) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
+        <h2 className="text-xl font-semibold mb-4">Thread Not Found</h2>
+        <p className="text-gray-600 dark:text-gray-300 mb-6">
+          The thread you're looking for may have been moved or deleted.
+        </p>
+        <Link 
+          to="/forum" 
+          className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        >
+          Return to Forum
+        </Link>
+      </div>
+    );
+  }
+
+  // Thread display
+  return (
+    <div className="space-y-6">
+      {/* Thread metadata */}
+      <div className="flex gap-2 text-sm text-gray-500 dark:text-gray-400">
+        <Link to="/forum" className="hover:text-blue-600 dark:hover:text-blue-400">
+          Forum
+        </Link>
+        <span>&gt;</span>
+        <Link 
+          to={`/forum/category/${currentThread.categoryId}`}
+          className="hover:text-blue-600 dark:hover:text-blue-400"
+        >
+          {currentThread.categoryName || "Category"}
+        </Link>
+      </div>
+
+      {/* Thread content */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="p-6">
+          <h1 className="text-2xl font-bold mb-4">
+            {currentThread.title}
+            {currentThread.isPinned && (
+              <span className="ml-2 text-sm bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-2 py-1 rounded-full">
+                Pinned
+              </span>
+            )}
+            {currentThread.isLocked && (
+              <span className="ml-2 text-sm bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-2 py-1 rounded-full">
+                Locked
+              </span>
+            )}
+          </h1>
+          
+          <div className="prose dark:prose-invert max-w-none mb-4">
+            {currentThread.content}
+          </div>
+          
+          <div className="flex flex-wrap items-center gap-x-4 text-sm text-gray-500 dark:text-gray-400">
+            <div className="flex items-center">
+              <FaUser className="mr-1" size={12} />
+              <span>
+                {currentThread.authorName}
+              </span>
+            </div>
+            
+            <div className="flex items-center">
+              <FaCalendar className="mr-1" size={12} />
+              <span>
+                Posted {formatDate(currentThread.createdAt)}
+              </span>
+            </div>
+            
+            <div className="flex items-center">
+              <FaEye className="mr-1" size={12} />
+              <span>
+                {currentThread.views || 0} views
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Thread actions */}
+        <div className="px-6 py-3 border-t border-gray-200 dark:border-gray-700 flex flex-wrap gap-2 bg-gray-50 dark:bg-gray-800">
+          {currentUser && !currentThread.isLocked && (
+            <button
+              onClick={() => setIsReplying(true)}
+              className="inline-flex items-center px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              <FaReply className="mr-1" size={12} />
+              Reply
+            </button>
+          )}
+          
+          {currentUser?.uid === currentThread.authorId && (
+            <>
+              <Link
+                to={`/forum/thread/${threadId}/edit`}
+                className="inline-flex items-center px-3 py-1.5 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+              >
+                <FaEdit className="mr-1" size={12} />
+                Edit
+              </Link>
+              
+              <button
+                onClick={handleThreadDelete}
+                className="inline-flex items-center px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+              >
+                <FaTrash className="mr-1" size={12} />
+                Delete
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Reply form */}
+      {isReplying && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-lg font-medium mb-4">Post a Reply</h3>
+          <ReplyEditor 
+            threadId={threadId} 
+            onSuccess={() => setIsReplying(false)}
+          />
+        </div>
+      )}
+
+      {/* Replies */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold">{currentThread.replyCount || 0} Replies</h2>
+        
+        {currentThread.replies?.length > 0 ? (
+          <div className="space-y-4">
+            {currentThread.replies.map((reply) => (
+              <div key={reply.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div className="prose dark:prose-invert max-w-none mb-4">
+                  {reply.content}
+                </div>
+                
+                <div className="flex flex-wrap items-center justify-between gap-y-2 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="flex items-center gap-x-4">
+                    <div className="flex items-center">
+                      <FaUser className="mr-1" size={12} />
+                      <span>{reply.authorName}</span>
+                    </div>
+                    
+                    <div className="flex items-center">
+                      <FaCalendar className="mr-1" size={12} />
+                      <span>
+                        {reply.isEdited 
+                          ? `Edited ${formatDate(reply.updatedAt)}`
+                          : `Posted ${formatDate(reply.createdAt)}`
+                        }
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {currentUser?.uid === reply.authorId && (
+                    <div className="flex gap-2">
+                      <Link
+                        to={`/forum/reply/${reply.id}/edit`}
+                        className="inline-flex items-center text-xs px-2 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                      >
+                        <FaEdit className="mr-1" size={10} />
+                        Edit
+                      </Link>
+                      
+                      <button
+                        className="inline-flex items-center text-xs px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                      >
+                        <FaTrash className="mr-1" size={10} />
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            
+            {pagination.replies.hasMore && (
+              <div className="flex justify-center">
+                <button
+                  onClick={handleLoadMoreReplies}
+                  disabled={loadingMore}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition"
+                >
+                  {loadingMore ? "Loading..." : "Load More Replies"}
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
+            <p className="text-gray-500 dark:text-gray-400">
+              No replies yet. Be the first to respond!
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }; 
