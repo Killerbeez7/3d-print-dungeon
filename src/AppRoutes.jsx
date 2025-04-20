@@ -1,13 +1,13 @@
 import { useRoutes, Navigate } from "react-router-dom";
 import { ROUTES } from "./config/routeConstants";
 
-// route imports
 import { publicRoutes } from "./routes/publicRoutes";
-import { businessRoutes } from "./routes/businessRoutes";
-import { storeRoutes } from "./routes/storeRoutes";
 import { exploreRoutes } from "./routes/exploreRoutes";
+import { communityRoutes } from "./routes/communityRoutes";
+import { storeRoutes } from "./routes/storeRoutes";
+import { businessRoutes } from "./routes/businessRoutes";
 import { forumRoutes } from "./routes/forumRoutes";
-import { modelsRoutes } from "./routes/modelsRoutes";        // NEW
+import { modelsRoutes } from "./routes/modelsRoutes";
 import { userRoutes } from "./routes/userRoutes";
 import { adminRoutes } from "./routes/adminRoutes";
 
@@ -20,9 +20,10 @@ export const AppRoutes = () => {
             element: <Layout />,
             children: [
                 ...publicRoutes,
-                ...businessRoutes,
-                ...storeRoutes,
                 ...exploreRoutes,
+                ...communityRoutes,
+                ...storeRoutes,
+                ...businessRoutes,
                 ...forumRoutes,
                 ...modelsRoutes,
                 ...userRoutes,
@@ -31,6 +32,5 @@ export const AppRoutes = () => {
             ],
         },
     ]);
-
     return routes;
 };
