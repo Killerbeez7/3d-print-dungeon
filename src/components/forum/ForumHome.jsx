@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useForum } from "../../contexts/forumContext";
 import { FaPlus, FaSearch } from "react-icons/fa";
-import { ThreadList } from "./ThreadList";
+// import { ThreadList } from "./ThreadList";
 import Skeleton from "../shared/Skeleton";
 
 export const ForumHome = () => {
