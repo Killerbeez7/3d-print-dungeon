@@ -10,6 +10,7 @@
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "noEmit": true, // ← stops TypeScript from emitting files
+        "types": ["vitest/globals"],
 
         /* paths / aliases -------------------------------------------------- */
         "baseUrl": ".",
@@ -21,6 +22,6 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true
     },
-    "include": ["src", "vite.config.ts"],
+    "include": ["src", "vite.config.ts", "tests", "functions", "__tests__", "vitest.config.ts"],
     "exclude": ["dist", "node_modules"]
 }
