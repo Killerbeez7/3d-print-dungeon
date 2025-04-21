@@ -234,7 +234,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                         <Link
                                             to="/model/upload"
                                             className="text-txt-secondary hover:text-txt-primary"
-                                            title="Upload Model"
+                                            title="Upload Model:desktop"
                                         >
                                             <MdFileUpload className="h-7 w-7" />
                                         </Link>
@@ -364,7 +364,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                         <Link
                             to="/model/upload"
                             className="text-txt-secondary hover:text-txt-primary"
-                            title="Upload Model"
+                            title="Upload Model:mobile"
                         >
                             <MdFileUpload className="h-7 w-7" />
                         </Link>
@@ -435,4 +435,5 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
 Navbar.propTypes = {
     onLoginClick: PropTypes.func.isRequired,
+    onSignUpClick: PropTypes.func.isRequired,
 };
