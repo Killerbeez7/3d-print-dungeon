@@ -101,4 +101,4 @@ Firestore Rules:
 
 
 
-on desktop mobile view nav doesnt detect clicks in nav links with hover and press on the carouse; insted of the nav links
+- [ ] on desktop mobile view nav doesnt detect clicks in nav links with hover and press on the carouse; insted of the nav links
