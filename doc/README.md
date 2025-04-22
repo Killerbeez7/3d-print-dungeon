@@ -78,3 +78,56 @@ npm run dev
 ```bash
 npm run build
 ``` 
+
+### Deploying for Production
+```bash
+npm run deploy
+``` 
+
+## Testing
+
+### Setup
+The project uses Vitest and React Testing Library for testing. The test environment is configured in `vitest.config.ts`.
+
+### Running Tests
+```bash
+# Run all tests
+npm test
+
+# Run tests in ui mode
+npm run test:ui
+
+### Test Structure
+- Tests are located in the `__tests__` directory
+- Component tests are organized in `__tests__/components`
+- Mock implementations are in `__tests__/mocks`
+
+### Writing Tests
+- Use `describe` blocks to group related tests
+- Each test should be independent and isolated
+- Mock external dependencies (Firebase, contexts, etc.)
+- Follow the Arrange-Act-Assert pattern
+
+Example test structure:
+```typescript
+describe('ComponentName', () => {
+  beforeEach(() => {
+    // Setup before each test
+  });
+
+  it('should do something specific', () => {
+    // Arrange
+    // Act
+    // Assert
+  });
+});
+```
+
+### Testing Best Practices
+1. Mock external services and contexts
+2. Test both success and error cases
+3. Use meaningful test descriptions
+4. Keep tests focused and maintainable
+5. Test user interactions and component behavior
+6. Use appropriate query methods from Testing Library
+7. Follow accessibility testing guidelines 
