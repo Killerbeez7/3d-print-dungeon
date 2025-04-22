@@ -3,7 +3,10 @@ import { useModels } from "@/contexts/modelsContext";
 import { Link } from "react-router-dom";
 import { LazyImage } from "../shared/lazy-image/LazyImage";
 import { FeaturedCarousel } from "./FeaturedCarousel";
-import { carouselMockData } from "./carouselMockData";
+import { featuredMockData } from "./featuredMockData";
+
+import { TrendingCarousel } from "./TrendingCarousel";
+import { trendingMockData } from "./trendingMockData";
 
 export const Home = () => {
     const { models, loading } = useModels();
@@ -36,7 +39,10 @@ export const Home = () => {
     return (
         <div className="bg-bg-primary text-txt-primary min-h-screen">
             {/* Featured Carousel Section */}
-            <FeaturedCarousel items={carouselMockData} />
+            <FeaturedCarousel items={featuredMockData} />
+
+            {/* Trending Carousel Section */}
+            <TrendingCarousel items={trendingMockData} />
 
             <div className="mx-auto p-4">
                 <h1 className="mb-4 font-bold">Models</h1>

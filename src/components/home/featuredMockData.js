@@ -1,4 +1,4 @@
-export const carouselMockData = [
+export const featuredMockData = [
     {
         id: "spring-sale",
         title: "Spring Sale",
