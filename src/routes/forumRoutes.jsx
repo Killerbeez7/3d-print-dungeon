@@ -3,7 +3,7 @@ import { ForumHome } from "../components/forum/ForumHome";
 import { ForumCategory } from "../components/forum/ForumCategory";
 import { ForumThread } from "../components/forum/ForumThread";
 import { ForumProvider } from "../contexts/forumContext";
-import { withProtected } from "../helpers/routeHelpers";
+import { withProtectedMaintenance } from "../helpers/routeHelpers";
 
 // Route constants
 const FORUM_ROUTES = {
@@ -29,13 +29,13 @@ export const forumRoutes = [
       { path: "thread/:threadId", element: <ForumThread /> },
       { 
         path: "new-thread", 
-        element: withProtected(<ForumThread isNew />, { 
+        element: withProtectedMaintenance(<ForumThread isNew />, { 
           redirectTo: "/login"
         }) 
       },
       { 
         path: "thread/:threadId/edit", 
-        element: withProtected(<ForumThread isEdit />, { 
+        element: withProtectedMaintenance(<ForumThread isEdit />, { 
           redirectTo: "/login"
         }) 
       },
