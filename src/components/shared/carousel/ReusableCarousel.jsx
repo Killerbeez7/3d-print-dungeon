@@ -106,7 +106,7 @@ export const ReusableCarousel = ({
                         key={item.id || index}
                         className={`inline-block px-2 w-full sm:w-1/2 md:w-1/3 lg:w-1/6 ${itemClassName}`}
                     >
-                        {renderItem ? renderItem(item) : null}
+                        {renderItem(item, index)}
                     </div>
                 ))}
             </Slider>
