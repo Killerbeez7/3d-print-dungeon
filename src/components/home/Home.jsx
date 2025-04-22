@@ -3,6 +3,7 @@ import { useModels } from "@/contexts/modelsContext";
 import { Link } from "react-router-dom";
 import { LazyImage } from "../shared/lazy-image/LazyImage";
 import { FeaturedCarousel } from "./FeaturedCarousel";
+import { carouselMockData } from "./carouselMockData";
 
 export const Home = () => {
     const { models, loading } = useModels();
@@ -35,7 +36,7 @@ export const Home = () => {
     return (
         <div className="bg-bg-primary text-txt-primary min-h-screen">
             {/* Featured Carousel Section */}
-            <FeaturedCarousel />
+            <FeaturedCarousel items={carouselMockData} />
 
             <div className="mx-auto p-4">
                 <h1 className="mb-4 font-bold">Models</h1>
@@ -159,7 +160,7 @@ export const Home = () => {
 
             {/* Gallery Grid */}
             <div className="mx-auto px-4">
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1">
                     {displayedArtworks.map((art) => (
                         <Link key={art.id} to={`/model/${art.id}`}>
                             <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
@@ -167,7 +168,7 @@ export const Home = () => {
                                     <LazyImage
                                         src={art.imageUrl}
                                         alt={art.title}
-                                        className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                                        className="absolute inset-0 w-full h-full object-cover rounded-md"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end justify-start opacity-0 hover:opacity-100 transition-opacity">
                                         <div className="text-white m-2">
