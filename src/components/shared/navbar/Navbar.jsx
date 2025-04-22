@@ -37,9 +37,9 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
     const navigate = useNavigate();
     const location = useLocation();
-    const dropdownRef = useRef(null);
-    const mobileDropdownRef = useRef(null);
-    const searchOverlayRef = useRef(null);
+    const dropdownRef = useRef(null); //desktop dropdown
+    const mobileDropdownRef = useRef(null); //mobile dropdown
+    const searchOverlayRef = useRef(null); //search overlay
 
     /* ---------- helpers ---------- */
 
