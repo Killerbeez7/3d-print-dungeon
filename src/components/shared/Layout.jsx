@@ -34,7 +34,7 @@ const Layout = () => {
                         </div>
                     }
                 >
-                    <Outlet />
+                    <Outlet context={{ openAuthModal: handleOpenAuthModal }} />
                 </Suspense>
             </main>
             <Footer />
