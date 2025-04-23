@@ -1,10 +1,12 @@
+import { STATIC_ASSETS } from "../../config/assetsConfig";
+
 export const featuredMockData = [
     {
         id: "spring-sale",
         title: "Spring Sale",
         subtitle: "Shop up to 70% off",
         badge: "MARKETPLACE",
-        image: "/public/assets/carousel-images/SpringSale.png",
+        image: STATIC_ASSETS.CAROUSEL.SPRING_SALE,
         link: "/marketplace/featured",
     },
     {
@@ -12,7 +14,7 @@ export const featuredMockData = [
         title: "Scheduled Projects",
         subtitle: "Development Update",
         badge: "NEWS",
-        image: "/public/assets/carousel-images/ScheduledProjects.png",
+        image: STATIC_ASSETS.CAROUSEL.SCHEDULED_PROJECTS,
         link: "magazine/new-arrivals",
     },
     {
@@ -20,16 +22,15 @@ export const featuredMockData = [
         title: "Trending Projects",
         subtitle: "Discover the Art of Assassin's Creed Shadows",
         badge: "ART BLAST",
-        image: "/public/assets/carousel-images/TrendingProjects.png",
+        image: STATIC_ASSETS.CAROUSEL.TRENDING_PROJECTS,
         link: "explore/trending-projects",
     },
-
     {
         id: "new-arrivals",
         title: "New Arrivals",
         subtitle: "Development Update",
         badge: "NEWS",
-        image: "/public/assets/carousel-images/NewArrivals.png",
+        image: STATIC_ASSETS.CAROUSEL.NEW_ARRIVALS,
         link: "/magazine/new-arrivals",
     },
     {
@@ -37,7 +38,7 @@ export const featuredMockData = [
         title: "3D Store",
         subtitle: "Development Update",
         badge: "NEWS",
-        image: "/public/assets/carousel-images/3d-store.png",
+        image: STATIC_ASSETS.CAROUSEL.STORE_3D,
         link: "magazine/3d-store",
     },
     {
@@ -45,23 +46,23 @@ export const featuredMockData = [
         title: "Project Ideas",
         subtitle: "Development Update",
         badge: "NEWS",
-        image: "/public/assets/carousel-images/ProjectIdeas.png",
+        image: STATIC_ASSETS.CAROUSEL.PROJECT_IDEAS,
         link: "magazine/project-ideas",
     },
     {
-        id: "scheduled-projects",
+        id: "scheduled-projects-2",
         title: "Scheduled Projects",
         subtitle: "Development Update",
         badge: "NEWS",
-        image: "/public/assets/carousel-images/ScheduledProjects.png",
+        image: STATIC_ASSETS.CAROUSEL.SCHEDULED_PROJECTS,
         link: "magazine/new-arrivals",
     },
     {
-        id: "trending-projects",
+        id: "trending-projects-2",
         title: "Trending Projects",
         subtitle: "Discover the Art of Assassin's Creed Shadows",
         badge: "ART BLAST",
-        image: "/public/assets/carousel-images/TrendingProjects.png",
+        image: STATIC_ASSETS.CAROUSEL.TRENDING_PROJECTS,
         link: "explore/trending-projects",
     },
 ];
