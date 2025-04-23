@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { useComments } from "../../../contexts/CommentsContext";
+import { useState } from "react";
+import PropTypes from "prop-types";
+//contexts
 import { useAuth } from "../../../contexts/authContext";
+import { useComments } from "../../../contexts/CommentsContext";
 
-export const Comments = ({ openAuthModal }) => {
+export const ModelComments = ({ openAuthModal }) => {
     const { currentUser } = useAuth();
     const { comments, loading, submitComment, removeComment, updateComment } =
         useComments();
@@ -18,7 +20,7 @@ export const Comments = ({ openAuthModal }) => {
         if (!newComment.trim()) return;
         if (!currentUser) {
             // Prompt sign in if not logged in
-            openAuthModal && openAuthModal();
+            openAuthModal();
             return;
         }
         try {
@@ -166,4 +168,8 @@ export const Comments = ({ openAuthModal }) => {
             )}
         </div>
     );
+};
+
+ModelComments.propTypes = {
+    openAuthModal: PropTypes.func,
 };
