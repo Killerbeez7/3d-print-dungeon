@@ -1,15 +1,43 @@
+Todays tasks
+########################################################################################
+
+Model page improvements
+
+1. Viewer Window Improvements:
+- [x] Add a loading spinner or progress indicator
+- [x] Improve the 3D viewer controls and interactions
+- [ ] Add zoom controls
+- [x] Add rotation controls
+- [ ] Add a reset view button                                               // fix it
+- [x] Add a fullscreen toggle
+- [x] Add a screenshot/capture button
+  
+1. UI/UX Improvements:
+- [ ] Make the viewer window more responsive
+- [ ] Add better error states
+- [ ] Improve the loading states
+- [ ] Add tooltips for controls
+- [ ] Add keyboard shortcuts
+  
+1. Performance Improvements:
+- [ ] Optimize the 3D model loading
+- [ ] Add lazy loading for thumbnails
+- [ ] Add progressive loading for large models
+
+########################################################################################
+
+
+
+
+
+
+
+
 # code optimization
 
 
 - [ ] Fix carousel on mobile to scroll only 1 tile not 4
 - [ ] add username is taken check - https://www.youtube.com/watch?v=_l5Q5kKHtR8
-
-
-
-
-
-
-
 
 
 1-since we have a daily cleanup function for viewTrackers, 
