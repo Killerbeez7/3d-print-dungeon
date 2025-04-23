@@ -13,6 +13,7 @@ export default defineConfig({
             "@": path.resolve(__dirname, "./src"),
         },
     },
+    base: "/",
     build: {
         chunkSizeWarningLimit: 1500,
         rollupOptions: {
@@ -33,5 +34,7 @@ export default defineConfig({
                 },
             },
         },
+        assetsDir: "assets",
+        copyPublicDir: true,
     },
 });
