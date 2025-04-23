@@ -10,6 +10,10 @@ export const FeaturedCarousel = ({ items }) => {
                     src={item.image}
                     alt={item.title}
                     className="w-full h-[250px] object-cover rounded-xl"
+                    onError={(e) => {
+                        console.error(`Failed to load image: ${item.image}`);
+                        e.target.src = "/assets/images/default-image.png"; // Fallback image
+                    }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                     <div className="text-center">
