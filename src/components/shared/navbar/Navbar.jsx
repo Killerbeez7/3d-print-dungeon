@@ -7,6 +7,7 @@ import { useSearch } from "../../../contexts/searchContext";
 import { useClickOutside } from "../../../hooks/useClickOutside";
 
 import { NAV_SECTIONS } from "../../../config/navConfig";
+import { STATIC_ASSETS } from "../../../config/assetsConfig";
 
 import {
     MdFileUpload,
@@ -130,7 +131,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                             <div className="md:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap flex-shrink-0">
                                 <Link to="/" className="flex items-center">
                                     <img
-                                        src="/logo.png"
+                                        src={STATIC_ASSETS.LOGO}
                                         alt="Site Logo"
                                         className="h-9 w-auto"
                                     />
@@ -141,7 +142,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                             <div className="hidden md:block whitespace-nowrap flex-shrink-0">
                                 <Link to="/" className="flex items-center space-x-2 ml-2">
                                     <img
-                                        src="/logo.png"
+                                        src={STATIC_ASSETS.LOGO}
                                         alt="Site Logo"
                                         className="h-9 w-auto"
                                     />
