@@ -42,7 +42,7 @@ export const Home = () => {
             <FeaturedCarousel items={featuredMockData} />
 
             {/* Trending Carousel Section */}
-            <TrendingCarousel items={trendingMockData} />
+            {/* <TrendingCarousel items={trendingMockData} /> */}
 
             <div className="mx-auto p-4">
                 <h1 className="mb-4 font-bold">Models</h1>
