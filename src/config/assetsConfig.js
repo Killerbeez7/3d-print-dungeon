@@ -23,4 +23,9 @@ export const STATIC_ASSETS = {
         STORE_3D: "/assets/carousel-images/3d-store.png",
         PROJECT_IDEAS: "/assets/carousel-images/ProjectIdeas.png",
     },
+
+    // 3D View images
+    THREE_D_VIEW: {
+        THUMBNAIL: "/assets/image/3d-view.png",
+    },
 };
