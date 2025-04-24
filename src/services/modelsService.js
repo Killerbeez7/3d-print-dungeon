@@ -25,7 +25,7 @@ export async function createAdvancedModel({
     renderFiles,
     selectedRenderIndex,
     uploaderId,
-    uploaderDisplayName = "Anonymous",
+    uploaderDisplayName,
     onProgress,
     posterBlob, // new param for your poster
     preConvertedFile, // new parameter to avoid reconversion
