@@ -37,8 +37,8 @@ export function GlobalSearch() {
             }
         };
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
     }, [setShowDropdown]);
 
     // Update global search term as the user types.
@@ -132,7 +132,7 @@ export function GlobalSearch() {
                 value={searchTerm}
                 onChange={handleInputChange}
                 onFocus={handleFocus}
-                className="border-2 border-gray-300 rounded-full w-full text-sm focus:outline-none focus:border-blue-500 py-2 pl-10 pr-10"
+                className="border-2 border-gray-300 rounded-full w-full text-sm focus:outline-none focus:border-accent-hover py-2 pl-10 pr-10"
             />
             {searchTerm && (
                 <button
@@ -144,7 +144,7 @@ export function GlobalSearch() {
                 </button>
             )}
             {!isMobile && showDropdown && (
-                <div className="absolute top-[110%] left-0 w-full bg-white border border-gray-300 rounded-md shadow-lg mt-1 z-50">
+                <div className="absolute top-[110%] left-0 w-full bg-bg-primary border border-gray-300 rounded-md shadow-lg mt-1 z-50">
                     <ul className="py-2 max-h-80 overflow-auto text-sm">
                         {searchTerm.trim() && artistResults.length > 0 && (
                             <>
@@ -152,7 +152,7 @@ export function GlobalSearch() {
                                     <li
                                         key={`artist-${a.uid}`}
                                         onMouseDown={() => handleArtistSelect(a.uid)}
-                                        className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                                        className="px-3 py-2 hover:--btn-secondary-hover cursor-pointer"
                                     >
                                         <div className="font-medium">{a.displayName}</div>
                                         <div className="text-xs text-gray-500">
@@ -166,17 +166,13 @@ export function GlobalSearch() {
                         {/* Preset links */}
                         <li
                             onMouseDown={() => handlePresetClick("artworks")}
-                            className={`px-3 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center ${
-                                activeTab === "artworks" ? "bg-gray-100" : ""
-                            }`}
+                            className={`px-3 py-2 cursor-pointer flex justify-between items-center text-txt-secondary hover:text-txt-primary`}
                         >
                             <span>Search Artworks</span>
                         </li>
                         <li
                             onMouseDown={() => handlePresetClick("artists")}
-                            className={`px-3 py-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center ${
-                                activeTab === "artists" ? "bg-gray-100" : ""
-                            }`}
+                            className={`px-3 py-2 cursor-pointer flex justify-between items-center text-txt-secondary hover:text-txt-primary`}
                         >
                             <span>Search Artists</span>
                         </li>
