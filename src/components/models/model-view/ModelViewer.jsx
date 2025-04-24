@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { LazyImage } from "../../shared/lazy-image/LazyImage";
 import { ModelControls } from "./ModelControls";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
+import { fullscreenConfig } from "../../../config/fullscreenConfig";
 
 export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex }) => {
     const [modelLoaded, setModelLoaded] = useState(false);
@@ -50,20 +51,38 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
         viewer.requestRender?.();
     }, [yOffset, modelLoaded]);
 
-    // Handle keyboard shortcuts
+    // Add fullscreen change event listener
+    useEffect(() => {
+        const cleanup = fullscreenConfig.onChange(() => {
+            setIsFullscreen(fullscreenConfig.isFullscreen());
+            setControlsVisible(!fullscreenConfig.isFullscreen());
+        });
+
+        return cleanup;
+    }, []);
+
     useEffect(() => {
         const handleKeyPress = (e) => {
-            if (!modelViewerRef.current) return;
+            const container = containerRef.current;
+            if (!container) return;
 
             switch (e.key) {
                 case "r":
                     toggleRotation();
                     break;
                 case "f":
-                    toggleFullscreen();
+                    e.preventDefault();
+                    if (fullscreenConfig.isFullscreen()) {
+                        fullscreenConfig.exit();
+                    } else {
+                        toggleFullscreen();
+                    }
                     break;
                 case "h":
                     resetView();
+                    break;
+                case "m":
+                    toggleMenu();
                     break;
                 default:
                     break;
@@ -76,54 +95,33 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
 
     const toggleRotation = () => {
         const viewer = modelViewerRef.current;
-        if (!viewer) return;
-        setAutoRotate(!autoRotate);
+        if (viewer) {
+            setAutoRotate((prev) => !prev);
+        }
+    };
+
+    const toggleMenu = () => {
+        setControlsVisible((prev) => !prev);
     };
 
     const resetView = () => {
         const viewer = modelViewerRef.current;
-        if (!viewer) return;
-        viewer.resetTurntable();
-        viewer.cameraOrbit = "0deg 75deg 105%";
-        viewer.fieldOfView = "30deg";
+        if (viewer) {
+            viewer.cameraOrbit = "0deg 75deg 105%";
+            viewer.fieldOfView = "50deg";
+        }
     };
 
     const toggleFullscreen = () => {
         const container = containerRef.current;
         if (!container) return;
 
-        if (!document.fullscreenElement) {
-            container
-                .requestFullscreen()
-                .then(() => {
-                    setIsFullscreen(true);
-                    setControlsVisible(false); // Hide controls initially in fullscreen
-                })
-                .catch((err) => {
-                    console.error(
-                        `Error attempting to enable fullscreen: ${err.message}`
-                    );
-                });
-        } else {
-            document.exitFullscreen();
-            setIsFullscreen(false);
-            setControlsVisible(true); // Show controls when exiting fullscreen
+        if (!fullscreenConfig.isFullscreen()) {
+            fullscreenConfig.enter(container).catch((err) => {
+                console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
         }
     };
-
-    // Handle fullscreen change events
-    useEffect(() => {
-        const handleFullscreenChange = () => {
-            setIsFullscreen(!!document.fullscreenElement);
-            if (!document.fullscreenElement) {
-                setControlsVisible(true);
-            }
-        };
-
-        document.addEventListener("fullscreenchange", handleFullscreenChange);
-        return () =>
-            document.removeEventListener("fullscreenchange", handleFullscreenChange);
-    }, []);
 
     const takeScreenshot = () => {
         const viewer = modelViewerRef.current;
@@ -174,19 +172,21 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
     };
 
     const NavigationArrow = ({ direction, onClick }) => (
-        <button
-            onClick={onClick}
-            className={`absolute ${
-                direction === "left" ? "left-4" : "right-4"
-            } top-1/2 transform -translate-y-1/2 flex items-center justify-center w-[35px] h-[35px] rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 z-40 group`}
-            aria-label={`${direction === "left" ? "Previous" : "Next"} view`}
-        >
-            {direction === "left" ? (
-                <FaArrowLeft className="text-white text-xl group-hover:scale-110 transition-transform" />
-            ) : (
-                <FaArrowRight className="text-white text-xl group-hover:scale-110 transition-transform" />
-            )}
-        </button>
+        <div className="invisible md:visible">
+            <button
+                onClick={onClick}
+                className={`absolute ${
+                    direction === "left" ? "left-4" : "right-4"
+                } top-1/2 transform -translate-y-1/2 flex items-center justify-center w-[35px] h-[35px] rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 z-40 group`}
+                aria-label={`${direction === "left" ? "Previous" : "Next"} view`}
+            >
+                {direction === "left" ? (
+                    <FaArrowLeft className="text-white text-xl group-hover:scale-110 transition-transform" />
+                ) : (
+                    <FaArrowRight className="text-white text-xl group-hover:scale-110 transition-transform" />
+                )}
+            </button>
+        </div>
     );
 
     NavigationArrow.propTypes = {
@@ -225,7 +225,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                         max-camera-orbit="auto auto 200%"
                         min-field-of-view="10deg"
                         max-field-of-view="90deg"
-                        field-of-view="30deg"
+                        field-of-view="50deg"
                     ></model-viewer>
 
                     {/* Navigation Arrows and Dots */}
@@ -266,9 +266,9 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                         className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 cursor-pointer z-50 transition-transform duration-300 ${
                             controlsVisible ? "translate-y-full" : "translate-y-0"
                         }`}
-                        onClick={() => setControlsVisible(!controlsVisible)}
+                        onClick={toggleMenu}
                     >
-                        <div className="bg-black/80 backdrop-blur-sm px-4 py-2 rounded-t-lg">
+                        <div className="bg-black/30 backdrop-blur-sm px-4 py-2 rounded-t-lg group relative">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className={`h-6 w-6 text-white transform transition-transform duration-300 ${
@@ -283,6 +283,9 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                                     clipRule="evenodd"
                                 />
                             </svg>
+                            <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-sm bg-black/90 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                Toggle Menu (M)
+                            </span>
                         </div>
                     </div>
 
@@ -292,7 +295,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                             controlsVisible ? "translate-y-0" : "translate-y-full"
                         }`}
                     >
-                        <div className="flex items-center justify-center gap-4 backdrop-blur-sm px-4 py-3 z-50 shadow-lg">
+                        <div className="flex items-center justify-center gap-4 backdrop-blur-sm px-4 py-3 z-50 shadow-lg bg-black/30">
                             <button
                                 onClick={toggleRotation}
                                 className="p-2 rounded-ful hover:bg-white/20 transition-colors group relative"
