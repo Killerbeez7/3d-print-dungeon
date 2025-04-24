@@ -1,3 +1,8 @@
+- [ ] fix fullscreen button in mobile model viewer
+- [ ] in some documents search for keyword fix 
+
+
+
 Todays tasks
 ########################################################################################
 
