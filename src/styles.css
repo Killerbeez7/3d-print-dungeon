@@ -37,53 +37,53 @@ h6 {
 @import "tailwindcss";
 
 :root {
-    --bg-primary: #f2f2f2;
-    --bg-secondary: #d9d9d9;
+    --bg-primary: #f5f7fa;
+    --bg-secondary: #e3e8ee;
     --bg-surface: #ffffff;
-    --bg-reverse: #202026;
+    --bg-reverse: #1e1e2f;
 
-    --txt-primary: #1a1a1a;
-    --txt-secondary: #616161;
-    --txt-highlight: #8c8c8c;
-    --txt-muted: #adb5bd;
+    --txt-primary: #12161c;
+    --txt-secondary: #4a4a68;
+    --txt-highlight: #6d6d90;
+    --txt-muted: #a0a0b3;
 
-    --accent: #aa40e3;
-    --accent-hover: #ce78fc;
+    --accent: #645cff; /* Artistic violet-blue */
+    --accent-hover: #7d6bff;
 
-    --br-primary: #999999;
-    --br-secondary: #d0d0d0;
+    --br-primary: #d0d3dd;
+    --br-secondary: #e0e2ea;
 
-    --btn-secondary: #bfbfbf;
-    --btn-secondary-hover: #adadad;
-    --btn-disabled: #e0e0e0;
+    --btn-secondary: #cbd3e1;
+    --btn-secondary-hover: #b4bccb;
+    --btn-disabled: #e8ebf0;
 
-    --success: #16a34a;
-    --error: #dc2626;
+    --success: #28c76f;
+    --error: #f44336;
 }
 
 [data-theme="dark"] {
-    --bg-primary: #202026;
-    --bg-secondary: #101014;
-    --bg-surface: #303038;
-    --bg-reverse: #f2f2f2;
+    --bg-primary: #1e1e2f;
+    --bg-secondary: #2a2a3c;
+    --bg-surface: #333344;
+    --bg-reverse: #f5f7fa;
 
-    --txt-primary: #e3e3e3;
-    --txt-secondary: #b3b3b3;
+    --txt-primary: #f2f2f8;
+    --txt-secondary: #c0c0d1;
     --txt-highlight: #ffffff;
-    --txt-muted: #7e7e7e;
+    --txt-muted: #8f8fa2;
 
-    --accent: #aa40e3;
-    --accent-hover: #ce78fc;
+    --accent: #645cff;
+    --accent-hover: #867eff;
 
-    --br-primary: #7e7e7e;
-    --br-secondary: #3d3d3d;
+    --br-primary: #4a4a68;
+    --br-secondary: #3a3a52;
 
-    --btn-secondary: #5e5e6e;
-    --btn-secondary-hover: #75758a;
-    --btn-disabled: #808080;
+    --btn-secondary: #5a5a7a;
+    --btn-secondary-hover: #6e6e90;
+    --btn-disabled: #757589;
 
-    --success: #22c55e;
-    --error: #ef4444;
+    --success: #34d399;
+    --error: #f87171;
 }
 
 @theme {
