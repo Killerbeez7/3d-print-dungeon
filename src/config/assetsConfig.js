@@ -22,6 +22,11 @@ export const STATIC_ASSETS = {
         NEW_ARRIVALS: "/assets/carousel-images/NewArrivals.png",
         STORE_3D: "/assets/carousel-images/3d-store.png",
         PROJECT_IDEAS: "/assets/carousel-images/ProjectIdeas.png",
+        MINIATURES_COMPETITION: "/assets/carousel-images/MiniaturesCompetition.jpg",
+        SCHEDULED_MODELS: "/assets/carousel-images/ScheduledModels.jpg",
+        TRENDING_MODELS: "/assets/carousel-images/TrendingModels.jpg",
+        UPCOMING_MODELS: "/assets/carousel-images/UpcomingModels.jpg",
+        UPCOMING_MODELS2: "/assets/carousel-images/UpcomingModels2.jpg",
     },
 
     // 3D View images
