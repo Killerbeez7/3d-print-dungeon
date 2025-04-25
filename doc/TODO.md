@@ -1,5 +1,8 @@
-- [ ] fix fullscreen button in mobile model viewer
-- [ ] in some documents search for keyword fix 
+model viewer component problems
+
+- [ ] fix: fullscreen button in mobile model viewer
+- [ ] fix: menu buttons are clickable even when the menu is closed in full screen
+
 
 
 
