@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { fullscreenConfig } from "@/config/fullscreenConfig";
 import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
+import { Model3DIcon } from "@/components/shared/icons/Model3DIcon";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import PropTypes from "prop-types";
-import { STATIC_ASSETS } from "@/config/assetsConfig";
+
 const NavigationArrow = ({ direction, onClick }) => (
     <button
         onClick={onClick}
@@ -256,13 +257,12 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
 
                             {/* Toggle Arrow */}
                             <div
-                                className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 cursor-pointer z-50 transition-transform duration-300 ${
+                                className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 cursor-pointer z-[60] transition-transform duration-300 ${
                                     controlsVisible ? "translate-y-full" : "translate-y-0"
                                 }`}
                                 onClick={toggleMenu}
                             >
-                                <div className="bg-black/30 backdrop-blur-sm px-4 py-2 rounded-t-lg group relative">  
-                                {/* fix button not working in mobile fullscreen the styles above */}
+                                <div className="bg-black/30 backdrop-blur-sm px-4 py-2 rounded-t-lg group hover:bg-black/40 transition-colors">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         className={`h-6 w-6 text-white transform transition-transform duration-300 ${
@@ -277,15 +277,12 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                                             clipRule="evenodd"
                                         />
                                     </svg>
-                                    {/* <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-sm bg-black/90 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                                        Toggle Menu (M)  - fix later
-                                    </span> */}
                                 </div>
                             </div>
 
                             {/* Controls Bar */}
                             <div
-                                className={`absolute bottom-0 left-0 right-0 transition-transform duration-300 ease-in-out transform ${
+                                className={`absolute bottom-0 left-0 right-0 transition-transform duration-300 ease-in-out transform z-50 ${
                                     controlsVisible ? "translate-y-0" : "translate-y-full"
                                 }`}
                             >
@@ -464,10 +461,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                             }`}
                         >
                             <div className="w-full h-full flex items-center justify-center">
-                                <LazyImage
-                                    src={STATIC_ASSETS.THREE_D_VIEW.THUMBNAIL}
-                                    className="w-24 h-24 text-black opacity-80"
-                                />
+                                <Model3DIcon size={32} className="text-gray-600 dark:text-gray-400" />
                             </div>
                         </div>
 
