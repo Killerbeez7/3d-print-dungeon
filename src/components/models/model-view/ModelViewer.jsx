@@ -65,8 +65,10 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [autoRotate, setAutoRotate] = useState(true);
     const [controlsVisible, setControlsVisible] = useState(true);
+    const [isHovering, setIsHovering] = useState(false);
     const modelViewerRef = useRef(null);
     const containerRef = useRef(null);
+    const autoHideTimerRef = useRef(null);
 
     const fallback3DUrl = model?.convertedFileUrl || model?.originalFileUrl || "";
     const renderFileUrls = model?.renderFileUrls || [];
@@ -136,6 +138,23 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
         return () => window.removeEventListener("keydown", handleKeyPress);
     }, []);
 
+    // Add new useEffect for auto-hide functionality
+    useEffect(() => {
+        if (isFullscreen && controlsVisible && !isHovering) {
+            // Start timer when controls are visible but not being hovered
+            autoHideTimerRef.current = setTimeout(() => {
+                setControlsVisible(false);
+            }, 3000);
+        }
+
+        return () => {
+            // Cleanup timer
+            if (autoHideTimerRef.current) {
+                clearTimeout(autoHideTimerRef.current);
+            }
+        };
+    }, [isFullscreen, controlsVisible, isHovering]);
+
     const toggleRotation = () => {
         const viewer = modelViewerRef.current;
         if (viewer) {
@@ -162,6 +181,10 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
         if (!fullscreenConfig.isFullscreen()) {
             fullscreenConfig.enter(container).catch((err) => {
                 console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+        } else {
+            fullscreenConfig.exit().catch((err) => {
+                console.error(`Error attempting to exit fullscreen: ${err.message}`);
             });
         }
     };
@@ -246,7 +269,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
 
                     {/* Navigation Arrows and Dots */}
                     {renderFileUrls.length > 0 && (
-                        <div >
+                        <div>
                             <NavigationArrow direction="left" onClick={handlePrevious} />
                             <NavigationArrow direction="right" onClick={handleNext} />
                             <NavigationDots
@@ -257,16 +280,18 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
 
                             {/* Toggle Arrow */}
                             <div
-                                className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 cursor-pointer z-[60] transition-transform duration-300 ${
-                                    controlsVisible ? "translate-y-full" : "translate-y-0"
+                                className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 cursor-pointer z-50 transition-transform duration-300 ${
+                                    controlsVisible
+                                        ? "translate-y-full pointer-events-none"
+                                        : "translate-y-0"
                                 }`}
-                                onClick={toggleMenu}
+                                onClick={controlsVisible ? undefined : toggleMenu}
                             >
                                 <div className="bg-black/30 backdrop-blur-sm px-4 py-2 rounded-t-lg group hover:bg-black/40 transition-colors">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         className={`h-6 w-6 text-white transform transition-transform duration-300 ${
-                                            controlsVisible ? "rotate-180" : ""
+                                            controlsVisible ? "rotate-180 opacity-50" : ""
                                         }`}
                                         viewBox="0 0 20 20"
                                         fill="currentColor"
@@ -277,19 +302,27 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                                             clipRule="evenodd"
                                         />
                                     </svg>
+                                    <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-sm bg-black/90 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                                        Toggle Menu (M)
+                                    </span>
                                 </div>
                             </div>
 
                             {/* Controls Bar */}
                             <div
-                                className={`absolute bottom-0 left-0 right-0 transition-transform duration-300 ease-in-out transform z-50 ${
-                                    controlsVisible ? "translate-y-0" : "translate-y-full"
+                                className={`absolute bottom-0 left-0 right-0 transition-transform duration-300 ease-in-out transform ${
+                                    controlsVisible
+                                        ? "translate-y-0"
+                                        : "translate-y-full pointer-events-none"
                                 }`}
                             >
                                 <div className="flex items-center justify-center gap-4 backdrop-blur-sm px-4 md:py-3 sm:py-1 z-50 shadow-lg bg-black/30">
                                     <button
                                         onClick={toggleRotation}
-                                        className="p-2 rounded-ful hover:bg-white/20 transition-colors group relative"
+                                        disabled={!controlsVisible}
+                                        className={`p-2 rounded-ful hover:bg-white/20 transition-colors group relative ${
+                                            !controlsVisible ? "opacity-50" : ""
+                                        }`}
                                         title="Toggle Auto-Rotation (R)"
                                     >
                                         <svg
@@ -315,7 +348,10 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
 
                                     <button
                                         onClick={resetView}
-                                        className="p-2 rounded-full hover:bg-white/20 transition-colors group relative"
+                                        disabled={!controlsVisible}
+                                        className={`p-2 rounded-full hover:bg-white/20 transition-colors group relative ${
+                                            !controlsVisible ? "opacity-50" : ""
+                                        }`}
                                         title="Reset View (H)"
                                     >
                                         <svg
@@ -335,7 +371,10 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
 
                                     <button
                                         onClick={toggleFullscreen}
-                                        className="p-2 rounded-full hover:bg-white/20 transition-colors group relative"
+                                        disabled={!controlsVisible}
+                                        className={`p-2 rounded-full hover:bg-white/20 transition-colors group relative ${
+                                            !controlsVisible ? "opacity-50" : ""
+                                        }`}
                                         title="Toggle Fullscreen (F)"
                                     >
                                         <svg
@@ -359,7 +398,10 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
 
                                     <button
                                         onClick={takeScreenshot}
-                                        className="p-2 rounded-full hover:bg-white/20 transition-colors group relative"
+                                        disabled={!controlsVisible}
+                                        className={`p-2 rounded-full hover:bg-white/20 transition-colors group relative ${
+                                            !controlsVisible ? "opacity-50" : ""
+                                        }`}
                                         title="Take Screenshot"
                                     >
                                         <svg
@@ -461,7 +503,10 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                             }`}
                         >
                             <div className="w-full h-full flex items-center justify-center">
-                                <Model3DIcon size={32} className="text-gray-600 dark:text-gray-400" />
+                                <Model3DIcon
+                                    size={32}
+                                    className="text-gray-600 dark:text-gray-400"
+                                />
                             </div>
                         </div>
 
