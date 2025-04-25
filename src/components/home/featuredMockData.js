@@ -18,14 +18,6 @@ export const featuredMockData = [
         link: "magazine/new-arrivals",
     },
     {
-        id: "new-arrivals",
-        title: "New Arrivals",
-        subtitle: "Development Update",
-        badge: "NEWS",
-        image: STATIC_ASSETS.CAROUSEL.UPCOMING_MODELS2,
-        link: "/magazine/new-arrivals",
-    },
-    {
         id: "trending-projects",
         title: "Trending Projects",
         subtitle: "Discover the Art of Assassin's Creed Shadows",
@@ -39,7 +31,7 @@ export const featuredMockData = [
         title: "3D Store",
         subtitle: "Development Update",
         badge: "NEWS",
-        image: STATIC_ASSETS.CAROUSEL.UPCOMING_MODELS,
+        image: STATIC_ASSETS.CAROUSEL.DUNGEON_MODELS,
         link: "magazine/3d-store",
     },
     {
@@ -47,7 +39,16 @@ export const featuredMockData = [
         title: "New Arrivals",
         subtitle: "Development Update",
         badge: "NEWS",
-        image: STATIC_ASSETS.CAROUSEL.UPCOMING_MODELS2,
+        image: STATIC_ASSETS.CAROUSEL.UPCOMING_MODELS,
+        link: "/magazine/new-arrivals",
+    },
+
+    {
+        id: "new-arrivals",
+        title: "New Arrivals",
+        subtitle: "Development Update",
+        badge: "NEWS",
+        image: STATIC_ASSETS.CAROUSEL.ARENA_MODELS,
         link: "/magazine/new-arrivals",
     },
     {
@@ -63,7 +64,7 @@ export const featuredMockData = [
         title: "3D Store",
         subtitle: "Development Update",
         badge: "NEWS",
-        image: STATIC_ASSETS.CAROUSEL.UPCOMING_MODELS,
+        image: STATIC_ASSETS.CAROUSEL.BATTLE_MODELS,
         link: "magazine/3d-store",
     },
 ];
