@@ -550,12 +550,18 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                 </div>
             )
         ) : (
-            <div className="relative">
+            <div
+                className={`relative flex items-center justify-center ${
+                    (isIOS && customFullscreen) || isFullscreen
+                        ? "h-screen"
+                        : "h-[40vh] lg:h-[calc(80vh-120px)]"
+                }`}
+            >
                 <LazyImage
                     src={renderFileUrls[selectedRenderIndex]}
                     alt={`Render ${selectedRenderIndex + 1}`}
                     loading="lazy"
-                    className="w-full h-[40vh] lg:h-[calc(80vh-120px)] object-contain rounded-md shadow-lg"
+                    className="w-full h-full object-contain rounded-md shadow-lg"
                 />
 
                 {/* Navigation Controls */}
