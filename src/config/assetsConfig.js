@@ -9,7 +9,7 @@ export const STATIC_ASSETS = {
     // General images
     LOGO: "/assets/images/logo.png",
     USER_DEFAULT: "/assets/images/user.png",
-    DEFAULT_AVATAR: "/assets/images/default-avatar.png",
+    DEFAULT_AVATAR: "/assets/images/user.png",
 
     // Icons
     FAVICON: "/assets/icons/favicon.svg",

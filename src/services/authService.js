@@ -15,7 +15,7 @@ import {
     reauthenticateWithCredential,
     EmailAuthProvider,
 } from "firebase/auth";
-
+import { STATIC_ASSETS } from "../config/assetsConfig";
 // upscale profile picture
 export const getHighResPhotoURL = (photoURL) => {
     if (photoURL && photoURL.includes("googleusercontent.com")) {
@@ -29,7 +29,7 @@ export const addUserToDatabase = async (
     uid,
     email,
     displayName = "Anonymous",
-    photoURL = "/user.png"
+    photoURL = STATIC_ASSETS.DEFAULT_AVATAR
 ) => {
     const userDocRef = doc(db, "users", uid);
     try {
