@@ -62,6 +62,11 @@ const isIOS =
     /iPad|iPhone|iPod/.test(navigator.userAgent) ||
     (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 
+const isMobile =
+    typeof window !== "undefined" && /Mobi|Android/i.test(navigator.userAgent);
+
+const getTimeoutDuration = () => (isMobile ? 5000 : 3000);
+
 export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex }) => {
     const [modelLoaded, setModelLoaded] = useState(false);
     const [loadProgress, setLoadProgress] = useState(0);
@@ -100,12 +105,32 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
         };
     }, [fallback3DUrl]);
 
+    // Add hover effect for auto-hide timer
+    useEffect(() => {
+        const shouldAutoHide =
+            (isFullscreen || (isIOS && customFullscreen)) &&
+            controlsVisible &&
+            (!isHovering || isMobile);
+
+        if (shouldAutoHide) {
+            autoHideTimerRef.current = setTimeout(() => {
+                setControlsVisible(false);
+            }, getTimeoutDuration());
+        }
+
+        return () => {
+            if (autoHideTimerRef.current) {
+                clearTimeout(autoHideTimerRef.current);
+            }
+        };
+    }, [isFullscreen, customFullscreen, controlsVisible, isHovering]);
+
     // Add fullscreen change event listener
     useEffect(() => {
         const cleanup = fullscreenConfig.onChange(() => {
             setIsFullscreen(fullscreenConfig.isFullscreen());
-            // Only set controls visible when entering fullscreen, not when exiting
-            if (fullscreenConfig.isFullscreen()) {
+            // Always show controls when not in fullscreen
+            if (!fullscreenConfig.isFullscreen()) {
                 setControlsVisible(true);
             }
         });
@@ -145,32 +170,14 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
         return () => window.removeEventListener("keydown", handleKeyPress);
     }, []);
 
-    // Add hover effect for auto-hide timer
-    useEffect(() => {
-        if (
-            (isFullscreen || (isIOS && customFullscreen)) &&
-            controlsVisible &&
-            !isHovering
-        ) {
-            // Start timer when not hovering
-            autoHideTimerRef.current = setTimeout(() => {
-                setControlsVisible(false);
-            }, 3000);
-        }
-
-        return () => {
-            // Cleanup timer
+    const handleTouchStart = () => {
+        setIsHovering(true);
+        // Only set controls visible on touch if in fullscreen mode
+        if (isFullscreen || (isIOS && customFullscreen)) {
+            setControlsVisible(true);
             if (autoHideTimerRef.current) {
                 clearTimeout(autoHideTimerRef.current);
             }
-        };
-    }, [isFullscreen, customFullscreen, controlsVisible, isHovering]);
-
-    const handleTouchStart = () => {
-        setIsHovering(true);
-        setControlsVisible(true);
-        if (autoHideTimerRef.current) {
-            clearTimeout(autoHideTimerRef.current);
         }
     };
 
@@ -205,8 +212,8 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
             // Use custom fullscreen for iOS
             setCustomFullscreen(!customFullscreen);
             setIsFullscreen(!customFullscreen);
-            // Only set controls visible when entering fullscreen
-            if (!customFullscreen) {
+            // Always show controls when not in fullscreen
+            if (customFullscreen) {
                 setControlsVisible(true);
             }
         } else {
@@ -217,11 +224,12 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                         `Error attempting to enable fullscreen: ${err.message}`
                     );
                 });
-                setControlsVisible(true);
             } else {
                 fullscreenConfig.exit().catch((err) => {
                     console.error(`Error attempting to exit fullscreen: ${err.message}`);
                 });
+                // Always show controls when exiting fullscreen
+                setControlsVisible(true);
             }
         }
     };
