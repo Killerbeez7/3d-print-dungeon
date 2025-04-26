@@ -83,93 +83,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
     const renderFileUrls = model?.renderFileUrls || [];
     const posterUrl = model?.posterUrl;
 
-    // Attach model-viewer event listeners
-    useEffect(() => {
-        const viewer = modelViewerRef.current;
-        if (!viewer) return;
-
-        const handleProgress = (event) => {
-            setLoadProgress(event.detail.totalProgress);
-        };
-
-        const handleLoad = () => {
-            setModelLoaded(true);
-        };
-
-        viewer.addEventListener("progress", handleProgress);
-        viewer.addEventListener("load", handleLoad);
-
-        return () => {
-            viewer.removeEventListener("progress", handleProgress);
-            viewer.removeEventListener("load", handleLoad);
-        };
-    }, [fallback3DUrl]);
-
-    // Add hover effect for auto-hide timer
-    useEffect(() => {
-        const shouldAutoHide =
-            (isFullscreen || (isIOS && customFullscreen)) &&
-            controlsVisible &&
-            (!isHovering || isMobile);
-
-        if (shouldAutoHide) {
-            autoHideTimerRef.current = setTimeout(() => {
-                setControlsVisible(false);
-            }, getTimeoutDuration());
-        }
-
-        return () => {
-            if (autoHideTimerRef.current) {
-                clearTimeout(autoHideTimerRef.current);
-            }
-        };
-    }, [isFullscreen, customFullscreen, controlsVisible, isHovering]);
-
-    // Add fullscreen change event listener
-    useEffect(() => {
-        const cleanup = fullscreenConfig.onChange(() => {
-            setIsFullscreen(fullscreenConfig.isFullscreen());
-            // Always show controls when not in fullscreen
-            if (!fullscreenConfig.isFullscreen()) {
-                setControlsVisible(true);
-            }
-        });
-
-        return cleanup;
-    }, []);
-
-    useEffect(() => {
-        const handleKeyPress = (e) => {
-            const container = containerRef.current;
-            if (!container) return;
-
-            switch (e.key) {
-                case "r":
-                    toggleRotation();
-                    break;
-                case "f":
-                    e.preventDefault();
-                    if (fullscreenConfig.isFullscreen()) {
-                        fullscreenConfig.exit();
-                    } else {
-                        toggleFullscreen();
-                    }
-                    break;
-                case "h":
-                    resetView();
-                    break;
-                case "m":
-                    toggleMenu();
-                    break;
-                default:
-                    break;
-            }
-        };
-
-        window.addEventListener("keydown", handleKeyPress);
-        return () => window.removeEventListener("keydown", handleKeyPress);
-    }, []);
-
+    // Event handlers
     const handleTouchStart = () => {
         setIsHovering(true);
         // Only set controls visible on touch if in fullscreen mode
@@ -234,18 +148,6 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
         }
     };
 
-    // Add styles for custom fullscreen mode on iOS
-    useEffect(() => {
-        if (isIOS && customFullscreen) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "";
-        }
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, [customFullscreen]);
-
     const takeScreenshot = () => {
         const viewer = modelViewerRef.current;
         if (!viewer) return;
@@ -268,40 +170,138 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
 
     const handlePrevious = () => {
         if (selectedRenderIndex === -1) {
-            // If we're on 3D view, go to last image
             setSelectedRenderIndex(renderFileUrls.length - 1);
         } else if (selectedRenderIndex === 0) {
-            // If we're on first image, go to 3D view
             setSelectedRenderIndex(-1);
         } else {
-            // Go to previous image
             setSelectedRenderIndex(selectedRenderIndex - 1);
         }
     };
 
     const handleNext = () => {
         if (selectedRenderIndex === -1) {
-            // If we're on 3D view, go to first image
             setSelectedRenderIndex(0);
         } else if (selectedRenderIndex === renderFileUrls.length - 1) {
-            // If we're on last image, go to 3D view
             setSelectedRenderIndex(-1);
         } else {
-            // Go to next image
             setSelectedRenderIndex(selectedRenderIndex + 1);
         }
+    };
+
+    // Effects
+    useEffect(() => {
+        const viewer = modelViewerRef.current;
+        if (!viewer) return;
+
+        const handleProgress = (event) => {
+            setLoadProgress(event.detail.totalProgress);
+        };
+
+        const handleLoad = () => {
+            setModelLoaded(true);
+        };
+
+        viewer.addEventListener("progress", handleProgress);
+        viewer.addEventListener("load", handleLoad);
+
+        return () => {
+            viewer.removeEventListener("progress", handleProgress);
+            viewer.removeEventListener("load", handleLoad);
+        };
+    }, [fallback3DUrl]);
+
+    useEffect(() => {
+        const shouldAutoHide =
+            (isFullscreen || (isIOS && customFullscreen)) &&
+            controlsVisible &&
+            (!isHovering || isMobile);
+
+        if (shouldAutoHide) {
+            autoHideTimerRef.current = setTimeout(() => {
+                setControlsVisible(false);
+            }, getTimeoutDuration());
+        }
+
+        return () => {
+            if (autoHideTimerRef.current) {
+                clearTimeout(autoHideTimerRef.current);
+            }
+        };
+    }, [isFullscreen, customFullscreen, controlsVisible, isHovering]);
+
+    useEffect(() => {
+        const cleanup = fullscreenConfig.onChange(() => {
+            setIsFullscreen(fullscreenConfig.isFullscreen());
+            if (!fullscreenConfig.isFullscreen()) {
+                setControlsVisible(true);
+            }
+        });
+
+        return cleanup;
+    }, []);
+
+    useEffect(() => {
+        const handleKeyPress = (e) => {
+            const container = containerRef.current;
+            if (!container) return;
+
+            switch (e.key) {
+                case "r":
+                    toggleRotation();
+                    break;
+                case "f":
+                    e.preventDefault();
+                    if (fullscreenConfig.isFullscreen()) {
+                        fullscreenConfig.exit();
+                    } else {
+                        toggleFullscreen();
+                    }
+                    break;
+                case "h":
+                    resetView();
+                    break;
+                case "m":
+                    toggleMenu();
+                    break;
+                default:
+                    break;
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyPress);
+        return () => window.removeEventListener("keydown", handleKeyPress);
+    }, []);
+
+    useEffect(() => {
+        if (isIOS && customFullscreen) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "";
+        }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [customFullscreen]);
+
+    // Helper function for container classes
+    const getContainerClasses = () => {
+        const baseClasses =
+            "relative w-full bg-gray-100 dark:bg-gray-800 overflow-hidden";
+        const heightClasses =
+            (isIOS && customFullscreen) || isFullscreen
+                ? "h-screen"
+                : "h-[40vh] lg:h-[calc(80vh-120px)]";
+        const borderClasses =
+            !customFullscreen && !isFullscreen
+                ? "rounded-lg border border-gray-200 dark:border-gray-700"
+                : "";
+        return `${baseClasses} ${heightClasses} ${borderClasses}`;
     };
 
     const mainPreview =
         selectedRenderIndex === -1 ? (
             fallback3DUrl ? (
-                <div
-                    className={`relative w-full ${
-                        (isIOS && customFullscreen) || isFullscreen
-                            ? "h-screen"
-                            : "h-[40vh] lg:h-[calc(80vh-120px)]"
-                    }`}
-                >
+                <div className={getContainerClasses()}>
                     <model-viewer
                         ref={modelViewerRef}
                         poster={posterUrl}
@@ -590,20 +590,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
             }`}
             ref={containerRef}
         >
-            {/* Main Preview */}
-            <div
-                className={`relative w-full ${
-                    (isIOS && customFullscreen) || isFullscreen
-                        ? "h-screen"
-                        : "h-[40vh] lg:h-[calc(80vh-120px)]"
-                } bg-gray-100 dark:bg-gray-800 overflow-hidden ${
-                    !customFullscreen && !isFullscreen
-                        ? "rounded-lg border border-gray-200 dark:border-gray-700"
-                        : ""
-                }`}
-            >
-                {mainPreview}
-            </div>
+            <div className={getContainerClasses()}>{mainPreview}</div>
 
             {/* Thumbnails Section - Hide in any fullscreen mode */}
             {!(isIOS ? customFullscreen : isFullscreen) && (
