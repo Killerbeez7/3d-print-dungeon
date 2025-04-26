@@ -104,7 +104,10 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
     useEffect(() => {
         const cleanup = fullscreenConfig.onChange(() => {
             setIsFullscreen(fullscreenConfig.isFullscreen());
-            setControlsVisible(!fullscreenConfig.isFullscreen());
+            // Only set controls visible when entering fullscreen, not when exiting
+            if (fullscreenConfig.isFullscreen()) {
+                setControlsVisible(true);
+            }
         });
 
         return cleanup;
@@ -163,6 +166,18 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
         };
     }, [isFullscreen, customFullscreen, controlsVisible, isHovering]);
 
+    const handleTouchStart = () => {
+        setIsHovering(true);
+        setControlsVisible(true);
+        if (autoHideTimerRef.current) {
+            clearTimeout(autoHideTimerRef.current);
+        }
+    };
+
+    const handleTouchEnd = () => {
+        setIsHovering(false);
+    };
+
     const toggleRotation = () => {
         const viewer = modelViewerRef.current;
         if (viewer) {
@@ -190,7 +205,10 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
             // Use custom fullscreen for iOS
             setCustomFullscreen(!customFullscreen);
             setIsFullscreen(!customFullscreen);
-            setControlsVisible(!customFullscreen);
+            // Only set controls visible when entering fullscreen
+            if (!customFullscreen) {
+                setControlsVisible(true);
+            }
         } else {
             // Use native fullscreen for other devices
             if (!fullscreenConfig.isFullscreen()) {
@@ -199,6 +217,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                         `Error attempting to enable fullscreen: ${err.message}`
                     );
                 });
+                setControlsVisible(true);
             } else {
                 fullscreenConfig.exit().catch((err) => {
                     console.error(`Error attempting to exit fullscreen: ${err.message}`);
@@ -315,7 +334,11 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
 
                             {/* Toggle Arrow */}
                             <div
-                                className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 cursor-pointer z-50 transition-transform duration-300 ${
+                                className={`${
+                                    (isIOS && customFullscreen) || isFullscreen
+                                        ? "fixed"
+                                        : "absolute"
+                                } bottom-0 left-1/2 transform -translate-x-1/2 cursor-pointer z-[9999] transition-transform duration-300 ${
                                     controlsVisible
                                         ? "translate-y-full pointer-events-none"
                                         : "translate-y-0"
@@ -323,8 +346,8 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                                 onClick={controlsVisible ? undefined : toggleMenu}
                                 onMouseEnter={() => setIsHovering(true)}
                                 onMouseLeave={() => setIsHovering(false)}
-                                onTouchStart={() => setIsHovering(true)}
-                                onTouchEnd={() => setIsHovering(false)}
+                                onTouchStart={handleTouchStart}
+                                onTouchEnd={handleTouchEnd}
                                 role="button"
                                 tabIndex={0}
                                 aria-label="Toggle Menu (M)"
@@ -360,17 +383,21 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
 
                             {/* Controls Bar */}
                             <div
-                                className={`absolute bottom-0 left-0 right-0 transition-transform duration-300 ease-in-out transform ${
+                                className={`${
+                                    (isIOS && customFullscreen) || isFullscreen
+                                        ? "fixed"
+                                        : "absolute"
+                                } bottom-0 left-0 right-0 transition-transform duration-300 ease-in-out transform z-[9999] ${
                                     controlsVisible
                                         ? "translate-y-0"
                                         : "translate-y-full pointer-events-none"
                                 }`}
                                 onMouseEnter={() => setIsHovering(true)}
                                 onMouseLeave={() => setIsHovering(false)}
-                                onTouchStart={() => setIsHovering(true)}
-                                onTouchEnd={() => setIsHovering(false)}
+                                onTouchStart={handleTouchStart}
+                                onTouchEnd={handleTouchEnd}
                             >
-                                <div className="flex items-center justify-center gap-4 backdrop-blur-sm px-4 md:py-3 sm:py-1 z-50 shadow-lg bg-black/30">
+                                <div className="flex items-center justify-center gap-4 backdrop-blur-sm px-4 md:py-3 sm:py-1 shadow-lg bg-black/30">
                                     <button
                                         onClick={toggleRotation}
                                         disabled={!controlsVisible}
