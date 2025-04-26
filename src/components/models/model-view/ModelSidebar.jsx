@@ -6,6 +6,7 @@ import { LikeButton } from "../action-buttons/likeButton";
 import { FavoritesButton } from "../action-buttons/favoritesButton";
 //contexts
 import { CommentsProvider } from "../../../contexts/CommentsContext";
+import { STATIC_ASSETS } from "../../../config/assetsConfig";
 
 export const ModelSidebar = ({
     model,
@@ -20,7 +21,7 @@ export const ModelSidebar = ({
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-4">
                     <img
-                        src={uploader?.photoURL || "/default-avatar.png"}
+                        src={uploader?.photoURL || STATIC_ASSETS.DEFAULT_AVATAR}
                         alt={uploader?.displayName || "Unknown User"}
                         className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
                     />
