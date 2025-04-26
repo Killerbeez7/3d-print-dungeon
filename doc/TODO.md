@@ -7,6 +7,8 @@ model viewer component problems
 - [x] add: menu close after 5 sec of not hovering in full screen mode 
 - [x] add: custom full screen  
 - [x] add: cutom sript for deploy hosting only "npm run hosting": "npm run build && firebase deploy --only hosting"
+- [x] fix: auto close not trigering in mobile full screen mode + add more time before close
+- [x] fix: render images not properly centered in full screen mode
 
 
 
