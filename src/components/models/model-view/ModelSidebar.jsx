@@ -16,14 +16,14 @@ export const ModelSidebar = ({
     openAuthModal,
 }) => {
     return (
-        <aside className="w-full lg:w-[400px] bg-white dark:bg-gray-800 flex flex-col h-full">
+        <aside className="w-full lg:w-[400px] flex flex-col h-full rounded-lg">
             {/* Creator Info Section */}
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-6 border-b border-br-primary">
                 <div className="flex items-center gap-4">
                     <img
                         src={uploader?.photoURL || STATIC_ASSETS.DEFAULT_AVATAR}
                         alt={uploader?.displayName || "Unknown User"}
-                        className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+                        className="w-16 h-16 rounded-full object-cover border-2 border-br-primary"
                     />
                     <div className="flex-1">
                         <h2 className="text-xl font-semibold text-txt-primary">
@@ -33,7 +33,7 @@ export const ModelSidebar = ({
                             Senior 3D Artist
                         </p>
                         <div className="flex items-center gap-3 mt-2">
-                            <button className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1.5 rounded-full text-sm font-medium transition-colors">
+                            <button className="bg-accent hover:bg-accent-hover text-white px-4 py-1.5 rounded-full text-sm font-medium transition-colors">
                                 Follow
                             </button>
                             <span className="text-sm text-txt-secondary">
@@ -45,7 +45,7 @@ export const ModelSidebar = ({
             </div>
 
             {/* Model Info Section */}
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-6 border-b border-br-primary">
                 <h1 className="text-2xl font-bold text-txt-primary mb-3">{model.name}</h1>
                 <p className="text-txt-secondary mb-4">{model.description}</p>
 
@@ -55,7 +55,7 @@ export const ModelSidebar = ({
                         {model.tags.map((tag, i) => (
                             <span
                                 key={i}
-                                className="px-3 py-1 text-sm rounded-full bg-gray-100 dark:bg-gray-700 text-txt-secondary"
+                                className="px-3 py-1 text-sm rounded-full bg-bg-tertiary text-txt-secondary"
                             >
                                 {tag}
                             </span>
@@ -65,7 +65,7 @@ export const ModelSidebar = ({
             </div>
 
             {/* Action Buttons Section */}
-            <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="p-6 border-b border-br-primary">
                 <div className="flex gap-4 mb-4">
                     <LikeButton
                         modelId={model.id}
@@ -84,7 +84,7 @@ export const ModelSidebar = ({
                     {model.originalFileUrl && (
                         <button
                             onClick={() => window.open(model.originalFileUrl, "_blank")}
-                            className="flex items-center justify-center gap-2 bg-fuchsia-600 hover:bg-fuchsia-700 text-white py-2.5 px-4 rounded-lg transition-colors text-sm font-medium"
+                            className="flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-white py-2.5 px-4 rounded-lg transition-colors text-sm font-medium"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -107,7 +107,7 @@ export const ModelSidebar = ({
                                 onClick={() =>
                                     window.open(model.convertedFileUrl, "_blank")
                                 }
-                                className="flex items-center justify-center gap-2 bg-gray-600 hover:bg-gray-700 text-white py-2.5 px-4 rounded-lg transition-colors text-sm font-medium"
+                                className="flex items-center justify-center gap-2 bg-bg-tertiary hover:bg-bg-surface text-txt-primary py-2.5 px-4 rounded-lg transition-colors text-sm font-medium"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
@@ -130,7 +130,7 @@ export const ModelSidebar = ({
                 {currentUser && currentUser.uid === model.uploaderId && (
                     <Link
                         to={`/model/${model.id}/edit`}
-                        className="flex items-center justify-center gap-2 w-full mt-3 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2.5 px-4 rounded-lg transition-colors text-sm font-medium"
+                        className="flex items-center justify-center gap-2 w-full mt-3 bg-bg-tertiary hover:bg-bg-surface text-txt-primary py-2.5 px-4 rounded-lg transition-colors text-sm font-medium"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"

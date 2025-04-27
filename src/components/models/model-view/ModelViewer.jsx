@@ -594,7 +594,9 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
 
             {/* Thumbnails Section - Hide in any fullscreen mode */}
             {!(isIOS ? customFullscreen : isFullscreen) && (
-                <div className="bg-white dark:bg-gray-800 rounded-lg p-4 space-y-4 lg:space-y-6 border border-gray-200 dark:border-gray-700">
+                // <div className=" dark:bg-gray-800 rounded-lg p-4 space-y-4 lg:space-y-6 border border-gray-200 dark:border-gray-700">
+                <div className="">
+
                     <div className="flex space-x-4 overflow-x-auto pb-2 -mx-2 px-2">
                         <div
                             onClick={() => setSelectedRenderIndex(-1)}

@@ -44,39 +44,35 @@ export const ModelPage = () => {
 
     const model = models.find((m) => m.id === id);
 
-    if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center text-xl text-txt-primary">
-                Loading model...
-            </div>
-        );
-    }
-
-    if (!model) {
-        return (
-            <div className="min-h-screen flex items-center justify-center text-xl text-txt-primary">
-                Model not found!
-            </div>
-        );
-    }
-
     return (
-        <div className="bg-bg-primary text-txt-primary min-h-screen flex flex-col lg:flex-row gap-4 p-4 lg:p-6">
-            {/* Left Side - Model Viewer */}
-            <ModelViewer
-                model={model}
-                selectedRenderIndex={selectedRenderIndex}
-                setSelectedRenderIndex={setSelectedRenderIndex}
-            />
+        <div className="text-txt-primary min-h-screen flex flex-col lg:flex-row gap-4 p-4 lg:p-6">
+            {loading ? (
+                <div className="min-h-screen flex items-center justify-center text-xl text-txt-primary">
+                    Loading model...
+                </div>
+            ) : !model ? (
+                <div className="min-h-screen flex items-center justify-center text-xl text-txt-primary">
+                    Model not found!
+                </div>
+            ) : (
+                <>
+                    {/* Left Side - Model Viewer */}
+                    <ModelViewer
+                        model={model}
+                        selectedRenderIndex={selectedRenderIndex}
+                        setSelectedRenderIndex={setSelectedRenderIndex}
+                    />
 
-            {/* Right Side - Info Panel */}
-            <ModelSidebar
-                model={model}
-                uploader={uploader}
-                viewCount={viewCount}
-                currentUser={currentUser}
-                openAuthModal={openAuthModal}
-            />
+                    {/* Right Side - Info Panel */}
+                    <ModelSidebar
+                        model={model}
+                        uploader={uploader}
+                        viewCount={viewCount}
+                        currentUser={currentUser}
+                        openAuthModal={openAuthModal}
+                    />
+                </>
+            )}
         </div>
     );
 };
