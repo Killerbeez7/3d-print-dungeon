@@ -1,7 +1,7 @@
-import { AuthProvider } from "./contexts/authContext";
-import { ModelsProvider } from "./contexts/modelsContext";
-import { SearchProvider } from "./contexts/searchContext";
-import { ForumProvider } from "./contexts/forumContext";
+import { AuthProvider } from "./providers/authProvider";
+import { ModelsProvider } from "./providers/modelsProvider";
+import { SearchProvider } from "./providers/searchProvider";
+import { ForumProvider } from "./providers/forumProvider";
 
 import { AppRoutes } from "./AppRoutes";
 
