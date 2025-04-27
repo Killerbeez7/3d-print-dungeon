@@ -1,7 +1,7 @@
 import { doc, setDoc, collection, query, where, getDocs, getDoc, writeBatch } from "firebase/firestore";
 import { db, auth } from "../config/firebase";
 import { useEffect } from "react";
-import { useAuth } from "../contexts/authContext";
+import { useAuth } from "../hooks/useAuth";
 
 // 30 minutes
 const VIEW_COOLDOWN_MS = 30 * 60_000;
@@ -80,12 +80,12 @@ export async function trackView(modelId) {
  * React Hook: automatically track a view whenever the user visits the component
  */
 export function useViewTracker(modelId) {
-    const { user } = useAuth();
+    const { currentUser } = useAuth();
 
     useEffect(() => {
         if (!modelId) return;
         trackView(modelId).catch(console.error);
-    }, [modelId, user]);
+    }, [modelId, currentUser]);
 }
 
 // Check if the current user is an admin
