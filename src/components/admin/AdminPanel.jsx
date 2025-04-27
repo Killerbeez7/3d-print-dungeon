@@ -5,9 +5,9 @@ import { ContentModeration } from "./tabs/ContentModeration";
 import { SiteSettings } from "./tabs/SiteSettings";
 import { Analytics } from "./tabs/Analytics";
 import { MaintenanceSettings } from "./tabs/MaintenanceSettings";
-import { useAuth } from "../../contexts/authContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "react-router-dom";
-import { isAdmin } from "../../services/adminService";
+import { isAdmin } from "@/services/adminService";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
