@@ -5,7 +5,7 @@ import { ModelComments } from "./ModelComments";
 import { LikeButton } from "../action-buttons/likeButton";
 import { FavoritesButton } from "../action-buttons/favoritesButton";
 //contexts
-import { CommentsProvider } from "../../../contexts/CommentsContext";
+import { CommentsProvider } from "../../../contexts/commentsContext";
 
 export const ModelSidebar = ({
     model,
