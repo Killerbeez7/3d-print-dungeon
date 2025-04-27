@@ -5,7 +5,8 @@ import { ModelComments } from "./ModelComments";
 import { LikeButton } from "../action-buttons/likeButton";
 import { FavoritesButton } from "../action-buttons/favoritesButton";
 //contexts
-import { CommentsProvider } from "../../../contexts/commentsContext";
+import { CommentsProvider } from "../../../contexts/CommentsContext";
+import { STATIC_ASSETS } from "../../../config/assetsConfig";
 
 export const ModelSidebar = ({
     model,
@@ -20,7 +21,7 @@ export const ModelSidebar = ({
             <div className="p-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center gap-4">
                     <img
-                        src={uploader?.photoURL || "/default-avatar.png"}
+                        src={uploader?.photoURL || STATIC_ASSETS.DEFAULT_AVATAR}
                         alt={uploader?.displayName || "Unknown User"}
                         className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
                     />
@@ -97,7 +98,7 @@ export const ModelSidebar = ({
                                     clipRule="evenodd"
                                 />
                             </svg>
-                            Download Original
+                            Download (STL)
                         </button>
                     )}
                     {model.convertedFileUrl &&
@@ -126,7 +127,7 @@ export const ModelSidebar = ({
                 </div>
 
                 {/* Edit Button for Owner */}
-                {currentUser && currentUser.uid === model.userId && (
+                {currentUser && currentUser.uid === model.uploaderId && (
                     <Link
                         to={`/model/${model.id}/edit`}
                         className="flex items-center justify-center gap-2 w-full mt-3 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2.5 px-4 rounded-lg transition-colors text-sm font-medium"
@@ -161,7 +162,7 @@ ModelSidebar.propTypes = {
         description: PropTypes.string,
         tags: PropTypes.arrayOf(PropTypes.string),
         likes: PropTypes.number,
-        userId: PropTypes.string,
+        uploaderId: PropTypes.string,
         originalFileUrl: PropTypes.string,
         convertedFileUrl: PropTypes.string,
     }).isRequired,

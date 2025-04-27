@@ -1,3 +1,18 @@
+model viewer component problems
+
+26/04/2025
+- [x] fix: fullscreen button in mobile model viewer
+- [x] fix: menu buttons are clickable even when the menu is closed in full screen
+- [x] add: roles and aria labels for menu buttons for better SEO
+- [x] add: menu close after 5 sec of not hovering in full screen mode 
+- [x] add: custom full screen  
+- [x] add: cutom sript for deploy hosting only "npm run hosting": "npm run build && firebase deploy --only hosting"
+- [x] fix: auto close not trigering in mobile full screen mode + add more time before close
+- [x] fix: render images not properly centered in full screen mode
+- [x] fix: add default image on sign up, but keep image check in model view for better UI (find better solution later)
+- [x] call it a day :D
+
+
 Todays tasks
 ########################################################################################
 

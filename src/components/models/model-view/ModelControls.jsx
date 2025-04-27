@@ -13,7 +13,7 @@ export const ModelControls = ({
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="fixed right-0 top-1/2 transform -translate-y-1/2 z-50">
+        <div className={`fixed right-0 top-1/2 transform -translate-y-1/2 z-50 `}>
             {/* Controls Panel */}
             <div
                 className={`relative bg-white dark:bg-gray-800 rounded-l-lg shadow-lg p-6 space-y-6 transform transition-transform duration-300 ease-in-out ${
