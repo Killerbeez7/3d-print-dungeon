@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
-import { useForum } from "../../contexts/forumContext";
-import { useAuth } from "../../contexts/authContext";
+import { useForum } from "@/hooks/useForum";
+import { useAuth } from "@/hooks/useAuth";
 import { formatDistanceToNow } from "date-fns";
 import { 
   FaEdit, 

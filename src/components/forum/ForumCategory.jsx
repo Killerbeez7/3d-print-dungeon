@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useForum } from "../../contexts/forumContext";
+import { useForum } from "@/hooks/useForum";
 import { ThreadList } from "./ThreadList";
 import { FaPlus } from "react-icons/fa";
-import Skeleton from "../shared/Skeleton";
+import Skeleton from "@/components/shared/Skeleton";
 
 export const ForumCategory = () => {
   const { categoryId } = useParams();
