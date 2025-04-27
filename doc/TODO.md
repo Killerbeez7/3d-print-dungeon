@@ -1,4 +1,19 @@
 model viewer component problems
+28/04/25
+- [ ] fix forum routes: delete lines [30-40] and add open auth modal if non logged user tries to click
+- [ ] add maintenance protection for forum home page - wrap lines [22-24] with {withMaintenance}
+
+27/04/2025
+- [x] split + tsx: authContext: authContext + authProvicer + useAuth
+- [x] split + tsx (only context file): modelsContext ==> modelsContext + modelsProvicer + useModels
+- [x] split + tsx (only context file): forumContext ==> forumContext + forumProvicer + useForum
+- [x] split + tsx (only context file): searchContext ==> searchContext + searchProvicer + useSearch
+- [x] split + tsx (only context file): commentsContext ==> commentsContext + commentsProvicer + useComments
+- [ ] 
+- [ ] refactor:
+- [ ] refactor:
+- [ ] refactor:
+
 
 26/04/2025
 - [x] fix: fullscreen button in mobile model viewer
