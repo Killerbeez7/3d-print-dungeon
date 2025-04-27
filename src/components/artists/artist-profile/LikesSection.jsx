@@ -10,9 +10,13 @@ export const LikesSection = ({ userId }) => {
 
     useEffect(() => {
         const fetchLikedArtworks = async () => {
-            if (!userId) return;
+            if (!userId) {
+                setLikedArtworks([]);
+                setLoading(false);
+                return;
+            }
+            
             setLoading(true);
-
             try {
                 // Query to fetch all likes by the user
                 const q = query(
@@ -21,16 +25,37 @@ export const LikesSection = ({ userId }) => {
                 );
 
                 const querySnapshot = await getDocs(q);
-                const likedArtIds = querySnapshot.docs.map(doc => doc.data().artId);
+                const likedModelIds = querySnapshot.docs.map(doc => doc.data().modelId).filter(Boolean);
 
-                // Now, fetch the corresponding artworks by their IDs
-                const artworks = await Promise.all(likedArtIds.map(async (artId) => {
-                    const artDoc = await getDoc(doc(db, "uploads", artId));
-                    if (artDoc.exists()) {
-                        return { id: artDoc.id, ...artDoc.data() };
-                    }
-                    return null;
-                }));
+                if (!likedModelIds || likedModelIds.length === 0) {
+                    setLikedArtworks([]);
+                    setLoading(false);
+                    return;
+                }
+
+                // Now, fetch the corresponding models by their IDs
+                const artworks = await Promise.all(
+                    likedModelIds.map(async (modelId) => {
+                        try {
+                            const modelDoc = await getDoc(doc(db, "models", modelId));
+                            if (modelDoc.exists()) {
+                                const data = modelDoc.data();
+                                return { 
+                                    id: modelDoc.id, 
+                                    title: data.name || "Untitled",
+                                    artist: data.uploaderDisplayName || "Unknown Artist",
+                                    imageUrl: data.primaryRenderUrl || "/default-artwork.png",
+                                    likes: data.likes || 0,
+                                    views: data.views || 0
+                                };
+                            }
+                            return null;
+                        } catch (error) {
+                            console.error(`Error fetching model ${modelId}:`, error);
+                            return null;
+                        }
+                    })
+                );
 
                 // Filter out any null values from artworks that might not exist
                 setLikedArtworks(artworks.filter(art => art !== null));
@@ -61,25 +86,25 @@ export const LikesSection = ({ userId }) => {
                             className="relative bg-bg-surface border border-br-primary rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                         >
                             <img
-                                src={art.imageUrl || "/default-artwork.png"}
-                                alt={art.title || "Artwork"}
+                                src={art.imageUrl}
+                                alt={art.title}
                                 className="w-full h-auto object-cover"
                             />
                             <div className="p-3">
                                 <h2 className="text-lg font-semibold mb-1 text-txt-primary">
-                                    {art.title || "Untitled"}
+                                    {art.title}
                                 </h2>
                                 <p className="text-txt-secondary text-sm mb-2">
-                                    By {art.artist || "Unknown Artist"}
+                                    By {art.artist}
                                 </p>
                                 <div className="flex items-center justify-between text-sm">
                                     <span className="text-txt-secondary">
                                         <i className="fas fa-heart text-error mr-1"></i>
-                                        {art.likes || 0}
+                                        {art.likes}
                                     </span>
                                     <span className="text-txt-secondary">
                                         <i className="fas fa-eye text-txt-highlight mr-1"></i>
-                                        {art.views || 0}
+                                        {art.views}
                                     </span>
                                 </div>
                             </div>
