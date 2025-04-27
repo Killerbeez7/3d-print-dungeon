@@ -13,17 +13,17 @@ export const ModelControls = ({
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className={`fixed right-0 top-1/2 transform -translate-y-1/2 z-50 `}>
+        <div className={`fixed right-0 top-1/2 transform -translate-y-1/2 z-50`}>
             {/* Controls Panel */}
             <div
-                className={`relative bg-white dark:bg-gray-800 rounded-l-lg shadow-lg p-6 space-y-6 transform transition-transform duration-300 ease-in-out ${
+                className={`relative bg-bg-surface rounded-l-lg shadow-lg p-6 space-y-6 transform transition-transform duration-300 ease-in-out ${
                     isOpen ? "translate-x-0" : "translate-x-full"
                 }`}
             >
                 {/* Toggle Button - Now inside the panel */}
                 <button
                     onClick={() => setIsOpen(!isOpen)}
-                    className="absolute -left-12 top-1/2 -translate-y-1/2 bg-fuchsia-600 hover:bg-fuchsia-700 text-white p-2 rounded-l-lg shadow-lg transition-colors duration-200"
+                    className="absolute -left-12 top-1/2 -translate-y-1/2 bg-accent hover:bg-accent-hover text-white p-2 rounded-l-lg shadow-lg transition-colors duration-200"
                 >
                     <VscSettings className="w-6 h-6" />
                 </button>
@@ -53,7 +53,7 @@ export const ModelControls = ({
                         step="0.01"
                         value={offset}
                         onChange={(e) => setOffset(parseFloat(e.target.value))}
-                        className="w-full accent-fuchsia-600"
+                        className="w-full accent-accent"
                     />
                 </div>
 
@@ -78,7 +78,7 @@ export const ModelControls = ({
                         step="0.01"
                         value={shadowIntensity}
                         onChange={(e) => setShadowIntensity(parseFloat(e.target.value))}
-                        className="w-full accent-fuchsia-600"
+                        className="w-full accent-accent"
                     />
                 </div>
 
@@ -103,7 +103,7 @@ export const ModelControls = ({
                         step="0.1"
                         value={exposure}
                         onChange={(e) => setExposure(parseFloat(e.target.value))}
-                        className="w-full accent-fuchsia-600"
+                        className="w-full accent-accent"
                     />
                 </div>
             </div>
