@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
-import { useAuth } from "../../../contexts/authContext";
-import { createAdvancedModel } from "../../../services/modelsService";
-import { finalConvertFileToGLB } from "../../../utils/models/converter";
+import { useAuth } from "@/hooks/useAuth";
+import { createAdvancedModel } from "@/services/modelsService";
+import { finalConvertFileToGLB } from "@/utils/models/converter";
 // components
 import { FilesUpload } from "./sections/FilesUpload";
 import { InfoForm } from "./sections/InfoForm";

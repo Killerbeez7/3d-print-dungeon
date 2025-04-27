@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { useModels } from "@/contexts/modelsContext";
+import { useModels } from "@/hooks/useModels";
 import { Link } from "react-router-dom";
-import { LazyImage } from "../shared/lazy-image/LazyImage";
+import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 import { FeaturedCarousel } from "./FeaturedCarousel";
 import { featuredMockData } from "./featuredMockData";
 
-import { TrendingCarousel } from "./TrendingCarousel";
-import { trendingMockData } from "./trendingMockData";
 
 export const Home = () => {
     const { models, loading } = useModels();

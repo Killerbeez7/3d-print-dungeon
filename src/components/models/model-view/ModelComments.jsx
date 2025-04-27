@@ -1,8 +1,8 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 //contexts
-import { useAuth } from "../../../contexts/authContext";
-import { useComments } from "../../../contexts/CommentsContext";
+import { useAuth } from "@/hooks/useAuth";
+import { useComments } from "@/hooks/useComments";
 
 export const ModelComments = ({ openAuthModal }) => {
     const { currentUser } = useAuth();

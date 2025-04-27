@@ -3,11 +3,11 @@ import { useParams, useOutletContext } from "react-router-dom";
 import PropTypes from "prop-types";
 import { ModelViewer } from "./ModelViewer";
 import { ModelSidebar } from "./ModelSidebar";
-import { useViewTracker } from "../../../services/viewService";
-import { useModels } from "../../../contexts/modelsContext";
-import { useAuth } from "../../../contexts/authContext";
+import { useViewTracker } from "@/services/viewService";
+import { useModels } from "@/hooks/useModels";
+import { useAuth } from "@/hooks/useAuth";
 import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "../../../config/firebase";
+import { db } from "@/config/firebase";
 
 export const ModelPage = () => {
     const { openAuthModal } = useOutletContext();

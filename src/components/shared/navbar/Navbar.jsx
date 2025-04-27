@@ -2,12 +2,12 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 
-import { useAuth } from "../../../contexts/authContext";
-import { useSearch } from "../../../contexts/searchContext";
-import { useClickOutside } from "../../../hooks/useClickOutside";
+import { useAuth } from "@/hooks/useAuth";
+import { useSearch } from "@/hooks/useSearch";
+import { useClickOutside } from "@/hooks/useClickOutside";
 
-import { NAV_SECTIONS } from "../../../config/navConfig";
-import { STATIC_ASSETS } from "../../../config/assetsConfig";
+import { NAV_SECTIONS } from "@/config/navConfig";
+import { STATIC_ASSETS } from "@/config/assetsConfig";
 
 import {
     MdFileUpload,
