@@ -228,9 +228,8 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                         type="submit"
                         className="
               w-full py-2
-              rounded bg-accent text-white
+              rounded cta-gradient
               font-semibold
-              hover:bg-accent-hover
               transition-colors
               focus:outline-none focus:ring-2 focus:ring-accent
             "

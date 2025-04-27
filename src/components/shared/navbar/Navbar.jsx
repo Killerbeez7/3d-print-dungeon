@@ -106,8 +106,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
     /* ---------- render ---------- */
 
     return (
-        <div className="sticky top-0 z-50">
-            <nav className="bg-bg-primary shadow-md">
+        <div className="sticky top-0 left-0 right-0 z-50">
+            <nav className="glass-effect shadow-md">
                 <div className="mx-auto px-4 sm:px-6 py-5">
                     <div className="flex items-center h-10">
                         {/* ---------- LEFT: logo & desktop nav ---------- */}
@@ -222,7 +222,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                         Sign Up
                                     </button>
                                     <button
-                                        className="bg-accent text-txt-primary font-medium px-4 py-1.5 rounded-lg hover:bg-btn-primary-hover text-md"
+                                        className="cta-gradient font-medium px-4 py-1.5 rounded-lg text-md"
                                         onClick={onLoginClick}
                                     >
                                         Sign In

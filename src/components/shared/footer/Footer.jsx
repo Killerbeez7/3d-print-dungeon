@@ -3,7 +3,7 @@ import { AiOutlineMail } from 'react-icons/ai';
 
 export const Footer = () => {
   return (
-    <footer className="bg-bg-primary text-txt-secondary py-10 mt-8 shadow-inner">
+    <footer className="glass-effect-footer bg-bg-primary text-txt-secondary py-10 mt-8">
       <div className="container mx-auto px-6 sm:px-8">
         {/* Footer Top Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center sm:text-left">
@@ -75,7 +75,7 @@ export const Footer = () => {
             />
             <button 
               type="submit"
-              className="px-6 py-2 bg-accent text-white rounded-lg hover:bg-accent-dark transition-colors duration-300"
+              className="px-6 py-2 cta-gradient font-medium rounded-lg text-md"
             >
               <AiOutlineMail className="inline mr-2 text-lg" />
               Subscribe
