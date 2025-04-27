@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../../../config/firebase";
-import { useModels } from "../../../contexts/modelsContext";
+import { db } from "@/config/firebase";
+import { useModels } from "@/hooks/useModels";
 
 export const ModelEdit = () => {
     const { id } = useParams();

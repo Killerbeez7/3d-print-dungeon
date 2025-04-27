@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ArtworksTab } from "./ArtworksTab";
 import { ArtistsTab } from "./ArtistsTab";
-import { useSearch } from "../../contexts/searchContext";
-import { useModels } from "../../contexts/modelsContext";
+import { useModels } from "@/hooks/useModels";
+import { useSearch } from "@/hooks/useSearch";
 
 export function DynamicSearch() {
     const { activeTab, setActiveTab } = useSearch();

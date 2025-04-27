@@ -1,8 +1,8 @@
 import { Navigate } from "react-router-dom";
 import PropTypes from "prop-types";
-import { useAuth } from "../../contexts/authContext";
+import { useAuth } from "@/hooks/useAuth";
 import { useState, useEffect } from "react";
-import { subscribeToMaintenanceStatus } from "../../services/maintenanceService";
+import { subscribeToMaintenanceStatus } from "@/services/maintenanceService";
 
 export const MaintenanceRoute = ({
     children,

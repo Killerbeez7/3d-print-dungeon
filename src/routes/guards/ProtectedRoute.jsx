@@ -1,8 +1,12 @@
 import { Navigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
-import { useAuth } from "../../contexts/authContext";
+import { useAuth } from "@/hooks/useAuth";
 
-export const ProtectedRoute = ({ children, requireAdmin = false, redirectTo = "/login" }) => {
+export const ProtectedRoute = ({
+    children,
+    requireAdmin = false,
+    redirectTo = "/login",
+}) => {
     const { currentUser, isAdmin } = useAuth();
     const location = useLocation();
 
@@ -20,15 +24,13 @@ export const ProtectedRoute = ({ children, requireAdmin = false, redirectTo = "/
 };
 
 ProtectedRoute.propTypes = {
-    children: PropTypes.oneOfType([
-        PropTypes.arrayOf(PropTypes.node),
-        PropTypes.node
-    ]).isRequired,
+    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node])
+        .isRequired,
     requireAdmin: PropTypes.bool,
-    redirectTo: PropTypes.string
+    redirectTo: PropTypes.string,
 };
 
 ProtectedRoute.defaultProps = {
     requireAdmin: false,
-    redirectTo: "/login"
-}; 
+    redirectTo: "/login",
+};

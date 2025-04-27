@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSearch } from "../../contexts/searchContext";
+import { useSearch } from "@/hooks/useSearch";
 import {
     getFirestore,
     collection,

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../contexts/authContext";
+import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
-import { subscribeToMaintenanceStatus } from "../../services/maintenanceService";
+import { subscribeToMaintenanceStatus } from "@/services/maintenanceService";
 
 export const MaintenancePage = () => {
     const navigate = useNavigate();
