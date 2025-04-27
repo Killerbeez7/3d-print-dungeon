@@ -98,7 +98,7 @@ export const ModelSidebar = ({
                                     clipRule="evenodd"
                                 />
                             </svg>
-                            Download Original
+                            Download (STL)
                         </button>
                     )}
                     {model.convertedFileUrl &&
@@ -127,7 +127,7 @@ export const ModelSidebar = ({
                 </div>
 
                 {/* Edit Button for Owner */}
-                {currentUser && currentUser.uid === model.userId && (
+                {currentUser && currentUser.uid === model.uploaderId && (
                     <Link
                         to={`/model/${model.id}/edit`}
                         className="flex items-center justify-center gap-2 w-full mt-3 bg-gray-200 hover:bg-gray-300 text-gray-800 py-2.5 px-4 rounded-lg transition-colors text-sm font-medium"
@@ -162,7 +162,7 @@ ModelSidebar.propTypes = {
         description: PropTypes.string,
         tags: PropTypes.arrayOf(PropTypes.string),
         likes: PropTypes.number,
-        userId: PropTypes.string,
+        uploaderId: PropTypes.string,
         originalFileUrl: PropTypes.string,
         convertedFileUrl: PropTypes.string,
     }).isRequired,
