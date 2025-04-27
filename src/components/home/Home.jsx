@@ -37,7 +37,7 @@ export const Home = () => {
     };
 
     return (
-        <div className="bg-bg-primary text-txt-primary min-h-screen">
+        <div className="text-txt-primary min-h-screen mt-4">
             {/* Featured Carousel Section */}
             <FeaturedCarousel items={featuredMockData} />
 
@@ -192,7 +192,7 @@ export const Home = () => {
                     <div className="text-center mt-8">
                         <button
                             onClick={handleLoadMore}
-                            className="bg-accent text-white py-2 px-6 rounded-full font-medium hover:bg-accent-hover transition-colors"
+                            className="cta-gradient py-2 px-6 rounded-full font-medium"
                         >
                             Load More
                         </button>
