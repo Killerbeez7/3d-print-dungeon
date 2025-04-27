@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { db } from "../config/firebase";
 import {
     collection,
@@ -12,10 +12,8 @@ import {
     doc,
     updateDoc,
 } from "firebase/firestore";
-
-const CommentsContext = createContext();
-
-export const useComments = () => useContext(CommentsContext);
+import PropTypes from "prop-types";
+import { CommentsContext } from "../contexts/commentsContext.tsx";
 
 export const CommentsProvider = ({ modelId, children }) => {
     const [comments, setComments] = useState([]);
@@ -92,3 +90,8 @@ export const CommentsProvider = ({ modelId, children }) => {
         </CommentsContext.Provider>
     );
 };
+
+CommentsProvider.propTypes = {
+    modelId: PropTypes.string.isRequired,
+    children: PropTypes.node.isRequired,
+}; 
