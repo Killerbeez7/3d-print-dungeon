@@ -66,10 +66,10 @@ export const ArtistsList = () => {
     }
 
     return (
-        <div className="bg-bg-primary text-txt-primary min-h-screen">
-            <section className="relative bg-gradient-to-r from-accent to-accent-hover px-4 py-12">
-                <h1 className="text-3xl text-white font-bold text-center">Artists</h1>
-            </section>
+        <div className="text-txt-primary min-h-screen">
+            <div className="mx-auto p-4">
+                <h1 className="mb-4 font-bold">Artists</h1>
+            </div>
             <div className="container mx-auto px-4 py-4">
                 {artists.length === 0 ? (
                     <div className="text-center py-8">
