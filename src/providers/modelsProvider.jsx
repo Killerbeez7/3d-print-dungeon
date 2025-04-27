@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { db } from "../config/firebase";
 import {
     collection,
@@ -10,10 +10,7 @@ import {
     getDoc,
 } from "firebase/firestore";
 import PropTypes from "prop-types";
-
-const ModelsContext = createContext();
-
-export const useModels = () => useContext(ModelsContext);
+import { ModelsContext } from "../contexts/modelsContext";
 
 export const ModelsProvider = ({ children }) => {
     const [models, setModels] = useState([]);
@@ -71,10 +68,6 @@ export const ModelsProvider = ({ children }) => {
         return () => unsubscribe();
     };
 
-    // fetch uploader info
-
-    // ...
-
     const fetchUploader = useCallback(async (uploaderId) => {
         try {
             const userDocRef = doc(db, "users", uploaderId);
@@ -107,4 +100,4 @@ export const ModelsProvider = ({ children }) => {
 
 ModelsProvider.propTypes = {
     children: PropTypes.node.isRequired,
-};
+}; 
