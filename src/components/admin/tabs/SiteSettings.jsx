@@ -22,11 +22,13 @@ export const SiteSettings = () => {
                 const settingsDoc = await getDoc(settingsRef);
                 
                 if (settingsDoc.exists()) {
+                    console.log("Fetched settings:", settingsDoc.data());
                     setSettings(current => ({
                         ...current,
                         ...settingsDoc.data()
                     }));
                 } else {
+                    console.log("Creating initial settings document");
                     // Create initial settings document if it doesn't exist
                     await setDoc(settingsRef, {
                         allowNewRegistrations: settings.allowNewRegistrations,
@@ -58,7 +60,9 @@ export const SiteSettings = () => {
                 featuredCategories: settings.featuredCategories,
             };
 
+            console.log("Saving settings:", settingsToSave);
             await setDoc(settingsRef, settingsToSave, { merge: true });
+            console.log("Settings saved successfully");
             setSaveStatus({ type: "success", message: "Settings saved successfully!" });
         } catch (error) {
             console.error("Error saving settings:", error);
@@ -70,6 +74,7 @@ export const SiteSettings = () => {
 
     const handleAddCategory = () => {
         if (settings.newCategoryName.trim() && !settings.featuredCategories.includes(settings.newCategoryName.trim())) {
+            console.log("Adding category:", settings.newCategoryName.trim());
             setSettings(current => ({
                 ...current,
                 featuredCategories: [...current.featuredCategories, current.newCategoryName.trim()],
@@ -79,6 +84,7 @@ export const SiteSettings = () => {
     };
 
     const handleRemoveCategory = (category) => {
+        console.log("Removing category:", category);
         setSettings(current => ({
             ...current,
             featuredCategories: current.featuredCategories.filter(c => c !== category)
@@ -165,6 +171,11 @@ export const SiteSettings = () => {
                                     ...current,
                                     newCategoryName: e.target.value
                                 }))}
+                                onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                        handleAddCategory();
+                                    }
+                                }}
                                 placeholder="Enter category name"
                                 className="flex-1 px-4 py-2 rounded-lg bg-bg-surface text-txt-primary"
                             />
