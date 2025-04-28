@@ -5,7 +5,6 @@ import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 import { FeaturedCarousel } from "./FeaturedCarousel";
 import { featuredMockData } from "./featuredMockData";
 
-
 export const Home = () => {
     const { models, loading } = useModels();
     const [hasMore, setHasMore] = useState(true);
