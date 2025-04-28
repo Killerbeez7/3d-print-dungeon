@@ -76,26 +76,50 @@ export const ReusableCarousel = ({
     responsive = [
         {
             breakpoint: 1024,
-            settings: { slidesToShow: 2 },
+            settings: {
+                slidesToShow: 3,
+                slidesToScroll: 3,
+            },
         },
         {
-            breakpoint: 600,
-            settings: { slidesToShow: 1 },
+            breakpoint: 768,
+            settings: {
+                slidesToShow: 2,
+                slidesToScroll: 2,
+            },
+        },
+        {
+            breakpoint: 480,
+            settings: {
+                slidesToShow: 1,
+                slidesToScroll: 1,
+            },
         },
     ],
     className = "",
     itemClassName = "",
     containerClassName = "",
 }) => {
+    // Adjust slidesToShow and slidesToScroll if there are fewer items
+    const adjustedSlidesToShow = Math.min(slidesToShow, items.length);
+    const adjustedSlidesToScroll = Math.min(slidesToScroll, items.length);
+
     const settings = {
         infinite,
         speed,
-        slidesToShow,
-        slidesToScroll,
+        slidesToShow: adjustedSlidesToShow,
+        slidesToScroll: adjustedSlidesToScroll,
         nextArrow: <NextArrow />,
         prevArrow: <PrevArrow />,
         select: false,
-        responsive,
+        responsive: responsive.map(breakpoint => ({
+            ...breakpoint,
+            settings: {
+                ...breakpoint.settings,
+                slidesToShow: Math.min(breakpoint.settings.slidesToShow, items.length),
+                slidesToScroll: Math.min(breakpoint.settings.slidesToScroll, items.length),
+            }
+        })),
     };
 
     return (
