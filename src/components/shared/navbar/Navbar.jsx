@@ -2,12 +2,17 @@ import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
 
+// hooks
 import { useAuth } from "@/hooks/useAuth";
 import { useSearch } from "@/hooks/useSearch";
 import { useClickOutside } from "@/hooks/useClickOutside";
 
+// configs
 import { NAV_SECTIONS } from "@/config/navConfig";
 import { STATIC_ASSETS } from "@/config/assetsConfig";
+
+// components
+import { AuthButtons } from "./AuthButtons";
 
 import {
     MdFileUpload,
@@ -214,20 +219,10 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                             </button>
 
                             {!currentUser ? (
-                                <>
-                                    <button
-                                        className="bg-btn-secondary text-txt-primary font-medium px-4 py-1.5 rounded-lg hover:bg-btn-secondary-hover text-md"
-                                        onClick={onSignUpClick}
-                                    >
-                                        Sign Up
-                                    </button>
-                                    <button
-                                        className="cta-gradient font-medium px-4 py-1.5 rounded-lg text-md"
-                                        onClick={onLoginClick}
-                                    >
-                                        Sign In
-                                    </button>
-                                </>
+                                <AuthButtons
+                                    onLoginClick={onLoginClick}
+                                    onSignUpClick={onSignUpClick}
+                                />
                             ) : (
                                 <>
                                     {/* Desktop buttons */}
