@@ -124,7 +124,8 @@ h6 {
 
 [data-theme="dark"] {
     --background-rgb: 20, 20, 20;
-    --accent-rgba: 154, 92, 255, 0.3;
+    /* --accent-rgba: 154, 92, 255, 0.3; */  
+    --accent-rgba: 106, 0, 255, 0.3;
 
     --bg-primary: #141414;
     --bg-secondary: #1B1B24;
