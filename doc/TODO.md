@@ -1,12 +1,17 @@
-model viewer component problems
-28/04/25
+
+29/04/25
 - [ ] fix forum routes: delete lines [30-40] and add open auth modal if non logged user tries to click
 - [ ] add maintenance protection for forum home page - wrap lines [22-24] with {withMaintenance}
+  
+28/04/25
+Small UX update Navbar, Carousel
 - [x] update: mobile carousel slide from 4 to 1
-- [x] update: move auth buttons out of navbar in separate component.hide sign up button on mobile, takes too much space
+- [x] update: move auth buttons out of navbar in separate component.hide sign up button on mobile, takes too much 
+- [x] add: logic to first item from carousel (featured models) now list all models that have the featured tag from admin dashboard
 
 
 27/04/2025
+Contexts refactoring
 - [x] split + tsx: authContext: authContext + authProvicer + useAuth
 - [x] split + tsx (only context file): modelsContext ==> modelsContext + modelsProvicer + useModels
 - [x] split + tsx (only context file): forumContext ==> forumContext + forumProvicer + useForum
@@ -15,6 +20,7 @@ model viewer component problems
 
 
 26/04/2025
+ModelViewer components fix
 - [x] fix: fullscreen button in mobile model viewer
 - [x] fix: menu buttons are clickable even when the menu is closed in full screen
 - [x] add: roles and aria labels for menu buttons for better SEO
