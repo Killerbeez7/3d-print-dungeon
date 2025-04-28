@@ -123,7 +123,7 @@ export function GlobalSearch() {
             className="relative w-full max-w-[1000px]"
             ref={containerRef}
         >
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted pointer-events-none">
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
                 <FontAwesomeIcon icon={faSearch} />
             </span>
             <input
@@ -132,19 +132,19 @@ export function GlobalSearch() {
                 value={searchTerm}
                 onChange={handleInputChange}
                 onFocus={handleFocus}
-                className="border-2 border-br-secondary rounded-full w-full text-sm focus:outline-none focus:border-accent-hover py-2 pl-10 pr-10"
+                className="border-2 border-gray-300 rounded-full w-full text-sm focus:outline-none focus:border-accent-hover py-2 pl-10 pr-10"
             />
             {searchTerm && (
                 <button
                     type="button"
                     onClick={handleClearSearch}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-muted hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                     <FontAwesomeIcon icon={faTimes} />
                 </button>
             )}
             {!isMobile && showDropdown && (
-                <div className="absolute top-[110%] left-0 w-full bg-bg-primary border border-br-secondary rounded-md shadow-lg mt-1 z-50">
+                <div className="absolute top-[110%] left-0 w-full bg-bg-primary border border-gray-300 rounded-md shadow-lg mt-1 z-50">
                     <ul className="py-2 max-h-80 overflow-auto text-sm">
                         {searchTerm.trim() && artistResults.length > 0 && (
                             <>
