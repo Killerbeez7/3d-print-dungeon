@@ -107,7 +107,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
     return (
         <div className="sticky top-0 left-0 right-0 z-50">
-            <nav className="glass-effect shadow-md">
+            <nav className="glass-effect shadow-sm">
                 <div className="mx-auto px-4 sm:px-6 py-5">
                     <div className="flex items-center h-10">
                         {/* ---------- LEFT: logo & desktop nav ---------- */}
@@ -265,7 +265,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                     : "opacity-0 invisible"
                                             }`}
                                         >
-                                            <div className="py-1">
+                                            <div className="py-1 z-200">
                                                 <div className="px-4 py-2 text-md text-txt-muted border-b border-br-secondary">
                                                     {currentUser?.displayName ||
                                                         "Username"}
@@ -352,7 +352,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
             {/* ---------- Mobile drawer ---------- */}
             <div
-                className={`md:hidden shadow-md absolute inset-x-0 bg-bg-primary transition-all duration-100 ease-out transform z-40 ${
+                className={`md:hidden shadow-md border-t border-br-secondary glass-effect absolute inset-x-0 bg-bg-primary transition-all duration-100 ease-out transform z-40 ${
                     isMobileMenuOpen
                         ? "translate-y-0 opacity-100 pointer-events-auto"
                         : "-translate-y-full opacity-0 pointer-events-none"

@@ -3,7 +3,7 @@ import { AiOutlineMail } from 'react-icons/ai';
 
 export const Footer = () => {
   return (
-    <footer className="glass-effect-footer bg-bg-primary text-txt-secondary py-10 mt-8">
+    <footer className="glass-effect-footer bg-bg-primary text-txt-secondary py-10 mt-10">
       <div className="container mx-auto px-6 sm:px-8">
         {/* Footer Top Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center sm:text-left">
