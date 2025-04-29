@@ -48,16 +48,16 @@ export const Footer = () => {
             <h3 className="text-lg font-semibold text-accent">Follow Us</h3>
             <div className="flex justify-center sm:justify-start space-x-4 text-xl mt-2">
               <a href="#" className="hover:text-accent-hover transition-colors duration-200" aria-label="Facebook">
-                <FaFacebook />
+                <FaFacebook size={24}/>
               </a>
               <a href="#" className="hover:text-accent-hover transition-colors duration-200" aria-label="Twitter">
-                <FaTwitter />
+                <FaTwitter size={24}/>
               </a>
               <a href="#" className="hover:text-accent-hover transition-colors duration-200" aria-label="Instagram">
-                <FaInstagram />
+                <FaInstagram size={24}/>
               </a>
               <a href="#" className="hover:text-accent-hover transition-colors duration-200" aria-label="LinkedIn">
-                <FaLinkedin />
+                <FaLinkedin size={24}/>
               </a>
             </div>
           </div>
