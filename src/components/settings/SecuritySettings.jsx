@@ -106,7 +106,7 @@ export const SecuritySettings = () => {
                 <div>
                     <button
                         type="submit"
-                        className={`px-4 py-2 cta-gradient rounded-md ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                        className={`px-4 py-2 cta-button ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
                         disabled={isLoading}
                     >
                         {isLoading ? "Updating..." : "Change Password"}

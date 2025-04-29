@@ -143,7 +143,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
           relative w-full max-w-md p-6
           bg-bg-surface text-txt-primary
           border border-br-primary
-          rounded-md shadow-lg
+          rounded-[10px] shadow-lg
           mx-auto top-1/2 -translate-y-1/2
         "
             >
@@ -160,10 +160,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                     {isSignUp ? "Sign Up" : "Sign In"}
                 </h2>
 
-                {/* ERROR MESSAGE */}
-                {error && (
-                    <p className="text-center text-error font-semibold mb-3">{error}</p>
-                )}
+                
 
                 {/* EMAIL / PASSWORD FORM */}
                 <form onSubmit={handleAuth} className="space-y-4">
@@ -177,7 +174,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                             placeholder="you@example.com"
                             className="
                 w-full px-3 py-2 
-                border-2 border-br-primary rounded
+                border-2 border-br-primary rounded-[10px]
                 bg-bgPrimary text-txt-primary
                 focus:outline-none focus:border-focus focus:ring-focus
               "
@@ -194,7 +191,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                             placeholder="Enter your password"
                             className="
                 w-full px-3 py-2 
-                border-2 border-br-primary rounded
+                border-2 border-br-primary rounded-[10px]
                 bg-bgPrimary text-txt-primary
                 focus:outline-none focus:border-focus focus:ring-focus
               "
@@ -215,7 +212,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                                 placeholder="Re-enter your password"
                                 className="
                   w-full px-3 py-2 
-                  border-2 border-br-primary rounded
+                  border-2 border-br-primary rounded-[10px]
                   bg-bgPrimary text-txt-primary
                   focus:outline-none focus:border-focus focus:ring-focus
                 "
@@ -223,16 +220,17 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                         </div>
                     )}
 
+                    {/* ERROR MESSAGE */}
+                    <div className="h-6 mb-3">
+                        {error && (
+                            <p className="text-center text-error font-semibold">{error}</p>
+                        )}
+                    </div>
+
                     {/* SUBMIT BUTTON */}
                     <button
                         type="submit"
-                        className="
-              w-full py-2
-              rounded cta-gradient
-              font-semibold
-              transition-colors
-              focus:outline-none focus:ring-2 focus:ring-accent
-            "
+                        className="w-full py-2 cta-button"
                     >
                         {loading
                             ? "Processing..."
@@ -309,7 +307,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                         </>
                     ) : (
                         <>
-                            Don't have an account?{" "}
+                            Don&apos;t have an account?{" "}
                             <button
                                 onClick={onSwitchMode}
                                 className="text-accent hover:underline ml-1 font-medium"
