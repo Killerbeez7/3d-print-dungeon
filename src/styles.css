@@ -1,7 +1,7 @@
 /* Reset CSS */
 
 /* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Michroma&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Michroma&display=swap");
 
 html,
 body {
@@ -9,14 +9,13 @@ body {
     padding: 0;
     box-sizing: border-box;
     min-height: 100lvh;
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
     background-color: var(--bg-primary);
-    background-image:
-        radial-gradient(
-            ellipse 50% 45% at 50% 70%,
-            rgba(var(--background-second-rgba)) 20%,
-            transparent 100%
-        );
+    background-image: radial-gradient(
+        ellipse 50% 45% at 50% 70%,
+        rgba(var(--background-second-rgba)) 20%,
+        transparent 100%
+    );
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -26,17 +25,20 @@ body {
 
 /* Blur Overlay */
 body::after {
-    content: '';
+    content: "";
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100lvh;
     pointer-events: none;
-    backdrop-filter: blur(80px);
-    -webkit-backdrop-filter: blur(80px);
-    z-index: -1;
     background: rgba(0, 0, 0, 0);
+    backdrop-filter: blur(80px);
+    -o-backdrop-filter: blur(80px);
+    -ms-backdrop-filter: blur(80px);
+    -moz-backdrop-filter: blur(80px);
+    -webkit-backdrop-filter: blur(80px);
+    z-index: 50;
 }
 
 /*Grain Overlay*/
@@ -61,8 +63,13 @@ body::after {
     box-sizing: inherit;
 }
 
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Michroma', sans-serif;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-family: "Michroma", sans-serif;
 }
 
 h1 {
@@ -92,10 +99,10 @@ h6 {
     --background-main-rgb: 217, 217, 217;
     --background-second-rgba: 255, 255, 255, 1;
 
-    --bg-primary: #D9D9D9;
-    --bg-secondary: #E6E6E6;
+    --bg-primary: #d9d9d9;
+    --bg-secondary: #e6e6e6;
     --bg-tertiary: #cccccc;
-    --bg-surface: #F4F4F4;
+    --bg-surface: #f4f4f4;
     --bg-reverse: #141414;
 
     --txt-primary: #1b1b24;
@@ -103,12 +110,12 @@ h6 {
     --txt-highlight: #666680;
     --txt-muted: #9999aa;
 
-    --accent-dark: #6C3CBF;
-    --accent: #9A5CFF;
-    --accent-hover: #B890FF;
+    --accent-dark: #6c3cbf;
+    --accent: #9a5cff;
+    --accent-hover: #b890ff;
 
-    --contrast: #FFB300;
-    --contrast-hover: #FFD366;
+    --contrast: #ffb300;
+    --contrast-hover: #ffd366;
 
     --br-primary: #9999aa;
     --br-secondary: #b2b2c3;
@@ -127,23 +134,23 @@ h6 {
     --background-second-rgba: 106, 0, 255, 0.3;
 
     --bg-primary: #141414;
-    --bg-secondary: #1B1B24;
-    --bg-tertiary: #3A3A4C;
+    --bg-secondary: #1b1b24;
+    --bg-tertiary: #3a3a4c;
     --bg-surface: #2a2a3c;
 
-    --bg-reverse: #F5F5F8;
+    --bg-reverse: #f5f5f8;
 
-    --txt-primary: #F5F5F8;
+    --txt-primary: #f5f5f8;
     --txt-secondary: #c7c7d9;
     --txt-highlight: #ffffff;
     --txt-muted: #9a9ab5;
 
-    --accent-dark: #6C3CBF;
-    --accent: #9A5CFF;
-    --accent-hover: #B890FF;
+    --accent-dark: #6c3cbf;
+    --accent: #9a5cff;
+    --accent-hover: #b890ff;
 
-    --contrast: #FFB300;
-    --contrast-hover: #FFD366;
+    --contrast: #ffb300;
+    --contrast-hover: #ffd366;
 
     --br-primary: #9a9ab5;
     --br-secondary: #6e6e81;
@@ -191,23 +198,30 @@ h6 {
 
 /* Glass morphism */
 .glass-effect {
-    background: rgba(var(--background-main-rgb), 0.9) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
-    z-index: -1;
+    background: rgba(var(--background-main-rgb), 0.9);
+    -webkit-backdrop-filter: blur(20px);
+    -moz-backdrop-filter: blur(20px);
+    -ms-backdrop-filter: blur(20px);
+    -o-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    z-index: 50;
 }
 
 .glass-effect-footer {
-    background: rgba(var(--background-main-rgb), 0.4) !important;
-    backdrop-filter: blur(20px) !important;
-    -webkit-backdrop-filter: blur(20px) !important;
+    background: rgba(var(--background-main-rgb), 0.4);
+    -webkit-backdrop-filter: blur(20px);
+    -moz-backdrop-filter: blur(20px);
+    -ms-backdrop-filter: blur(20px);
+    -o-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    z-index: 50;
 }
 
 /* CTA Button Gradient */
 .cta-button {
     background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 100%);
     transition: all 0.3s ease;
-    color: #F5F5F8;
+    color: #f5f5f8;
     font-weight: 600;
     border-radius: 10px;
 }
@@ -221,7 +235,7 @@ h6 {
 .secondary-button {
     background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-tertiary) 100%);
     transition: all 0.3s ease;
-    color: #F5F5F8;
+    color: #f5f5f8;
     font-weight: 600;
     border-radius: 10px;
 }
@@ -230,5 +244,5 @@ h6 {
     background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-tertiary) 100%);
     transform: translateY(-1px);
     box-shadow: 0 0px 12px var(--bg-tertiary);
-    color: #F5F5F8;
+    color: #f5f5f8;
 }
