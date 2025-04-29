@@ -60,7 +60,7 @@ export const SecuritySettings = () => {
                         id="currentPassword"
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="relative w-2/3 px-4 py-2 border border-br-primary rounded-md bg-bg-primary text-txt-primary"
+                        className="relative w-2/3 px-3 py-2 border border-br-primary rounded-md bg-bg-secondary text-txt-primary"
                         placeholder="Enter current password"
                         required
                     />
@@ -76,7 +76,7 @@ export const SecuritySettings = () => {
                         id="newPassword"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="relative w-2/3 px-4 py-2 border border-br-primary rounded-md bg-bg-primary text-txt-primary"
+                        className="relative w-2/3 px-3 py-2 border border-br-primary rounded-md bg-bg-secondary text-txt-primary"
                         placeholder="Enter new password"
                         required
                     />
@@ -92,7 +92,7 @@ export const SecuritySettings = () => {
                         id="confirmPassword"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="relative w-2/3 px-4 py-2 border border-br-primary rounded-md bg-bg-primary text-txt-primary"
+                        className="relative w-2/3 px-3 py-2 border border-br-primary rounded-md bg-bg-secondary text-txt-primary"
                         placeholder="Confirm new password"
                         required
                     />

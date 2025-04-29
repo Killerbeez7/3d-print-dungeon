@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { TiDelete } from "react-icons/ti";
 // components
 import { ImagesUpload } from "./ImagesUpload";
@@ -36,7 +36,7 @@ export function InfoForm({ modelData, setModelData }) {
 
     return (
         <section className="flex flex-col gap-2">
-            <section className="bg-bg-secondary rounded-md py-4 px-8">
+            <section className="bg-bg-surface rounded-md py-4 px-8">
                 <div>
                     {/* Image Upload Section */}
                     <ImagesUpload modelData={modelData} setModelData={setModelData} />
