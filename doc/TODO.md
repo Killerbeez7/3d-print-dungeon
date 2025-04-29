@@ -2,6 +2,7 @@
 29/04/25
 - [ ] fix forum routes: delete lines [30-40] and add open auth modal if non logged user tries to click
 - [ ] add maintenance protection for forum home page - wrap lines [22-24] with {withMaintenance}
+- [ ] add timestamps for comments
   
 28/04/25
 Small UX update Navbar, Carousel
