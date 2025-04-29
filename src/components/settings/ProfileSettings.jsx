@@ -17,9 +17,9 @@ export const ProfileSettings = () => {
     ];
 
     return (
-        <div className="max-w-6xl mx-auto p-4 flex space-x-6">
+        <div className="max-w-6xl mx-auto p-4 flex gap-4 md:flex-row flex-col">
             {/* Sidebar */}
-            <aside className="w-1/4 p-4 bg-bg-surface shadow-md rounded-lg">
+            <aside className="md:w-1/4 p-4 bg-bg-surface shadow-md rounded-lg flex-grow">
                 <div className="flex flex-col items-center text-center">
                     <img
                         src={currentUser?.photoURL || "/user.png"}
@@ -51,7 +51,7 @@ export const ProfileSettings = () => {
             </aside>
 
             {/* Main Content */}
-            <section className="w-3/4 p-6 bg-bg-surface shadow-md rounded-lg">
+            <section className="md:w-3/4 p-6 bg-bg-surface shadow-md rounded-lg flex-grow">
                 {activeTab === "account" && <AccountSettings />}
                 {/* {activeTab === "notifications" && <NotificationSettings />} */}
                 {activeTab === "security" && <SecuritySettings />}
