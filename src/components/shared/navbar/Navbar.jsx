@@ -120,15 +120,15 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                             {/* mobile hamburger */}
                             <button
                                 id="hamburger-button"
-                                className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+                                className="md:hidden p-[0.5px] rounded-lg hover:bg-gray-100"
                                 onClick={toggleMobileMenu}
                                 aria-label="Toggle mobile menu"
                                 aria-expanded={isMobileMenuOpen}
                             >
                                 {isMobileMenuOpen ? (
-                                    <MdClose size={24} />
+                                    <MdClose size={30} />
                                 ) : (
-                                    <MdMenu size={24} />
+                                    <MdMenu size={30} />
                                 )}
                             </button>
 
