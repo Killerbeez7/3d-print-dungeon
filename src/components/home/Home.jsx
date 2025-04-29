@@ -189,7 +189,7 @@ export const Home = () => {
                     <div className="text-center mt-8">
                         <button
                             onClick={handleLoadMore}
-                            className="cta-gradient py-2 px-6 rounded-full font-medium"
+                            className="cta-button py-2 px-6 rounded-full font-bold"
                         >
                             Load More
                         </button>

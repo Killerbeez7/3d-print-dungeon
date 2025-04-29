@@ -85,7 +85,7 @@ export const ModelComments = ({ openAuthModal }) => {
                 />
                 <button
                     type="submit"
-                    className="cta-gradient px-4 py-2 rounded-lg font-semibold transition-colors"
+                    className="cta-button px-4 py-2"
                 >
                     Submit
                 </button>

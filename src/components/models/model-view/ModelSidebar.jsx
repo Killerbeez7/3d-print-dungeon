@@ -84,7 +84,7 @@ export const ModelSidebar = ({
                     {model.originalFileUrl && (
                         <button
                             onClick={() => window.open(model.originalFileUrl, "_blank")}
-                            className="flex items-center justify-center gap-2 bg-accent hover:bg-accent-hover text-white py-2.5 px-4 rounded-lg transition-colors text-sm font-medium"
+                            className="cta-button flex items-center justify-center gap-2 py-4 px-2.5 text-sm"
                         >
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
@@ -107,7 +107,7 @@ export const ModelSidebar = ({
                                 onClick={() =>
                                     window.open(model.convertedFileUrl, "_blank")
                                 }
-                                className="flex items-center justify-center gap-2 bg-bg-tertiary hover:bg-bg-surface text-txt-primary py-2.5 px-4 rounded-lg transition-colors text-sm font-medium"
+                                className="secondary-button flex items-center justify-center gap-2 py-4 px-2.5 text-sm"
                             >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
