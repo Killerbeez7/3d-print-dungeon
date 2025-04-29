@@ -1,6 +1,17 @@
 {
   "hosting": {
     "public": "dist",
+    "headers": [
+  {
+    "source": "**",
+    "headers": [
+      {
+        "key": "Permissions-Policy",
+        "value": "layout-animations=(self), display-capture=(), document-domain=(), fullscreen=(self), sync-xhr=(), backdrop-filter=(self)"
+      }
+    ]
+  }
+],
     "rewrites": [
       {
         "source": "/**",

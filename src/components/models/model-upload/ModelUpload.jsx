@@ -175,7 +175,7 @@ export function ModelUpload() {
             </div>
 
             {error && (
-                <div className="text-red-600 font-semibold text-center">{error}</div>
+                <div className="text-error font-semibold text-center">{error}</div>
             )}
 
             <FilesUpload step={step} files={files} setFiles={setFiles} />
@@ -191,15 +191,15 @@ export function ModelUpload() {
                 </div>
             )}
 
-            <section className="bg-bg-secondary rounded-md p-4">
+            <section className="bg-bg-surface rounded-md p-4">
                 {step === 1 && (
                     <div className="flex justify-center">
                         <button
                             onClick={() => setStep(2)}
                             className={`px-4 py-2 rounded-md ${
                                 files.length === 0
-                                    ? "bg-btn-disabled"
-                                    : "bg-green-500 text-white hover:bg-green-600"
+                                    ? "bg-btn-disabled font-medium"
+                                    : "cta-button"
                             }`}
                             disabled={files.length === 0}
                         >
@@ -218,7 +218,7 @@ export function ModelUpload() {
                         </button>
                         <button
                             onClick={handleSubmit}
-                            className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
+                            className="cta-button px-4 py-2"
                             disabled={isUploading}
                         >
                             {isUploading ? "Uploading..." : "Submit"}
@@ -255,12 +255,12 @@ function StepIndicator({ stepNumber, label, currentStep }) {
     return (
         <div
             className={`flex items-center space-x-2 ${
-                isActive ? "text-green-600" : "text-gray-600"
+                isActive ? "text-accent" : "text-txt-secondary"
             }`}
         >
             <div
                 className={`w-6 h-6 flex items-center justify-center rounded-full ${
-                    isActive ? "bg-green-500" : "bg-gray-300"
+                    isActive ? "bg-accent" : "bg-txt-secondary"
                 } text-white font-bold`}
             >
                 {stepNumber}

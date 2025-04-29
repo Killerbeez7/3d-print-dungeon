@@ -123,7 +123,7 @@ export const ReusableCarousel = ({
     };
 
     return (
-        <section className={`px-4 mb-8 ${containerClassName}`}>
+        <section className={`p-2 ${containerClassName}`}>
             <Slider {...settings} className={className}>
                 {items.map((item, index) => (
                     <div

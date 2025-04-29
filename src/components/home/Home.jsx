@@ -34,7 +34,7 @@ export const Home = () => {
     };
 
     return (
-        <div className="text-txt-primary min-h-screen mt-4">
+        <div className="text-txt-primary min-h-screen">
             {/* Featured Carousel Section */}
             <FeaturedCarousel items={featuredMockData} />
 
