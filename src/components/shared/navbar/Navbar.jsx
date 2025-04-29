@@ -174,18 +174,18 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                         </button>
                                         {/* Desktop Dropdown */}
                                         <div
-                                            className={`absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-bg-surface ring-1 ring-black ring-opacity-5 transition-all duration-200 ${
+                                            className={`absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-bg-surface ring-1 ring-black ring-opacity-5 transition-all duration-200 overflow-hidden ${
                                                 activeDropdown === section.label
                                                     ? "opacity-100 visible"
                                                     : "opacity-0 invisible"
                                             }`}
                                         >
-                                            <div className="py-1">
+                                            <div>
                                                 {section.items.map((item) => (
                                                     <Link
                                                         key={item.to}
                                                         to={item.to}
-                                                        className="block px-4 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
+                                                        className="block px-4 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:overflow-hidden"
                                                         onClick={() =>
                                                             setActiveDropdown(null)
                                                         }

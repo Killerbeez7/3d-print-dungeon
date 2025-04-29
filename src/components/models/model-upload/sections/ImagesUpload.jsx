@@ -1,4 +1,3 @@
-import React from "react";
 import { TiDelete } from "react-icons/ti";
 
 export function ImagesUpload({ modelData, setModelData }) {
