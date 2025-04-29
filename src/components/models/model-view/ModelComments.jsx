@@ -1,5 +1,6 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
+import { formatDistanceToNow } from "date-fns";
 //contexts
 import { useAuth } from "@/hooks/useAuth";
 import { useComments } from "@/hooks/useComments";
@@ -141,6 +142,11 @@ export const ModelComments = ({ openAuthModal }) => {
                                     <div className="text-sm font-semibold text-txt-primary">
                                         {comment.userName}
                                     </div>
+                                    {comment.createdAt && (
+                                        <div className="text-xs text-txt-secondary">
+                                            {formatDistanceToNow(comment.createdAt.toDate(), { addSuffix: true })}
+                                        </div>
+                                    )}
                                 </div>
                                 <p className="text-sm text-txt-secondary whitespace-pre-line">
                                     {comment.text}
