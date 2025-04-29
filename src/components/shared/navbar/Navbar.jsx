@@ -112,7 +112,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
     return (
         <div className="sticky top-0 left-0 right-0 z-50">
-            <nav className="glass-effect shadow-sm">
+            <nav className="glass-effect">
                 <div className="mx-auto px-4 sm:px-6 py-5">
                     <div className="flex items-center h-10">
                         {/* ---------- LEFT: logo & desktop nav ---------- */}
@@ -144,12 +144,12 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                             </div>
 
                             {/* logo desktop */}
-                            <div className="hidden md:block whitespace-nowrap flex-shrink-0">
+                            <div className="hidden md:block whitespace-nowrap flex-shrink-0 w-[50px]">
                                 <Link to="/" className="flex items-center space-x-2 ml-2">
                                     <img
                                         src={STATIC_ASSETS.LOGO}
                                         alt="Site Logo"
-                                        className="h-9 w-auto"
+                                        className="h-9 w-auto hover:h-10 transition-all duration-300"
                                     />
                                 </Link>
                             </div>
@@ -252,15 +252,16 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                         >
                                             <MdAccountCircle className="h-7 w-7" />
                                         </button>
-
+                                        
+                                        {/*Profile Dropdown Options*/}
                                         <div
-                                            className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-bg-surface ring-1 ring-black ring-opacity-5 transition-all duration-200 ${
+                                            className={`absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-bg-surface ring-1 ring-black ring-opacity-5 transition-all duration-200 z-60 ${
                                                 activeDropdown === "profile"
                                                     ? "opacity-100 visible"
                                                     : "opacity-0 invisible"
                                             }`}
                                         >
-                                            <div className="py-1 z-200">
+                                            <div className="py-1 z-60">
                                                 <div className="px-4 py-2 text-md text-txt-muted border-b border-br-secondary">
                                                     {currentUser?.displayName ||
                                                         "Username"}
@@ -330,7 +331,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                     {/* ---------- Search overlay (mobile) ---------- */}
                     <div
                         ref={searchOverlayRef}
-                        className={`fixed inset-0 bg-black bg-opacity-50 z-50 transition-opacity duration-200 ${
+                        className={`fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-200 ${
                             isSearchVisible
                                 ? "opacity-100 pointer-events-auto"
                                 : "opacity-0 pointer-events-none"
@@ -347,7 +348,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
             {/* ---------- Mobile drawer ---------- */}
             <div
-                className={`md:hidden shadow-md border-t border-br-secondary glass-effect absolute inset-x-0 bg-bg-primary transition-all duration-100 ease-out transform z-40 ${
+                className={`md:hidden shadow-md border-t border-br-secondary glass-effect absolute inset-x-0 transition-all duration-300 ease-in-out transform ${
                     isMobileMenuOpen
                         ? "translate-y-0 opacity-100 pointer-events-auto"
                         : "-translate-y-full opacity-0 pointer-events-none"
@@ -401,7 +402,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                 />
                             </button>
                             <div
-                                className={`bg-bg-secondary transition-all duration-200 ${
+                                className={`bg-bg-secondary transition-all duration-200 rounded-md ${
                                     mobileDropdown === section.label
                                         ? "max-h-48 overflow-y-auto"
                                         : "max-h-0 overflow-hidden"
