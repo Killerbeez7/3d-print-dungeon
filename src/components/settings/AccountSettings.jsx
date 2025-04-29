@@ -22,18 +22,18 @@ export const AccountSettings = () => {
 
                 <div className="relative w-2/3">
                     <div
-                        className="relative cursor-pointer border border-br-primary px-2 py-2 rounded-md text-txt-primary bg-bg-primary"
+                        className="relative cursor-pointer border border-br-primary pl-3 py-2 rounded-md text-txt-primary bg-bg-secondary"
                         onClick={() => setIsOpen(!isOpen)}
                     >
                         <span>{themes.find((t) => t.id === theme)?.label || "Select Theme"}</span>
                     </div>
 
                     {isOpen && (
-                        <div className="absolute text-txt-secondary mt-1 bg-bg-primary w-full border border-br-primary rounded-md shadow-md z-10 overflow-hidden">
+                        <div className="absolute text-txt-secondary mt-1 bg-bg-secondary w-full border border-br-primary rounded-md shadow-md z-10 overflow-hidden">
                             {themes.map((t) => (
                                 <button
                                     key={t.id}
-                                    className="block w-full text-left px-2 py-2 hover:bg-bg-secondary hover:text-txt-primary hover:cursor-pointer transition"
+                                    className="block w-full text-left pl-3 py-2 hover:bg-bg-primary hover:text-txt-primary hover:cursor-pointer transition"
                                     onClick={() => {
                                         setTheme(t.id);
                                         setIsOpen(false);
