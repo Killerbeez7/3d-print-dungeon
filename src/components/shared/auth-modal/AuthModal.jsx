@@ -2,7 +2,11 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useAuth } from "@/hooks/useAuth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle, faTwitter, faFacebook } from "@fortawesome/free-brands-svg-icons";
+import {
+    faGoogle,
+    faTwitter,
+    faFacebook,
+} from "@fortawesome/free-brands-svg-icons";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
@@ -42,18 +46,32 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
         if (isOpen) {
             // Capture wheel, touchmove, and keydown events at the window level
             window.addEventListener("wheel", blockScroll, { passive: false });
-            window.addEventListener("touchmove", blockScroll, { passive: false });
+            window.addEventListener("touchmove", blockScroll, {
+                passive: false,
+            });
             window.addEventListener("keydown", blockScroll, { passive: false });
         } else {
-            window.removeEventListener("wheel", blockScroll, { passive: false });
-            window.removeEventListener("touchmove", blockScroll, { passive: false });
-            window.removeEventListener("keydown", blockScroll, { passive: false });
+            window.removeEventListener("wheel", blockScroll, {
+                passive: false,
+            });
+            window.removeEventListener("touchmove", blockScroll, {
+                passive: false,
+            });
+            window.removeEventListener("keydown", blockScroll, {
+                passive: false,
+            });
         }
 
         return () => {
-            window.removeEventListener("wheel", blockScroll, { passive: false });
-            window.removeEventListener("touchmove", blockScroll, { passive: false });
-            window.removeEventListener("keydown", blockScroll, { passive: false });
+            window.removeEventListener("wheel", blockScroll, {
+                passive: false,
+            });
+            window.removeEventListener("touchmove", blockScroll, {
+                passive: false,
+            });
+            window.removeEventListener("keydown", blockScroll, {
+                passive: false,
+            });
         };
     }, [isOpen]);
 
@@ -132,35 +150,27 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
         <div
             className="fixed inset-0 z-50"
             onClick={handleClose}
-            style={{ pointerEvents: "auto" }}
-        >
+            style={{ pointerEvents: "auto" }}>
             <div className="absolute inset-0 bg-black/60" />
 
             {/* The modal itself */}
             <div
                 onClick={(e) => e.stopPropagation()} // Prevent closing on modal clicks
-                className="
-          relative w-full max-w-md p-6
-          bg-bg-surface text-txt-primary
-          border border-br-primary
-          rounded-[10px] shadow-lg
-          mx-auto top-1/2 -translate-y-1/2
-        "
-            >
+                className="fixed w-full max-w-md p-6
+                bg-bg-surface text-txt-primary
+                border border-br-primary rounded-[10px] shadow-lg
+                left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
                 {/* CLOSE BUTTON */}
                 <button
                     className="absolute top-3 right-3 text-txt-secondary hover:text-error"
-                    onClick={handleClose}
-                >
+                    onClick={handleClose}>
                     <FontAwesomeIcon icon={faXmark} size="lg" />
                 </button>
 
                 {/* TITLE */}
-                <h2 className="text-center text--txt-primary text-2xl font-bold mb-5">
+                <h2 className="text-center text-txt-primary text-2xl font-bold mb-5">
                     {isSignUp ? "Sign Up" : "Sign In"}
                 </h2>
-
-                
 
                 {/* EMAIL / PASSWORD FORM */}
                 <form onSubmit={handleAuth} className="space-y-4">
@@ -176,13 +186,14 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                 w-full px-3 py-2 
                 border-2 border-br-primary rounded-[10px]
                 bg-bgPrimary text-txt-primary
-                focus:outline-none focus:border-focus focus:ring-focus
-              "
+                focus:outline-none focus:border-focus focus:ring-focus"
                         />
                     </div>
 
                     <div>
-                        <label className="block mb-1 font-medium">Password</label>
+                        <label className="block mb-1 font-medium">
+                            Password
+                        </label>
                         <input
                             type="password"
                             required
@@ -193,8 +204,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                 w-full px-3 py-2 
                 border-2 border-br-primary rounded-[10px]
                 bg-bgPrimary text-txt-primary
-                focus:outline-none focus:border-focus focus:ring-focus
-              "
+                focus:outline-none focus:border-focus focus:ring-focus"
                         />
                     </div>
 
@@ -208,14 +218,15 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                                 type="password"
                                 required
                                 value={confirmPassword}
-                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                onChange={(e) =>
+                                    setConfirmPassword(e.target.value)
+                                }
                                 placeholder="Re-enter your password"
                                 className="
                   w-full px-3 py-2 
                   border-2 border-br-primary rounded-[10px]
                   bg-bgPrimary text-txt-primary
-                  focus:outline-none focus:border-focus focus:ring-focus
-                "
+                  focus:outline-none focus:border-focus focus:ring-focus"
                             />
                         </div>
                     )}
@@ -223,15 +234,14 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                     {/* ERROR MESSAGE */}
                     <div className="h-6 mb-3">
                         {error && (
-                            <p className="text-center text-error font-semibold">{error}</p>
+                            <p className="text-center text-error font-semibold">
+                                {error}
+                            </p>
                         )}
                     </div>
 
                     {/* SUBMIT BUTTON */}
-                    <button
-                        type="submit"
-                        className="w-full py-2 cta-button"
-                    >
+                    <button type="submit" className="w-full py-2 cta-button">
                         {loading
                             ? "Processing..."
                             : isSignUp
@@ -261,8 +271,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                   rounded-full border border-br-primary
                   hover:bg-[var(--color-btn-primary-hover)]
                   transition-colors
-                "
-                            >
+                ">
                                 <FontAwesomeIcon icon={faFacebook} />
                             </button>
                             {/* Google */}
@@ -272,9 +281,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                   w-10 h-10 flex items-center justify-center
                   rounded-full border border-br-primary
                   hover:bg-[var(--color-btn-primary-hover)]
-                  transition-colors
-                "
-                            >
+                  transition-colors">
                                 <FontAwesomeIcon icon={faGoogle} />
                             </button>
                             {/* Twitter */}
@@ -284,9 +291,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                   w-10 h-10 flex items-center justify-center
                   rounded-full border border-br-primary
                   hover:bg-[var(--color-btn-primary-hover)]
-                  transition-colors
-                "
-                            >
+                  transition-colors">
                                 <FontAwesomeIcon icon={faTwitter} />
                             </button>
                         </div>
@@ -300,8 +305,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                             Already have an account?{" "}
                             <button
                                 onClick={onSwitchMode}
-                                className="text-accent hover:underline ml-1 font-medium"
-                            >
+                                className="text-accent hover:underline ml-1 font-medium">
                                 Sign In
                             </button>
                         </>
@@ -310,8 +314,7 @@ export const AuthModal = ({ isOpen, onClose, isSignUp, onSwitchMode }) => {
                             Don&apos;t have an account?{" "}
                             <button
                                 onClick={onSwitchMode}
-                                className="text-accent hover:underline ml-1 font-medium"
-                            >
+                                className="text-accent hover:underline ml-1 font-medium">
                                 Sign Up
                             </button>
                         </>
