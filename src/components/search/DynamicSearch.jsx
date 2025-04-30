@@ -48,7 +48,7 @@ export function DynamicSearch() {
     };
 
     return (
-        <div className="min-h-screen bg-bg-primary text-txt-primary p-6">
+        <div className="min-h-screen text-txt-primary p-6">
             {/* Dynamic Search input field */}
             <div className="max-w-xl mx-auto mb-4 relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
@@ -65,8 +65,7 @@ export function DynamicSearch() {
                     <button
                         type="button"
                         onClick={handleClear}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                    >
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                         <FontAwesomeIcon icon={faTimes} />
                     </button>
                 )}
@@ -79,8 +78,7 @@ export function DynamicSearch() {
                         activeTab === "artworks"
                             ? "bg-accent text-white"
                             : "bg-bg-surface text-txt-secondary hover:bg-accent-hover"
-                    }`}
-                >
+                    }`}>
                     Artworks
                 </button>
                 <button
@@ -89,8 +87,7 @@ export function DynamicSearch() {
                         activeTab === "artists"
                             ? "bg-accent text-white"
                             : "bg-bg-surface text-txt-secondary hover:bg-accent-hover"
-                    }`}
-                >
+                    }`}>
                     Artists
                 </button>
             </div>
@@ -107,7 +104,8 @@ export function DynamicSearch() {
                         What would you like to search for?
                     </h2>
                     <p className="text-sm text-txt-secondary max-w-sm">
-                        Start your search with a keyword or add filtering options.
+                        Start your search with a keyword or add filtering
+                        options.
                     </p>
                 </div>
             ) : activeTab === "artworks" ? (
