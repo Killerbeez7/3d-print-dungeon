@@ -122,7 +122,7 @@ export const Footer = () => {
                         <input
                             type="email"
                             placeholder="Enter your email"
-                            className="px-4 py-2 rounded-[10px] border border-txt-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent w-2/3 sm:w-1/2"
+                            className="px-4 py-2 rounded-[10px] border border-br-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent w-2/3 sm:w-1/2"
                         />
                         <button type="submit" className="px-6 py-2 cta-button">
                             <AiOutlineMail className="inline mr-2 text-lg" />
