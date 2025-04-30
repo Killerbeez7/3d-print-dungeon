@@ -15,7 +15,7 @@ const Layout = () => {
     const handleSwitchAuthMode = () => setIsSignUp((prev) => !prev);
 
     return (
-        <div className="flex flex-col min-h-screen text-txt-primary relative">
+        <div className="flex flex-col min-h-lvh text-txt-primary relative">
             <div className="background-blur" />
             <Navbar
                 onLoginClick={() => {
