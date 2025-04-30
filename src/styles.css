@@ -10,6 +10,9 @@ body {
     box-sizing: border-box;
     font-family: "Inter", sans-serif;
     font-size: 16px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
 
     background-color: var(--bg-primary);
     background-image: radial-gradient(

@@ -122,7 +122,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                             {/* mobile hamburger */}
                             <button
                                 id="hamburger-button"
-                                className="md:hidden p-[0.5px] rounded-lg hover:bg-gray-100"
+                                className="md:hidden p-[0.5px] rounded-lg hover:bg-bg-surface"
                                 onClick={toggleMobileMenu}
                                 aria-label="Toggle mobile menu"
                                 aria-expanded={isMobileMenuOpen}>
@@ -189,7 +189,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                     <Link
                                                         key={item.to}
                                                         to={item.to}
-                                                        className="block px-2 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:border-l-2 hover:border-br-primary hover:font-semibold"
+                                                        className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:shadow-sm hover:font-semibold"
                                                         onClick={() =>
                                                             setActiveDropdown(
                                                                 null
@@ -258,7 +258,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
                                         {/*Profile Dropdown Options*/}
                                         <div
-                                            className={`absolute right-0 mt-2 w-50 rounded-md shadow-md bg-bg-surface transition-all duration-200 p-2 border border-br-secondary z-60 ${
+                                            className={`absolute right-0 mt-2 w-52 rounded-md shadow-md bg-bg-surface transition-all duration-200 p-2 border border-br-secondary z-60 ${
                                                 activeDropdown === "profile"
                                                     ? "opacity-100 visible"
                                                     : "opacity-0 invisible"
@@ -270,7 +270,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                             {isAdmin && (
                                                 <Link
                                                     to={`/admin-panel`}
-                                                    className="block px-2 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary border-top-gradient hover:rounded-sm hover:border-l-2 hover:border-br-primary hover:font-semibold"
+                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary border-top-gradient hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)
                                                     }>
@@ -284,7 +284,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                             <div className="border-top-gradient">
                                                 <Link
                                                     to={`/artist/${currentUser?.uid}`}
-                                                    className="block px-2 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:border-l-2 hover:border-br-primary hover:font-semibold"
+                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)
                                                     }>
@@ -296,7 +296,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                 </Link>
                                                 <Link
                                                     to="/settings"
-                                                    className="block px-2 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:border-l-2 hover:border-br-primary hover:font-semibold"
+                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)
                                                     }>
@@ -311,7 +311,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                         setActiveDropdown(null);
                                                         handleLogout();
                                                     }}
-                                                    className="w-full text-left px-2 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:border-l-2 hover:border-br-primary hover:font-semibold">
+                                                    className="w-full text-left px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold">
                                                     <FontAwesomeIcon
                                                         icon={faSignOutAlt}
                                                         className="mr-2"
@@ -383,7 +383,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                     {NAV_SECTIONS.map((section) => (
                         <div key={section.label}>
                             <button
-                                className="w-full text-left px-4 py-2 text-txt-secondary hover:rounded-md hover:bg-bg-surface hover:text-txt-primary flex items-center justify-between"
+                                className={`w-full text-left px-4 py-2 text-txt-secondary hover:rounded-md hover:bg-bg-secondary hover:text-txt-primary flex items-center justify-between ${mobileDropdown === section.label ? 'bg-bg-surface rounded-md text-txt-primary font-semibold' : ''}`}
                                 onClick={(e) =>
                                     toggleMobileDropdown(section.label, e)
                                 }>
@@ -398,7 +398,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                 />
                             </button>
                             <div
-                                className={`bg-bg-secondary transition-all duration-200 rounded-md ${
+                                className={`transition-all duration-200 rounded-md ${
                                     mobileDropdown === section.label
                                         ? "max-h-48 overflow-y-auto"
                                         : "max-h-0 overflow-hidden"
@@ -407,7 +407,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                     <Link
                                         key={item.to}
                                         to={item.to}
-                                        className="block px-6 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary"
+                                        className="block px-6 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
                                         onClick={() => {
                                             setIsMobileMenuOpen(false);
                                             setMobileDropdown(null);
