@@ -26,10 +26,9 @@ export const ScrollToTopButton = () => {
     return (
         <button
             onClick={scrollToTop}
-            className={`fixed bottom-5 right-5 w-[50px] h-[50px] bg-[var(--badge-bg,#4F46E5)] text-[var(--primary-text-color,#FFFFFF)] rounded-full text-2xl z-5 cursor-pointer transition-all duration-300 ease-in-out shadow-[0_4px_6px_var(--box-shadow-color,#00000029)] flex items-center justify-center ${
+            className={`fixed bottom-5 right-5 w-[50px] h-[50px] cta-button rounded-full! text-2xl z-5 cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center ${
                 isVisible ? "opacity-100 visible" : "opacity-0 invisible"
-            } hover:bg-[var(--hover-text-color,#4338CA)] hover:scale-110 z-1000000000`}
-        >
+            } hover:scale-110 z-101`}>
             <FaArrowUp />
         </button>
     );
