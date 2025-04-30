@@ -15,7 +15,8 @@ const Layout = () => {
     const handleSwitchAuthMode = () => setIsSignUp((prev) => !prev);
 
     return (
-        <div className="flex flex-col min-h-screen bg-background text-txt-primary">
+        <div className="flex flex-col min-h-screen text-txt-primary">
+            <div className="background-blur" />
             <Navbar
                 onLoginClick={() => {
                     setIsSignUp(false);
@@ -26,14 +27,13 @@ const Layout = () => {
                     handleOpenAuthModal();
                 }}
             />
-            <main className="flex-grow min-h-[calc(100vh-200px)] z-5">
+            <main className="flex-grow min-h-[100vh] mb-10 z-5">
                 <Suspense
                     fallback={
                         <div className="min-h-[300px] flex items-center justify-center">
                             Loading...
                         </div>
-                    }
-                >
+                    }>
                     <Outlet context={{ openAuthModal: handleOpenAuthModal }} />
                 </Suspense>
             </main>
