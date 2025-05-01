@@ -1,12 +1,12 @@
 import { useState, Suspense } from "react";
 import { Outlet } from "react-router-dom";
-//components imports
+// Component imports
 import { Navbar } from "./navbar/Navbar";
 import { Footer } from "./footer/Footer";
 import { AuthModal } from "./auth-modal/AuthModal";
 import { ScrollToTopButton } from "./ScrollToTopButton";
 
-const Layout = () => {
+const Layout: React.FC = () => {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false);
 
@@ -17,6 +17,7 @@ const Layout = () => {
     return (
         <div className="flex flex-col min-h-lvh text-txt-primary relative">
             <div className="background-blur" />
+
             <Navbar
                 onLoginClick={() => {
                     setIsSignUp(false);
@@ -27,6 +28,7 @@ const Layout = () => {
                     handleOpenAuthModal();
                 }}
             />
+
             <main className="flex-grow min-h-[100vh] mb-10 z-5">
                 <Suspense
                     fallback={
@@ -37,6 +39,7 @@ const Layout = () => {
                     <Outlet context={{ openAuthModal: handleOpenAuthModal }} />
                 </Suspense>
             </main>
+
             <Footer />
             <ScrollToTopButton />
 
