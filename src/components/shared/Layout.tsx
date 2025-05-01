@@ -15,7 +15,7 @@ const Layout: React.FC = () => {
     const handleSwitchAuthMode = () => setIsSignUp((prev) => !prev);
 
     return (
-        <div className="flex flex-col min-h-lvh text-txt-primary relative">
+        <div className="flex flex-col text-txt-primary relative layout">
             <div className="background-blur" />
 
             <Navbar
@@ -29,7 +29,7 @@ const Layout: React.FC = () => {
                 }}
             />
 
-            <main className="flex-grow min-h-[100vh] mb-10 z-5">
+            <main className="flex-grow min-h-[100vh] mb-10 z-1">
                 <Suspense
                     fallback={
                         <div className="min-h-[300px] flex items-center justify-center">

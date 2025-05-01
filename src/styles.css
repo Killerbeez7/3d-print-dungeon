@@ -3,24 +3,49 @@
 /* Google Fonts */
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Michroma&display=swap");
 
+/* Base HTML & Body styles */
 html,
 body {
     margin: 0;
     padding: 0;
+    height: 100%;
     box-sizing: border-box;
     font-family: "Inter", sans-serif;
     font-size: 16px;
-    min-height: 100vh;
-    min-height: 100dvh;
-    position: relative;
-
     background-color: var(--bg-primary);
+}
+
+/* Blur background using a ::before layer */
+.layout::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100lvh;
+    z-index: 0;
+    pointer-events: none;
+
     background-image: radial-gradient(
         ellipse 50% 45% at 50% 80%,
         rgba(var(--background-second-rgba)) 20%,
         transparent 100%
     );
-    background-attachment: fixed;
+}
+
+.background-blur {
+    background: rgba(var(--background-main-rgb), 0);
+    -webkit-backdrop-filter: blur(80px);
+    -moz-backdrop-filter: blur(80px);
+    -ms-backdrop-filter: blur(80px);
+    -o-backdrop-filter: blur(80px);
+    backdrop-filter: blur(80px);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    isolation: isolate;
 }
 
 *,
@@ -86,11 +111,6 @@ h6 {
     --br-primary: #9999aa;
     --br-secondary: #b2b2c3;
 
-    /* These shouldn't be used */
-    --btn-secondary: #cbd3e1;
-    --btn-secondary-hover: #b4bccb;
-    --btn-disabled: #e8ebf0;
-
     --success: #28c76f;
     --error: #f44336;
 }
@@ -120,11 +140,6 @@ h6 {
 
     --br-primary: #9a9ab5;
     --br-secondary: #6e6e81;
-
-    /* These shouldn't be used */
-    --btn-secondary: #5a5a7a;
-    --btn-secondary-hover: #6e6e90;
-    --btn-disabled: #757589;
 
     --success: #34d399;
     --error: #f87171;
@@ -162,21 +177,7 @@ h6 {
     --color-error: var(--error);
 }
 
-.background-blur {
-    background: rgba(var(--background-main-rgb), 0);
-    -webkit-backdrop-filter: blur(80px);
-    -moz-backdrop-filter: blur(80px);
-    -ms-backdrop-filter: blur(80px);
-    -o-backdrop-filter: blur(80px);
-    backdrop-filter: blur(80px);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    isolation: isolate;
-}
-
+/* Navbar Glass Overlay */
 .glass-effect {
     background: rgba(var(--background-main-rgb), 0.9);
     -webkit-backdrop-filter: blur(20px);
@@ -188,7 +189,6 @@ h6 {
 }
 
 /* Buttons */
-
 .cta-button {
     background: linear-gradient(
         135deg,
@@ -234,6 +234,7 @@ h6 {
     color: #f5f5f8;
 }
 
+/* Custom Divider */
 .border-top-gradient {
     background-image: linear-gradient(
         to right,
