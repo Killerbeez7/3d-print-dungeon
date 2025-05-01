@@ -1,7 +1,18 @@
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { AiOutlineMail } from "react-icons/ai";
+import { useState } from "react";
+import AlertModal from "../alert-modal/AlertModal";
 
 export const Footer = () => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [email, setEmail] = useState("");
+
+    const handleSubscribe = (e) => {
+        e.preventDefault();
+        setIsModalOpen(true);
+        setEmail(""); // Clear the email input
+    };
+
     return (
         <footer className="text-txt-secondary py-10 border-top-gradient z-10">
             <div className="container mx-auto px-6 sm:px-8">
@@ -58,7 +69,7 @@ export const Footer = () => {
 
                     {/* Contact Information */}
                     <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-accent">
+                        <h3 className="text font-semibold text-accent">
                             Contact
                         </h3>
                         <ul className="mt-2 text-sm">
@@ -77,9 +88,7 @@ export const Footer = () => {
 
                     {/* Social Media */}
                     <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-accent">
-                            Follow Us
-                        </h3>
+                        <h3 className="font-semibold text-accent">Follow Us</h3>
                         <div className="flex justify-center sm:justify-start space-x-4 text-xl mt-2">
                             <a
                                 href="#"
@@ -111,21 +120,26 @@ export const Footer = () => {
 
                 {/* Newsletter Subscription Section */}
                 <div className="bg-accent-light p-6 rounded-lg text-center mt-8 border-top-gradient">
-                    <h3 className="text-xl font-semibold text-accent">
-                        Subscribe to Our Newsletter
+                    <h3 className="font-semibold text-accent">
+                        Get the Latest Model Drops
                     </h3>
-                    <p className="text-sm mt-2">
-                        Stay updated with the latest news and offers from 3D
-                        Print Dungeon.
+                    <p className="mt-2">
+                        Raid the 3D Print Dungeon: News, Models & Hidden
+                        Treasures Await!
                     </p>
-                    <form className="mt-4 flex justify-center items-center space-x-4">
+                    <form className="mt-4 flex flex-col sm:flex-row justify-center items-center gap-4" onSubmit={handleSubscribe}>
                         <input
                             type="email"
                             placeholder="Enter your email"
+                            required
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             className="px-4 py-2 rounded-[10px] border border-br-primary focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent w-2/3 sm:w-1/2"
                         />
-                        <button type="submit" className="px-6 py-2 cta-button">
-                            <AiOutlineMail className="inline mr-2 text-lg" />
+                        <button
+                            type="submit"
+                            className="px-6 py-2 cta-button w-2/3 sm:w-auto">
+                            <AiOutlineMail className="inline mr-2 text-xl" />
                             Subscribe
                         </button>
                     </form>
@@ -136,6 +150,13 @@ export const Footer = () => {
                     <p>&copy; 2025 3D Print Dungeon — All rights reserved</p>
                 </div>
             </div>
+
+            <AlertModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                title="Subscription Complete!"
+                message="Thanks for joining the 3D Print Dungeon! You'll now get the latest model releases, special offers, and updates delivered straight to your inbox."
+            />
         </footer>
     );
 };
