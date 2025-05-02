@@ -9,7 +9,6 @@ import PropTypes from "prop-types";
 export const ThreadList = ({
     categoryId,
     sortBy = "lastActivity",
-    limit = 10,
     showCategory = false,
     isCompact = false,
 }) => {
@@ -60,7 +59,7 @@ export const ThreadList = ({
                 {[...Array(5)].map((_, i) => (
                     <div
                         key={i}
-                        className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
+                        className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-4"
                     >
                         <Skeleton className="h-6 w-3/4 mb-2" />
                         <div className="flex flex-wrap gap-4 text-sm text-gray-500">
@@ -84,13 +83,13 @@ export const ThreadList = ({
 
     if (localThreads?.length === 0) {
         return (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
-                <p className="text-gray-500 dark:text-gray-400">
+            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
+                <p className="text-[var(--txt-muted)]">
                     No threads found in this category. Be the first to start a discussion!
                 </p>
                 <Link
                     to="/forum/new-thread"
-                    className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    className="inline-block mt-4 px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
                 >
                     Create New Thread
                 </Link>
@@ -103,7 +102,7 @@ export const ThreadList = ({
             {localThreads?.map((thread) => (
                 <div
                     key={thread.id}
-                    className={`bg-white dark:bg-gray-800 rounded-lg shadow ${
+                    className={`bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow ${
                         thread.isPinned ? "border-l-4 border-yellow-400" : ""
                     } ${isCompact ? "p-3" : "p-4"}`}
                 >
@@ -111,7 +110,7 @@ export const ThreadList = ({
                         <div className="flex-1">
                             <Link
                                 to={`/forum/thread/${thread.id}`}
-                                className="text-lg font-medium hover:text-blue-600 dark:hover:text-blue-400 transition"
+                                className="text-lg font-medium hover:text-[var(--accent)] transition"
                             >
                                 {thread.title}
                             </Link>
@@ -121,10 +120,10 @@ export const ThreadList = ({
                                     {thread.tags.map((tag) => (
                                         <span
                                             key={tag}
-                                            className="inline-flex items-center px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 rounded-full"
+                                            className="inline-flex items-center px-2 py-1 text-xs bg-[var(--bg-tertiary)] text-[var(--txt-primary)] rounded-full"
                                         >
                                             <FaTag
-                                                className="mr-1 text-gray-400"
+                                                className="mr-1 text-[var(--txt-muted)]"
                                                 size={10}
                                             />
                                             {tag}
@@ -144,7 +143,7 @@ export const ThreadList = ({
                     <div
                         className={`flex flex-wrap ${
                             isCompact ? "mt-1" : "mt-2"
-                        } gap-x-4 text-sm text-gray-500 dark:text-gray-400`}
+                        } gap-x-4 text-sm text-[var(--txt-muted)]`}
                     >
                         <span className="inline-flex items-center">
                             <FaUser className="mr-1" size={12} />
@@ -182,7 +181,7 @@ export const ThreadList = ({
                     <button
                         onClick={handleLoadMore}
                         disabled={loadingMore}
-                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition"
+                        className="px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] disabled:bg-[var(--accent-hover)] disabled:cursor-not-allowed transition"
                     >
                         {loadingMore ? "Loading..." : "Load More"}
                     </button>
@@ -195,7 +194,6 @@ export const ThreadList = ({
 ThreadList.propTypes = {
     categoryId: PropTypes.string,
     sortBy: PropTypes.string,
-    limit: PropTypes.number,
     showCategory: PropTypes.bool,
     isCompact: PropTypes.bool,
 };

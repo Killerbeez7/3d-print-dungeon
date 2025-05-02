@@ -77,7 +77,7 @@ export const ThreadEditor = ({
             <div>
                 <label
                     htmlFor="title"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    className="block text-sm font-medium text-[var(--txt-primary)]"
                 >
                     Thread Title
                 </label>
@@ -88,7 +88,7 @@ export const ThreadEditor = ({
                     value={formData.title}
                     onChange={handleChange}
                     disabled={isLoading}
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+                    className={`mt-1 block w-full rounded-lg border-[var(--br-secondary)] bg-[var(--bg-surface)] text-[var(--txt-primary)] shadow-sm focus:border-[var(--accent)] focus:ring-[var(--accent)] ${
                         errors.title ? "border-red-500" : ""
                     }`}
                     placeholder="Enter a descriptive title"
@@ -104,7 +104,7 @@ export const ThreadEditor = ({
             <div>
                 <label
                     htmlFor="categoryId"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    className="block text-sm font-medium text-[var(--txt-primary)]"
                 >
                     Category
                 </label>
@@ -114,7 +114,7 @@ export const ThreadEditor = ({
                     value={formData.categoryId}
                     onChange={handleChange}
                     disabled={isLoading || isEdit}
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+                    className={`mt-1 block w-full rounded-lg border-[var(--br-secondary)] bg-[var(--bg-surface)] text-[var(--txt-primary)] shadow-sm focus:border-[var(--accent)] focus:ring-[var(--accent)] ${
                         errors.categoryId ? "border-red-500" : ""
                     }`}
                 >
@@ -136,7 +136,7 @@ export const ThreadEditor = ({
             <div>
                 <label
                     htmlFor="tags"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    className="block text-sm font-medium text-[var(--txt-primary)]"
                 >
                     Tags (comma separated)
                 </label>
@@ -147,7 +147,7 @@ export const ThreadEditor = ({
                     value={tags}
                     onChange={(e) => setTags(e.target.value)}
                     disabled={isLoading}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className="mt-1 block w-full rounded-lg border-[var(--br-secondary)] bg-[var(--bg-surface)] text-[var(--txt-primary)] shadow-sm focus:border-[var(--accent)] focus:ring-[var(--accent)]"
                     placeholder="e.g., question, help, tutorial"
                 />
             </div>
@@ -156,7 +156,7 @@ export const ThreadEditor = ({
             <div>
                 <label
                     htmlFor="content"
-                    className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    className="block text-sm font-medium text-[var(--txt-primary)]"
                 >
                     Content
                 </label>
@@ -167,7 +167,7 @@ export const ThreadEditor = ({
                     onChange={handleChange}
                     disabled={isLoading}
                     rows={10}
-                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
+                    className={`mt-1 block w-full rounded-lg border-[var(--br-secondary)] bg-[var(--bg-surface)] text-[var(--txt-primary)] shadow-sm focus:border-[var(--accent)] focus:ring-[var(--accent)] ${
                         errors.content ? "border-red-500" : ""
                     }`}
                     placeholder="Write your thread content here..."
@@ -177,7 +177,7 @@ export const ThreadEditor = ({
                         {errors.content}
                     </p>
                 )}
-                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-1 text-sm text-[var(--txt-muted)]">
                     Basic formatting is supported: **bold**, *italic*, [link](url)
                 </p>
             </div>
@@ -189,7 +189,7 @@ export const ThreadEditor = ({
                         type="button"
                         onClick={onCancel}
                         disabled={isLoading}
-                        className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="inline-flex items-center px-4 py-2 rounded-lg font-semibold border border-[var(--br-secondary)] bg-[var(--bg-surface)] text-[var(--txt-primary)] hover:bg-[var(--bg-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                     >
                         <FaTimes className="mr-2 -ml-1" />
                         Cancel
@@ -199,10 +199,10 @@ export const ThreadEditor = ({
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-300 disabled:cursor-not-allowed"
+                    className="inline-flex items-center px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                 >
                     <FaSave className="mr-2 -ml-1" />
-                    {isLoading ? "Saving..." : isEdit ? "Update Thread" : "Create Thread"}
+                    {isEdit ? "Save Changes" : "Create Thread"}
                 </button>
             </div>
         </form>
