@@ -46,20 +46,17 @@ export const ForumHome = () => {
                         {searchResults.map((thread) => (
                             <div
                                 key={thread.id}
-                                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
-                            >
+                                className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                                 <Link
                                     to={`/forum/thread/${thread.id}`}
-                                    className="text-lg font-medium hover:text-blue-600 dark:hover:text-blue-400"
-                                >
+                                    className="text-lg font-medium hover:text-blue-600 dark:hover:text-blue-400">
                                     {thread.title}
                                 </Link>
                                 <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                                     Posted in{" "}
                                     <Link
                                         to={`/forum/category/${thread.categoryId}`}
-                                        className="text-blue-600 dark:text-blue-400 hover:underline"
-                                    >
+                                        className="text-blue-600 dark:text-blue-400 hover:underline">
                                         {categories.find(
                                             (c) => c.id === thread.categoryId
                                         )?.name || "Unknown Category"}
@@ -76,7 +73,8 @@ export const ForumHome = () => {
             return (
                 <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
                     <p className="text-gray-500 dark:text-gray-400">
-                        No results found for "{searchQuery}". Try a different search term.
+                        No results found for "{searchQuery}". Try a different
+                        search term.
                     </p>
                 </div>
             );
@@ -86,28 +84,29 @@ export const ForumHome = () => {
             case "recent":
                 return (
                     <div className="mt-6">
-                        <h2 className="text-lg font-medium mb-4">Recent Discussions</h2>
+                        <h2 className="text-lg font-medium mb-4">
+                            Recent Discussions
+                        </h2>
                         {threads.recent?.length > 0 ? (
                             <div className="space-y-4">
                                 {threads.recent.map((thread) => (
                                     <div
                                         key={thread.id}
-                                        className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
-                                    >
+                                        className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                                         <Link
                                             to={`/forum/thread/${thread.id}`}
-                                            className="text-lg font-medium hover:text-blue-600 dark:hover:text-blue-400"
-                                        >
+                                            className="text-lg font-medium hover:text-blue-600 dark:hover:text-blue-400">
                                             {thread.title}
                                         </Link>
                                         <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                                             Posted in{" "}
                                             <Link
                                                 to={`/forum/category/${thread.categoryId}`}
-                                                className="text-blue-600 dark:text-blue-400 hover:underline"
-                                            >
+                                                className="text-blue-600 dark:text-blue-400 hover:underline">
                                                 {categories.find(
-                                                    (c) => c.id === thread.categoryId
+                                                    (c) =>
+                                                        c.id ===
+                                                        thread.categoryId
                                                 )?.name || "Unknown Category"}
                                             </Link>
                                         </div>
@@ -117,7 +116,8 @@ export const ForumHome = () => {
                         ) : (
                             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
                                 <p className="text-gray-500 dark:text-gray-400">
-                                    No recent discussions yet. Start a new thread!
+                                    No recent discussions yet. Start a new
+                                    thread!
                                 </p>
                             </div>
                         )}
@@ -127,28 +127,29 @@ export const ForumHome = () => {
             case "popular":
                 return (
                     <div className="mt-6">
-                        <h2 className="text-lg font-medium mb-4">Popular Discussions</h2>
+                        <h2 className="text-lg font-medium mb-4">
+                            Popular Discussions
+                        </h2>
                         {threads.popular?.length > 0 ? (
                             <div className="space-y-4">
                                 {threads.popular.map((thread) => (
                                     <div
                                         key={thread.id}
-                                        className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
-                                    >
+                                        className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                                         <Link
                                             to={`/forum/thread/${thread.id}`}
-                                            className="text-lg font-medium hover:text-blue-600 dark:hover:text-blue-400"
-                                        >
+                                            className="text-lg font-medium hover:text-blue-600 dark:hover:text-blue-400">
                                             {thread.title}
                                         </Link>
                                         <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                                             Posted in{" "}
                                             <Link
                                                 to={`/forum/category/${thread.categoryId}`}
-                                                className="text-blue-600 dark:text-blue-400 hover:underline"
-                                            >
+                                                className="text-blue-600 dark:text-blue-400 hover:underline">
                                                 {categories.find(
-                                                    (c) => c.id === thread.categoryId
+                                                    (c) =>
+                                                        c.id ===
+                                                        thread.categoryId
                                                 )?.name || "Unknown Category"}
                                             </Link>
                                         </div>
@@ -158,7 +159,8 @@ export const ForumHome = () => {
                         ) : (
                             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
                                 <p className="text-gray-500 dark:text-gray-400">
-                                    No popular discussions yet. Start a new thread!
+                                    No popular discussions yet. Start a new
+                                    thread!
                                 </p>
                             </div>
                         )}
@@ -176,22 +178,21 @@ export const ForumHome = () => {
                                 {threads.unanswered.map((thread) => (
                                     <div
                                         key={thread.id}
-                                        className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
-                                    >
+                                        className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                                         <Link
                                             to={`/forum/thread/${thread.id}`}
-                                            className="text-lg font-medium hover:text-blue-600 dark:hover:text-blue-400"
-                                        >
+                                            className="text-lg font-medium hover:text-blue-600 dark:hover:text-blue-400">
                                             {thread.title}
                                         </Link>
                                         <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
                                             Posted in{" "}
                                             <Link
                                                 to={`/forum/category/${thread.categoryId}`}
-                                                className="text-blue-600 dark:text-blue-400 hover:underline"
-                                            >
+                                                className="text-blue-600 dark:text-blue-400 hover:underline">
                                                 {categories.find(
-                                                    (c) => c.id === thread.categoryId
+                                                    (c) =>
+                                                        c.id ===
+                                                        thread.categoryId
                                                 )?.name || "Unknown Category"}
                                             </Link>
                                         </div>
@@ -201,8 +202,8 @@ export const ForumHome = () => {
                         ) : (
                             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
                                 <p className="text-gray-500 dark:text-gray-400">
-                                    All discussions have been answered. Great job
-                                    community!
+                                    All discussions have been answered. Great
+                                    job community!
                                 </p>
                             </div>
                         )}
@@ -226,8 +227,7 @@ export const ForumHome = () => {
                     {[...Array(6)].map((_, i) => (
                         <div
                             key={i}
-                            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
-                        >
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                             <Skeleton className="h-6 w-12 mb-2" />
                             <Skeleton className="h-4 w-3/4 mb-1" />
                             <Skeleton className="h-4 w-1/2" />
@@ -245,8 +245,7 @@ export const ForumHome = () => {
                     {[...Array(3)].map((_, i) => (
                         <div
                             key={i}
-                            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
-                        >
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
                             <Skeleton className="h-6 w-3/4 mb-2" />
                             <Skeleton className="h-4 w-1/2" />
                         </div>
@@ -259,7 +258,9 @@ export const ForumHome = () => {
     if (error) {
         return (
             <div className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg text-red-700 dark:text-red-400">
-                <h2 className="text-lg font-semibold mb-2">Error Loading Forum</h2>
+                <h2 className="text-lg font-semibold mb-2">
+                    Error Loading Forum
+                </h2>
                 <p>{error}</p>
             </div>
         );
@@ -285,8 +286,7 @@ export const ForumHome = () => {
                         <button
                             type="submit"
                             className="absolute right-1 bottom-1 top-1 px-3 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none"
-                            disabled={isSearching || !searchQuery.trim()}
-                        >
+                            disabled={isSearching || !searchQuery.trim()}>
                             {isSearching ? "..." : "Search"}
                         </button>
                     </div>
@@ -294,8 +294,7 @@ export const ForumHome = () => {
 
                 <Link
                     to="/forum/new-thread"
-                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none"
-                >
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none">
                     <FaPlus className="mr-2" />
                     New Thread
                 </Link>
@@ -307,13 +306,16 @@ export const ForumHome = () => {
                     <Link
                         key={category.id}
                         to={`/forum/category/${category.id}`}
-                        className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition"
-                    >
+                        className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                         <div className="flex items-center gap-3">
                             {category.icon && (
-                                <span className="text-2xl">{category.icon}</span>
+                                <span className="text-2xl">
+                                    {category.icon}
+                                </span>
                             )}
-                            <h3 className="font-semibold text-lg">{category.name}</h3>
+                            <h3 className="font-semibold text-lg">
+                                {category.name}
+                            </h3>
                         </div>
                         <p className="mt-2 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                             {category.description}
@@ -334,8 +336,7 @@ export const ForumHome = () => {
                             activeTab === "recent"
                                 ? "border-blue-500 text-blue-600 dark:text-blue-400"
                                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
-                        }`}
-                    >
+                        }`}>
                         Recent
                     </button>
                     <button
@@ -344,8 +345,7 @@ export const ForumHome = () => {
                             activeTab === "popular"
                                 ? "border-blue-500 text-blue-600 dark:text-blue-400"
                                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
-                        }`}
-                    >
+                        }`}>
                         Popular
                     </button>
                     <button
@@ -354,8 +354,7 @@ export const ForumHome = () => {
                             activeTab === "unanswered"
                                 ? "border-blue-500 text-blue-600 dark:text-blue-400"
                                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
-                        }`}
-                    >
+                        }`}>
                         Unanswered
                     </button>
                 </nav>
