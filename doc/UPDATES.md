@@ -1,8 +1,12 @@
 
+30/04/25
+- [ ] disable scroll over model in modelView mobile version
+
+
 29/04/25
 - [ ] fix forum routes: delete lines [30-40] and add open auth modal if non logged user tries to click
 - [ ] add maintenance protection for forum home page - wrap lines [22-24] with {withMaintenance}
-- [ ] add timestamps for comments
+- [x] add timestamps for comments
   
 28/04/25
 Small UX update Navbar, Carousel
@@ -70,9 +74,6 @@ Model page improvements
 
 
 # code optimization
-
-
-- [ ] Fix carousel on mobile to scroll only 1 tile not 4
 - [ ] add username is taken check - https://www.youtube.com/watch?v=_l5Q5kKHtR8
 
 
@@ -81,14 +82,11 @@ we can potentially simplify by only keeping userViews and
 the view count on the model documents themselves.
 
 
-### Update the styles of this components while keeping all the existing functionality the same!
-- [x] ModelView
-- [ ] 
 
 ### General
-- [ ] Fill other pages with content (Buy 3D models, For Business)
-- [ ] Analytics Dashboard
-- [ ] Monitor Analytics
+- [x] Fill other pages with content (Buy 3D models, For Business)
+- [x] Analytics Dashboard
+- [x] Monitor Analytics
 - [ ] Digital Purchases & Licensing
 - [ ] Community Forums or Q&A
 - [ ] Messaging & Notifications
@@ -116,15 +114,15 @@ the view count on the model documents themselves.
 - [ ] Add sorting (and filters- optionally)
 
 ### ModelView
-- [ ] Fix styles
-- [ ] Create likes functionality
-- [ ] Display number of likes and downloads
-- [ ] Display liked models in user's profile
-- [ ] Review comment / ratings
+- [x] Fix styles
+- [x] Create likes functionality
+- [x] Display number of likes and downloads
+- [x] Display liked models in user's profile
+- [x] Review comment / ratings
 
 ### UploadModel
-- [ ] Fix styles
-- [ ] Improve general structure - bigger previews for example
+- [x] Fix styles
+- [x] Improve general structure - bigger previews for example
 
 ### Profile
 - [ ] Order history?
@@ -166,3 +164,4 @@ Firestore Rules:
 
 
 - [ ] on desktop mobile view nav doesnt detect clicks in nav links with hover and press on the carouse; insted of the nav links
+
