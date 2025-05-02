@@ -9,15 +9,17 @@ import { FaPlusSquare } from "react-icons/fa";
 export const ForumLayout = () => {
     const location = useLocation();
     const { categories, loading } = useForum();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(
+        window.innerWidth >= 768
+    );
 
     useEffect(() => {
         const handleResize = () => {
             setIsSidebarOpen(window.innerWidth >= 768);
         };
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
     }, []);
 
     const toggleSidebar = () => {
@@ -32,10 +34,10 @@ export const ForumLayout = () => {
 
     return (
         <div className="relative flex min-h-screen">
-            <div className="sticky top-20 h-[calc(100vh-140px)]">
+            <div className="sticky top-20 h-[calc(100vh-120px)]">
                 {/* Compact Sidebar */}
                 <div
-                    className={`absolute mt-2 left-0 w-[60px] h-[calc(100vh-140px)] flex flex-col transition-transform duration-200 ${
+                    className={`absolute mt-2 left-0 w-[60px] h-[calc(100vh-120px)] flex flex-col transition-transform duration-200 ${
                         !isSidebarOpen ? "translate-x-0" : "-translate-x-full"
                     }`}>
                     <section className="text-txt-primary h-full">
@@ -120,7 +122,7 @@ export const ForumLayout = () => {
 
                 {/* Full Sidebar */}
                 <div
-                    className={`absolute left-0 w-[300px] h-[calc(100vh-140px)] flex flex-col transition-transform duration-200 ${
+                    className={`absolute left-0 w-[300px] h-[calc(100vh-120px)] flex flex-col transition-transform duration-200 ${
                         isSidebarOpen ? "translate-x-0" : "-translate-x-[300px]"
                     }`}>
                     <section className="text-txt-primary h-full">
