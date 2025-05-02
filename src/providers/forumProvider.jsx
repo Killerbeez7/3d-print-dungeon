@@ -3,12 +3,12 @@ import PropTypes from "prop-types";
 import { useAuth } from "../hooks/useAuth";
 import { ForumContext } from "../contexts/forumContext";
 import { forumService } from "../services/forumService";
+import { FORUM_CATEGORIES } from "@/config/forumCategories";
 
 export const ForumProvider = ({ children }) => {
     const { currentUser } = useAuth();
 
     // State management
-    const [categories, setCategories] = useState([]);
     const [threads, setThreads] = useState({
         recent: [],
         popular: [],
@@ -30,18 +30,16 @@ export const ForumProvider = ({ children }) => {
         },
     });
 
-    // Load categories and global threads once
+    // Load global threads once
     useEffect(() => {
         const init = async () => {
             setLoading(true);
             try {
-                const [cats, recent, popular, unanswered] = await Promise.all([
-                    forumService.getCategories(),
+                const [recent, popular, unanswered] = await Promise.all([
                     forumService.getRecentThreads(),
                     forumService.getPopularThreads(),
                     forumService.getUnansweredThreads(),
                 ]);
-                setCategories(cats);
                 setThreads((prev) => ({ ...prev, recent, popular, unanswered }));
             } catch (err) {
                 console.error("Error initializing forum:", err);
@@ -53,16 +51,16 @@ export const ForumProvider = ({ children }) => {
         init();
     }, []);
 
-    // Get a specific category
+    // Get a specific category from config
     const getCategory = useCallback(async (categoryId) => {
         setLoading(true);
         setError(null);
         try {
-            const category = await forumService.getCategoryById(categoryId);
-            setCurrentCategory(category);
+            const category = FORUM_CATEGORIES.find((cat) => cat.id === categoryId);
+            setCurrentCategory(category || null);
+            if (!category) throw new Error("Category not found");
             return category;
         } catch (err) {
-            console.error("Error getting category:", err);
             setError(err.message);
             throw err;
         } finally {
@@ -533,7 +531,7 @@ export const ForumProvider = ({ children }) => {
     const contextValue = useMemo(
         () => ({
             // State
-            categories,
+            categories: FORUM_CATEGORIES,
             threads,
             currentThread,
             currentCategory,
@@ -559,31 +557,7 @@ export const ForumProvider = ({ children }) => {
             clearCurrentThread,
             clearError,
         }),
-        [
-            categories,
-            threads,
-            currentThread,
-            currentCategory,
-            loading,
-            error,
-            pagination,
-            getCategory,
-            getThreadsByCategory,
-            loadMoreThreads,
-            loadThread,
-            loadMoreReplies,
-            createThread,
-            updateThread,
-            deleteThread,
-            addReply,
-            updateReply,
-            deleteReply,
-            searchThreads,
-            getUserThreads,
-            getUserReplies,
-            clearCurrentThread,
-            clearError,
-        ]
+        [threads, currentThread, currentCategory, loading, error, pagination, getCategory, getThreadsByCategory, loadMoreThreads, loadThread, loadMoreReplies, createThread, updateThread, deleteThread, addReply, updateReply, deleteReply, searchThreads, getUserThreads, getUserReplies, clearCurrentThread, clearError]
     );
 
     return <ForumContext.Provider value={contextValue}>{children}</ForumContext.Provider>;
