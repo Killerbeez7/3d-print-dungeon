@@ -13,10 +13,6 @@ import {
     deleteDoc,
     serverTimestamp,
     startAfter,
-    endBefore,
-    startAt,
-    endAt,
-    limitToLast,
     increment,
 } from "firebase/firestore";
 
@@ -26,154 +22,9 @@ import {
  */
 export const forumService = {
     /**
-     * Get all categories
-     */
-    async getCategories() {
-        try {
-            const categoriesRef = collection(db, "forumCategories");
-            const q = query(categoriesRef, orderBy("order", "asc"));
-            const snapshot = await getDocs(q);
-            
-            // If no categories exist, create default ones
-            if (snapshot.empty) {
-                console.log("No categories found, creating default categories...");
-                const defaultCategories = [
-                    {
-                        name: "General Discussion",
-                        description: "General topics about 3D printing",
-                        order: 1,
-                        icon: "💬"
-                    },
-                    {
-                        name: "Technical Support",
-                        description: "Get help with technical issues",
-                        order: 2,
-                        icon: "🔧"
-                    },
-                    {
-                        name: "Showcase",
-                        description: "Show off your 3D prints",
-                        order: 3,
-                        icon: "🎨"
-                    },
-                    {
-                        name: "Marketplace",
-                        description: "Buy and sell 3D prints",
-                        order: 4,
-                        icon: "🛒"
-                    },
-                    {
-                        name: "Events",
-                        description: "Upcoming events and meetups",
-                        order: 5,
-                        icon: "📅"
-                    }
-                ];
-
-                // Create default categories
-                for (const category of defaultCategories) {
-                    await addDoc(categoriesRef, {
-                        ...category,
-                        createdAt: serverTimestamp(),
-                        updatedAt: serverTimestamp()
-                    });
-                }
-
-                // Fetch categories again after creating them
-                const newSnapshot = await getDocs(q);
-                return newSnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-            }
-
-            return snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-        } catch (error) {
-            console.error("Error getting categories:", error);
-            throw error;
-        }
-    },
-
-    /**
-     * Get a category by ID
-     */
-    async getCategoryById(categoryId) {
-        try {
-            const categoryRef = doc(db, "forumCategories", categoryId);
-            const categoryDoc = await getDoc(categoryRef);
-            
-            if (!categoryDoc.exists()) {
-                throw new Error("Category not found");
-            }
-            
-            return {
-                id: categoryDoc.id,
-                ...categoryDoc.data()
-            };
-        } catch (error) {
-            console.error("Error getting category:", error);
-            throw error;
-        }
-    },
-
-    /**
-     * Create a new category
-     */
-    async createCategory(categoryData) {
-        try {
-            const categoriesRef = collection(db, "forumCategories");
-            const data = {
-                ...categoryData,
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
-            };
-            
-            const docRef = await addDoc(categoriesRef, data);
-            return docRef.id;
-        } catch (error) {
-            console.error("Error creating category:", error);
-            throw error;
-        }
-    },
-
-    /**
-     * Update a category
-     */
-    async updateCategory(categoryId, categoryData) {
-        try {
-            const categoryRef = doc(db, "forumCategories", categoryId);
-            await updateDoc(categoryRef, {
-                ...categoryData,
-                updatedAt: serverTimestamp()
-            });
-            return categoryId;
-        } catch (error) {
-            console.error("Error updating category:", error);
-            throw error;
-        }
-    },
-
-    /**
-     * Delete a category
-     */
-    async deleteCategory(categoryId) {
-        try {
-            const categoryRef = doc(db, "forumCategories", categoryId);
-            await deleteDoc(categoryRef);
-            return categoryId;
-        } catch (error) {
-            console.error("Error deleting category:", error);
-            throw error;
-        }
-    },
-
-    /**
      * Get threads by category with pagination
      */
-    async getThreadsByCategory(categoryId, sortBy = "lastActivity", page = 1, pageSize = 20) {
+    async getThreadsByCategory(categoryId, sortBy = "lastActivity", pageSize = 20) {
         try {
             const threadsRef = collection(db, "forumThreads");
             const q = query(
@@ -341,13 +192,6 @@ export const forumService = {
             };
             
             const docRef = await addDoc(threadsRef, newThread);
-
-            // Update thread count in category
-            const categoryRef = doc(db, "forumCategories", threadData.categoryId);
-            await updateDoc(categoryRef, {
-                threadCount: increment(1)
-            });
-
             return docRef.id;
         } catch (error) {
             console.error("Error creating thread:", error);
@@ -375,7 +219,7 @@ export const forumService = {
     /**
      * Delete thread
      */
-    async deleteThread(threadId, categoryId) {
+    async deleteThread(threadId) {
         try {
             // Delete all replies first
             const repliesRef = collection(db, "forumReplies");
@@ -390,12 +234,6 @@ export const forumService = {
             // Delete thread
             const threadRef = doc(db, "forumThreads", threadId);
             batch.delete(threadRef);
-
-            // Update thread count in category
-            const categoryRef = doc(db, "forumCategories", categoryId);
-            batch.update(categoryRef, {
-                threadCount: increment(-1)
-            });
             
             await batch.commit();
             return threadId;
@@ -478,7 +316,7 @@ export const forumService = {
     /**
      * Get thread replies with pagination
      */
-    async getThreadReplies(threadId, page = 1, pageSize = 20) {
+    async getThreadReplies(threadId, pageSize = 20) {
         try {
             const repliesRef = collection(db, "forumReplies");
             const q = query(
@@ -552,7 +390,7 @@ export const forumService = {
     /**
      * Search threads
      */
-    async searchThreads(query, page = 1, pageSize = 20) {
+    async searchThreads(query, pageSize = 20) {
         try {
             // Due to Firestore limitations, we can't do full-text search
             // We'll search by title for now (for production, consider Algolia or similar)
@@ -584,7 +422,7 @@ export const forumService = {
     /**
      * Get user's threads
      */
-    async getUserThreads(userId, page = 1, pageSize = 20) {
+    async getUserThreads(userId, pageSize = 20) {
         try {
             const threadsRef = collection(db, "forumThreads");
             const q = query(
@@ -613,7 +451,7 @@ export const forumService = {
     /**
      * Get user's replies
      */
-    async getUserReplies(userId, page = 1, pageSize = 20) {
+    async getUserReplies(userId, pageSize = 20) {
         try {
             const repliesRef = collection(db, "forumReplies");
             const q = query(
