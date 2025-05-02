@@ -179,7 +179,7 @@ h6 {
 
 /* Navbar Glass Overlay */
 .glass-effect {
-    background: rgba(var(--background-main-rgb), 0.9);
+    background: rgba(var(--background-main-rgb), 0.85);
     -webkit-backdrop-filter: blur(20px);
     -moz-backdrop-filter: blur(20px);
     -ms-backdrop-filter: blur(20px);
@@ -235,7 +235,7 @@ h6 {
 }
 
 /* Custom Divider */
-.border-top-gradient {
+.divider-top {
     background-image: linear-gradient(
         to right,
         rgba(0, 0, 0, 0) 10%,
