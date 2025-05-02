@@ -1,111 +1,224 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useForum } from "@/hooks/useForum";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { LuPanelLeftClose, LuPanelLeftOpen } from "react-icons/lu";
+import { MdHome } from "react-icons/md";
+import { BiSolidCategory } from "react-icons/bi";
+import { FaPlusSquare } from "react-icons/fa";
 
 export const ForumLayout = () => {
     const location = useLocation();
     const { categories, loading } = useForum();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsSidebarOpen(window.innerWidth >= 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
     };
 
+    const handleSidebarClick = () => {
+        if (window.innerWidth < 768) {
+            setIsSidebarOpen(false);
+        }
+    };
+
     return (
         <div className="relative flex min-h-screen">
-            {/* Sidebar */}
-            <div
-                className={`fixed inset-y-0 left-0 z-30 w-64 transform bg-white dark:bg-gray-900 shadow-lg transition-transform duration-300 md:relative md:translate-x-0 ${
-                    isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-                }`}
-            >
-                <div className="flex flex-col h-full">
-                    <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-                            Community Forum
-                        </h2>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                            Discuss 3D printing topics
-                        </p>
-                    </div>
-
-                    <div className="p-4 flex-1 overflow-auto">
-                        <nav className="space-y-1">
-                            <Link
-                                to="/forum"
-                                className={`block px-3 py-2 rounded-md ${
-                                    location.pathname === "/forum"
-                                        ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                                        : "hover:bg-gray-100 dark:hover:bg-gray-800"
-                                }`}
-                            >
-                                Home
-                            </Link>
-
-                            <div className="mt-4 mb-2">
-                                <h3 className="px-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    Categories
-                                </h3>
+            <div className="sticky top-20 h-[calc(100vh-140px)]">
+                {/* Compact Sidebar */}
+                <div
+                    className={`absolute mt-2 left-0 w-[60px] h-[calc(100vh-140px)] flex flex-col transition-transform duration-200 ${
+                        !isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                    }`}>
+                    <section className="text-txt-primary h-full">
+                        <div className="p-2">
+                            <div className="flex justify-center items-center">
+                                <button
+                                    onClick={toggleSidebar}
+                                    className="p-2 mt-2 rounded-[10px] text-txt-secondary hover:bg-bg-surface"
+                                    aria-label="Toggle sidebar">
+                                    <LuPanelLeftOpen
+                                        size={24}
+                                        className="text-lg"
+                                    />
+                                </button>
                             </div>
+                        </div>
 
-                            {loading ? (
-                                <div className="animate-pulse space-y-2">
-                                    {[...Array(5)].map((_, i) => (
-                                        <div
-                                            key={i}
-                                            className="h-10 bg-gray-200 dark:bg-gray-700 rounded"
+                        <div className="divider-top p-[10px] flex-1">
+                            <nav className="space-y-1">
+                                <Link
+                                    to="/forum"
+                                    onClick={handleSidebarClick}
+                                    className="block p-2 secondary-button justify-center"
+                                    title="Home">
+                                    <MdHome size={24} />
+                                </Link>
+
+                                <div className="mt-8 mb-2">
+                                    <div className="flex justify-center">
+                                        <BiSolidCategory size={20} />
+                                    </div>
+                                </div>
+
+                                {loading ? (
+                                    <div className="animate-pulse space-y-2">
+                                        {[...Array(5)].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className="h-10 bg-bg-surface rounded-[10px]"
+                                            />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="space-y-1 text-txt-secondary">
+                                        {categories.map((category) => (
+                                            <Link
+                                                key={category.id}
+                                                to={`/forum/category/${category.id}`}
+                                                onClick={handleSidebarClick}
+                                                className={`flex justify-center py-[7px] px-2 rounded-[10px] ${
+                                                    location.pathname ===
+                                                    `/forum/category/${category.id}`
+                                                        ? "bg-bg-surface text-txt-primary"
+                                                        : "hover:bg-bg-surface"
+                                                }`}
+                                                title={category.name}>
+                                                {category.icon && (
+                                                    <span className="text-lg">
+                                                        {category.icon}
+                                                    </span>
+                                                )}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </nav>
+                        </div>
+
+                        <div className="p-[10px] divider-top">
+                            <Link
+                                to="/forum/new-thread"
+                                onClick={handleSidebarClick}
+                                className="block py-[10px] text-center cta-button"
+                                title="New Thread">
+                                <div className="flex justify-center">
+                                    <FaPlusSquare size={20} />
+                                </div>
+                            </Link>
+                        </div>
+                    </section>
+                </div>
+
+                {/* Full Sidebar */}
+                <div
+                    className={`absolute left-0 w-[300px] h-[calc(100vh-140px)] flex flex-col transition-transform duration-200 ${
+                        isSidebarOpen ? "translate-x-0" : "-translate-x-[300px]"
+                    }`}>
+                    <section className="text-txt-primary h-full">
+                        <div className="p-4">
+                            <div className="flex justify-between items-center mb-2">
+                                <h1 className="font-bold">Forum</h1>
+                                <button
+                                    onClick={toggleSidebar}
+                                    className="p-2 rounded-[10px] text-txt-secondary hover:bg-bg-surface"
+                                    aria-label="Toggle sidebar">
+                                    <LuPanelLeftClose
+                                        size={24}
+                                        className="text-lg"
+                                    />
+                                </button>
+                            </div>
+                            <p className="text-sm text-txt-secondary">
+                                Discuss 3D printing topics
+                            </p>
+                        </div>
+
+                        <div className="divider-top p-4 flex-1">
+                            <nav className="space-y-1">
+                                <Link
+                                    to="/forum"
+                                    onClick={handleSidebarClick}
+                                    className="block rounded-md secondary-button">
+                                    <div className="flex px-3 py-2 items-center">
+                                        <MdHome size={20} className="mr-2" />
+                                        <span>Home</span>
+                                    </div>
+                                </Link>
+
+                                <div className="mt-4 mb-2">
+                                    <h4 className="px-3 font-semibold text-txt-primary uppercase tracking-wider flex items-center">
+                                        <BiSolidCategory
+                                            size={20}
+                                            className="mr-2"
                                         />
-                                    ))}
+                                        Categories
+                                    </h4>
                                 </div>
-                            ) : (
-                                <div className="space-y-1">
-                                    {categories.map((category) => (
-                                        <Link
-                                            key={category.id}
-                                            to={`/forum/category/${category.id}`}
-                                            className={`flex items-center px-3 py-2 rounded-md ${
-                                                location.pathname ===
-                                                `/forum/category/${category.id}`
-                                                    ? "bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
-                                                    : "hover:bg-gray-100 dark:hover:bg-gray-800"
-                                            }`}
-                                        >
-                                            {category.icon && (
-                                                <span className="mr-2 text-lg">
-                                                    {category.icon}
-                                                </span>
-                                            )}
-                                            <span>{category.name}</span>
-                                        </Link>
-                                    ))}
-                                </div>
-                            )}
-                        </nav>
-                    </div>
 
-                    <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                        <Link
-                            to="/forum/new-thread"
-                            className="block w-full py-2 px-4 text-center rounded-md bg-blue-600 text-white hover:bg-blue-700"
-                        >
-                            New Thread
-                        </Link>
-                    </div>
+                                {loading ? (
+                                    <div className="animate-pulse space-y-2">
+                                        {[...Array(5)].map((_, i) => (
+                                            <div
+                                                key={i}
+                                                className="h-10 bg-bg-surface rounded-[10px]"
+                                            />
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="space-y-1 text-txt-secondary">
+                                        {categories.map((category) => (
+                                            <Link
+                                                key={category.id}
+                                                to={`/forum/category/${category.id}`}
+                                                onClick={handleSidebarClick}
+                                                className={`flex items-center px-3 py-2 rounded-[10px] ${
+                                                    location.pathname ===
+                                                    `/forum/category/${category.id}`
+                                                        ? "bg-bg-surface text-txt-primary font-semibold"
+                                                        : "hover:bg-bg-surface"
+                                                }`}>
+                                                {category.icon && (
+                                                    <span className="mr-2 text-lg">
+                                                        {category.icon}
+                                                    </span>
+                                                )}
+                                                <span>{category.name}</span>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+                            </nav>
+                        </div>
+
+                        <div className="p-4 divider-top">
+                            <Link
+                                to="/forum/new-thread"
+                                onClick={handleSidebarClick}
+                                className="block w-full py-2 px-4 text-center cta-button">
+                                <div className="flex items-center justify-center">
+                                    <FaPlusSquare size={20} className="mr-2" />
+                                    <span>New Thread</span>
+                                </div>
+                            </Link>
+                        </div>
+                    </section>
                 </div>
             </div>
 
-            {/* Sidebar toggle button for mobile */}
-            <button
-                onClick={toggleSidebar}
-                className="fixed bottom-4 left-4 md:hidden z-40 p-2 rounded-full bg-blue-600 text-white shadow-lg"
-                aria-label="Toggle sidebar"
-            >
-                {isSidebarOpen ? <FaChevronLeft /> : <FaChevronRight />}
-            </button>
-
             {/* Main content */}
-            <div className="flex-1 p-4 md:p-6 md:ml-6">
+            <div
+                className={`flex-1 mt-2 p-4 transition-all duration-200 ${
+                    isSidebarOpen ? "ml-[300px]" : "ml-[60px]"
+                }`}>
                 <Outlet />
             </div>
         </div>

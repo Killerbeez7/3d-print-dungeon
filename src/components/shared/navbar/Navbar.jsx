@@ -270,7 +270,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                             {isAdmin && (
                                                 <Link
                                                     to={`/admin-panel`}
-                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary border-top-gradient hover:rounded-sm hover:border-br-primary hover:font-semibold"
+                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary divider-top hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)
                                                     }>
@@ -281,7 +281,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                     Admin Dashboard
                                                 </Link>
                                             )}
-                                            <div className="border-top-gradient">
+                                            <div className="divider-top">
                                                 <Link
                                                     to={`/artist/${currentUser?.uid}`}
                                                     className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
@@ -345,7 +345,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
             {/* ---------- Mobile drawer ---------- */}
             <div
-                className={`md:hidden shadow-md border-top-gradient glass-effect absolute inset-x-0 transition-all duration-300 ease-in-out transform ${
+                className={`md:hidden shadow-md divider-top glass-effect absolute inset-x-0 transition-all duration-300 ease-in-out transform ${
                     isMobileMenuOpen
                         ? "translate-y-0 opacity-100 pointer-events-auto"
                         : "-translate-y-full opacity-0 pointer-events-none"
@@ -372,7 +372,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
                 {/* Mobile Search */}
                 <div
-                    className="p-4 border-top-gradient"
+                    className="p-4 divider-top"
                     onClick={() => setShowDropdown(false)}>
                     <GlobalSearch />
                 </div>
@@ -383,7 +383,11 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                     {NAV_SECTIONS.map((section) => (
                         <div key={section.label}>
                             <button
-                                className={`w-full text-left px-4 py-2 text-txt-secondary hover:rounded-md hover:bg-bg-secondary hover:text-txt-primary flex items-center justify-between ${mobileDropdown === section.label ? 'bg-bg-surface rounded-md text-txt-primary font-semibold' : ''}`}
+                                className={`w-full text-left px-4 py-2 text-txt-secondary hover:rounded-md hover:bg-bg-secondary hover:text-txt-primary flex items-center justify-between ${
+                                    mobileDropdown === section.label
+                                        ? "bg-bg-surface rounded-md text-txt-primary font-semibold"
+                                        : ""
+                                }`}
                                 onClick={(e) =>
                                     toggleMobileDropdown(section.label, e)
                                 }>

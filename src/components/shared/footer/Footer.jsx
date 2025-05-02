@@ -14,7 +14,7 @@ export const Footer = () => {
     };
 
     return (
-        <footer className="text-txt-secondary py-10 border-top-gradient z-10">
+        <footer className="text-txt-secondary py-10 divider-top z-10">
             <div className="container mx-auto px-6 sm:px-8">
                 {/* Footer Top Section */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center sm:text-left">
@@ -119,7 +119,7 @@ export const Footer = () => {
                 </div>
 
                 {/* Newsletter Subscription Section */}
-                <div className="bg-accent-light p-6 rounded-lg text-center mt-8 border-top-gradient">
+                <div className="bg-accent-light p-6 rounded-lg text-center mt-8 divider-top">
                     <h3 className="font-semibold text-accent">
                         Get the Latest Model Drops
                     </h3>
@@ -127,7 +127,9 @@ export const Footer = () => {
                         Raid the 3D Print Dungeon: News, Models & Hidden
                         Treasures Await!
                     </p>
-                    <form className="mt-4 flex flex-col sm:flex-row justify-center items-center gap-4" onSubmit={handleSubscribe}>
+                    <form
+                        className="mt-4 flex flex-col sm:flex-row justify-center items-center gap-4"
+                        onSubmit={handleSubscribe}>
                         <input
                             type="email"
                             placeholder="Enter your email"
@@ -146,7 +148,7 @@ export const Footer = () => {
                 </div>
 
                 {/* Footer Bottom Section */}
-                <div className="border-top-gradient mt-8 pt-6 text-center text-sm">
+                <div className="divider-top mt-8 pt-6 text-center text-sm">
                     <p>&copy; 2025 3D Print Dungeon — All rights reserved</p>
                 </div>
             </div>
