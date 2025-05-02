@@ -1,7 +1,12 @@
-import * as THREE from "three";
-import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
-import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
+// Lazy imports for Three.js and its loaders
+const loadThree = async () => {
+    const three = await import("three");
+    const STLLoader = (await import("three/examples/jsm/loaders/STLLoader")).STLLoader;
+    const OBJLoader = (await import("three/examples/jsm/loaders/OBJLoader")).OBJLoader;
+    const GLTFExporter = (await import("three/examples/jsm/exporters/GLTFExporter"))
+        .GLTFExporter;
+    return { THREE: three, STLLoader, OBJLoader, GLTFExporter };
+};
 
 /**
  * finalConvertFileToGLB(file)
@@ -11,19 +16,23 @@ import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter";
 export async function finalConvertFileToGLB(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
-        reader.onload = () => {
+        reader.onload = async () => {
             try {
                 const arrayBuffer = reader.result;
                 const lowerExt = file.name.toLowerCase();
 
+                const { THREE, STLLoader, OBJLoader, GLTFExporter } = await loadThree();
+                if (!THREE) {
+                    throw new Error("Failed to load Three.js");
+                }
+
                 let scene = new THREE.Scene();
-                // scene.background = new THREE.Color(0x222222);  /old
                 scene.background = new THREE.Color(0x616161);
 
                 if (lowerExt.endsWith(".stl")) {
                     const stlLoader = new STLLoader();
                     const geometry = stlLoader.parse(arrayBuffer);
-                    const mesh = centerMesh(geometry);
+                    const mesh = centerMesh(geometry, THREE);
                     scene.add(mesh);
                 } else if (lowerExt.endsWith(".obj")) {
                     const objText = new TextDecoder().decode(arrayBuffer);
@@ -57,10 +66,14 @@ export async function finalConvertFileToGLB(file) {
                     { binary: true }
                 );
             } catch (err) {
+                console.error("Conversion error:", err);
                 reject(err);
             }
         };
-        reader.onerror = (err) => reject(err);
+        reader.onerror = (err) => {
+            console.error("File reading error:", err);
+            reject(err);
+        };
         reader.readAsArrayBuffer(file);
     });
 }
@@ -68,9 +81,8 @@ export async function finalConvertFileToGLB(file) {
 /**
  * Helper: centerMesh(geometry)
  */
-function centerMesh(geometry) {
-    // const material = new THREE.MeshStandardMaterial({ color: 0xcccccc }); //old
-    const material = new THREE.MeshStandardMaterial({ color: 0xE4E4E4 }); 
+function centerMesh(geometry, THREE) {
+    const material = new THREE.MeshStandardMaterial({ color: 0xe4e4e4 });
     const mesh = new THREE.Mesh(geometry, material);
     geometry.computeBoundingBox();
 
