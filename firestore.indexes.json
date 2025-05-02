@@ -140,15 +140,5 @@
         }
     ],
     "fieldOverrides": [
-        {
-            "collectionGroup": "forumCategories",
-            "fieldPath": "order",
-            "indexes": [
-                {
-                    "order": "ASCENDING",
-                    "queryScope": "COLLECTION"
-                }
-            ]
-        }
     ]
 }
