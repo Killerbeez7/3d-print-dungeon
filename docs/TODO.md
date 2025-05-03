@@ -1,3 +1,14 @@
+desktop 
+- use search in layout for all components and pass different searchResults for diff components
+
+mobile
+- only button should appear on close side menu
+- side menu takes whole screen, disable the rest on open and vise versa
+
+
+
+
+
 
 03/05/2025
 MARKETPLACE UPDATES

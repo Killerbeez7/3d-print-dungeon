@@ -11,7 +11,7 @@ import {
   FaCalendar, 
   FaUser
 } from "react-icons/fa";
-import Skeleton from "../shared/Skeleton";
+import Skeleton from "@/components/shared/Skeleton";
 import { ThreadEditor } from "./ThreadEditor";
 import { ReplyEditor } from "./ReplyEditor";
 import PropTypes from "prop-types";

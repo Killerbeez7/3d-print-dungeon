@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
-import { useAuth } from "../hooks/useAuth";
-import { ForumContext } from "../contexts/forumContext";
-import { forumService } from "../services/forumService";
+import { useAuth } from "@/hooks/useAuth";
+import { ForumContext } from "@/contexts/forumContext";
+import { forumService } from "@/services/forumService";
 import { FORUM_CATEGORIES } from "@/config/forumCategories";
 
 export const ForumProvider = ({ children }) => {

@@ -1,5 +1,5 @@
-import { EventsHome } from "@/components/events/EventsHome";
-import { EventDetails } from "@/components/events/EventDetails";
+import { EventsHome } from "@/components/community/events/EventsHome";
+import { EventDetails } from "@/components/community/events/EventDetails";
 
 // Placeholder for EventEntryForm
 const EventEntryForm = () => (
