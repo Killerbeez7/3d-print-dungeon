@@ -4,6 +4,10 @@ import { ForumCategory } from "@/components/forum/ForumCategory";
 import { ForumThread } from "@/components/forum/ForumThread";
 import { ForumProvider } from "@/providers/forumProvider";
 import { withProtectedMaintenance } from "@/helpers/routeHelpers";
+import { ForumDashboard } from "@/components/forum/ForumDashboard";
+import { ForumMyThreads } from "@/components/forum/ForumMyThreads";
+import { ForumRules } from "@/components/forum/ForumRules";
+import { ForumHelp } from "@/components/forum/ForumHelp";
 
 // Route constants
 const FORUM_ROUTES = {
@@ -27,6 +31,10 @@ export const forumRoutes = [
             { index: true, element: <ForumHome /> },
             { path: "category/:categoryId", element: <ForumCategory /> },
             { path: "thread/:threadId", element: <ForumThread /> },
+            { path: "dashboard", element: <ForumDashboard /> },
+            { path: "my-threads", element: <ForumMyThreads /> },
+            { path: "rules", element: <ForumRules /> },
+            { path: "help", element: <ForumHelp /> },
             {
                 path: "new-thread",
                 element: withProtectedMaintenance(<ForumThread isNew />, {
