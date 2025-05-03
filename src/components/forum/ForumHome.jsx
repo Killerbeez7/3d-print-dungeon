@@ -292,16 +292,16 @@ export const ForumHome = () => {
                     </div>
                 </form>
 
-                <Link
+                {/* <Link
                     to="/forum/new-thread"
                     className="inline-flex items-center px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] focus:outline-none transition">
                     <FaPlus className="mr-2" />
                     New Thread
-                </Link>
+                </Link> */}
             </div>
 
             {/* Categories grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {categories.map((category) => (
                     <Link
                         key={category.id}
@@ -325,7 +325,7 @@ export const ForumHome = () => {
                         </div>
                     </Link>
                 ))}
-            </div>
+            </div> */}
 
             {/* Tabs */}
             <div className="border-b border-[var(--br-secondary)]">
