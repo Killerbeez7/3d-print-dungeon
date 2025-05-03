@@ -9,8 +9,8 @@ export const ROUTES = {
     COLLECTIONS: "/collections",
 
     /* Community */
-    COMMUNITY_EVENTS: "/community/events",
-    COMMUNITY_BLOG: "/community/blog",
+    EVENTS: "/events",
+    BLOG: "/blog",
 
     /* Forum */
     FORUM: "/forum",
@@ -42,4 +42,7 @@ export const ROUTES = {
 
     /* Admin */
     ADMIN_PANEL: "/admin-panel",
+
+    /* Competitions */
+    COMPETITIONS: "/competitions",
 };

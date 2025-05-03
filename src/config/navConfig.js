@@ -14,9 +14,9 @@ export const NAV_SECTIONS = [
         label: "Community",
         to: "/community",
         items: [
+            { label: "Events", to: ROUTES.EVENTS },
             { label: "Forum", to: ROUTES.FORUM },
-            { label: "Events", to: ROUTES.COMMUNITY_EVENTS },
-            { label: "Blog", to: ROUTES.COMMUNITY_BLOG },
+            { label: "Blog", to: ROUTES.BLOG },
         ],
     },
     {
