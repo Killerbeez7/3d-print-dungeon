@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 export default function Skeleton({ className = '' }) {
   return (
     <div 
@@ -5,3 +7,7 @@ export default function Skeleton({ className = '' }) {
     />
   );
 } 
+
+Skeleton.propTypes = {
+  className: PropTypes.string,
+};

@@ -1,13 +1,13 @@
-import { ForumLayout } from "@/components/forum/ForumLayout";
-import { ForumHome } from "@/components/forum/ForumHome";
-import { ForumCategory } from "@/components/forum/ForumCategory";
-import { ForumThread } from "@/components/forum/ForumThread";
+import { ForumLayout } from "@/components/community/forum/ForumLayout";
+import { ForumHome } from "@/components/community/forum/ForumHome";
+import { ForumCategory } from "@/components/community/forum/ForumCategory";
+import { ForumThread } from "@/components/community/forum/ForumThread";
 import { ForumProvider } from "@/providers/forumProvider";
 import { withProtectedMaintenance } from "@/helpers/routeHelpers";
-import { ForumDashboard } from "@/components/forum/ForumDashboard";
-import { ForumMyThreads } from "@/components/forum/ForumMyThreads";
-import { ForumRules } from "@/components/forum/ForumRules";
-import { ForumHelp } from "@/components/forum/ForumHelp";
+import { ForumDashboard } from "@/components/community/forum/ForumDashboard";
+import { ForumMyThreads } from "@/components/community/forum/ForumMyThreads";
+import { ForumRules } from "@/components/community/forum/ForumRules";
+import { ForumHelp } from "@/components/community/forum/ForumHelp";
 
 // Route constants
 const FORUM_ROUTES = {

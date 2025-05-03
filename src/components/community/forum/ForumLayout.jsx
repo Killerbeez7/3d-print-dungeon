@@ -76,9 +76,27 @@ export const ForumLayout = () => {
                                 {categories && (
                                     <>
                                         {/* MAIN */}
-                                        <SidebarLink icon={MdHome} label={null} to="/forum" onClick={handleSidebarClick} className="justify-center w-10 h-10 flex items-center mx-auto" />
-                                        <SidebarLink icon={MdDashboard} label={null} to="/forum/dashboard" onClick={handleSidebarClick} className="justify-center w-10 h-10 flex items-center mx-auto" />
-                                        <SidebarLink icon={FaUser} label={null} to="/forum/my-threads" onClick={handleSidebarClick} className="justify-center w-10 h-10 flex items-center mx-auto" />
+                                        <SidebarLink
+                                            icon={MdHome}
+                                            label={null}
+                                            to="/forum"
+                                            onClick={handleSidebarClick}
+                                            className="justify-center w-10 h-10 flex items-center mx-auto"
+                                        />
+                                        <SidebarLink
+                                            icon={MdDashboard}
+                                            label={null}
+                                            to="/forum/dashboard"
+                                            onClick={handleSidebarClick}
+                                            className="justify-center w-10 h-10 flex items-center mx-auto"
+                                        />
+                                        <SidebarLink
+                                            icon={FaUser}
+                                            label={null}
+                                            to="/forum/my-threads"
+                                            onClick={handleSidebarClick}
+                                            className="justify-center w-10 h-10 flex items-center mx-auto"
+                                        />
                                         <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
                                         {/* CATEGORIES */}
                                         {categories.map((category) => {
@@ -90,7 +108,12 @@ export const ForumLayout = () => {
                                                     label={null}
                                                     to={`/forum/category/${category.id}`}
                                                     onClick={handleSidebarClick}
-                                                    className={`justify-center w-10 h-10 flex items-center mx-auto ${location.pathname === `/forum/category/${category.id}` ? "bg-[var(--bg-surface)] text-[var(--txt-primary)]" : "hover:bg-[var(--bg-surface)]"}`}
+                                                    className={`justify-center w-10 h-10 flex items-center mx-auto ${
+                                                        location.pathname ===
+                                                        `/forum/category/${category.id}`
+                                                            ? "bg-[var(--bg-surface)] text-[var(--txt-primary)]"
+                                                            : "hover:bg-[var(--bg-surface)]"
+                                                    }`}
                                                 />
                                             );
                                         })}
@@ -106,8 +129,20 @@ export const ForumLayout = () => {
                                         </Link>
                                         <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
                                         {/* INFO */}
-                                        <SidebarLink icon={FaInfoCircle} label={null} to="/forum/rules" onClick={handleSidebarClick} className="justify-center w-10 h-10 flex items-center mx-auto" />
-                                        <SidebarLink icon={FaQuestionCircle} label={null} to="/forum/help" onClick={handleSidebarClick} className="justify-center w-10 h-10 flex items-center mx-auto" />
+                                        <SidebarLink
+                                            icon={FaInfoCircle}
+                                            label={null}
+                                            to="/forum/rules"
+                                            onClick={handleSidebarClick}
+                                            className="justify-center w-10 h-10 flex items-center mx-auto"
+                                        />
+                                        <SidebarLink
+                                            icon={FaQuestionCircle}
+                                            label={null}
+                                            to="/forum/help"
+                                            onClick={handleSidebarClick}
+                                            className="justify-center w-10 h-10 flex items-center mx-auto"
+                                        />
                                     </>
                                 )}
                             </nav>
@@ -144,15 +179,34 @@ export const ForumLayout = () => {
                                     <>
                                         {/* MAIN */}
                                         <div className="mb-4">
-                                            <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">MAIN</h4>
-                                            <SidebarLink icon={MdHome} label="Home" to="/forum" onClick={handleSidebarClick} />
-                                            <SidebarLink icon={MdDashboard} label="Dashboard" to="/forum/dashboard" onClick={handleSidebarClick} />
-                                            <SidebarLink icon={FaUser} label="My Threads" to="/forum/my-threads" onClick={handleSidebarClick} />
+                                            <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
+                                                MAIN
+                                            </h4>
+                                            <SidebarLink
+                                                icon={MdHome}
+                                                label="Home"
+                                                to="/forum"
+                                                onClick={handleSidebarClick}
+                                            />
+                                            <SidebarLink
+                                                icon={MdDashboard}
+                                                label="Dashboard"
+                                                to="/forum/dashboard"
+                                                onClick={handleSidebarClick}
+                                            />
+                                            <SidebarLink
+                                                icon={FaUser}
+                                                label="My Threads"
+                                                to="/forum/my-threads"
+                                                onClick={handleSidebarClick}
+                                            />
                                         </div>
                                         <div className="my-2 border-t border-[var(--br-secondary)]" />
                                         {/* CATEGORIES */}
                                         <div className="mb-4">
-                                            <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">CATEGORIES</h4>
+                                            <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
+                                                CATEGORIES
+                                            </h4>
                                             {categories.map((category) => {
                                                 const Icon = category.icon;
                                                 return (
@@ -162,7 +216,12 @@ export const ForumLayout = () => {
                                                         label={category.name}
                                                         to={`/forum/category/${category.id}`}
                                                         onClick={handleSidebarClick}
-                                                        className={`${location.pathname === `/forum/category/${category.id}` ? "bg-[var(--bg-surface)] text-[var(--txt-primary)] font-semibold" : "hover:bg-[var(--bg-surface)]"}`}
+                                                        className={`${
+                                                            location.pathname ===
+                                                            `/forum/category/${category.id}`
+                                                                ? "bg-[var(--bg-surface)] text-[var(--txt-primary)] font-semibold"
+                                                                : "hover:bg-[var(--bg-surface)]"
+                                                        }`}
                                                     />
                                                 );
                                             })}
@@ -170,15 +229,35 @@ export const ForumLayout = () => {
                                         <div className="my-2 border-t border-[var(--br-secondary)]" />
                                         {/* ACTIONS */}
                                         <div className="mb-4">
-                                            <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">ACTIONS</h4>
-                                            <SidebarLink icon={FaPlusSquare} label="New Thread" to="/forum/new-thread" onClick={handleSidebarClick} className="font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)]" />
+                                            <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
+                                                ACTIONS
+                                            </h4>
+                                            <SidebarLink
+                                                icon={FaPlusSquare}
+                                                label="New Thread"
+                                                to="/forum/new-thread"
+                                                onClick={handleSidebarClick}
+                                                className="font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)]"
+                                            />
                                         </div>
                                         <div className="my-2 border-t border-[var(--br-secondary)]" />
                                         {/* INFO */}
                                         <div>
-                                            <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">INFO</h4>
-                                            <SidebarLink icon={FaInfoCircle} label="Forum Rules" to="/forum/rules" onClick={handleSidebarClick} />
-                                            <SidebarLink icon={FaQuestionCircle} label="Help" to="/forum/help" onClick={handleSidebarClick} />
+                                            <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
+                                                INFO
+                                            </h4>
+                                            <SidebarLink
+                                                icon={FaInfoCircle}
+                                                label="Forum Rules"
+                                                to="/forum/rules"
+                                                onClick={handleSidebarClick}
+                                            />
+                                            <SidebarLink
+                                                icon={FaQuestionCircle}
+                                                label="Help"
+                                                to="/forum/help"
+                                                onClick={handleSidebarClick}
+                                            />
                                         </div>
                                     </>
                                 )}

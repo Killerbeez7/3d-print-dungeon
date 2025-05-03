@@ -1,5 +1,5 @@
-import { EventsHome } from "../components/events/EventsHome";
-import { Blog } from "../components/blog/Blog";
+import { EventsHome } from "../components/community/events/EventsHome";
+import { Blog } from "../components/community/blog/Blog";
 import { withMaintenance } from "../helpers/routeHelpers";
 import { ROUTES } from "../config/routeConstants";
 
