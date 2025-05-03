@@ -1,4 +1,31 @@
 
+03/05/2025
+MARKETPLACE UPDATES
+Requirements & Features
+- [ ] Core Marketplace Features:
+- [ ] Listings: Users can post items for sale/trade (3D prints, printers, materials, services, etc.).
+- [ ] Listing Details: Title, description, price, images, category, location, condition, contact method.
+- [ ] Search & Filter: By category, price, location, keywords, etc.
+- [ ] User Profiles: View seller’s other listings, ratings, and contact info.
+- [ ] Messaging: (Optional) In-app messaging or external contact (email, Discord, etc.).
+- [ ] Moderation: Report listings, admin controls for removal.
+- [ ] Status: Mark as sold/available.
+- [ ] Safety: Warnings about scams, safe trading tips.
+
+UI/UX Structure
+Marketplace Home:
+- [ ] Search bar, filters, categories grid, featured/newest listings.
+Listing Card:
+- [ ] Image, title, price, location, status, quick contact.
+Listing Details Page:
+- [ ] All info, image gallery, seller info, contact button, report button.
+Create/Edit Listing Form:
+- [ ] Robust validation, image upload, preview.
+My Listings:
+- [ ] Manage, edit, mark as sold, delete.
+Admin Panel:
+- [ ] Moderate reported listings.
+
 30/04/25
 - [ ] disable scroll over model in modelView mobile version
 
