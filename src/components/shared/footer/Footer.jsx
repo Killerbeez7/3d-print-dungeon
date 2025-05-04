@@ -119,7 +119,7 @@ export const Footer = () => {
                 </div>
 
                 {/* Newsletter Subscription Section */}
-                <div className="bg-accent-light p-6 rounded-lg text-center mt-8 divider-top">
+                <div className="p-6 rounded-lg text-center mt-8 divider-top">
                     <h3 className="font-semibold text-accent">
                         Get the Latest Model Drops
                     </h3>
