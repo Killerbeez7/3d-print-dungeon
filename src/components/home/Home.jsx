@@ -1,15 +1,44 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useModels } from "@/hooks/useModels";
 import { Link } from "react-router-dom";
 import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 import { FeaturedCarousel } from "./FeaturedCarousel";
 import { featuredMockData } from "./featuredMockData";
+import { FilterPanel } from "./FilterPanel";
 
 export const Home = () => {
     const { models, loading } = useModels();
     const [hasMore, setHasMore] = useState(true);
     const [sortBy, setSortBy] = useState("community");
     const [categoryFilter, setCategoryFilter] = useState("all");
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [isMainContentVisible, setIsMainContentVisible] = useState(true);
+    const mainContentRef = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                setIsMainContentVisible(entry.isIntersecting);
+                if (!entry.isIntersecting && isFilterOpen) {
+                    setIsFilterOpen(false);
+                }
+            },
+            {
+                threshold: 0.1, // Trigger when at least 10% of the element is visible
+                rootMargin: "-100px 0px", // Add some margin to trigger earlier
+            }
+        );
+
+        if (mainContentRef.current) {
+            observer.observe(mainContentRef.current);
+        }
+
+        return () => {
+            if (mainContentRef.current) {
+                observer.unobserve(mainContentRef.current);
+            }
+        };
+    }, [isFilterOpen]);
 
     if (loading) {
         return <p className="p-4">Loading models...</p>;
@@ -20,14 +49,18 @@ export const Home = () => {
         title: m.name || "Untitled Model",
         artist: m.uploaderDisplayName || "Anonymous",
         tags: Array.isArray(m.tags) ? m.tags : ["3D"],
-        imageUrl: m.primaryRenderLowResUrl || m.primaryRenderUrl || "/image.png",
+        imageUrl:
+            m.primaryRenderLowResUrl || m.primaryRenderUrl || "/image.png",
         likes: m.likes || 0,
         views: m.views || 0,
         createdAt: m.createdAt,
     }));
 
     const sortedArtworks = applySorting(artworks, sortBy);
-    const displayedArtworks = applyCategoryFilter(sortedArtworks, categoryFilter);
+    const displayedArtworks = applyCategoryFilter(
+        sortedArtworks,
+        categoryFilter
+    );
 
     const handleLoadMore = () => {
         setHasMore(false);
@@ -35,134 +68,62 @@ export const Home = () => {
 
     return (
         <div className="text-txt-primary min-h-screen">
+            {/* Filter Button */}
+            <button
+                onClick={() => setIsFilterOpen(!isFilterOpen)}
+                className={`fixed bottom-5 left-5 z-50 bg-accent p-3 rounded-full! secondary-button transition-all duration-300 ${
+                    isMainContentVisible
+                        ? "opacity-100 translate-x-0"
+                        : "opacity-0 -translate-x-4 pointer-events-none"
+                }`}>
+                {isFilterOpen ? (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M6 18L18 6M6 6l12 12"
+                        />
+                    </svg>
+                ) : (
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-6 w-6"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                        />
+                    </svg>
+                )}
+            </button>
+
+            {/* Filter Panel */}
+            <FilterPanel
+                isOpen={isFilterOpen}
+                onClose={() => setIsFilterOpen(false)}
+                categoryFilter={categoryFilter}
+                setCategoryFilter={setCategoryFilter}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+            />
+
             {/* Featured Carousel Section */}
             <FeaturedCarousel items={featuredMockData} />
 
-            {/* Trending Carousel Section */}
-            {/* <TrendingCarousel items={trendingMockData} /> */}
-
-            <div className="mx-auto p-4">
+            {/* Main Content Section */}
+            <div ref={mainContentRef} className="mx-auto p-4">
                 <h1 className="mb-4 font-bold">Models</h1>
-
-                {/* Category Buttons */}
-                <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
-                    <div className="flex flex-col md:flex-row md:items-center gap-2">
-                        <label
-                            htmlFor="sortBy"
-                            className="text-txt-secondary text-lg font-medium whitespace-nowrap"
-                        >
-                            Filter by:
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                            <button
-                                onClick={() => setCategoryFilter("all")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
-                                    categoryFilter === "all"
-                                        ? "bg-accent text-white"
-                                        : "bg-bg-surface hover:bg-accent-hover"
-                                }`}
-                            >
-                                All
-                            </button>
-                            <button
-                                onClick={() => setCategoryFilter("2D")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
-                                    categoryFilter === "2D"
-                                        ? "bg-accent text-white"
-                                        : "bg-bg-surface hover:bg-accent-hover"
-                                }`}
-                            >
-                                2D
-                            </button>
-                            <button
-                                onClick={() => setCategoryFilter("3D")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
-                                    categoryFilter === "3D"
-                                        ? "bg-accent text-white"
-                                        : "bg-bg-surface hover:bg-accent-hover"
-                                }`}
-                            >
-                                3D
-                            </button>
-                            <button
-                                onClick={() => setCategoryFilter("Concept")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
-                                    categoryFilter === "Concept"
-                                        ? "bg-accent text-white"
-                                        : "bg-bg-surface hover:bg-accent-hover"
-                                }`}
-                            >
-                                Concept
-                            </button>
-                            <button
-                                onClick={() => setCategoryFilter("Fantasy")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
-                                    categoryFilter === "Fantasy"
-                                        ? "bg-accent text-white"
-                                        : "bg-bg-surface hover:bg-accent-hover"
-                                }`}
-                            >
-                                Fantasy
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Sort Menu */}
-                    <div className="flex flex-col md:flex-row md:items-center gap-2">
-                        <label
-                            htmlFor="sortBy"
-                            className="text-txt-secondary text-lg font-medium whitespace-nowrap"
-                        >
-                            Sort by:
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                            <button
-                                onClick={() => setSortBy("community")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
-                                    sortBy === "community"
-                                        ? "bg-accent text-white"
-                                        : "bg-bg-surface hover:bg-accent-hover"
-                                }`}
-                            >
-                                Community
-                            </button>
-                            <button
-                                onClick={() => setSortBy("popular")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
-                                    sortBy === "popular"
-                                        ? "bg-accent text-white"
-                                        : "bg-bg-surface hover:bg-accent-hover"
-                                }`}
-                            >
-                                Popular
-                            </button>
-                            <button
-                                onClick={() => setSortBy("latest")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
-                                    sortBy === "latest"
-                                        ? "bg-accent text-white"
-                                        : "bg-bg-surface hover:bg-accent-hover"
-                                }`}
-                            >
-                                Latest
-                            </button>
-                            <button
-                                onClick={() => setSortBy("views")}
-                                className={`py-2 px-4 rounded-full text-sm font-medium transition-all ${
-                                    sortBy === "views"
-                                        ? "bg-accent text-white"
-                                        : "bg-bg-surface hover:bg-accent-hover"
-                                }`}
-                            >
-                                Most Viewed
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Gallery Grid */}
-            <div className="mx-auto px-4">
+                {/* Gallery Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1">
                     {displayedArtworks.map((art) => (
                         <Link key={art.id} to={`/model/${art.id}`}>
@@ -175,8 +136,12 @@ export const Home = () => {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end justify-start opacity-0 hover:opacity-100 transition-opacity">
                                         <div className="text-white m-2">
-                                            <h4 className="font-semibold">{art.title}</h4>
-                                            <p className="text-sm">{art.artist}</p>
+                                            <h4 className="font-semibold">
+                                                {art.title}
+                                            </h4>
+                                            <p className="text-sm">
+                                                {art.artist}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -189,8 +154,7 @@ export const Home = () => {
                     <div className="text-center mt-8">
                         <button
                             onClick={handleLoadMore}
-                            className="cta-button py-2 px-6 rounded-full font-bold"
-                        >
+                            className="cta-button py-2 px-6 rounded-full font-bold">
                             Load More
                         </button>
                     </div>
@@ -206,7 +170,8 @@ function applySorting(artworks, sortBy) {
             return [...artworks].sort((a, b) => b.likes - a.likes);
         case "latest":
             return [...artworks].sort(
-                (a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)
+                (a, b) =>
+                    (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)
             );
         case "views":
             return [...artworks].sort((a, b) => b.views - a.views);
