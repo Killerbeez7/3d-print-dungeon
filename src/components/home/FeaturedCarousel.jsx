@@ -2,14 +2,15 @@ import { Link } from "react-router-dom";
 import { ReusableCarousel } from "../shared/carousel/ReusableCarousel";
 import PropTypes from "prop-types";
 
-export const FeaturedCarousel = ({ items }) => {
+export const FeaturedCarousel = ({ items, itemHeight = 250, slidesToShow = 4 }) => {
     const renderItem = (item) => (
         <Link to={item.link} target="_blank" rel="noopener noreferrer">
             <div className="relative overflow-hidden rounded-xl group">
                 <img
                     src={item.image}
                     alt={item.title}
-                    className="w-full h-[250px] object-cover rounded-xl"
+                    className="w-full object-cover rounded-xl"
+                    style={{ height: itemHeight }}
                     onError={(e) => {
                         console.error(`Failed to load image: ${item.image}`);
                         e.target.src = "/assets/images/default-image.png"; // Fallback image
@@ -36,8 +37,8 @@ export const FeaturedCarousel = ({ items }) => {
         <ReusableCarousel
             items={items}
             renderItem={renderItem}
-            slidesToShow={4}
-            slidesToScroll={4}
+            slidesToShow={slidesToShow}
+            slidesToScroll={slidesToShow}
             infinite={false}
             speed={500}
         />
@@ -55,4 +56,6 @@ FeaturedCarousel.propTypes = {
             link: PropTypes.string.isRequired,
         })
     ).isRequired,
+    itemHeight: PropTypes.number,
+    slidesToShow: PropTypes.number,
 };

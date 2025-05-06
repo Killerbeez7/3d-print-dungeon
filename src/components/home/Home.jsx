@@ -67,7 +67,7 @@ export const Home = () => {
     };
 
     return (
-        <div className="text-txt-primary min-h-screen">
+        <div className="text-txt-primary min-h-screen px-4 md:px-10 2xl:px-18">
             {/* Filter Button */}
             <button
                 onClick={() => setIsFilterOpen(!isFilterOpen)}
@@ -118,7 +118,7 @@ export const Home = () => {
             />
 
             {/* Featured Carousel Section */}
-            <FeaturedCarousel items={featuredMockData} />
+            <FeaturedCarousel items={featuredMockData} itemHeight={180} slidesToShow={5} />
 
             {/* Main Content Section */}
             <div ref={mainContentRef} className="mx-auto p-4">
