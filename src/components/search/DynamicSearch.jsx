@@ -94,6 +94,8 @@ export function DynamicSearch() {
             {/* Render search results */}
             {modelsLoading ? (
                 <p className="text-sm text-txt-secondary mb-4">Loading...</p>
+            ) : activeTab === "artworks" ? (
+                <ArtworksTab searchTerm={debouncedQuery} models={models} />
             ) : noSearchNoFilters ? (
                 <div className="flex flex-col items-center justify-center text-center py-20">
                     <FontAwesomeIcon
@@ -108,8 +110,6 @@ export function DynamicSearch() {
                         options.
                     </p>
                 </div>
-            ) : activeTab === "artworks" ? (
-                <ArtworksTab searchTerm={debouncedQuery} models={models} />
             ) : (
                 <ArtistsTab searchTerm={debouncedQuery} />
             )}
