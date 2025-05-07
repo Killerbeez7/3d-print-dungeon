@@ -64,7 +64,7 @@ export const ModelEdit = () => {
     }
 
     return (
-        <div className="min-h-screen p-8 bg-bg-primary">
+        <div className="min-h-screen p-8">
             <h1 className="text-3xl font-bold text-txt-primary mb-6">
                 Edit Model
             </h1>

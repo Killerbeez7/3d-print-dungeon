@@ -5,6 +5,7 @@ import { finalConvertFileToGLB } from "@/utils/models/converter";
 // components
 import { FilesUpload } from "./sections/FilesUpload";
 import { InfoForm } from "./sections/InfoForm";
+import AlertModal from "@/components/shared/alert-modal/AlertModal";
 
 export function ModelUpload() {
     const { currentUser } = useAuth();
@@ -16,6 +17,7 @@ export function ModelUpload() {
     const [files, setFiles] = useState([]);
     const [posterDataUrl, setPosterDataUrl] = useState(null);
     const [convertedBlob, setConvertedBlob] = useState(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
     const [modelData, setModelData] = useState({
         name: "",
@@ -124,7 +126,7 @@ export function ModelUpload() {
 
             const firstFile = files[0];
 
-            const result = await createAdvancedModel({
+            await createAdvancedModel({
                 name: modelData.name,
                 description: modelData.description,
                 category: modelData.category,
@@ -139,7 +141,7 @@ export function ModelUpload() {
                 preConvertedFile: convertedBlob,
             });
 
-            alert("Model + Poster uploaded!\nDoc ID: " + result.modelId);
+            setShowSuccessModal(true);
 
             setFiles([]);
             setModelData({
@@ -162,11 +164,15 @@ export function ModelUpload() {
     };
 
     return (
-        <div className="container mx-auto p-4 space-y-2">
+        <div className="container mx-auto p-6 space-y-6 max-w-6xl">
             {/* Step Indicator */}
-            <div className="flex items-center w-full max-w-md mx-auto mb-6">
-                <StepIndicator stepNumber={1} label="Upload" currentStep={step} />
-                <div className="flex-1 mx-4 border-t border-dashed border-gray-300"></div>
+            <div className="flex items-center w-full max-w-md mx-auto mb-8">
+                <StepIndicator
+                    stepNumber={1}
+                    label="Upload"
+                    currentStep={step}
+                />
+                <div className="flex-1 mx-4 border-t border-dashed border-br-surface"></div>
                 <StepIndicator
                     stepNumber={2}
                     label="Model Information"
@@ -174,54 +180,57 @@ export function ModelUpload() {
                 />
             </div>
 
-            {error && <div className="text-error font-semibold text-center">{error}</div>}
+            {error && (
+                <div className="bg-error/10 border border-error/20 rounded-lg p-4 text-error font-semibold text-center">
+                    {error}
+                </div>
+            )}
 
-            <FilesUpload step={step} files={files} setFiles={setFiles} />
+            <div className="rounded-xl p-6">
+                <FilesUpload step={step} files={files} setFiles={setFiles} />
 
-            {step === 2 && <InfoForm modelData={modelData} setModelData={setModelData} />}
+                {step === 2 && (
+                    <div className="mt-6 pt-6 border-t border-br-secondary">
+                        <InfoForm
+                            modelData={modelData}
+                            setModelData={setModelData}
+                        />
+                    </div>
+                )}
+            </div>
 
             {isUploading && (
-                <div className="w-full bg-gray-200 rounded-md overflow-hidden">
+                <div className="w-full bg-bg-surface rounded-lg overflow-hidden">
                     <div
-                        className="bg-green-500 h-4 transition-all"
+                        className="bg-accent h-2 transition-all duration-300 ease-in-out"
                         style={{ width: `${uploadProgress}%` }}
                     />
                 </div>
             )}
 
-            <section className="rounded-md p-4">
-                {step === 1 && (
-                    <div className="flex justify-center">
+            <section className="flex justify-center gap-4 mt-8">
+                {step === 1 ? (
+                    files.length > 0 && (
                         <button
                             onClick={() => setStep(2)}
-                            className={`px-4 py-2 rounded-md ${
-                                files.length === 0
-                                    ? "bg-btn-disabled font-medium"
-                                    : "cta-button"
-                            }`}
-                            disabled={files.length === 0}
-                        >
+                            className="cta-button px-6 py-3 font-semibold transition-all">
                             Next Step
                         </button>
-                    </div>
-                )}
-
-                {step === 2 && (
-                    <div className="flex justify-center gap-4">
+                    )
+                ) : (
+                    <>
                         <button
                             onClick={() => setStep(1)}
-                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300"
-                        >
+                            className="secondary-button px-6 py-3">
                             Previous Step
                         </button>
                         <button
                             onClick={handleSubmit}
-                            className="cta-button px-4 py-2"
-                            disabled={isUploading}
-                        >
+                            className="cta-button px-6 py-3"
+                            disabled={isUploading}>
                             {isUploading ? "Uploading..." : "Submit"}
                         </button>
-                    </div>
+                    </>
                 )}
             </section>
 
@@ -244,6 +253,13 @@ export function ModelUpload() {
                 camera-controls
                 environment-image="neutral"
             />
+
+            <AlertModal
+                isOpen={showSuccessModal}
+                onClose={() => setShowSuccessModal(false)}
+                title="Upload Successful!"
+                message="Your model has been successfully uploaded!"
+            />
         </div>
     );
 }
@@ -252,15 +268,15 @@ function StepIndicator({ stepNumber, label, currentStep }) {
     const isActive = currentStep === stepNumber;
     return (
         <div
-            className={`flex items-center space-x-2 ${
+            className={`flex items-center space-x-3 ${
                 isActive ? "text-accent" : "text-txt-secondary"
-            }`}
-        >
+            }`}>
             <div
-                className={`w-6 h-6 flex items-center justify-center rounded-full ${
-                    isActive ? "bg-accent" : "bg-txt-secondary"
-                } text-white font-bold`}
-            >
+                className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
+                    isActive
+                        ? "bg-accent shadow-lg shadow-accent/20"
+                        : "bg-bg-surface"
+                } text-white font-bold`}>
                 {stepNumber}
             </div>
             <span className="font-semibold">{label}</span>
