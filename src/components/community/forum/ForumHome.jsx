@@ -1,15 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useForum } from "@/hooks/useForum";
-import { FaPlus, FaSearch } from "react-icons/fa";
+import { FaSearch, FaPlus } from "react-icons/fa";
 import Skeleton from "@/components/shared/Skeleton";
+import { forumService } from "@/services/forumService";
+import { formatDistanceToNow } from "date-fns";
+import PropTypes from "prop-types";
 
 export const ForumHome = () => {
     const { categories, threads, loading, error, searchThreads } = useForum();
+    const [displayedThreads, setDisplayedThreads] = useState([]);
+    const [lastVisible, setLastVisible] = useState(null);
+    const [hasMore, setHasMore] = useState(true);
+    const [loadingMore, setLoadingMore] = useState(false);
     const [activeTab, setActiveTab] = useState("recent");
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
+    const scrollTimeoutRef = useRef(null);
 
     useEffect(() => {
         // Reset search when tab changes
@@ -18,6 +26,121 @@ export const ForumHome = () => {
             setSearchResults([]);
         }
     }, [activeTab]);
+
+    // Always scroll to top on mount and when tab changes
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [activeTab]);
+
+    // Reset loaded threads on mount (refresh)
+    useEffect(() => {
+        setDisplayedThreads([]);
+        setLastVisible(null);
+        setHasMore(true);
+    }, []);
+
+    // Fetch first 10 threads on mount
+    useEffect(() => {
+        const fetchInitialThreads = async () => {
+            setLoadingMore(true);
+            try {
+                const result = await forumService.getNewestThreads(10);
+                console.log("Initial threads fetch:", result);
+                const threads = Array.isArray(result) ? result : result.threads || [];
+                setDisplayedThreads(threads);
+                setLastVisible(result.lastVisible || null);
+                setHasMore(
+                    result.hasMore !== undefined ? result.hasMore : threads.length === 10
+                );
+            } catch (error) {
+                console.error("Error fetching initial threads:", error);
+            } finally {
+                setLoadingMore(false);
+            }
+        };
+        fetchInitialThreads();
+    }, []);
+
+    // Throttled scroll handler with inline loadMoreThreads
+    useEffect(() => {
+        const handleScroll = () => {
+            if (scrollTimeoutRef.current) return;
+            
+            scrollTimeoutRef.current = setTimeout(async () => {
+                const totalHeight = document.documentElement.scrollHeight;
+                const scrollY = window.scrollY;
+                const innerHeight = window.innerHeight;
+                const scrolled = scrollY + innerHeight;
+                const scrollPercent = scrolled / totalHeight;
+                
+                console.log('Scroll position:', { 
+                    scrollY,
+                    innerHeight,
+                    totalHeight,
+                    scrollPercent: Math.round(scrollPercent * 100) + '%',
+                    hasMore,
+                    loadingMore,
+                    hasLastVisible: !!lastVisible 
+                });
+                
+                // Only trigger loading when user has scrolled past 80% of the page
+                if (
+                    scrollPercent > 0.8 &&
+                    hasMore &&
+                    !loadingMore &&
+                    lastVisible
+                ) {
+                    console.log("Triggering loadMoreThreads at 80% scroll");
+                    // Inline loadMoreThreads logic
+                    try {
+                        setLoadingMore(true);
+                        const result = await forumService.getMoreNewestThreads(lastVisible, 5);
+                        const threads = Array.isArray(result) ? result : result.threads || [];
+                        if (threads.length === 0) {
+                            setHasMore(false);
+                            return;
+                        }
+                        setDisplayedThreads((prev) => [...prev, ...threads]);
+                        setLastVisible(result.lastVisible || null);
+                        setHasMore(
+                            result.hasMore !== undefined ? result.hasMore : threads.length === 5
+                        );
+                    } catch (error) {
+                        console.error("Error loading more threads:", error);
+                        setHasMore(false);
+                    } finally {
+                        setLoadingMore(false);
+                    }
+                }
+                
+                scrollTimeoutRef.current = null;
+            }, 200);
+        };
+        
+        window.addEventListener("scroll", handleScroll);
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            if (scrollTimeoutRef.current) {
+                clearTimeout(scrollTimeoutRef.current);
+            }
+        };
+    }, [hasMore, loadingMore, lastVisible]);
+
+    // Format relative time
+    const formatRelativeTime = (timestamp) => {
+        if (!timestamp) return "Unknown time";
+        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        return formatDistanceToNow(date, { addSuffix: true });
+    };
+
+    // Check if a thread is new (less than 24 hours old)
+    const isNewThread = (thread) => {
+        if (!thread.createdAt) return false;
+        const createdAt = thread.createdAt.toDate ? thread.createdAt.toDate() : new Date(thread.createdAt);
+        const now = new Date();
+        const hoursDiff = (now - createdAt) / (1000 * 60 * 60);
+        return hoursDiff < 24;
+    };
 
     const handleSearch = async (e) => {
         e.preventDefault();
@@ -35,6 +158,64 @@ export const ForumHome = () => {
         }
     };
 
+    // Thread card component for reuse
+    const ThreadCard = ({ thread }) => (
+        <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+            <div className="flex justify-between items-start">
+                <Link
+                    to={`/forum/thread/${thread.id}`}
+                    className="text-lg font-medium hover:text-[var(--accent)]"
+                >
+                    {thread.title}
+                    {isNewThread(thread) && (
+                        <span className="ml-2 text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">
+                            New
+                        </span>
+                    )}
+                </Link>
+            </div>
+            
+            <div className="mt-2 text-sm text-[var(--txt-muted)]">
+                Posted in{" "}
+                <Link
+                    to={`/forum/category/${thread.categoryId}`}
+                    className="text-[var(--accent)] hover:underline"
+                >
+                    {categories.find(c => c.id === thread.categoryId)?.name || "Unknown Category"}
+                </Link>
+                {" · "}
+                {formatRelativeTime(thread.createdAt)}
+                {thread.replyCount !== undefined && (
+                    <>
+                        {" · "}
+                        {thread.replyCount} {thread.replyCount === 1 ? "reply" : "replies"}
+                    </>
+                )}
+                {thread.views !== undefined && (
+                    <>
+                        {" · "}
+                        {thread.views} {thread.views === 1 ? "view" : "views"}
+                    </>
+                )}
+            </div>
+        </div>
+    );
+
+    ThreadCard.propTypes = {
+        thread: PropTypes.shape({
+            id: PropTypes.string.isRequired,
+            title: PropTypes.string.isRequired,
+            categoryId: PropTypes.string,
+            createdAt: PropTypes.oneOfType([
+                PropTypes.string,
+                PropTypes.object, // Firestore timestamp
+                PropTypes.instanceOf(Date)
+            ]),
+            replyCount: PropTypes.number,
+            views: PropTypes.number
+        }).isRequired
+    };
+
     const renderThreadListForTab = () => {
         if (searchQuery && searchResults.length > 0) {
             return (
@@ -44,25 +225,7 @@ export const ForumHome = () => {
                     </h2>
                     <div className="space-y-4">
                         {searchResults.map((thread) => (
-                            <div
-                                key={thread.id}
-                                className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
-                                <Link
-                                    to={`/forum/thread/${thread.id}`}
-                                    className="text-lg font-medium hover:text-[var(--accent)]">
-                                    {thread.title}
-                                </Link>
-                                <div className="mt-2 text-sm text-[var(--txt-muted)]">
-                                    Posted in{" "}
-                                    <Link
-                                        to={`/forum/category/${thread.categoryId}`}
-                                        className="text-[var(--accent)] hover:underline">
-                                        {categories.find(
-                                            (c) => c.id === thread.categoryId
-                                        )?.name || "Unknown Category"}
-                                    </Link>
-                                </div>
-                            </div>
+                            <ThreadCard key={thread.id} thread={thread} />
                         ))}
                     </div>
                 </div>
@@ -80,87 +243,47 @@ export const ForumHome = () => {
             );
         }
 
-        switch (activeTab) {
-            case "recent":
-                return (
-                    <div className="mt-6">
-                        <h2 className="text-lg font-medium mb-4">
-                            Recent Discussions
-                        </h2>
-                        {threads.recent?.length > 0 ? (
-                            <div className="space-y-4">
-                                {threads.recent.map((thread) => (
-                                    <div
-                                        key={thread.id}
-                                        className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
-                                        <Link
-                                            to={`/forum/thread/${thread.id}`}
-                                            className="text-lg font-medium hover:text-[var(--accent)]">
-                                            {thread.title}
-                                        </Link>
-                                        <div className="mt-2 text-sm text-[var(--txt-muted)]">
-                                            Posted in{" "}
-                                            <Link
-                                                to={`/forum/category/${thread.categoryId}`}
-                                                className="text-[var(--accent)] hover:underline">
-                                                {categories.find(
-                                                    (c) =>
-                                                        c.id ===
-                                                        thread.categoryId
-                                                )?.name || "Unknown Category"}
-                                            </Link>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
-                                <p className="text-[var(--txt-muted)]">
-                                    No recent discussions yet. Start a new
-                                    thread!
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                );
+        if (activeTab === "recent" && !searchQuery) {
+            return (
+                <div className="mt-6">
+                    <h2 className="text-lg font-medium mb-4">Recent Discussions</h2>
+                    {displayedThreads.length > 0 ? (
+                        <div className="space-y-4">
+                            {displayedThreads.map((thread) => (
+                                <ThreadCard key={thread.id} thread={thread} />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
+                            <p className="text-[var(--txt-muted)]">
+                                No recent discussions yet. Start a new thread!
+                            </p>
+                        </div>
+                    )}
+                    {loadingMore && (
+                        <div className="text-center mt-4 text-[var(--txt-muted)]">
+                            Loading more...
+                        </div>
+                    )}
+                </div>
+            );
+        }
 
+        switch (activeTab) {
             case "popular":
                 return (
                     <div className="mt-6">
-                        <h2 className="text-lg font-medium mb-4">
-                            Popular Discussions
-                        </h2>
+                        <h2 className="text-lg font-medium mb-4">Popular Discussions</h2>
                         {threads.popular?.length > 0 ? (
                             <div className="space-y-4">
                                 {threads.popular.map((thread) => (
-                                    <div
-                                        key={thread.id}
-                                        className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
-                                        <Link
-                                            to={`/forum/thread/${thread.id}`}
-                                            className="text-lg font-medium hover:text-[var(--accent)]">
-                                            {thread.title}
-                                        </Link>
-                                        <div className="mt-2 text-sm text-[var(--txt-muted)]">
-                                            Posted in{" "}
-                                            <Link
-                                                to={`/forum/category/${thread.categoryId}`}
-                                                className="text-[var(--accent)] hover:underline">
-                                                {categories.find(
-                                                    (c) =>
-                                                        c.id ===
-                                                        thread.categoryId
-                                                )?.name || "Unknown Category"}
-                                            </Link>
-                                        </div>
-                                    </div>
+                                    <ThreadCard key={thread.id} thread={thread} />
                                 ))}
                             </div>
                         ) : (
                             <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
                                 <p className="text-[var(--txt-muted)]">
-                                    No popular discussions yet. Start a new
-                                    thread!
+                                    No popular discussions yet. Start a new thread!
                                 </p>
                             </div>
                         )}
@@ -176,34 +299,14 @@ export const ForumHome = () => {
                         {threads.unanswered?.length > 0 ? (
                             <div className="space-y-4">
                                 {threads.unanswered.map((thread) => (
-                                    <div
-                                        key={thread.id}
-                                        className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
-                                        <Link
-                                            to={`/forum/thread/${thread.id}`}
-                                            className="text-lg font-medium hover:text-[var(--accent)]">
-                                            {thread.title}
-                                        </Link>
-                                        <div className="mt-2 text-sm text-[var(--txt-muted)]">
-                                            Posted in{" "}
-                                            <Link
-                                                to={`/forum/category/${thread.categoryId}`}
-                                                className="text-[var(--accent)] hover:underline">
-                                                {categories.find(
-                                                    (c) =>
-                                                        c.id ===
-                                                        thread.categoryId
-                                                )?.name || "Unknown Category"}
-                                            </Link>
-                                        </div>
-                                    </div>
+                                    <ThreadCard key={thread.id} thread={thread} />
                                 ))}
                             </div>
                         ) : (
                             <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
                                 <p className="text-[var(--txt-muted)]">
-                                    All discussions have been answered. Great
-                                    job community!
+                                    All discussions have been answered. Great job
+                                    community!
                                 </p>
                             </div>
                         )}
@@ -227,7 +330,8 @@ export const ForumHome = () => {
                     {[...Array(6)].map((_, i) => (
                         <div
                             key={i}
-                            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
+                        >
                             <Skeleton className="h-6 w-12 mb-2" />
                             <Skeleton className="h-4 w-3/4 mb-1" />
                             <Skeleton className="h-4 w-1/2" />
@@ -245,7 +349,8 @@ export const ForumHome = () => {
                     {[...Array(3)].map((_, i) => (
                         <div
                             key={i}
-                            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+                            className="bg-white dark:bg-gray-800 rounded-lg shadow p-4"
+                        >
                             <Skeleton className="h-6 w-3/4 mb-2" />
                             <Skeleton className="h-4 w-1/2" />
                         </div>
@@ -258,9 +363,7 @@ export const ForumHome = () => {
     if (error) {
         return (
             <div className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg text-red-700 dark:text-red-400">
-                <h2 className="text-lg font-semibold mb-2">
-                    Error Loading Forum
-                </h2>
+                <h2 className="text-lg font-semibold mb-2">Error Loading Forum</h2>
                 <p>{error}</p>
             </div>
         );
@@ -286,46 +389,21 @@ export const ForumHome = () => {
                         <button
                             type="submit"
                             className="absolute right-1 bottom-1 top-1 px-3 rounded bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] focus:outline-none transition"
-                            disabled={isSearching || !searchQuery.trim()}>
+                            disabled={isSearching || !searchQuery.trim()}
+                        >
                             {isSearching ? "..." : "Search"}
                         </button>
                     </div>
                 </form>
 
-                {/* <Link
+                <Link
                     to="/forum/new-thread"
-                    className="inline-flex items-center px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] focus:outline-none transition">
+                    className="inline-flex items-center px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] focus:outline-none transition"
+                >
                     <FaPlus className="mr-2" />
                     New Thread
-                </Link> */}
+                </Link>
             </div>
-
-            {/* Categories grid */}
-            {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {categories.map((category) => (
-                    <Link
-                        key={category.id}
-                        to={`/forum/category/${category.id}`}
-                        className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-4 hover:bg-[var(--bg-tertiary)] transition">
-                        <div className="flex items-center gap-3">
-                            {category.icon && (
-                                <span className="text-2xl">
-                                    {category.icon}
-                                </span>
-                            )}
-                            <h3 className="font-semibold text-lg">
-                                {category.name}
-                            </h3>
-                        </div>
-                        <p className="mt-2 text-sm text-[var(--txt-secondary)] line-clamp-2">
-                            {category.description}
-                        </p>
-                        <div className="mt-2 text-xs text-[var(--txt-muted)]">
-                            {category.threadCount || 0} threads
-                        </div>
-                    </Link>
-                ))}
-            </div> */}
 
             {/* Tabs */}
             <div className="border-b border-[var(--br-secondary)]">
@@ -336,7 +414,8 @@ export const ForumHome = () => {
                             activeTab === "recent"
                                 ? "border-[var(--accent)] text-[var(--accent)]"
                                 : "border-transparent text-[var(--txt-muted)] hover:text-[var(--txt-primary)] hover:border-[var(--br-secondary)]"
-                        }`}>
+                        }`}
+                    >
                         Recent
                     </button>
                     <button
@@ -345,7 +424,8 @@ export const ForumHome = () => {
                             activeTab === "popular"
                                 ? "border-[var(--accent)] text-[var(--accent)]"
                                 : "border-transparent text-[var(--txt-muted)] hover:text-[var(--txt-primary)] hover:border-[var(--br-secondary)]"
-                        }`}>
+                        }`}
+                    >
                         Popular
                     </button>
                     <button
@@ -354,7 +434,8 @@ export const ForumHome = () => {
                             activeTab === "unanswered"
                                 ? "border-[var(--accent)] text-[var(--accent)]"
                                 : "border-transparent text-[var(--txt-muted)] hover:text-[var(--txt-primary)] hover:border-[var(--br-secondary)]"
-                        }`}>
+                        }`}
+                    >
                         Unanswered
                     </button>
                 </nav>
