@@ -467,15 +467,25 @@ export const ForumProvider = ({ children }) => {
         [currentUser]
     );
 
-    // Search threads
+    // Search threads (quick fix: client-side filtering for substring, case-insensitive)
     const searchThreads = useCallback(async (searchQuery) => {
         if (!searchQuery) return [];
 
         setLoading(true);
         setError(null);
         try {
-            const result = await forumService.searchThreads(searchQuery);
-            return result.threads;
+            // Fetch a large batch of threads (adjust pageSize as needed)
+            const result = await forumService.getRecentThreads(100);
+            // Support both array and { threads: [...] }
+            const threads = Array.isArray(result) ? result : (result.threads || []);
+            console.log('Fetched threads for search:', threads);
+            // Filter client-side for case-insensitive substring match
+            const lowerQuery = searchQuery.toLowerCase();
+            const filtered = threads.filter(thread =>
+                thread.title && thread.title.toLowerCase().includes(lowerQuery)
+            );
+            console.log('Search query:', searchQuery, 'Filtered results:', filtered);
+            return filtered;
         } catch (err) {
             console.error("Error searching threads:", err);
             setError(err.message);
