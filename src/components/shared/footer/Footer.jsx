@@ -20,7 +20,7 @@ export const Footer = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center sm:text-left">
                     {/* Company Info */}
                     <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-accent">
+                        <h3 className="text-lg font-semibold text-txt-primary">
                             3D Print Dungeon
                         </h3>
                         <p className="text-sm mt-2">
@@ -32,35 +32,35 @@ export const Footer = () => {
 
                     {/* Useful Links */}
                     <div className="mb-6">
-                        <h3 className="text-lg font-semibold text-accent">
+                        <h3 className="text-lg font-semibold text-txt-primary">
                             Useful Links
                         </h3>
                         <ul className="mt-2 text-sm">
                             <li>
                                 <a
                                     href="#"
-                                    className="block hover:text-accent-hover transition-colors duration-200">
+                                    className="block hover:text-accent-hover transition-colors duration-300">
                                     About Us
                                 </a>
                             </li>
                             <li>
                                 <a
                                     href="#"
-                                    className="block hover:text-accent-hover transition-colors duration-200">
+                                    className="block hover:text-accent-hover transition-colors duration-300">
                                     Contact
                                 </a>
                             </li>
                             <li>
                                 <a
                                     href="#"
-                                    className="block hover:text-accent-hover transition-colors duration-200">
+                                    className="block hover:text-accent-hover transition-colors duration-300">
                                     Privacy Policy
                                 </a>
                             </li>
                             <li>
                                 <a
                                     href="#"
-                                    className="block hover:text-accent-hover transition-colors duration-200">
+                                    className="block hover:text-accent-hover transition-colors duration-300">
                                     Terms & Conditions
                                 </a>
                             </li>
@@ -69,7 +69,7 @@ export const Footer = () => {
 
                     {/* Contact Information */}
                     <div className="mb-6">
-                        <h3 className="text font-semibold text-accent">
+                        <h3 className="text font-semibold text-txt-primary">
                             Contact
                         </h3>
                         <ul className="mt-2 text-sm">
@@ -88,29 +88,31 @@ export const Footer = () => {
 
                     {/* Social Media */}
                     <div className="mb-6">
-                        <h3 className="font-semibold text-accent">Follow Us</h3>
+                        <h3 className="font-semibold text-txt-primary">
+                            Follow Us
+                        </h3>
                         <div className="flex justify-center sm:justify-start space-x-4 text-xl mt-2">
                             <a
                                 href="#"
-                                className="hover:text-accent-hover transition-colors duration-200"
+                                className="hover:text-accent-hover transition-colors duration-300"
                                 aria-label="Facebook">
                                 <FaFacebook size={24} />
                             </a>
                             <a
                                 href="#"
-                                className="hover:text-accent-hover transition-colors duration-200"
+                                className="hover:text-accent-hover transition-colors duration-300"
                                 aria-label="Twitter">
                                 <FaTwitter size={24} />
                             </a>
                             <a
                                 href="#"
-                                className="hover:text-accent-hover transition-colors duration-200"
+                                className="hover:text-accent-hover transition-colors duration-300"
                                 aria-label="Instagram">
                                 <FaInstagram size={24} />
                             </a>
                             <a
                                 href="#"
-                                className="hover:text-accent-hover transition-colors duration-200"
+                                className="hover:text-accent-hover transition-colors duration-300"
                                 aria-label="LinkedIn">
                                 <FaLinkedin size={24} />
                             </a>
@@ -120,7 +122,7 @@ export const Footer = () => {
 
                 {/* Newsletter Subscription Section */}
                 <div className="p-6 rounded-lg text-center mt-8 divider-top">
-                    <h3 className="font-semibold text-accent">
+                    <h3 className="font-semibold text-txt-primary">
                         Get the Latest Model Drops
                     </h3>
                     <p className="mt-2">
