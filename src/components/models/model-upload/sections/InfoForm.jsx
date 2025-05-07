@@ -36,7 +36,7 @@ export function InfoForm({ modelData, setModelData }) {
 
     return (
         <section className="flex flex-col gap-2">
-            <section className="bg-bg-surface rounded-md py-4 px-8">
+            <section className="rounded-md py-4 px-8">
                 <div>
                     {/* Image Upload Section */}
                     <ImagesUpload modelData={modelData} setModelData={setModelData} />

@@ -174,9 +174,7 @@ export function ModelUpload() {
                 />
             </div>
 
-            {error && (
-                <div className="text-error font-semibold text-center">{error}</div>
-            )}
+            {error && <div className="text-error font-semibold text-center">{error}</div>}
 
             <FilesUpload step={step} files={files} setFiles={setFiles} />
 
@@ -191,7 +189,7 @@ export function ModelUpload() {
                 </div>
             )}
 
-            <section className="bg-bg-surface rounded-md p-4">
+            <section className="rounded-md p-4">
                 {step === 1 && (
                     <div className="flex justify-center">
                         <button
