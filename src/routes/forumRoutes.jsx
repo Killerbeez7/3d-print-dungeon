@@ -6,8 +6,8 @@ import { ForumProvider } from "@/providers/forumProvider";
 import { withProtectedMaintenance } from "@/helpers/routeHelpers";
 import { ForumDashboard } from "@/components/community/forum/ForumDashboard";
 import { ForumMyThreads } from "@/components/community/forum/ForumMyThreads";
-import { ForumRules } from "@/components/community/forum/ForumRules";
-import { ForumHelp } from "@/components/community/forum/ForumHelp";
+import { ForumRules } from "@/components/community/forum/tabs/ForumRules";
+import { ForumHelp } from "@/components/community/forum/tabs/ForumHelp";
 
 // Route constants
 const FORUM_ROUTES = {
