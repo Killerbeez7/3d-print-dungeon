@@ -26,11 +26,14 @@ body {
     z-index: 0;
     pointer-events: none;
 
-    background-image: radial-gradient(
+    /* new - add colors to the background constant */
+    background-image: linear-gradient(to bottom, #232527 10%, #000000 80%);
+    /* old */
+    /* background-image: radial-gradient(
         ellipse 50% 45% at 50% 80%,
         rgba(var(--background-second-rgba)) 20%,
         transparent 100%
-    );
+    ); */
 }
 
 .background-blur {
@@ -190,11 +193,7 @@ h6 {
 
 /* Buttons */
 .cta-button {
-    background: linear-gradient(
-        135deg,
-        var(--accent-dark) 0%,
-        var(--accent) 100%
-    );
+    background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 100%);
     transition: all 0.3s ease;
     color: #f5f5f8;
     font-weight: 600;
@@ -202,21 +201,13 @@ h6 {
 }
 
 .cta-button:hover {
-    background: linear-gradient(
-        135deg,
-        var(--accent) 0%,
-        var(--accent-hover) 100%
-    );
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
     transform: translateY(-1px);
     box-shadow: 0px 0px 12px var(--accent-dark);
 }
 
 .secondary-button {
-    background: linear-gradient(
-        135deg,
-        var(--bg-surface) 0%,
-        var(--bg-tertiary) 100%
-    );
+    background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-tertiary) 100%);
     transition: all 0.3s ease;
     color: #f5f5f8;
     font-weight: 600;
@@ -224,11 +215,7 @@ h6 {
 }
 
 .secondary-button:hover {
-    background: linear-gradient(
-        135deg,
-        var(--bg-tertiary) 0%,
-        var(--bg-tertiary) 100%
-    );
+    background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-tertiary) 100%);
     transform: translateY(-1px);
     box-shadow: 0 0px 12px var(--bg-tertiary);
     color: #f5f5f8;
