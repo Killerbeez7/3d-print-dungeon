@@ -475,5 +475,67 @@ export const forumService = {
             console.error("Error getting user replies:", error);
             throw error;
         }
+    },
+
+    /**
+     * Get newest threads (by creation date, descending)
+     */
+    async getNewestThreads(limitCount = 10) {
+        try {
+            const threadsRef = collection(db, "forumThreads");
+            const q = query(
+                threadsRef,
+                orderBy("createdAt", "desc"),
+                limit(limitCount)
+            );
+            const snapshot = await getDocs(q);
+            console.log(`[forumService] Fetched ${snapshot.docs.length} newest threads`);
+            
+            return {
+                threads: snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                })),
+                lastVisible: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
+                hasMore: snapshot.docs.length === limitCount
+            };
+        } catch (error) {
+            console.error("[forumService] Error getting newest threads:", error);
+            return { threads: [], lastVisible: null, hasMore: false };
+        }
+    },
+
+    /**
+     * Get more newest threads (pagination)
+     */
+    async getMoreNewestThreads(lastVisible, limitCount = 5) {
+        try {
+            if (!lastVisible) {
+                console.error("[forumService] No lastVisible document provided for pagination");
+                return { threads: [], lastVisible: null, hasMore: false };
+            }
+            
+            const threadsRef = collection(db, "forumThreads");
+            const q = query(
+                threadsRef,
+                orderBy("createdAt", "desc"),
+                startAfter(lastVisible),
+                limit(limitCount)
+            );
+            const snapshot = await getDocs(q);
+            console.log(`[forumService] Fetched ${snapshot.docs.length} more threads`);
+            
+            return {
+                threads: snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                })),
+                lastVisible: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
+                hasMore: snapshot.docs.length === limitCount
+            };
+        } catch (error) {
+            console.error("[forumService] Error getting more threads:", error);
+            return { threads: [], lastVisible: null, hasMore: false };
+        }
     }
 }; 
