@@ -203,3 +203,22 @@ Firestore Rules:
 
 - [ ] on desktop mobile view nav doesnt detect clicks in nav links with hover and press on the carouse; insted of the nav links
 
+
+
+
+
+###########################
+1. Use a Full-Text Search Service
+Algolia or Typesense: These services index your Firestore data and provide fast, typo-tolerant, case-insensitive, full-text search.
+Firestore’s new full-text search (if available in your region/project).
+How to implement:
+Set up an Algolia/Typesense account.
+Sync your forumThreads collection to the search service (using a cloud function or scheduled sync).
+Replace the client-side filter with an API call to the search service.
+Update your searchThreads function to call the search API and return results.
+
+How to implement:
+Set up an Algolia/Typesense account.
+Sync your forumThreads collection to the search service (using a cloud function or scheduled sync).
+Replace the client-side filter with an API call to the search service.
+Update your searchThreads function to call the search API and return results.
