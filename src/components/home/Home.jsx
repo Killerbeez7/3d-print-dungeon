@@ -1,19 +1,70 @@
-import { useState, useEffect, useRef } from "react";
-import { useModels } from "@/hooks/useModels";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 import { FeaturedCarousel } from "./FeaturedCarousel";
 import { featuredMockData } from "./featuredMockData";
 import { FilterPanel } from "./FilterPanel";
+import { InfiniteScrollList } from "@/components/shared/InfiniteScrollList";
+import { collection, query, orderBy, limit, getDocs, startAfter } from "firebase/firestore";
+import { db } from "@/config/firebase";
+
+const PAGE_SIZE = 30;
+
+async function fetchModelsPage(lastDoc = null) {
+    let q = query(
+        collection(db, "models"),
+        orderBy("createdAt", "desc"),
+        limit(PAGE_SIZE)
+    );
+    if (lastDoc) {
+        q = query(
+            collection(db, "models"),
+            orderBy("createdAt", "desc"),
+            startAfter(lastDoc),
+            limit(PAGE_SIZE)
+        );
+    }
+    const snapshot = await getDocs(q);
+    return {
+        models: snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })),
+        lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
+        hasMore: snapshot.docs.length === PAGE_SIZE
+    };
+}
 
 export const Home = () => {
-    const { models, loading } = useModels();
+    const [models, setModels] = useState([]);
+    const [lastDoc, setLastDoc] = useState(null);
     const [hasMore, setHasMore] = useState(true);
+    const [loading, setLoading] = useState(true);
     const [sortBy, setSortBy] = useState("community");
     const [categoryFilter, setCategoryFilter] = useState("all");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [isMainContentVisible, setIsMainContentVisible] = useState(true);
     const mainContentRef = useRef(null);
+
+    // Initial load
+    useEffect(() => {
+        setLoading(true);
+        fetchModelsPage().then(({ models, lastDoc, hasMore }) => {
+            setModels(models);
+            setLastDoc(lastDoc);
+            setHasMore(hasMore);
+            setLoading(false);
+        });
+    }, []);
+
+    // Loader for InfiniteScrollList
+    const loadMoreModels = useCallback(() => {
+        if (!hasMore || loading) return;
+        setLoading(true);
+        fetchModelsPage(lastDoc).then(({ models: newModels, lastDoc: newLastDoc, hasMore: more }) => {
+            setModels(prev => [...prev, ...newModels]);
+            setLastDoc(newLastDoc);
+            setHasMore(more);
+            setLoading(false);
+        });
+    }, [lastDoc, hasMore, loading]);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -40,7 +91,7 @@ export const Home = () => {
         };
     }, [isFilterOpen]);
 
-    if (loading) {
+    if (loading && models.length === 0) {
         return <p className="p-4">Loading models...</p>;
     }
 
@@ -61,10 +112,6 @@ export const Home = () => {
         sortedArtworks,
         categoryFilter
     );
-
-    const handleLoadMore = () => {
-        setHasMore(false);
-    };
 
     return (
         <div className="text-txt-primary min-h-screen px-4 md:px-10 2xl:px-18">
@@ -123,42 +170,38 @@ export const Home = () => {
             {/* Main Content Section */}
             <div ref={mainContentRef} className="mx-auto p-4">
                 <h1 className="mb-4 font-bold">Models</h1>
-                {/* Gallery Grid */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1">
-                    {displayedArtworks.map((art) => (
-                        <Link key={art.id} to={`/model/${art.id}`}>
-                            <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
-                                <div className="relative w-full aspect-square">
-                                    <LazyImage
-                                        src={art.imageUrl}
-                                        alt={art.title}
-                                        className="absolute inset-0 w-full h-full object-cover rounded-md"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end justify-start opacity-0 hover:opacity-100 transition-opacity">
-                                        <div className="text-white m-2">
-                                            <h4 className="font-semibold">
-                                                {art.title}
-                                            </h4>
-                                            <p className="text-sm">
-                                                {art.artist}
-                                            </p>
+                <InfiniteScrollList
+                    items={displayedArtworks}
+                    hasMore={hasMore}
+                    loadMore={loadMoreModels}
+                    loader={<div className="text-center my-4">Loading more models...</div>}
+                >
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1">
+                        {displayedArtworks.map((art) => (
+                            <Link key={art.id} to={`/model/${art.id}`}>
+                                <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
+                                    <div className="relative w-full aspect-square">
+                                        <LazyImage
+                                            src={art.imageUrl}
+                                            alt={art.title}
+                                            className="absolute inset-0 w-full h-full object-cover rounded-md"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end justify-start opacity-0 hover:opacity-100 transition-opacity">
+                                            <div className="text-white m-2">
+                                                <h4 className="font-semibold">
+                                                    {art.title}
+                                                </h4>
+                                                <p className="text-sm">
+                                                    {art.artist}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </article>
-                        </Link>
-                    ))}
-                </div>
-
-                {hasMore && (
-                    <div className="text-center mt-8">
-                        <button
-                            onClick={handleLoadMore}
-                            className="cta-button py-2 px-6 rounded-full font-bold">
-                            Load More
-                        </button>
+                                </article>
+                            </Link>
+                        ))}
                     </div>
-                )}
+                </InfiniteScrollList>
             </div>
         </div>
     );
