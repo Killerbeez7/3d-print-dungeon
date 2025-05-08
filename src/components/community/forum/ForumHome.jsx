@@ -65,37 +65,37 @@ export const ForumHome = () => {
     useEffect(() => {
         const handleScroll = () => {
             if (scrollTimeoutRef.current) return;
-            
+
             scrollTimeoutRef.current = setTimeout(async () => {
                 const totalHeight = document.documentElement.scrollHeight;
                 const scrollY = window.scrollY;
                 const innerHeight = window.innerHeight;
                 const scrolled = scrollY + innerHeight;
                 const scrollPercent = scrolled / totalHeight;
-                
-                console.log('Scroll position:', { 
+
+                console.log("Scroll position:", {
                     scrollY,
                     innerHeight,
                     totalHeight,
-                    scrollPercent: Math.round(scrollPercent * 100) + '%',
+                    scrollPercent: Math.round(scrollPercent * 100) + "%",
                     hasMore,
                     loadingMore,
-                    hasLastVisible: !!lastVisible 
+                    hasLastVisible: !!lastVisible,
                 });
-                
+
                 // Only trigger loading when user has scrolled past 80% of the page
-                if (
-                    scrollPercent > 0.8 &&
-                    hasMore &&
-                    !loadingMore &&
-                    lastVisible
-                ) {
+                if (scrollPercent > 0.8 && hasMore && !loadingMore && lastVisible) {
                     console.log("Triggering loadMoreThreads at 80% scroll");
                     // Inline loadMoreThreads logic
                     try {
                         setLoadingMore(true);
-                        const result = await forumService.getMoreNewestThreads(lastVisible, 5);
-                        const threads = Array.isArray(result) ? result : result.threads || [];
+                        const result = await forumService.getMoreNewestThreads(
+                            lastVisible,
+                            5
+                        );
+                        const threads = Array.isArray(result)
+                            ? result
+                            : result.threads || [];
                         if (threads.length === 0) {
                             setHasMore(false);
                             return;
@@ -103,7 +103,9 @@ export const ForumHome = () => {
                         setDisplayedThreads((prev) => [...prev, ...threads]);
                         setLastVisible(result.lastVisible || null);
                         setHasMore(
-                            result.hasMore !== undefined ? result.hasMore : threads.length === 5
+                            result.hasMore !== undefined
+                                ? result.hasMore
+                                : threads.length === 5
                         );
                     } catch (error) {
                         console.error("Error loading more threads:", error);
@@ -112,11 +114,11 @@ export const ForumHome = () => {
                         setLoadingMore(false);
                     }
                 }
-                
+
                 scrollTimeoutRef.current = null;
             }, 200);
         };
-        
+
         window.addEventListener("scroll", handleScroll);
         return () => {
             window.removeEventListener("scroll", handleScroll);
@@ -136,7 +138,9 @@ export const ForumHome = () => {
     // Check if a thread is new (less than 24 hours old)
     const isNewThread = (thread) => {
         if (!thread.createdAt) return false;
-        const createdAt = thread.createdAt.toDate ? thread.createdAt.toDate() : new Date(thread.createdAt);
+        const createdAt = thread.createdAt.toDate
+            ? thread.createdAt.toDate()
+            : new Date(thread.createdAt);
         const now = new Date();
         const hoursDiff = (now - createdAt) / (1000 * 60 * 60);
         return hoursDiff < 24;
@@ -174,21 +178,23 @@ export const ForumHome = () => {
                     )}
                 </Link>
             </div>
-            
+
             <div className="mt-2 text-sm text-[var(--txt-muted)]">
                 Posted in{" "}
                 <Link
                     to={`/forum/category/${thread.categoryId}`}
                     className="text-[var(--accent)] hover:underline"
                 >
-                    {categories.find(c => c.id === thread.categoryId)?.name || "Unknown Category"}
+                    {categories.find((c) => c.id === thread.categoryId)?.name ||
+                        "Unknown Category"}
                 </Link>
                 {" · "}
                 {formatRelativeTime(thread.createdAt)}
                 {thread.replyCount !== undefined && (
                     <>
                         {" · "}
-                        {thread.replyCount} {thread.replyCount === 1 ? "reply" : "replies"}
+                        {thread.replyCount}{" "}
+                        {thread.replyCount === 1 ? "reply" : "replies"}
                     </>
                 )}
                 {thread.views !== undefined && (
@@ -209,11 +215,11 @@ export const ForumHome = () => {
             createdAt: PropTypes.oneOfType([
                 PropTypes.string,
                 PropTypes.object, // Firestore timestamp
-                PropTypes.instanceOf(Date)
+                PropTypes.instanceOf(Date),
             ]),
             replyCount: PropTypes.number,
-            views: PropTypes.number
-        }).isRequired
+            views: PropTypes.number,
+        }).isRequired,
     };
 
     const renderThreadListForTab = () => {
@@ -395,14 +401,6 @@ export const ForumHome = () => {
                         </button>
                     </div>
                 </form>
-
-                <Link
-                    to="/forum/new-thread"
-                    className="inline-flex items-center px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] focus:outline-none transition"
-                >
-                    <FaPlus className="mr-2" />
-                    New Thread
-                </Link>
             </div>
 
             {/* Tabs */}
