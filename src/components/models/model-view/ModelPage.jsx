@@ -8,6 +8,8 @@ import { useModels } from "@/hooks/useModels";
 import { useAuth } from "@/hooks/useAuth";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/config/firebase";
+import { CommentsProvider } from "@/providers/commentsProvider";
+import { ModelComments } from "./ModelComments";
 
 export const ModelPage = () => {
     const { openAuthModal } = useOutletContext();
@@ -45,34 +47,41 @@ export const ModelPage = () => {
     const model = models.find((m) => m.id === id);
 
     return (
-        <div className="text-txt-primary min-h-screen flex flex-col lg:flex-row gap-4 p-4 lg:p-6">
-            {loading ? (
-                <div className="min-h-screen flex items-center justify-center text-xl text-txt-primary">
-                    Loading model...
-                </div>
-            ) : !model ? (
-                <div className="min-h-screen flex items-center justify-center text-xl text-txt-primary">
-                    Model not found!
-                </div>
-            ) : (
-                <>
-                    {/* Left Side - Model Viewer */}
-                    <ModelViewer
-                        model={model}
-                        selectedRenderIndex={selectedRenderIndex}
-                        setSelectedRenderIndex={setSelectedRenderIndex}
-                    />
+        <div>
+            <div className="text-txt-primary flex flex-col lg:flex-row gap-4 p-4 lg:p-6">
+                {loading ? (
+                    <div className="min-h-screen flex items-center justify-center text-xl text-txt-primary">
+                        Loading model...
+                    </div>
+                ) : !model ? (
+                    <div className="min-h-screen flex items-center justify-center text-xl text-txt-primary">
+                        Model not found!
+                    </div>
+                ) : (
+                    <>
+                        {/* Left Side - Model Viewer */}
+                        <ModelViewer
+                            model={model}
+                            selectedRenderIndex={selectedRenderIndex}
+                            setSelectedRenderIndex={setSelectedRenderIndex}
+                        />
 
-                    {/* Right Side - Info Panel */}
-                    <ModelSidebar
-                        model={model}
-                        uploader={uploader}
-                        viewCount={viewCount}
-                        currentUser={currentUser}
-                        openAuthModal={openAuthModal}
-                    />
-                </>
-            )}
+                        {/* Right Side - Info Panel */}
+                        <ModelSidebar
+                            model={model}
+                            uploader={uploader}
+                            viewCount={viewCount}
+                            currentUser={currentUser}
+                            openAuthModal={openAuthModal}
+                        />
+                    </>
+                )}
+            </div>
+            <div className="flex-1 overflow-y-auto p-6">
+                <CommentsProvider modelId={model.id}>
+                    <ModelComments openAuthModal={openAuthModal} />
+                </CommentsProvider>
+            </div>
         </div>
     );
 };
