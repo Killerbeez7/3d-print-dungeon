@@ -179,7 +179,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                         </button>
                                         {/* Desktop Dropdown */}
                                         <div
-                                            className={`absolute left-0 mt-2 w-48 rounded-md shadow-md bg-bg-surface transition-all duration-200 p-2 border border-br-secondary ${
+                                            className={`absolute left-0 mt-2 w-48 rounded-md shadow-md bg-bg-secondary border border-br-secondary transition-all duration-200 p-2 ${
                                                 activeDropdown === section.label
                                                     ? "opacity-100 visible"
                                                     : "opacity-0 invisible"
@@ -189,7 +189,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                     <Link
                                                         key={item.to}
                                                         to={item.to}
-                                                        className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:shadow-sm hover:font-semibold"
+                                                        className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:shadow-sm hover:font-semibold"
                                                         onClick={() =>
                                                             setActiveDropdown(
                                                                 null
@@ -258,7 +258,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
                                         {/*Profile Dropdown Options*/}
                                         <div
-                                            className={`absolute right-0 mt-2 w-52 rounded-md shadow-md bg-bg-surface transition-all duration-200 p-2 border border-br-secondary z-60 ${
+                                            className={`absolute right-0 mt-2 w-52 rounded-md shadow-md bg-bg-secondary border border-br-secondary transition-all duration-200 p-2 z-60 ${
                                                 activeDropdown === "profile"
                                                     ? "opacity-100 visible"
                                                     : "opacity-0 invisible"
@@ -270,7 +270,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                             {isAdmin && (
                                                 <Link
                                                     to={`/admin-panel`}
-                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary divider-top hover:rounded-sm hover:border-br-primary hover:font-semibold"
+                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary divider-top hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)
                                                     }>
@@ -284,7 +284,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                             <div className="divider-top">
                                                 <Link
                                                     to={`/artist/${currentUser?.uid}`}
-                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
+                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)
                                                     }>
@@ -296,7 +296,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                 </Link>
                                                 <Link
                                                     to="/settings"
-                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
+                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)
                                                     }>
@@ -311,7 +311,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                         setActiveDropdown(null);
                                                         handleLogout();
                                                     }}
-                                                    className="w-full text-left px-3 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold">
+                                                    className="w-full text-left px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold">
                                                     <FontAwesomeIcon
                                                         icon={faSignOutAlt}
                                                         className="mr-2"
