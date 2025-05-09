@@ -83,29 +83,33 @@ h6 {
 @import "tailwindcss";
 
 :root {
-    --background-main-rgb: 170, 170, 170;
-    --background-second-rgb: 210, 210, 210;
+    --background-main-rgb: 180, 180, 180;
+    --background-second-rgb: 220, 220, 220;
 
-    --bg-primary: #a0a0a0;
+    --bg-primary: #b3b3b3;
     --bg-secondary: #c2c2c2;
     --bg-surface: #e0e0e0;
     --bg-tertiary: #f5f5f5;
     --bg-reverse: #141414;
-    
+
     --txt-primary: #141414;
     --txt-secondary: #333333;
     --txt-highlight: #000000;
     --txt-muted: #5a5a5a;
-    
+
     --accent-dark: #6c3cbf;
     --accent: #9a5cff;
     --accent-hover: #b890ff;
 
+    --btn-main: hsl(0, 0%, 45%);
+    --btn-secondary: hsl(0, 0%, 55%);
+
     --contrast: #ffb300;
     --contrast-hover: #ffd366;
 
-    --br-primary: #5a5a5a;
-    --br-secondary: #6e6e6e;
+    --br-primary: #595959;
+    --br-secondary: #8c8c8c;
+    --btn-hover: #a6a6a6;
 
     --success: #28c76f;
     --error: #f44336;
@@ -130,11 +134,15 @@ h6 {
     --accent: #9a5cff;
     --accent-hover: #b890ff;
 
+    --btn-main: #4d4d4d;
+    --btn-secondary: #666666;
+    --btn-hover: #808080;
+
     --contrast: #ffb300;
     --contrast-hover: #ffd366;
 
-    --br-primary: #9a9a9a;
-    --br-secondary: #6e6e6e;
+    --br-primary: #999999;
+    --br-secondary: #595959;
 
     --success: #34d399;
     --error: #f87171;
@@ -209,8 +217,8 @@ h6 {
 .secondary-button {
     background: linear-gradient(
         135deg,
-        var(--bg-surface) 0%,
-        var(--bg-tertiary) 100%
+        var(--btn-main) 0%,
+        var(--btn-secondary) 100%
     );
     transition: all 0.3s ease;
     color: #f5f5f8;
@@ -221,12 +229,12 @@ h6 {
 .secondary-button:hover {
     background: linear-gradient(
         135deg,
-        var(--bg-tertiary) 0%,
-        var(--bg-tertiary) 100%
+        var(--btn-secondary) 0%,
+        var(--btn-hover) 100%
     );
     transform: translateY(-1px);
-    box-shadow: 0 0px 12px var(--bg-tertiary);
-    color: #f5f5f8;
+    box-shadow: 0 0px 12px var(--btn-hover);
+    color: #fff;
 }
 
 /* Custom Divider */
@@ -234,8 +242,19 @@ h6 {
     background-image: linear-gradient(
         to right,
         rgba(0, 0, 0, 0) 10%,
-        var(--br-secondary) 50%,
+        var(--br-primary) 50%,
         rgba(0, 0, 0, 0) 90%
+    );
+    background-position: top;
+    background-repeat: no-repeat;
+    background-size: 100% 1px;
+}
+
+.divider-top-left {
+    background-image: linear-gradient(
+        to right,
+        var(--br-primary),
+        rgba(0, 0, 0, 0) 65%
     );
     background-position: top;
     background-repeat: no-repeat;
