@@ -1,62 +1,392 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { AccountSettings } from "./AccountSettings";
-// import { NotificationSettings } from "./NotificationSettings";
-import { SecuritySettings } from "./SecuritySettings";
-// import { BioSettings } from "./BioSettings";
+import { profileService } from "@/services/profileService";
+import { countries } from "@/data/countries";
+import AlertModal from "@/components/shared/alert-modal/AlertModal";
 
 export const ProfileSettings = () => {
     const { currentUser } = useAuth();
-    const [activeTab, setActiveTab] = useState("account");
+    const [displayName, setDisplayName] = useState(
+        currentUser?.displayName || ""
+    );
+    const [email, setEmail] = useState(currentUser?.email || "");
+    const [isEmailPublic, setIsEmailPublic] = useState(false);
+    const [city, setCity] = useState("");
+    const [country, setCountry] = useState("");
+    const [bio, setBio] = useState("");
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [coverPhoto, setCoverPhoto] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-    const tabs = [
-        { id: "account", label: "Account" },
-        { id: "notifications", label: "Notifications" },
-        { id: "security", label: "Security" },
-        { id: "bio", label: "Bio" }
-    ];
+    // Social media states
+    const [facebook, setFacebook] = useState("");
+    const [twitter, setTwitter] = useState("");
+    const [instagram, setInstagram] = useState("");
+    const [linkedin, setLinkedin] = useState("");
+
+    useEffect(() => {
+        const loadProfileData = async () => {
+            if (!currentUser?.uid) return;
+
+            try {
+                const profileData = await profileService.getProfileData(
+                    currentUser.uid
+                );
+                if (profileData) {
+                    setCity(profileData.city || "");
+                    setCountry(profileData.country || "");
+                    setBio(profileData.bio || "");
+                    setIsEmailPublic(profileData.isEmailPublic || false);
+
+                    // Load social media data
+                    if (profileData.socials) {
+                        setFacebook(profileData.socials.facebook || "");
+                        setTwitter(profileData.socials.twitter || "");
+                        setInstagram(profileData.socials.instagram || "");
+                        setLinkedin(profileData.socials.linkedin || "");
+                    }
+                }
+            } catch (error) {
+                console.error("Error loading profile data:", error);
+                setError("Failed to load profile data. Please try again.");
+            }
+        };
+
+        loadProfileData();
+    }, [currentUser]);
+
+    const handleProfilePictureChange = (e) => {
+        if (e.target.files[0]) {
+            setProfilePicture(e.target.files[0]);
+        }
+    };
+
+    const handleCoverPhotoChange = (e) => {
+        if (e.target.files[0]) {
+            setCoverPhoto(e.target.files[0]);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError(null);
+
+        try {
+            const profileData = {
+                displayName,
+                email,
+                isEmailPublic,
+                city,
+                country,
+                bio,
+                socials: {
+                    facebook,
+                    twitter,
+                    instagram,
+                    linkedin,
+                },
+            };
+
+            await profileService.updateProfile(
+                currentUser,
+                profileData,
+                profilePicture,
+                coverPhoto
+            );
+
+            // Reset file inputs after successful update
+            setProfilePicture(null);
+            setCoverPhoto(null);
+
+            // Show success modal instead of alert
+            setShowSuccessModal(true);
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            setError("Failed to update profile. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     return (
-        <div className="max-w-6xl mx-auto p-4 flex gap-4 md:flex-row flex-col">
-            {/* Sidebar */}
-            <aside className="md:w-1/4 p-4 bg-bg-surface shadow-md rounded-lg flex-grow">
-                <div className="flex flex-col items-center text-center">
-                    <img
-                        src={currentUser?.photoURL || "/user.png"}
-                        alt="User Avatar"
-                        className="w-24 h-24 rounded-full border-2 border-br-primary"
-                    />
-                    <h2 className="mt-2 text-lg font-semibold text-txt-primary">
-                        {currentUser?.displayName || "Anonymous"}
-                    </h2>
+        <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-txt-primary">
+                Profile Settings
+            </h2>
+
+            {error && (
+                <div className="p-4 bg-bg-reverse border border-error text-error rounded-md">
+                    {error}
+                </div>
+            )}
+
+            <form
+                onSubmit={handleSubmit}
+                className="space-y-6 divider-top-left pt-4">
+                {/* User's Info Section */}
+                <div>
+                    <h4 className="mb-6 font-semibold text-txt-primary">
+                        User
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                htmlFor="displayName"
+                                className="block text-sm font-medium text-txt-secondary">
+                                Display Name
+                            </label>
+                            <input
+                                type="text"
+                                id="displayName"
+                                value={displayName}
+                                onChange={(e) => setDisplayName(e.target.value)}
+                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                                required
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="email"
+                                className="block text-sm font-medium text-txt-secondary">
+                                Email
+                            </label>
+                            <input
+                                type="text"
+                                id="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                                required
+                            />
+                            <div className="mt-2 flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="isEmailPublic"
+                                    checked={isEmailPublic}
+                                    onChange={(e) =>
+                                        setIsEmailPublic(e.target.checked)
+                                    }
+                                    className="h-4 w-4 rounded border-br-primary text-accent focus:ring-accent"
+                                />
+                                <label
+                                    htmlFor="isEmailPublic"
+                                    className="ml-2 block text-sm text-txt-secondary">
+                                    Public Email
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="md:mt-0 mt-6">
+                        <label
+                            htmlFor="bio"
+                            className="block text-sm font-medium text-txt-secondary">
+                            Short Bio
+                        </label>
+                        <textarea
+                            id="bio"
+                            value={bio}
+                            onChange={(e) => setBio(e.target.value)}
+                            rows={3}
+                            className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                            placeholder="A quick glimpse of who you are and what you do...."
+                        />
+                    </div>
                 </div>
 
-                <nav className="mt-6">
-                    <ul className="space-y-2">
-                        {tabs.map((tab) => (
-                            <li key={tab.id}>
-                                <button
-                                    onClick={() => setActiveTab(tab.id)}
-                                    className={`w-full text-left px-4 py-2 rounded-md font-medium ${activeTab === tab.id
-                                            ? "bg-accent text-white"
-                                            : "text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
-                                        }`}
-                                >
-                                    {tab.label}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
-            </aside>
+                {/* Social Section */}
+                <div className="mt-16">
+                    <h4 className="mb-6 font-semibold text-txt-primary">
+                        Social
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                htmlFor="facebook"
+                                className="block text-sm font-medium text-txt-secondary">
+                                Facebook
+                            </label>
+                            <input
+                                type="text"
+                                id="facebook"
+                                value={facebook}
+                                onChange={(e) => setFacebook(e.target.value)}
+                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                            />
+                        </div>
 
-            {/* Main Content */}
-            <section className="md:w-3/4 p-6 bg-bg-surface shadow-md rounded-lg flex-grow">
-                {activeTab === "account" && <AccountSettings />}
-                {/* {activeTab === "notifications" && <NotificationSettings />} */}
-                {activeTab === "security" && <SecuritySettings />}
-                {/* {activeTab === "bio" && <BioSettings />} */}
-            </section>
+                        <div>
+                            <label
+                                htmlFor="twitter"
+                                className="block text-sm font-medium text-txt-secondary">
+                                Twitter
+                            </label>
+                            <input
+                                type="text"
+                                id="twitter"
+                                value={twitter}
+                                onChange={(e) => setTwitter(e.target.value)}
+                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="instagram"
+                                className="block text-sm font-medium text-txt-secondary">
+                                Instagram
+                            </label>
+                            <input
+                                type="text"
+                                id="instagram"
+                                value={instagram}
+                                onChange={(e) => setInstagram(e.target.value)}
+                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="linkedin"
+                                className="block text-sm font-medium text-txt-secondary">
+                                LinkedIn
+                            </label>
+                            <input
+                                type="text"
+                                id="linkedin"
+                                value={linkedin}
+                                onChange={(e) => setLinkedin(e.target.value)}
+                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Location Section */}
+                <div className="mt-16">
+                    <h4 className="mb-6 font-semibold text-txt-primary">
+                        Location
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label
+                                htmlFor="city"
+                                className="block text-sm font-medium text-txt-secondary">
+                                City
+                            </label>
+                            <input
+                                type="text"
+                                id="city"
+                                value={city}
+                                onChange={(e) => setCity(e.target.value)}
+                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                            />
+                        </div>
+
+                        <div>
+                            <label
+                                htmlFor="country"
+                                className="block text-sm font-medium text-txt-secondary">
+                                Country
+                            </label>
+                            <select
+                                id="country"
+                                value={country}
+                                onChange={(e) => setCountry(e.target.value)}
+                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent">
+                                <option value="">Select a country</option>
+                                {countries.map((countryName) => (
+                                    <option
+                                        key={countryName}
+                                        value={countryName}>
+                                        {countryName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Appearance Section */}
+                <div className="mt-16">
+                    <h4 className="mb-6 font-semibold text-txt-primary">
+                        Appearance
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Profile Picture */}
+                        <div className="space-y-4">
+                            <label className="block text-sm font-medium text-txt-secondary">
+                                Profile Picture
+                            </label>
+                            <div className="flex flex-col space-y-4">
+                                <div className="h-32 w-32 rounded-full overflow-hidden bg-bg-secondary">
+                                    <img
+                                        src={
+                                            currentUser?.photoURL || "/user.png"
+                                        }
+                                        alt="Profile"
+                                        className="h-full w-full object-cover"
+                                    />
+                                </div>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleProfilePictureChange}
+                                    className="block w-full text-sm text-txt-secondary file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-accent/90"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Cover Photo */}
+                        <div className="space-y-4">
+                            <label className="block text-sm font-medium text-txt-secondary">
+                                Cover Photo
+                            </label>
+                            <div className="flex flex-col space-y-4">
+                                <div className="h-48 w-full overflow-hidden rounded-lg bg-bg-secondary">
+                                    {currentUser?.coverURL ? (
+                                        <img
+                                            src={currentUser.coverURL}
+                                            alt="Cover"
+                                            className="h-full w-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="h-full w-full flex items-center justify-center text-txt-secondary">
+                                            No cover photo
+                                        </div>
+                                    )}
+                                </div>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleCoverPhotoChange}
+                                    className="block w-full text-sm text-txt-secondary file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-accent/90"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Submit Button */}
+                <div className="flex justify-start pt-4">
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="px-6 py-2 cta-button disabled:opacity-50 disabled:cursor-not-allowed">
+                        {loading ? "Saving..." : "Save Changes"}
+                    </button>
+                </div>
+            </form>
+
+            <AlertModal
+                isOpen={showSuccessModal}
+                onClose={() => setShowSuccessModal(false)}
+                title="Success"
+                message="Your profile has been updated successfully!"
+            />
         </div>
     );
 };
