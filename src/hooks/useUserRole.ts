@@ -1,15 +1,17 @@
 import { useContext } from "react";
 import { AuthContext } from "@/contexts/authContext";
 
+// Custom hook to check user roles
 export function useUserRole() {
-  const { userData, isAdmin } = useContext(AuthContext);
+  const { roles = [], isAdmin } = useContext(AuthContext);
 
-  const role = userData?.role ?? (isAdmin ? "admin" : "user");
+  const hasRole = (role: string): boolean => {
+    return roles.includes(role) || (role === "admin" && isAdmin);
+  };
 
   return {
-    role,
-    isAdmin: role === "admin",
-    isArtist: role === "artist",
-    isUser: role === "user",
+    roles,
+    isAdmin,
+    hasRole,
   };
 }
