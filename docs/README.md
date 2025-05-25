@@ -3,7 +3,20 @@
 A platform for sharing and discovering 3D printable models.
 You can access it on: https://print-dungeon-3d.web.app/
 
-## Features
+
+# Features
+
+### Authentication & Role-Based Access Control
+- Firebase Authentication (email, Google) with session-aware AuthProvider using React context.
+- User roles stored in Firestore as roles: string[] (supports multiple roles per user).
+- Access control logic centralized via:
+- ProtectedRoute component for guarding pages based on auth and roles
+- withProtected, withRole, and withProtectedMaintenance helpers for clean route definitions
+- Roles supported: admin, artist, moderator, user, premium, etc.
+- UI and routes conditionally render based on user permissions using a custom useUserRole() hook.
+- Unauthorized users are redirected automatically to login or home, with fallback protection for maintenance mode.
+#### Example: /admin is only accessible to users with the admin role, while /model-upload is available to admin and artist
+
 
 ### View Tracking System
 - Tracks views for each model
