@@ -6,7 +6,7 @@ export const adminRoutes = [
     {
         path: ROUTES.ADMIN_PANEL,
         element: withProtectedMaintenance(<AdminPanel />, {
-            requireAdmin: true,
+            allowedRoles: ["admin"],
             authRedirect: "/login",
             maintenanceRedirect: "/maintenance",
             fallback: null,
