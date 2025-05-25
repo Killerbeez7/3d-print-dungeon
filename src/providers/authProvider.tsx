@@ -1,7 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../config/firebase";
-import { isAdmin } from "../services/adminService";
 import { AuthContext } from "../contexts/authContext";
 import { UserData } from "../types/auth";
 import { MaintenanceStatus, UserId } from "../types/maintenance";
@@ -26,7 +25,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [maintenanceMode, setMaintenanceMode] = useState(false);
     const [maintenanceMessage, setMaintenanceMessage] = useState<string | null>(null);
     const [maintenanceEndTime, setMaintenanceEndTime] = useState<Date | null>(null);
-    const [isAdminUser, setIsAdminUser] = useState(false);
 
     const handleAuthError = (error: unknown, provider: string) => {
         const errorMessage =
@@ -47,7 +45,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const handleGithubSignIn = async () => {
         try {
-            // Implement GitHub sign-in logic here
             throw new Error("GitHub sign-in not implemented");
         } catch (error) {
             handleAuthError(error, "GitHub sign-in");
@@ -57,18 +54,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const fetchUserData = useCallback(async (): Promise<void> => {
         if (!currentUser) {
             setUserData(null);
-            setIsAdminUser(false);
             return;
         }
 
-        getUserFromDatabase(currentUser.uid, async (data: UserData | null) => {
-            if (data) {
-                setUserData(data);
-                setIsAdminUser(await isAdmin(currentUser.uid));
-            } else {
-                setUserData(null);
-                setIsAdminUser(false);
-            }
+        getUserFromDatabase(currentUser.uid, (data: UserData | null) => {
+            setUserData(data);
         });
     }, [currentUser]);
 
@@ -107,7 +97,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             await signOut();
             setCurrentUser(null);
             setUserData(null);
-            setIsAdminUser(false);
         } catch (error) {
             handleAuthError(error, "Sign-out");
         }
@@ -121,7 +110,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             } else {
                 setCurrentUser(null);
                 setUserData(null);
-                setIsAdminUser(false);
             }
             setLoading(false);
         });
@@ -136,16 +124,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             setMaintenanceMode(status.inMaintenance);
             setMaintenanceMessage(status.message);
             setMaintenanceEndTime(status.endTime);
-            setIsAdminUser(status.isAdmin);
         };
 
         checkMaintenance();
+
         const unsubscribe = subscribeToMaintenanceStatus(
             (status: MaintenanceStatus) => {
                 setMaintenanceMode(status.inMaintenance);
                 setMaintenanceMessage(status.message);
                 setMaintenanceEndTime(status.endTime);
-                setIsAdminUser(status.isAdmin);
             },
             currentUser?.uid ? undefined : null
         );
@@ -153,14 +140,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return () => unsubscribe();
     }, [currentUser?.uid]);
 
+    const roles = userData?.roles ?? [];
     const value = {
         currentUser,
         userData,
+        roles,
+        isAdmin: roles.includes("admin"),
         authError,
         maintenanceMode,
         maintenanceMessage,
         maintenanceEndTime,
-        isAdmin: isAdminUser,
         loading,
         handleEmailSignUp,
         handleEmailSignIn,
