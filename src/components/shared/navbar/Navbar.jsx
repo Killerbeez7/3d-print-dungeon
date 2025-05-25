@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 
 // hooks
 import { useAuth } from "@/hooks/useAuth";
+import { useUserRole } from "@/hooks/useUserRole";
 import { useSearch } from "@/hooks/useSearch";
 import { useClickOutside } from "@/hooks/useClickOutside";
 
@@ -33,7 +34,8 @@ import {
 import { GlobalSearch } from "../../search/GlobalSearch";
 
 export const Navbar = ({ onLoginClick, onSignUpClick }) => {
-    const { currentUser, handleSignOut, isAdmin } = useAuth();
+    const { isAdmin } = useUserRole();
+    const { currentUser, handleSignOut } = useAuth();
     const { setShowDropdown } = useSearch();
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -74,9 +76,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
     const toggleMobileDropdown = (dropdownName, e) => {
         e.stopPropagation();
-        setMobileDropdown((prev) =>
-            prev === dropdownName ? null : dropdownName
-        );
+        setMobileDropdown((prev) => (prev === dropdownName ? null : dropdownName));
     };
 
     const handleLogout = async () => {
@@ -125,7 +125,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                 className="md:hidden p-[0.5px] rounded-lg hover:bg-bg-surface"
                                 onClick={toggleMobileMenu}
                                 aria-label="Toggle mobile menu"
-                                aria-expanded={isMobileMenuOpen}>
+                                aria-expanded={isMobileMenuOpen}
+                            >
                                 {isMobileMenuOpen ? (
                                     <MdClose size={30} />
                                 ) : (
@@ -146,9 +147,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
                             {/* logo desktop */}
                             <div className="hidden md:block whitespace-nowrap flex-shrink-0 w-[50px]">
-                                <Link
-                                    to="/"
-                                    className="flex items-center space-x-2 ml-2">
+                                <Link to="/" className="flex items-center space-x-2 ml-2">
                                     <img
                                         src={STATIC_ASSETS.LOGO}
                                         alt="Site Logo"
@@ -167,14 +166,12 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                         onMouseEnter={() =>
                                             setActiveDropdown(section.label)
                                         }
-                                        onMouseLeave={() =>
-                                            setActiveDropdown(null)
-                                        }>
+                                        onMouseLeave={() => setActiveDropdown(null)}
+                                    >
                                         <button
                                             className="inline-flex items-center text-md text-txt-secondary hover:text-txt-primary group-hover:text-txt-highlighted whitespace-nowrap"
-                                            onClick={() =>
-                                                toggleDropdown(section.label)
-                                            }>
+                                            onClick={() => toggleDropdown(section.label)}
+                                        >
                                             {section.label}
                                         </button>
                                         {/* Desktop Dropdown */}
@@ -183,7 +180,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                 activeDropdown === section.label
                                                     ? "opacity-100 visible"
                                                     : "opacity-0 invisible"
-                                            }`}>
+                                            }`}
+                                        >
                                             <div>
                                                 {section.items.map((item) => (
                                                     <Link
@@ -191,10 +189,9 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                         to={item.to}
                                                         className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:shadow-sm hover:font-semibold"
                                                         onClick={() =>
-                                                            setActiveDropdown(
-                                                                null
-                                                            )
-                                                        }>
+                                                            setActiveDropdown(null)
+                                                        }
+                                                    >
                                                         {item.label}
                                                     </Link>
                                                 ))}
@@ -218,7 +215,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                             <button
                                 onClick={handleSearchClick}
                                 className="hidden md:block lg:hidden text-txt-secondary hover:text-txt-primary"
-                                title="Search">
+                                title="Search"
+                            >
                                 <MdSearch className="h-7 w-7" />
                             </button>
 
@@ -234,14 +232,16 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                         <Link
                                             to="/model/upload"
                                             className="text-txt-secondary hover:text-txt-primary"
-                                            title="Upload Model:desktop">
+                                            title="Upload Model:desktop"
+                                        >
                                             <MdFileUpload className="h-7 w-7" />
                                         </Link>
 
                                         <Link
                                             to="/notifications"
                                             className="text-txt-secondary hover:text-txt-primary"
-                                            title="Notifications">
+                                            title="Notifications"
+                                        >
                                             <MdNotifications className="h-7 w-7" />
                                         </Link>
                                     </div>
@@ -249,10 +249,9 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                     {/* Profile Dropdown */}
                                     <div className="relative" ref={dropdownRef}>
                                         <button
-                                            onClick={() =>
-                                                toggleDropdown("profile")
-                                            }
-                                            className="flex items-center text-txt-secondary hover:text-txt-primary cursor-pointer">
+                                            onClick={() => toggleDropdown("profile")}
+                                            className="flex items-center text-txt-secondary hover:text-txt-primary cursor-pointer"
+                                        >
                                             <MdAccountCircle className="h-7 w-7" />
                                         </button>
 
@@ -262,10 +261,10 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                 activeDropdown === "profile"
                                                     ? "opacity-100 visible"
                                                     : "opacity-0 invisible"
-                                            }`}>
+                                            }`}
+                                        >
                                             <h6 className="px-2 py-2 text-txt-muted">
-                                                {currentUser?.displayName ||
-                                                    "Username"}
+                                                {currentUser?.displayName || "Username"}
                                             </h6>
                                             {isAdmin && (
                                                 <Link
@@ -273,7 +272,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                     className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary divider-top hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)
-                                                    }>
+                                                    }
+                                                >
                                                     <FontAwesomeIcon
                                                         icon={faUser}
                                                         className="mr-2"
@@ -287,7 +287,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                     className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)
-                                                    }>
+                                                    }
+                                                >
                                                     <FontAwesomeIcon
                                                         icon={faUser}
                                                         className="mr-2"
@@ -299,7 +300,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                     className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)
-                                                    }>
+                                                    }
+                                                >
                                                     <FontAwesomeIcon
                                                         icon={faCog}
                                                         className="mr-2"
@@ -311,7 +313,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                                         setActiveDropdown(null);
                                                         handleLogout();
                                                     }}
-                                                    className="w-full text-left px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold">
+                                                    className="w-full text-left px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
+                                                >
                                                     <FontAwesomeIcon
                                                         icon={faSignOutAlt}
                                                         className="mr-2"
@@ -333,7 +336,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                             isSearchVisible
                                 ? "opacity-100 pointer-events-auto"
                                 : "opacity-0 pointer-events-none"
-                        }`}>
+                        }`}
+                    >
                         <div className="absolute top-0 left-0 right-0 bg-bg-primary p-4 shadow-lg transform transition-transform duration-200">
                             <div className="max-w-3xl mx-auto">
                                 <GlobalSearch />
@@ -350,36 +354,35 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                         ? "translate-y-0 opacity-100 pointer-events-auto"
                         : "-translate-y-full opacity-0 pointer-events-none"
                 }`}
-                style={{ top: "100%" }}>
+                style={{ top: "100%" }}
+            >
                 {/* Mobile action buttons */}
                 {currentUser && (
                     <div className="flex items-center justify-center space-x-8 p-4">
                         <Link
                             to="/model/upload"
                             className="text-txt-secondary hover:text-txt-primary"
-                            title="Upload Model:mobile">
+                            title="Upload Model:mobile"
+                        >
                             <MdFileUpload className="h-7 w-7" />
                         </Link>
 
                         <Link
                             to="/notifications"
                             className="text-txt-secondary hover:text-txt-primary"
-                            title="Notifications">
+                            title="Notifications"
+                        >
                             <MdNotifications className="h-7 w-7" />
                         </Link>
                     </div>
                 )}
 
                 {/* Mobile Search */}
-                <div
-                    className="p-4 divider-top"
-                    onClick={() => setShowDropdown(false)}>
+                <div className="p-4 divider-top" onClick={() => setShowDropdown(false)}>
                     <GlobalSearch />
                 </div>
 
-                <div
-                    className="px-2 pt-2 h-auto pb-3 space-y-1"
-                    ref={mobileDropdownRef}>
+                <div className="px-2 pt-2 h-auto pb-3 space-y-1" ref={mobileDropdownRef}>
                     {NAV_SECTIONS.map((section) => (
                         <div key={section.label}>
                             <button
@@ -388,9 +391,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                         ? "bg-bg-surface rounded-md text-txt-primary font-semibold"
                                         : ""
                                 }`}
-                                onClick={(e) =>
-                                    toggleMobileDropdown(section.label, e)
-                                }>
+                                onClick={(e) => toggleMobileDropdown(section.label, e)}
+                            >
                                 {section.label}
                                 <FontAwesomeIcon
                                     icon={faChevronDown}
@@ -406,7 +408,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                     mobileDropdown === section.label
                                         ? "max-h-48 overflow-y-auto"
                                         : "max-h-0 overflow-hidden"
-                                }`}>
+                                }`}
+                            >
                                 {section.items.map((item) => (
                                     <Link
                                         key={item.to}
@@ -415,7 +418,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
                                         onClick={() => {
                                             setIsMobileMenuOpen(false);
                                             setMobileDropdown(null);
-                                        }}>
+                                        }}
+                                    >
                                         {item.label}
                                     </Link>
                                 ))}
