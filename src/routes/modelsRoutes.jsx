@@ -5,7 +5,7 @@ import { withMaintenance, withProtectedMaintenance } from "../helpers/routeHelpe
 import { ROUTES } from "../config/routeConstants";
 
 export const modelsRoutes = [
-    { path: ROUTES.MODEL_UPLOAD, element: withProtectedMaintenance(<ModelUpload />) },
+    { path: ROUTES.MODEL_UPLOAD, element: withProtectedMaintenance(<ModelUpload />, { allowedRoles: ["admin", "artist"] }) },
     { path: ROUTES.MODEL_VIEW, element: withMaintenance(<ModelPage />) },
-    { path: ROUTES.MODEL_EDIT, element: withProtectedMaintenance(<ModelEdit />) },
+    { path: ROUTES.MODEL_EDIT, element: withProtectedMaintenance(<ModelEdit />, { allowedRoles: ["admin", "artist"] }) },
 ];

@@ -5,7 +5,7 @@ import { withMaintenance, withProtectedMaintenance } from "../helpers/routeHelpe
 import { ROUTES } from "../config/routeConstants";
 
 export const userRoutes = [
-    { path: ROUTES.SETTINGS, element: withProtectedMaintenance(<SettingsPage />) },
+    { path: ROUTES.SETTINGS, element: withProtectedMaintenance(<SettingsPage />, { allowedRoles: ["admin", "artist", "user"] }) },
     { path: ROUTES.USER_ARTISTS, element: withMaintenance(<ArtistsList />) },
     { path: ROUTES.USER_ARTIST_PROFILE, element: withMaintenance(<ArtistProfile />) },
 ];
