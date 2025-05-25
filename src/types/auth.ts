@@ -3,7 +3,7 @@ export interface UserData {
     email: string | null;
     displayName: string | null;
     photoURL: string | null;
-    role?: string;
+    roles?: string[];
     username?: string;
     createdAt?: Date;
     lastLogin?: Date;
