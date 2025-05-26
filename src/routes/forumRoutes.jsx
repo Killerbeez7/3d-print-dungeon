@@ -1,9 +1,11 @@
+import { ForumProvider } from "@/providers/forumProvider";
+import { withProtectedMaintenance } from "@/helpers/routeHelpers";
+
+//components
 import { ForumLayout } from "@/components/community/forum/ForumLayout";
 import { ForumHome } from "@/components/community/forum/ForumHome";
 import { ForumCategory } from "@/components/community/forum/ForumCategory";
 import { ForumThread } from "@/components/community/forum/ForumThread";
-import { ForumProvider } from "@/providers/forumProvider";
-import { withProtectedMaintenance } from "@/helpers/routeHelpers";
 import { ForumDashboard } from "@/components/community/forum/ForumDashboard";
 import { ForumMyThreads } from "@/components/community/forum/ForumMyThreads";
 import { ForumRules } from "@/components/community/forum/tabs/ForumRules";
