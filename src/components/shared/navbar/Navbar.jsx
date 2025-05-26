@@ -1,20 +1,19 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import PropTypes from "prop-types";
-
 // hooks
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useSearch } from "@/hooks/useSearch";
 import { useClickOutside } from "@/hooks/useClickOutside";
-
+import { useModal } from "@/hooks/useModal"; // NEW
 // configs
 import { NAV_SECTIONS } from "@/config/navConfig";
 import { STATIC_ASSETS } from "@/config/assetsConfig";
-
 // components
 import { AuthButtons } from "./AuthButtons";
-
+import { GlobalSearch } from "@/components/search/GlobalSearch";
+// icons
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     MdFileUpload,
     MdAccountCircle,
@@ -23,7 +22,6 @@ import {
     MdNotifications,
     MdSearch,
 } from "react-icons/md";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faSignOutAlt,
     faUser,
@@ -31,12 +29,11 @@ import {
     faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { GlobalSearch } from "../../search/GlobalSearch";
-
-export const Navbar = ({ onLoginClick, onSignUpClick }) => {
+export const Navbar = () => {
     const { isAdmin } = useUserRole();
     const { currentUser, handleSignOut } = useAuth();
     const { setShowDropdown } = useSearch();
+    const { open } = useModal("auth");
 
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState(null);
@@ -49,8 +46,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
     const mobileDropdownRef = useRef(null); //mobile dropdown
     const searchOverlayRef = useRef(null); //search overlay
 
-    /* ---------- helpers ---------- */
-
+    // helpers
     const closeAll = () => {
         setActiveDropdown(null);
         setMobileDropdown(null);
@@ -92,7 +88,7 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
         navigate("/search?query=");
     };
 
-    /* ---------- outside‑click & route‑change ---------- */
+    //outside‑click & route‑change
 
     useClickOutside(dropdownRef, () => {
         setActiveDropdown(null);
@@ -110,14 +106,12 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
         closeAll();
     }, [location.pathname, setShowDropdown]);
 
-    /* ---------- render ---------- */
-
     return (
         <div className="sticky top-0 left-0 right-0 z-50">
             <nav className="glass-effect">
                 <div className="mx-auto px-4 sm:px-6 py-5">
                     <div className="flex items-center h-10">
-                        {/* ---------- LEFT: logo & desktop nav ---------- */}
+                        {/* LEFT: logo & desktop nav */}
                         <div className="flex items-center space-x-4 min-w-fit">
                             {/* mobile hamburger */}
                             <button
@@ -222,8 +216,8 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
 
                             {!currentUser ? (
                                 <AuthButtons
-                                    onLoginClick={onLoginClick}
-                                    onSignUpClick={onSignUpClick}
+                                    onLoginClick={() => open({ mode: "login" })}
+                                    onSignUpClick={() => open({ mode: "signup" })}
                                 />
                             ) : (
                                 <>
@@ -430,9 +424,4 @@ export const Navbar = ({ onLoginClick, onSignUpClick }) => {
             </div>
         </div>
     );
-};
-
-Navbar.propTypes = {
-    onLoginClick: PropTypes.func.isRequired,
-    onSignUpClick: PropTypes.func.isRequired,
 };
