@@ -1,0 +1,47 @@
+/**
+ * Integration test for the AuthModal component + focus / esc behaviour.
+ * Path: <repo-root>/__tests__/components/auth-modal/AuthModal.test.tsx
+ */
+import { render, screen, fireEvent } from "@testing-library/react";
+import { ModalProvider } from "@/providers/ModalProvider";
+import { AuthModal } from "@/components/shared/auth-modal/AuthModal";
+import { useModal } from "@/hooks/useModal";
+
+// helper component to trigger modal open
+const Opener = () => {
+    const { open } = useModal("auth");
+    return <button onClick={() => open({ mode: "login" })}>open</button>;
+};
+
+const setup = () =>
+    render(
+        <ModalProvider>
+            <AuthModal />
+            <Opener />
+        </ModalProvider>
+    );
+
+describe("AuthModal", () => {
+    it("renders login mode then switches to signup", () => {
+        setup();
+        fireEvent.click(screen.getByText(/open/i));
+
+        // login visible
+        const titleLogin = screen.getByRole("heading", { name: /sign in/i });
+        expect(titleLogin).toBeInTheDocument();
+
+        // swap to signup
+        fireEvent.click(screen.getByRole("button", { name: /sign up/i }));
+        const titleSignup = screen.getByRole("heading", { name: /sign up/i });
+        expect(titleSignup).toBeInTheDocument();
+    });
+
+    it("closes when ESC key pressed", () => {
+        setup();
+        fireEvent.click(screen.getByText(/open/i));
+        fireEvent.keyDown(window, { key: "Escape" });
+        expect(
+            screen.queryByRole("heading", { name: /sign in/i })
+        ).not.toBeInTheDocument();
+    });
+});
