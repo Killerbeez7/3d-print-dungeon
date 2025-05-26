@@ -1,7 +1,7 @@
 import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin } from "react-icons/fa";
 import { AiOutlineMail } from "react-icons/ai";
 import { useState } from "react";
-import AlertModal from "../alert-modal/AlertModal";
+import AlertModal from "../alert-modal/AlertModal.jsx";
 
 export const Footer = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
