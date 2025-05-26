@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-//icons
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle, faTwitter, faFacebook } from "@fortawesome/free-brands-svg-icons";
+import FocusLock from "react-focus-lock";
 //hooks
 import { useAuth } from "@/hooks/useAuth";
 import { useModal } from "@/hooks/useModal";
+import { Spinner } from "@/components/shared/Spinner";
+//icons
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faGoogle, faTwitter, faFacebook } from "@fortawesome/free-brands-svg-icons";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
-export const AuthModal = () => {
+export function AuthModal() {
     const { isOpen, payload, close, toggle } = useModal("auth");
-    const mode = (payload && payload.mode) === "signup" ? "signup" : "login";
+    const mode = payload?.mode === "signup" ? "signup" : "login";
 
+    /* auth handlers */
     const {
         handleEmailSignUp,
         handleEmailSignIn,
@@ -20,51 +23,64 @@ export const AuthModal = () => {
         handleTwitterSignIn,
     } = useAuth();
 
+    const OAUTH_ICONS = [
+        { fn: handleFacebookSignIn, icon: faFacebook },
+        { fn: handleGoogleSignIn, icon: faGoogle },
+        { fn: handleTwitterSignIn, icon: faTwitter },
+    ];
+
+    /* form state */
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
+    const [confirmPassword, setConfirmPass] = useState("");
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    //block page scroll while modal is open
+    /* ── keyboard: ESC closes ── */
     useEffect(() => {
+        if (!isOpen) return;
+        const onKey = (e) => e.key === "Escape" && handleClose();
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [isOpen]);
+
+    /* ── block background scroll ── */
+    useEffect(() => {
+        if (!isOpen) return;
         const block = (e) => {
             const el = document.activeElement;
-            const input =
+            if (
                 el &&
                 (el.tagName === "INPUT" ||
                     el.tagName === "TEXTAREA" ||
-                    el.isContentEditable);
-            if (input) return;
+                    el.isContentEditable)
+            )
+                return;
             e.preventDefault();
-            e.stopPropagation();
-            return false;
         };
-
-        if (isOpen) {
-            window.addEventListener("wheel", block, { passive: false });
-            window.addEventListener("touchmove", block, { passive: false });
-            window.addEventListener("keydown", block, { passive: false });
-        }
+        window.addEventListener("wheel", block, { passive: false });
+        window.addEventListener("touchmove", block, { passive: false });
         return () => {
             window.removeEventListener("wheel", block);
             window.removeEventListener("touchmove", block);
-            window.removeEventListener("keydown", block);
         };
     }, [isOpen]);
 
     if (!isOpen) return null;
 
-    //helpers
-    const resetAndClose = () => {
+    /* helpers */
+    function resetFields() {
         setEmail("");
         setPassword("");
-        setConfirmPassword("");
+        setConfirmPass("");
         setError(null);
+    }
+    function handleClose() {
+        resetFields();
         close();
-    };
+    }
 
-    const handleSubmit = async (e) => {
+    async function handleSubmit(e) {
         e.preventDefault();
         setError(null);
         setLoading(true);
@@ -81,56 +97,53 @@ export const AuthModal = () => {
             } else {
                 await handleEmailSignIn(email, password);
             }
-            resetAndClose();
+            handleClose();
         } catch (err) {
             setError(err.message);
+            setLoading(false);
         }
-        setLoading(false);
-    };
+    }
 
-    const oauth = async (fn) => {
+    async function oauth(fn) {
         try {
             setError(null);
             setLoading(true);
             await fn();
-            resetAndClose();
+            handleClose();
         } catch (err) {
             setError(err.message);
+            setLoading(false);
         }
-        setLoading(false);
-    };
+    }
 
+    /* ───────────────── render ───────────────── */
     return createPortal(
         <div
-            className="fixed inset-0 z-[11001]"
-            onClick={resetAndClose}
+            className="fixed inset-0 z-[11000]"
+            onClick={handleClose}
             style={{ pointerEvents: "auto" }}
         >
-            <div
-                className="fixed inset-0 z-50"
-                onClick={resetAndClose}
-                style={{ pointerEvents: "auto" }}
-            >
-                <div className="absolute inset-0 bg-black/60" />
+            <div className="absolute inset-0 bg-black/60" />
 
+            <FocusLock returnFocus>
                 <div
                     onClick={(e) => e.stopPropagation()}
                     className="
-             fixed w-full max-w-md p-6
-             bg-bg-surface text-txt-primary
-             border border-br-primary rounded-[10px] shadow-lg
-             left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+               fixed z-[11001] w-full max-w-md p-6
+               bg-bg-surface text-txt-primary
+               border border-br-primary rounded-[10px] shadow-lg
+               left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
                 >
-                    {/* close button */}
+                    {/* close btn */}
                     <button
                         className="absolute top-3 right-3 text-txt-secondary hover:text-error"
-                        onClick={resetAndClose}
+                        onClick={handleClose}
                     >
                         <FontAwesomeIcon icon={faXmark} size="lg" />
                     </button>
 
                     {/* title */}
-                    <h2 className="text-center text-txt-primary text-2xl font-bold mb-5">
+                    <h2 className="text-center text-2xl font-bold mb-5">
                         {mode === "signup" ? "Sign Up" : "Sign In"}
                     </h2>
 
@@ -144,10 +157,10 @@ export const AuthModal = () => {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 className="
-                   w-full px-3 py-2 mt-1
-                   border-2 border-br-primary rounded-[10px]
-                   bg-bgPrimary text-txt-primary
-                   focus:outline-none focus:border-focus focus:ring-focus"
+                     w-full px-3 py-2 mt-1
+                     border-2 border-br-primary rounded-[10px]
+                     bg-bgPrimary text-txt-primary
+                     focus:outline-none focus:border-focus focus:ring-focus"
                             />
                         </label>
 
@@ -159,10 +172,10 @@ export const AuthModal = () => {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="
-                   w-full px-3 py-2 mt-1
-                   border-2 border-br-primary rounded-[10px]
-                   bg-bgPrimary text-txt-primary
-                   focus:outline-none focus:border-focus focus:ring-focus"
+                     w-full px-3 py-2 mt-1
+                     border-2 border-br-primary rounded-[10px]
+                     bg-bgPrimary text-txt-primary
+                     focus:outline-none focus:border-focus focus:ring-focus"
                             />
                         </label>
 
@@ -173,17 +186,18 @@ export const AuthModal = () => {
                                     type="password"
                                     required
                                     value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    onChange={(e) => setConfirmPass(e.target.value)}
                                     className="
-                     w-full px-3 py-2 mt-1
-                     border-2 border-br-primary rounded-[10px]
-                     bg-bgPrimary text-txt-primary
-                     focus:outline-none focus:border-focus focus:ring-focus"
+                       w-full px-3 py-2 mt-1
+                       border-2 border-br-primary rounded-[10px]
+                       bg-bgPrimary text-txt-primary
+                       focus:outline-none focus:border-focus focus:ring-focus"
                                 />
                             </label>
                         )}
 
-                        <div className="h-6 mb-3">
+                        {/* error */}
+                        <div className="h-6 mb-2">
                             {error && (
                                 <p className="text-center text-error font-semibold">
                                     {error}
@@ -191,15 +205,19 @@ export const AuthModal = () => {
                             )}
                         </div>
 
+                        {/* submit */}
                         <button type="submit" className="w-full py-2 cta-button">
-                            {loading
-                                ? "Processing..."
-                                : mode === "signup"
-                                ? "Create Account"
-                                : "Sign In"}
+                            {loading ? (
+                                <Spinner size={18} />
+                            ) : mode === "signup" ? (
+                                "Create Account"
+                            ) : (
+                                "Sign In"
+                            )}
                         </button>
                     </form>
 
+                    {/* social login */}
                     {mode === "login" && (
                         <>
                             <div className="flex items-center my-4">
@@ -211,39 +229,23 @@ export const AuthModal = () => {
                             </div>
 
                             <div className="flex justify-center gap-3">
-                                <button
-                                    onClick={() => oauth(handleFacebookSignIn)}
-                                    className="w-10 h-10 flex items-center justify-center
-                              rounded-full border border-br-primary
-                              hover:bg-[var(--color-btn-primary-hover)]
-                              transition-colors"
-                                >
-                                    <FontAwesomeIcon icon={faFacebook} />
-                                </button>
-
-                                <button
-                                    onClick={() => oauth(handleGoogleSignIn)}
-                                    className="w-10 h-10 flex items-center justify-center
-                              rounded-full border border-br-primary
-                              hover:bg-[var(--color-btn-primary-hover)]
-                              transition-colors"
-                                >
-                                    <FontAwesomeIcon icon={faGoogle} />
-                                </button>
-
-                                <button
-                                    onClick={() => oauth(handleTwitterSignIn)}
-                                    className="w-10 h-10 flex items-center justify-center
-                              rounded-full border border-br-primary
-                              hover:bg-[var(--color-btn-primary-hover)]
-                              transition-colors"
-                                >
-                                    <FontAwesomeIcon icon={faTwitter} />
-                                </button>
+                                {OAUTH_ICONS.map(({ fn, icon }) => (
+                                    <button
+                                        key={icon.iconName}
+                                        onClick={() => oauth(eval(fn))}
+                                        className="w-10 h-10 flex items-center justify-center
+                                  rounded-full border border-br-primary
+                                  hover:bg-[var(--color-btn-primary-hover)]
+                                  transition-colors"
+                                    >
+                                        <FontAwesomeIcon icon={icon} />
+                                    </button>
+                                ))}
                             </div>
                         </>
                     )}
 
+                    {/* switch mode */}
                     <p className="text-center text-sm mt-5">
                         {mode === "signup" ? (
                             <>
@@ -268,10 +270,8 @@ export const AuthModal = () => {
                         )}
                     </p>
                 </div>
-            </div>
+            </FocusLock>
         </div>,
         document.body
     );
-};
-
-export default AuthModal;
+}
