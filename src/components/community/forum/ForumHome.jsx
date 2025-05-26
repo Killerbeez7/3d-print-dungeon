@@ -1,11 +1,14 @@
 import { useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import { useForum } from "@/hooks/useForum";
-import { FaSearch, FaPlus } from "react-icons/fa";
-import Skeleton from "@/components/shared/Skeleton";
-import { forumService } from "@/services/forumService";
+import { FaSearch } from "react-icons/fa";
 import { formatDistanceToNow } from "date-fns";
 import PropTypes from "prop-types";
+// context, srv, hooks
+import { useForum } from "@/hooks/useForum";
+import { forumService } from "@/services/forumService";
+//components
+import Skeleton from "@/components/shared/Skeleton";
+import { Spinner } from "@/components/shared/Spinner";
 
 export const ForumHome = () => {
     const { categories, threads, loading, error, searchThreads } = useForum();
@@ -27,12 +30,12 @@ export const ForumHome = () => {
         }
     }, [activeTab]);
 
-    // Always scroll to top on mount and when tab changes
+    // Scroll to top when tab changes
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [activeTab]);
 
-    // Reset loaded threads on mount (refresh)
+    // Reset loaded threads on refresh
     useEffect(() => {
         setDisplayedThreads([]);
         setLastVisible(null);
@@ -83,10 +86,9 @@ export const ForumHome = () => {
                     hasLastVisible: !!lastVisible,
                 });
 
-                // Only trigger loading when user has scrolled past 80% of the page
+                // trigger loading when user has scrolled past 80% of the page
                 if (scrollPercent > 0.8 && hasMore && !loadingMore && lastVisible) {
                     console.log("Triggering loadMoreThreads at 80% scroll");
-                    // Inline loadMoreThreads logic
                     try {
                         setLoadingMore(true);
                         const result = await forumService.getMoreNewestThreads(
@@ -267,8 +269,8 @@ export const ForumHome = () => {
                         </div>
                     )}
                     {loadingMore && (
-                        <div className="text-center mt-4 text-[var(--txt-muted)]">
-                            Loading more...
+                        <div className="flex justify-center mt-4">
+                            <Spinner size={24} />
                         </div>
                     )}
                 </div>
