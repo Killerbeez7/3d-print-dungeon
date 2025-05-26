@@ -1,56 +1,31 @@
-import { useState, Suspense } from "react";
+import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
-// Component imports
+
+//components
 import { Navbar } from "./navbar/Navbar";
 import { Footer } from "./footer/Footer";
 import { AuthModal } from "./auth-modal/AuthModal";
-import { ScrollToTopButton } from "./ScrollToTopButton";
+import { Spinner } from "@/components/shared/Spinner";
 
-const Layout: React.FC = () => {
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-    const [isSignUp, setIsSignUp] = useState(false);
+export const Layout: React.FC = () => (
+    <div className="flex flex-col min-h-screen">
+        <Navbar />
 
-    const handleOpenAuthModal = () => setIsAuthModalOpen(true);
-    const handleCloseAuthModal = () => setIsAuthModalOpen(false);
-    const handleSwitchAuthMode = () => setIsSignUp((prev) => !prev);
+        <main className="flex-1">
+            <Suspense
+                fallback={
+                    <div className="h-full flex items-center justify-center">
+                        <Spinner size={48} />
+                    </div>
+                }
+            >
+                <Outlet />
+            </Suspense>
+        </main>
 
-    return (
-        <div className="flex flex-col text-txt-primary relative layout">
-            <div className="background-blur" />
-
-            <Navbar
-                onLoginClick={() => {
-                    setIsSignUp(false);
-                    handleOpenAuthModal();
-                }}
-                onSignUpClick={() => {
-                    setIsSignUp(true);
-                    handleOpenAuthModal();
-                }}
-            />
-
-            <main className="flex-grow min-h-[100vh] mb-10 z-1">
-                <Suspense
-                    fallback={
-                        <div className="min-h-[300px] flex items-center justify-center">
-                            Loading...
-                        </div>
-                    }>
-                    <Outlet context={{ openAuthModal: handleOpenAuthModal }} />
-                </Suspense>
-            </main>
-
-            <Footer />
-            <ScrollToTopButton />
-
-            <AuthModal
-                isOpen={isAuthModalOpen}
-                onClose={handleCloseAuthModal}
-                isSignUp={isSignUp}
-                onSwitchMode={handleSwitchAuthMode}
-            />
-        </div>
-    );
-};
+        <AuthModal />
+        <Footer />
+    </div>
+);
 
 export default Layout;
