@@ -3,6 +3,10 @@ import { LuPanelLeftClose, LuPanelLeftOpen } from "react-icons/lu";
 import { MdHome, MdDashboard } from "react-icons/md";
 import { FaPlusSquare, FaUser, FaInfoCircle, FaQuestionCircle } from "react-icons/fa";
 import PropTypes from "prop-types";
+//hooks
+import { useNavigate } from "react-router-dom";
+import { useModal } from "@/hooks/useModal";
+import { useAuth } from "@/hooks/useAuth";
 
 const SidebarLink = ({ icon: Icon, label, to, onClick, className = "" }) => (
     <Link
@@ -23,7 +27,16 @@ SidebarLink.propTypes = {
     className: PropTypes.string,
 };
 
-export default function ForumSidebar({ isSidebarOpen, toggleSidebar, handleSidebarClick, categories }) {
+export default function ForumSidebar({
+    isSidebarOpen,
+    toggleSidebar,
+    handleSidebarClick,
+    categories,
+}) {
+    const { currentUser } = useAuth();
+    const { open } = useModal("auth");
+    const navigate = useNavigate();
+
     const location = useLocation();
     return (
         <div className="sticky top-20 h-[calc(100vh-120px)]">
@@ -94,14 +107,22 @@ export default function ForumSidebar({ isSidebarOpen, toggleSidebar, handleSideb
                                     })}
                                     <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
                                     {/* ACTIONS */}
-                                    <Link
-                                        to="/forum/new-thread"
-                                        onClick={handleSidebarClick}
-                                        className="flex items-center justify-center w-12 h-12 mx-auto rounded-full bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition shadow-lg mb-2"
+                                    <button
                                         aria-label="New Thread"
+                                        className="flex items-center justify-center w-12 h-12 mx-auto
+             rounded-full bg-[var(--accent)] text-[var(--txt-highlight)]
+             hover:bg-[var(--accent-hover)] transition shadow-lg mb-2"
+                                        onClick={() => {
+                                            if (!currentUser) {
+                                                open({ mode: "login" });
+                                                return;
+                                            }
+                                            navigate("/forum/new-thread");
+                                            handleSidebarClick();
+                                        }}
                                     >
                                         <FaPlusSquare className="text-2xl" />
-                                    </Link>
+                                    </button>
                                     <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
                                     {/* INFO */}
                                     <SidebarLink
@@ -207,13 +228,23 @@ export default function ForumSidebar({ isSidebarOpen, toggleSidebar, handleSideb
                                         <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
                                             ACTIONS
                                         </h4>
-                                        <SidebarLink
-                                            icon={FaPlusSquare}
-                                            label="New Thread"
-                                            to="/forum/new-thread"
-                                            onClick={handleSidebarClick}
-                                            className="font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)]"
-                                        />
+                                        <button
+                                            className="flex items-center min-w-4/5 gap-2 px-3 py-2 rounded-lg
+             font-semibold bg-[var(--accent)]
+             text-[var(--txt-highlight)]
+             hover:bg-[var(--accent-hover)]"
+                                            onClick={() => {
+                                                if (!currentUser) {
+                                                    open({ mode: "login" });
+                                                    return;
+                                                }
+                                                navigate("/forum/new-thread");
+                                                handleSidebarClick();
+                                            }}
+                                        >
+                                            <FaPlusSquare className="text-lg" />
+                                            <span>New Thread</span>
+                                        </button>
                                     </div>
                                     <div className="my-2 border-t border-[var(--br-secondary)]" />
                                     {/* INFO */}
@@ -249,4 +280,4 @@ ForumSidebar.propTypes = {
     toggleSidebar: PropTypes.func.isRequired,
     handleSidebarClick: PropTypes.func.isRequired,
     categories: PropTypes.array.isRequired,
-}; 
+};
