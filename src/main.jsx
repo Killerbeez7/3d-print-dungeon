@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { App } from "./App.jsx";
 import { ScrollToTop } from "./utils/ScrollToTop.js";
+import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 console.log("Starting app initialization");
 
@@ -14,10 +15,12 @@ try {
     console.log("Root created");
 
     root.render(
-        <BrowserRouter>
-            <ScrollToTop />
-            <App />
-        </BrowserRouter>
+        <ErrorBoundary>
+            <BrowserRouter>
+                <ScrollToTop />
+                <App />
+            </BrowserRouter>
+        </ErrorBoundary>
     );
     console.log("Initial render called");
 } catch (error) {
