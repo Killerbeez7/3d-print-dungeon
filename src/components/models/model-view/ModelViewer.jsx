@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
+import PropTypes from "prop-types";
+import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
+//components
 import { fullscreenConfig } from "@/config/fullscreenConfig";
 import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 import { Model3DIcon } from "@/components/shared/icons/Model3DIcon";
-import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
-import PropTypes from "prop-types";
 
 const NavigationArrow = ({ direction, onClick }) => (
     <button
@@ -11,7 +12,8 @@ const NavigationArrow = ({ direction, onClick }) => (
         className={`absolute ${
             direction === "left" ? "left-4" : "right-4"
         } top-1/2 transform -translate-y-1/2 flex items-center justify-center w-[35px] h-[35px] rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 z-40 group invisible md:visible`}
-        aria-label={`${direction === "left" ? "Previous" : "Next"} view`}>
+        aria-label={`${direction === "left" ? "Previous" : "Next"} view`}
+    >
         {direction === "left" ? (
             <FaArrowLeft className="text-white text-xl group-hover:scale-110 transition-transform" />
         ) : (
@@ -66,11 +68,7 @@ const isMobile =
 
 const getTimeoutDuration = () => (isMobile ? 5000 : 3000);
 
-export const ModelViewer = ({
-    model,
-    selectedRenderIndex,
-    setSelectedRenderIndex,
-}) => {
+export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex }) => {
     const [modelLoaded, setModelLoaded] = useState(false);
     const [loadProgress, setLoadProgress] = useState(0);
     const [isFullscreen, setIsFullscreen] = useState(false);
@@ -82,12 +80,11 @@ export const ModelViewer = ({
     const containerRef = useRef(null);
     const autoHideTimerRef = useRef(null);
 
-    const fallback3DUrl =
-        model?.convertedFileUrl || model?.originalFileUrl || "";
+    const fallback3DUrl = model?.convertedFileUrl || model?.originalFileUrl || "";
     const renderFileUrls = model?.renderFileUrls || [];
     const posterUrl = model?.posterUrl;
 
-    // Event handlers
+    //handlers
     const handleTouchStart = () => {
         setIsHovering(true);
         // Only set controls visible on touch if in fullscreen mode
@@ -144,9 +141,7 @@ export const ModelViewer = ({
                 });
             } else {
                 fullscreenConfig.exit().catch((err) => {
-                    console.error(
-                        `Error attempting to exit fullscreen: ${err.message}`
-                    );
+                    console.error(`Error attempting to exit fullscreen: ${err.message}`);
                 });
                 // Always show controls when exiting fullscreen
                 setControlsVisible(true);
@@ -159,18 +154,16 @@ export const ModelViewer = ({
         if (!viewer) return;
 
         try {
-            viewer
-                .toBlob({ idealAspect: true, mimeType: "image/png" })
-                .then((blob) => {
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement("a");
-                    a.href = url;
-                    a.download = `${model.name || "model"}-screenshot.png`;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                });
+            viewer.toBlob({ idealAspect: true, mimeType: "image/png" }).then((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${model.name || "model"}-screenshot.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
         } catch (error) {
             console.error("Error taking screenshot:", error);
         }
@@ -334,19 +327,14 @@ export const ModelViewer = ({
                         max-camera-orbit="auto auto 200%"
                         min-field-of-view="10deg"
                         max-field-of-view="70deg"
-                        field-of-view="50deg"></model-viewer>
+                        field-of-view="50deg"
+                    ></model-viewer>
 
                     {/* Navigation Arrows and Dots */}
                     {renderFileUrls.length > 0 && (
                         <div>
-                            <NavigationArrow
-                                direction="left"
-                                onClick={handlePrevious}
-                            />
-                            <NavigationArrow
-                                direction="right"
-                                onClick={handleNext}
-                            />
+                            <NavigationArrow direction="left" onClick={handlePrevious} />
+                            <NavigationArrow direction="right" onClick={handleNext} />
                             <NavigationDots
                                 selectedIndex={selectedRenderIndex}
                                 totalItems={renderFileUrls.length}
@@ -359,14 +347,12 @@ export const ModelViewer = ({
                                     (isIOS && customFullscreen) || isFullscreen
                                         ? "fixed"
                                         : "absolute"
-                                } bottom-0 left-1/2 transform -translate-x-1/2 cursor-pointer z-[9999] transition-transform duration-300 ${
+                                } bottom-0 left-1/2 transform -translate-x-1/2 cursor-pointer z-[999] transition-transform duration-300 ${
                                     controlsVisible
                                         ? "translate-y-full pointer-events-none"
                                         : "translate-y-0"
                                 }`}
-                                onClick={
-                                    controlsVisible ? undefined : toggleMenu
-                                }
+                                onClick={controlsVisible ? undefined : toggleMenu}
                                 onMouseEnter={() => setIsHovering(true)}
                                 onMouseLeave={() => setIsHovering(false)}
                                 onTouchStart={handleTouchStart}
@@ -378,17 +364,17 @@ export const ModelViewer = ({
                                     if (e.key === "Enter" || e.key === " ") {
                                         toggleMenu();
                                     }
-                                }}>
+                                }}
+                            >
                                 <div className="bg-black/30 backdrop-blur-sm px-4 py-2 rounded-t-lg group hover:bg-black/40 transition-colors relative">
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
                                         className={`h-6 w-6 text-white transform transition-transform duration-300 ${
-                                            controlsVisible
-                                                ? "rotate-180 opacity-50"
-                                                : ""
+                                            controlsVisible ? "rotate-180 opacity-50" : ""
                                         }`}
                                         viewBox="0 0 20 20"
-                                        fill="currentColor">
+                                        fill="currentColor"
+                                    >
                                         <path
                                             fillRule="evenodd"
                                             d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
@@ -397,7 +383,8 @@ export const ModelViewer = ({
                                     </svg>
                                     <span
                                         role="tooltip"
-                                        className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-black/80 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                        className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-black/80 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
+                                    >
                                         Toggle Menu (M)
                                     </span>
                                 </div>
@@ -417,7 +404,8 @@ export const ModelViewer = ({
                                 onMouseEnter={() => setIsHovering(true)}
                                 onMouseLeave={() => setIsHovering(false)}
                                 onTouchStart={handleTouchStart}
-                                onTouchEnd={handleTouchEnd}>
+                                onTouchEnd={handleTouchEnd}
+                            >
                                 <div className="flex items-center justify-center gap-4 backdrop-blur-sm px-4 md:py-3 sm:py-1 shadow-lg bg-black/30">
                                     <button
                                         onClick={toggleRotation}
@@ -425,14 +413,16 @@ export const ModelViewer = ({
                                         aria-label="Rotate (R)"
                                         className={`p-2 rounded-full hover:bg-white/20 transition-colors group relative ${
                                             !controlsVisible ? "opacity-50" : ""
-                                        }`}>
+                                        }`}
+                                    >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className={`h-6 w-6 text-white ${
                                                 autoRotate ? "animate-spin" : ""
                                             }`}
                                             viewBox="0 0 20 20"
-                                            fill="currentColor">
+                                            fill="currentColor"
+                                        >
                                             <path
                                                 fillRule="evenodd"
                                                 d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
@@ -441,7 +431,8 @@ export const ModelViewer = ({
                                         </svg>
                                         <span
                                             role="tooltip"
-                                            className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-black/80 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                            className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-black/80 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
+                                        >
                                             Rotate (R)
                                         </span>
                                     </button>
@@ -454,19 +445,22 @@ export const ModelViewer = ({
                                         aria-label="Reset View (H)"
                                         className={`p-2 rounded-full hover:bg-white/20 transition-colors group relative ${
                                             !controlsVisible ? "opacity-50" : ""
-                                        }`}>
+                                        }`}
+                                    >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className="h-6 w-6 text-white"
                                             viewBox="0 0 20 20"
-                                            fill="currentColor">
+                                            fill="currentColor"
+                                        >
                                             <path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z" />
                                             <path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z" />
                                             <path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z" />
                                         </svg>
                                         <span
                                             role="tooltip"
-                                            className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-black/80 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                            className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-black/80 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
+                                        >
                                             Reset View (H)
                                         </span>
                                     </button>
@@ -477,12 +471,14 @@ export const ModelViewer = ({
                                         aria-label="Fullscreen (F)"
                                         className={`p-2 rounded-full hover:bg-white/20 transition-colors group relative ${
                                             !controlsVisible ? "opacity-50" : ""
-                                        }`}>
+                                        }`}
+                                    >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className="h-6 w-6 text-white"
                                             viewBox="0 0 20 20"
-                                            fill="currentColor">
+                                            fill="currentColor"
+                                        >
                                             <path
                                                 fillRule="evenodd"
                                                 d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 11-1.414 1.414L5 6.414V8a1 1 0 01-2 0V4zm9 1a1 1 0 010-2h4a1 1 0 011 1v4a1 1 0 01-2 0V6.414l-2.293 2.293a1 1 0 11-1.414-1.414L13.586 5H12zm-9 7a1 1 0 012 0v1.586l2.293-2.293a1 1 0 111.414 1.414L6.414 15H8a1 1 0 010 2H4a1 1 0 01-1-1v-4zm13-1a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 010-2h1.586l-2.293-2.293a1 1 0 111.414-1.414L15 13.586V12a1 1 0 011-1z"
@@ -491,7 +487,8 @@ export const ModelViewer = ({
                                         </svg>
                                         <span
                                             role="tooltip"
-                                            className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-black/80 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                            className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-black/80 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
+                                        >
                                             Fullscreen (F)
                                         </span>
                                     </button>
@@ -504,12 +501,14 @@ export const ModelViewer = ({
                                         aria-label="Take Screenshot"
                                         className={`p-2 rounded-full hover:bg-white/20 transition-colors group relative ${
                                             !controlsVisible ? "opacity-50" : ""
-                                        }`}>
+                                        }`}
+                                    >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             className="h-6 w-6 text-white"
                                             viewBox="0 0 20 20"
-                                            fill="currentColor">
+                                            fill="currentColor"
+                                        >
                                             <path
                                                 fillRule="evenodd"
                                                 d="M4 5a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V7a2 2 0 00-2-2h-1.586a1 1 0 01-.707-.293l-1.121-1.121A2 2 0 0011.172 3H8.828a2 2 0 00-1.414.586L6.293 4.707A1 1 0 015.586 5H4zm6 9a3 3 0 100-6 3 3 0 000 6z"
@@ -518,7 +517,8 @@ export const ModelViewer = ({
                                         </svg>
                                         <span
                                             role="tooltip"
-                                            className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-black/80 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                                            className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 text-xs bg-black/80 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none"
+                                        >
                                             Screenshot
                                         </span>
                                     </button>
@@ -535,10 +535,9 @@ export const ModelViewer = ({
                                             <div
                                                 className="h-full bg-cyan-300 transition-all duration-300"
                                                 style={{
-                                                    width: `${
-                                                        loadProgress * 100
-                                                    }%`,
-                                                }}></div>
+                                                    width: `${loadProgress * 100}%`,
+                                                }}
+                                            ></div>
                                         </div>
                                     </div>
                                 </div>
@@ -557,7 +556,8 @@ export const ModelViewer = ({
                     (isIOS && customFullscreen) || isFullscreen
                         ? "h-screen"
                         : "h-[40vh] lg:h-[calc(80vh-120px)]"
-                }`}>
+                }`}
+            >
                 <LazyImage
                     src={renderFileUrls[selectedRenderIndex]}
                     alt={`Render ${selectedRenderIndex + 1}`}
@@ -568,14 +568,8 @@ export const ModelViewer = ({
                 {/* Navigation Controls */}
                 {renderFileUrls.length > 0 && (
                     <div className="invisible md:visible">
-                        <NavigationArrow
-                            direction="left"
-                            onClick={handlePrevious}
-                        />
-                        <NavigationArrow
-                            direction="right"
-                            onClick={handleNext}
-                        />
+                        <NavigationArrow direction="left" onClick={handlePrevious} />
+                        <NavigationArrow direction="right" onClick={handleNext} />
                         <NavigationDots
                             selectedIndex={selectedRenderIndex}
                             totalItems={renderFileUrls.length}
@@ -595,7 +589,8 @@ export const ModelViewer = ({
                     ? "h-screen"
                     : ""
             }`}
-            ref={containerRef}>
+            ref={containerRef}
+        >
             <div className={getContainerClasses()}>{mainPreview}</div>
 
             {/* Thumbnails Section - Hide in any fullscreen mode */}
@@ -609,7 +604,8 @@ export const ModelViewer = ({
                                 selectedRenderIndex === -1
                                     ? "border-fuchsia-600 shadow-lg ring-2 ring-fuchsia-500/50"
                                     : "border-gray-200 dark:border-gray-700 hover:border-fuchsia-500 hover:shadow-md"
-                            }`}>
+                            }`}
+                        >
                             <div className="w-full h-full flex items-center justify-center">
                                 <Model3DIcon
                                     size={32}
@@ -626,7 +622,8 @@ export const ModelViewer = ({
                                     selectedRenderIndex === idx
                                         ? "border-fuchsia-600 shadow-lg ring-2 ring-fuchsia-500/50"
                                         : "border-gray-200 dark:border-gray-700 hover:border-fuchsia-500 hover:shadow-md"
-                                }`}>
+                                }`}
+                            >
                                 <LazyImage
                                     src={url}
                                     alt={`Render ${idx + 1}`}
