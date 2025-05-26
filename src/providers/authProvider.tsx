@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { AuthContext } from "../contexts/authContext";
-import { UserData } from "../types/auth";
+import { RawUserData  } from "../types/auth";
 import { MaintenanceStatus, UserId } from "../types/maintenance";
 import {
     signUpWithEmail,
@@ -19,9 +19,9 @@ import {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const [userData, setUserData] = useState<UserData | null>(null);
+    const [userData, setUserData] = useState<RawUserData  | null>(null);
     const [loading, setLoading] = useState(true);
-    const [authError, setAuthError] = useState("");
+    const [authError, setAuthError] = useState<string | null>(null);  
     const [maintenanceMode, setMaintenanceMode] = useState(false);
     const [maintenanceMessage, setMaintenanceMessage] = useState<string | null>(null);
     const [maintenanceEndTime, setMaintenanceEndTime] = useState<Date | null>(null);
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             return;
         }
 
-        getUserFromDatabase(currentUser.uid, (data: UserData | null) => {
+        getUserFromDatabase(currentUser.uid, (data: RawUserData | null) => {
             setUserData(data);
         });
     }, [currentUser]);
@@ -159,6 +159,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         changePassword,
         fetchUserData,
         handleAuthError,
+        // openAuthModal
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
