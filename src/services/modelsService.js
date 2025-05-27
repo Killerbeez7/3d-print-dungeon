@@ -7,15 +7,15 @@ import {
     updateDoc,
     arrayUnion,
     increment,
+    query,
+    orderBy,
+    limit,
+    getDocs,
+    startAfter,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { finalConvertFileToGLB } from "../utils/models/converter";
 
-/**
- * createAdvancedModel
- * - Now accepts an optional preConvertedFile so that if the file was already converted,
- *   we avoid doing it again.
- */
 export async function createAdvancedModel({
     name,
     description,
@@ -155,7 +155,7 @@ export async function createAdvancedModel({
         posterUrl: posterUrl || null,
         createdAt: serverTimestamp(),
         views: 0,
-        likes: 0
+        likes: 0,
     });
 
     // ============= 6) Update user doc =============
@@ -183,9 +183,27 @@ export const incrementModelViews = async (modelId) => {
         const modelRef = doc(db, "models", modelId);
         await updateDoc(modelRef, {
             views: increment(1),
-            lastViewed: serverTimestamp()
+            lastViewed: serverTimestamp(),
         });
     } catch (error) {
         console.error("Error incrementing views:", error);
     }
 };
+
+export const PAGE_SIZE = 30;
+
+/** Loads the first or next page of models, newest first. */
+export async function fetchModels(pageParam) {
+    const base = query(collection(db, "models"), orderBy("createdAt", "desc"));
+    const q = pageParam
+        ? query(base, startAfter(pageParam), limit(PAGE_SIZE))
+        : query(base, limit(PAGE_SIZE));
+
+    const snap = await getDocs(q);
+
+    return {
+        models: snap.docs.map((d) => ({ id: d.id, ...d.data() })),
+        nextCursor:
+            snap.docs.length === PAGE_SIZE ? snap.docs[snap.docs.length - 1] : undefined,
+    };
+}
