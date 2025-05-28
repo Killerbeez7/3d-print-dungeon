@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { duplicateModels } from "../scripts/duplicateModels";
+import { deleteAllModelsAndRelated } from "../scripts/deleteAllModels";
 
 export const Scripts = () => {
     // List of scripts (expandable in the future)
@@ -8,6 +9,11 @@ export const Scripts = () => {
             name: "Duplicate Models",
             description: "Duplicate all models in the database for testing.",
             run: duplicateModels,
+        },
+        {
+            name: "Delete All Models",
+            description: "Delete ALL models and all related data (comments, likes, views, favorites, user uploads, and files in storage). This action is IRREVERSIBLE!",
+            run: deleteAllModelsAndRelated,
         },
     ];
 
