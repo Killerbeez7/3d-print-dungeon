@@ -19,14 +19,20 @@ export const Scripts = () => {
 
     const [progress, setProgress] = useState(Array(scripts.length).fill(0));
     const [running, setRunning] = useState(Array(scripts.length).fill(false));
+    const [complete, setComplete] = useState(Array(scripts.length).fill(false));
 
     const handleRun = async (idx) => {
         setRunning((r) => r.map((v, i) => (i === idx ? true : v)));
         setProgress((p) => p.map((v, i) => (i === idx ? 0 : v)));
+        setComplete((c) => c.map((v, i) => (i === idx ? false : v)));
         try {
             await scripts[idx].run((prog) =>
                 setProgress((p) => p.map((v, i) => (i === idx ? prog : v)))
             );
+            setComplete((c) => c.map((v, i) => (i === idx ? true : v)));
+            setTimeout(() => {
+                setComplete((c) => c.map((v, i) => (i === idx ? false : v)));
+            }, 3000);
         } catch (e) {
             alert("Script failed: " + e.message);
         }
@@ -64,6 +70,9 @@ export const Scripts = () => {
                         <span className="ml-2 text-xs w-8 text-right tabular-nums">
                             {progress[idx]}%
                         </span>
+                        {complete[idx] && (
+                            <span className="ml-4 text-green-600 font-bold text-xs">Complete</span>
+                        )}
                     </div>
                 ))}
             </div>
