@@ -116,7 +116,7 @@ export const Navbar = () => {
                             {/* mobile hamburger */}
                             <button
                                 id="hamburger-button"
-                                className="md:hidden p-[0.5px] rounded-lg hover:bg-bg-surface"
+                                className="md:hidden p-[0.5px] rounded-lg text-txt-secondary hover:bg-bg-surface"
                                 onClick={toggleMobileMenu}
                                 aria-label="Toggle mobile menu"
                                 aria-expanded={isMobileMenuOpen}

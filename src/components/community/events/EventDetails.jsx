@@ -37,40 +37,42 @@ export const EventDetails = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
-      <div className="mb-6">
-        <img src={event.bannerUrl} alt={event.title} className="w-full h-56 object-cover rounded-lg shadow" />
+    <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
+      <div className="mb-6 rounded-lg overflow-hidden shadow">
+        <div className="relative w-full aspect-[16/7] bg-gray-200">
+          <img src={event.bannerUrl} alt={event.title} className="absolute inset-0 w-full h-full object-cover" />
+        </div>
       </div>
-      <h1 className="text-3xl font-bold mb-2 text-[var(--txt-primary)]">{event.title}</h1>
-      <div className="mb-2 text-[var(--txt-secondary)]">{event.startDate} - {event.endDate}</div>
-      <div className="mb-4 text-[var(--txt-muted)]">Status: <span className="font-semibold">{event.status}</span></div>
-      <div className="mb-4 text-lg text-[var(--txt-primary)]">{event.description}</div>
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-[var(--txt-primary)] text-center break-words">{event.title}</h1>
+      <div className="mb-2 text-sm sm:text-base text-[var(--txt-secondary)] text-center">{event.startDate} - {event.endDate}</div>
+      <div className="mb-4 text-xs sm:text-sm text-[var(--txt-muted)] text-center">Status: <span className="font-semibold">{event.status}</span></div>
+      <div className="mb-4 text-base sm:text-lg text-[var(--txt-primary)] text-center">{event.description}</div>
       {event.type === "competition" && event.prizes && (
         <div className="mb-4">
-          <h2 className="font-semibold mb-1">Prizes</h2>
-          <div className="text-[var(--txt-highlight)]">{event.prizes}</div>
+          <h2 className="font-semibold mb-1 text-sm sm:text-base">Prizes</h2>
+          <div className="text-[var(--txt-highlight)] text-xs sm:text-sm">{event.prizes}</div>
         </div>
       )}
       {event.rules && (
         <div className="mb-4">
-          <h2 className="font-semibold mb-1">Rules</h2>
-          <div className="text-[var(--txt-secondary)] whitespace-pre-line">{event.rules}</div>
+          <h2 className="font-semibold mb-1 text-sm sm:text-base">Rules</h2>
+          <div className="text-[var(--txt-secondary)] whitespace-pre-line text-xs sm:text-sm">{event.rules}</div>
         </div>
       )}
       {event.type === "competition" && event.status === "ongoing" && (
-        <div className="mb-8">
+        <div className="mb-8 text-center">
           <Link
             to={`/events/${event.id}/enter`}
-            className="inline-block px-6 py-2 rounded bg-[var(--accent)] text-[var(--txt-highlight)] font-semibold hover:bg-[var(--accent-hover)]"
+            className="inline-block px-6 py-2 rounded bg-[var(--accent)] text-[var(--txt-highlight)] font-semibold hover:bg-[var(--accent-hover)] transition-colors"
           >
             Enter Now
           </Link>
         </div>
       )}
       {(event.type === "meetup" || event.type === "webinar") && event.status === "upcoming" && (
-        <div className="mb-8">
+        <div className="mb-8 text-center">
           <button
-            className="inline-block px-6 py-2 rounded bg-[var(--accent)] text-[var(--txt-highlight)] font-semibold hover:bg-[var(--accent-hover)]"
+            className="inline-block px-6 py-2 rounded bg-[var(--accent)] text-[var(--txt-highlight)] font-semibold hover:bg-[var(--accent-hover)] transition-colors"
           >
             RSVP
           </button>
@@ -78,15 +80,15 @@ export const EventDetails = () => {
       )}
       {event.type === "competition" && (
         <div className="mb-4">
-          <h2 className="font-semibold mb-3">Entries Gallery</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <h2 className="font-semibold mb-3 text-center text-base sm:text-lg">Entries Gallery</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             {mockEntries.map((entry) => (
               <EventEntryCard key={entry.id} entry={entry} />
             ))}
           </div>
         </div>
       )}
-      <div className="mt-8">
+      <div className="mt-8 text-center">
         <Link to="/events" className="text-[var(--accent)] hover:underline">&larr; Back to Events</Link>
       </div>
     </div>
