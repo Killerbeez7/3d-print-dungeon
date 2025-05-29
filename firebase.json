@@ -1,45 +1,48 @@
 {
-  "hosting": {
-    "public": "dist",
-    "headers": [
-  {
-    "source": "**",
-    "headers": [
-      {
-        "key": "Permissions-Policy",
-        "value": "layout-animations=(self), display-capture=(), document-domain=(), fullscreen=(self), sync-xhr=(), backdrop-filter=(self)"
-      }
-    ]
-  }
-],
-    "rewrites": [
-      {
-        "source": "/**",
-        "destination": "/index.html"
-      }
-    ]
-  },
-  "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "storage": {
-    "rules": "storage.rules"
-  },
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local"
-      ],
-      "predeploy": [
-        "npm --prefix \"$RESOURCE_DIR\" run lint"
-      ]
+    "hosting": {
+        "public": "dist",
+        "headers": [
+            {
+                "source": "**",
+                "headers": [
+                    {
+                        "key": "Permissions-Policy",
+                        "value": "layout-animations=(self), display-capture=(), document-domain=(), fullscreen=(self), sync-xhr=(), backdrop-filter=(self)"
+                    }
+                ]
+            }
+        ],
+        "rewrites": [
+            {
+                "source": "/**",
+                "destination": "/index.html"
+            }
+        ]
+    },
+    "firestore": {
+        "rules": "firestore.rules",
+        "indexes": "firestore.indexes.json"
+    },
+    "storage": {
+        "rules": "storage.rules"
+    },
+    "functions": [
+        {
+            "source": "functions",
+            "codebase": "default",
+            "ignore": [
+                "node_modules",
+                ".git",
+                "firebase-debug.log",
+                "firebase-debug.*.log",
+                "*.local"
+            ],
+            "predeploy": ["npm --prefix \"$RESOURCE_DIR\" run lint"]
+        }
+    ],
+    "extensions": {
+        "storage-resize-images": {
+            "extension": "firebase/storage-resize-images@0.2.9"
+        }
     }
-  ]
 }
