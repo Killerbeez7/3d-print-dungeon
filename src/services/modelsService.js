@@ -27,121 +27,120 @@ export async function createAdvancedModel({
     uploaderId,
     uploaderDisplayName,
     onProgress,
-    posterBlob, // new param for your poster
-    preConvertedFile, // new parameter to avoid reconversion
+    posterBlob,
+    preConvertedFile,
 }) {
-    if (!file) throw new Error("No model file provided");
     const progressFn = onProgress || (() => {});
     let progress = 0;
     progressFn(progress);
 
-    // ============= 1) Upload original 3D file =============
-    const originalRef = ref(storage, `models/original/${file.name}`);
-    const originalTask = uploadBytesResumable(originalRef, file);
-    const originalFileUrl = await new Promise((resolve, reject) => {
-        originalTask.on(
+    // original 3D file
+    const origRef = ref(storage, `models/original/${file.name}`);
+    const origTask = uploadBytesResumable(origRef, file);
+    const originalFileUrl = await new Promise((res, rej) => {
+        origTask.on(
             "state_changed",
-            (snapshot) => {
-                const ratio = snapshot.bytesTransferred / snapshot.totalBytes;
-                progress = ratio * 50;
+            (snap) => {
+                progress = (snap.bytesTransferred / snap.totalBytes) * 20;
                 progressFn(progress);
             },
-            reject,
-            async () => {
-                const url = await getDownloadURL(originalTask.snapshot.ref);
-                resolve(url);
-            }
+            rej,
+            async () => res(await getDownloadURL(origTask.snapshot.ref))
         );
     });
 
-    // ============= 2) Convert if needed (e.g. .stl or .obj) =============
-    let convertedFileUrl = null;
+    // convert to GLB
     const lower = file.name.toLowerCase();
-    if ((lower.endsWith(".stl") || lower.endsWith(".obj")) && preConvertedFile) {
-        const baseName = file.name.replace(/\.[^/.]+$/, "");
-        const convertedRef = ref(storage, `models/converted/${baseName}.glb`);
-        const convertedTask = uploadBytesResumable(convertedRef, preConvertedFile);
-        convertedFileUrl = await new Promise((resolve, reject) => {
-            convertedTask.on(
+    let convertedFileUrl = originalFileUrl;
+    if (lower.endsWith(".stl") || lower.endsWith(".obj")) {
+        const blob = preConvertedFile
+            ? preConvertedFile
+            : (await finalConvertFileToGLB(file)).blob;
+        const base = file.name.replace(/\.[^.]+$/, "");
+        const convRef = ref(storage, `models/converted/${base}.glb`);
+        const convTask = uploadBytesResumable(convRef, blob);
+        convertedFileUrl = await new Promise((res, rej) => {
+            convTask.on(
                 "state_changed",
-                (snapshot) => {
-                    const ratio = snapshot.bytesTransferred / snapshot.totalBytes;
-                    const offset = 50 + ratio * 50;
+                (snap) => {
+                    const offset = 20 + (snap.bytesTransferred / snap.totalBytes) * 20;
                     progressFn(offset);
                 },
-                reject,
-                async () => {
-                    const url = await getDownloadURL(convertedTask.snapshot.ref);
-                    resolve(url);
-                }
-            );
-        });
-    } else if (lower.endsWith(".stl") || lower.endsWith(".obj")) {
-        const { blob } = await finalConvertFileToGLB(file);
-        const baseName = file.name.replace(/\.[^/.]+$/, "");
-        const convertedRef = ref(storage, `models/converted/${baseName}.glb`);
-        const convertedTask = uploadBytesResumable(convertedRef, blob);
-        convertedFileUrl = await new Promise((resolve, reject) => {
-            convertedTask.on(
-                "state_changed",
-                (snapshot) => {
-                    const ratio = snapshot.bytesTransferred / snapshot.totalBytes;
-                    const offset = 50 + ratio * 50;
-                    progressFn(offset);
-                },
-                reject,
-                async () => {
-                    const url = await getDownloadURL(convertedTask.snapshot.ref);
-                    resolve(url);
-                }
+                rej,
+                async () => res(await getDownloadURL(convTask.snapshot.ref))
             );
         });
     } else {
-        convertedFileUrl = originalFileUrl;
-        progressFn(100);
+        progressFn(40);
     }
 
-    // ============= 3) Upload any render files =============
-    let renderFileUrls = [];
-    if (renderFiles && renderFiles.length > 0) {
-        for (const render of renderFiles) {
-            const renderRef = ref(storage, `models/render/${render.name}`);
-            const renderTask = uploadBytesResumable(renderRef, render);
-            const url = await new Promise((resolve, reject) => {
-                renderTask.on(
+    // renders: one primary, rest extras
+    let renderPrimaryUrl = null;
+    let renderExtraUrls = [];
+
+    if (renderFiles?.length) {
+        // primary
+        const primary = renderFiles[selectedRenderIndex];
+        if (primary) {
+            const pRef = ref(storage, `models/renders/renderPrimary/${primary.name}`);
+            const pTask = uploadBytesResumable(pRef, primary);
+            renderPrimaryUrl = await new Promise((res, rej) => {
+                pTask.on(
                     "state_changed",
                     () => {},
-                    reject,
+                    rej,
                     async () => {
-                        const downloadUrl = await getDownloadURL(renderTask.snapshot.ref);
-                        resolve(downloadUrl);
+                        res(await getDownloadURL(pTask.snapshot.ref));
                     }
                 );
             });
-            renderFileUrls.push(url);
         }
+
+        // extras
+        renderExtraUrls = await Promise.all(
+            renderFiles
+                .filter((_, i) => i !== selectedRenderIndex)
+                .map(async (extra) => {
+                    const xRef = ref(
+                        storage,
+                        `models/renders/renderExtras/${extra.name}`
+                    );
+                    const xTask = uploadBytesResumable(xRef, extra);
+                    return await new Promise((res, rej) => {
+                        xTask.on(
+                            "state_changed",
+                            () => {},
+                            rej,
+                            async () => {
+                                res(await getDownloadURL(xTask.snapshot.ref));
+                            }
+                        );
+                    });
+                })
+        );
+        progressFn(60);
     }
 
-    // ============= 4) Upload the posterBlob (if present) =============
+    // create poster for model-viewer
     let posterUrl = null;
     if (posterBlob) {
-        const posterRef = ref(storage, `models/posters/${file.name}.webp`);
-        const posterTask = uploadBytesResumable(posterRef, posterBlob);
-        posterUrl = await new Promise((resolve, reject) => {
-            posterTask.on(
+        const postRef = ref(storage, `models/posters/${file.name}.webp`);
+        const postTask = uploadBytesResumable(postRef, posterBlob);
+        posterUrl = await new Promise((res, rej) => {
+            postTask.on(
                 "state_changed",
                 () => {},
-                reject,
+                rej,
                 async () => {
-                    const downloadUrl = await getDownloadURL(posterTask.snapshot.ref);
-                    resolve(downloadUrl);
+                    res(await getDownloadURL(postTask.snapshot.ref));
                 }
             );
         });
     }
+    progressFn(80);
 
-    // ============= 5) Create Firestore doc =============
-    const modelDocRef = await addDoc(collection(db, "models"), {
+    // write Firestore
+    const modelDoc = await addDoc(collection(db, "models"), {
         name,
         description,
         category,
@@ -149,40 +148,41 @@ export async function createAdvancedModel({
         uploaderId,
         uploaderDisplayName,
         originalFileUrl,
-        convertedFileUrl: convertedFileUrl || originalFileUrl,
-        renderFileUrls: renderFileUrls.length > 0 ? renderFileUrls : null,
-        primaryRenderUrl: renderFileUrls[selectedRenderIndex] || null,
-        posterUrl: posterUrl || null,
+        convertedFileUrl,
+        renderPrimaryUrl,
+        renderExtraUrls,
+        posterUrl,
         createdAt: serverTimestamp(),
         views: 0,
         likes: 0,
     });
 
-    // ============= 6) Update user doc =============
-    const userRef = doc(db, "users", uploaderId);
-    await updateDoc(userRef, {
-        uploads: arrayUnion(modelDocRef.id),
+    // link to user
+    await updateDoc(doc(db, "users", uploaderId), {
+        uploads: arrayUnion(modelDoc.id),
         artist: true,
     });
 
     progressFn(100);
-
     return {
-        modelId: modelDocRef.id,
+        modelId: modelDoc.id,
         originalFileUrl,
-        convertedFileUrl: convertedFileUrl || originalFileUrl,
-        renderFileUrls,
-        primaryRenderUrl: renderFileUrls[selectedRenderIndex] || null,
+        convertedFileUrl,
+        renderPrimaryUrl,
+        renderExtraUrls,
         posterUrl,
     };
 }
 
-// Function to increment view count
+// function to increment view count
+
 export const incrementModelViews = async (modelId) => {
     try {
         const modelRef = doc(db, "models", modelId);
+
         await updateDoc(modelRef, {
             views: increment(1),
+
             lastViewed: serverTimestamp(),
         });
     } catch (error) {
@@ -190,11 +190,12 @@ export const incrementModelViews = async (modelId) => {
     }
 };
 
+// pagination
 export const PAGE_SIZE = 30;
 
-/** Loads the first or next page of models, newest first. */
 export async function fetchModels(pageParam) {
     const base = query(collection(db, "models"), orderBy("createdAt", "desc"));
+
     const q = pageParam
         ? query(base, startAfter(pageParam), limit(PAGE_SIZE))
         : query(base, limit(PAGE_SIZE));
@@ -203,6 +204,7 @@ export async function fetchModels(pageParam) {
 
     return {
         models: snap.docs.map((d) => ({ id: d.id, ...d.data() })),
+
         nextCursor:
             snap.docs.length === PAGE_SIZE ? snap.docs[snap.docs.length - 1] : undefined,
     };
