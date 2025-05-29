@@ -1,13 +1,10 @@
 import { Link } from "react-router-dom";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useState, useCallback, useRef, useEffect } from "react";
-
 // config
 import { STATIC_ASSETS } from "@/config/assetsConfig";
-
 // service
 import { fetchModels, PAGE_SIZE } from "@/services/modelsService";
-
 // components
 import { FilterPanel } from "./FilterPanel";
 import { Spinner } from "@/components/shared/Spinner";
@@ -15,7 +12,7 @@ import { FeaturedCarousel } from "./FeaturedCarousel";
 import { featuredMockData } from "./featuredMockData";
 import { ModelCardSkeleton } from "../models/parts/ModelCardSkeleton";
 import { InfiniteScrollList } from "@/components/shared/InfiniteScrollList";
-import { ProgressiveImage } from "@/components/shared/ProgressiveImage";
+import { SequentialImage } from "@/components/shared/SequentialImage";
 
 function applySorting(items, sortBy) {
     switch (sortBy) {
@@ -45,19 +42,22 @@ export const Home = () => {
     const [categoryFilter, setCategoryFilter] = useState("all");
     const [isFilterOpen, setIsFilterOpen] = useState(false);
 
+    // sequential loader index
+    const [loadIndex, setLoadIndex] = useState(0);
+    const bumpIndex = useCallback(() => setLoadIndex((i) => i + 1), []);
+
     // infinite scroll via TanStack Query
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
         useInfiniteQuery({
             queryKey: ["models", sortBy, categoryFilter],
             queryFn: ({ pageParam }) => fetchModels(pageParam),
             getNextPageParam: (last) => last.nextCursor,
-            // suspense: true, // you can enable this if you wrap in <Suspense>
         });
 
-    // all loaded documents so far
+    // flatten pages
     const raw = data?.pages.flatMap((p) => p.models) ?? [];
 
-    // FAB hide/show
+    // FAB hide/show on scroll
     const mainRef = useRef(null);
     const [fabVisible, setFabVisible] = useState(true);
     useEffect(() => {
@@ -69,32 +69,42 @@ export const Home = () => {
         return () => obs.disconnect();
     }, []);
 
+    const addThumb = (full) => {
+        if (!full) return STATIC_ASSETS.PLACEHOLDER_IMAGE;
+
+        // Remove any old query string
+        const [base] = full.split("?");
+        // Make the 400 × 400 WEBP + add ?alt=media
+        const dot = base.lastIndexOf(".");
+        if (dot === -1) return full; // safety
+        return `${base.slice(0, dot)}_400x400.webp?alt=media`;
+    };
+
     // map to “artwork” shape
-    const artworks = raw.map((m) => ({
-        id: m.id,
-        title: m.name || "Untitled Model",
-        artist: m.uploaderDisplayName || "Anonymous",
-        tags: Array.isArray(m.tags) ? m.tags : ["3D"],
-        lowResSrc: m.primaryRenderLowResUrl || STATIC_ASSETS.PLACEHOLDER_IMAGE,
-        imageUrl:
-            m.primaryRenderUrl ||
-            m.primaryRenderLowResUrl ||
-            STATIC_ASSETS.PLACEHOLDER_IMAGE,
-        likes: m.likes || 0,
-        views: m.views || 0,
-        createdAt: m.createdAt,
-    }));
+    const artworks = raw.map((m) => {
+        const thumbUrl = addThumb(m.renderPrimaryUrl);
+
+        return {
+            id: m.id,
+            title: m.name,
+            artist: m.uploaderDisplayName,
+            tags: m.tags || [],
+            thumbnailUrl: thumbUrl,
+            likes: m.likes || 0,
+            views: m.views || 0,
+            createdAt: m.createdAt,
+        };
+    });
 
     // apply sort & filter
     const sorted = applySorting(artworks, sortBy);
     const filtered = applyCategoryFilter(sorted, categoryFilter);
 
-    // tell react-query to fetch more
+    // fetch next page
     const loadMore = useCallback(() => {
         if (hasNextPage && !isFetchingNextPage) fetchNextPage();
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    // initial skeleton screen
     if (isLoading) {
         return (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 p-4">
@@ -172,31 +182,20 @@ export const Home = () => {
                     }
                 >
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1">
-                        {filtered.map((art) => (
+                        {filtered.map((art, idx) => (
                             <Link key={art.id} to={`/model/${art.id}`}>
                                 <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
-                                    <div className="relative w-full aspect-square">
-                                        <ProgressiveImage
-                                            lowResSrc={art.lowResSrc}
-                                            src={art.imageUrl}
-                                            alt={art.title}
-                                            className="absolute inset-0 w-full h-full rounded-md"
-                                        />
-                                        <div
-                                            className="
-                        absolute inset-0
-                        bg-gradient-to-t from-[#0000006f] to-transparent
-                        flex items-end
-                        opacity-0 hover:opacity-100
-                        transition-opacity rounded-md
-                      "
-                                        >
-                                            <div className="text-white m-2">
-                                                <h4 className="font-semibold">
-                                                    {art.title}
-                                                </h4>
-                                                <p className="text-sm">{art.artist}</p>
-                                            </div>
+                                    <SequentialImage
+                                        index={idx}
+                                        loadIndex={loadIndex}
+                                        src={art.thumbnailUrl}
+                                        alt={art.title}
+                                        onLoad={bumpIndex}
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end opacity-0 hover:opacity-100 transition-opacity rounded-md">
+                                        <div className="text-white m-2">
+                                            <h4 className="font-semibold">{art.title}</h4>
+                                            <p className="text-sm">{art.artist}</p>
                                         </div>
                                     </div>
                                 </article>
@@ -204,12 +203,6 @@ export const Home = () => {
                         ))}
                     </div>
                 </InfiniteScrollList>
-
-                {!hasNextPage && filtered.length > 0 && (
-                    <p className="text-center text-[var(--txt-muted)] mt-6">
-                        You’ve reached the end.
-                    </p>
-                )}
             </div>
         </div>
     );
