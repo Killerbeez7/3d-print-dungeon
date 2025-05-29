@@ -167,11 +167,7 @@ export function ModelUpload() {
         <div className="container mx-auto p-6 space-y-6 max-w-6xl">
             {/* Step Indicator */}
             <div className="flex items-center w-full max-w-md mx-auto mb-8">
-                <StepIndicator
-                    stepNumber={1}
-                    label="Upload"
-                    currentStep={step}
-                />
+                <StepIndicator stepNumber={1} label="Upload" currentStep={step} />
                 <div className="flex-1 mx-4 border-t border-dashed border-br-surface"></div>
                 <StepIndicator
                     stepNumber={2}
@@ -191,10 +187,7 @@ export function ModelUpload() {
 
                 {step === 2 && (
                     <div className="mt-6 pt-6 border-t border-br-secondary">
-                        <InfoForm
-                            modelData={modelData}
-                            setModelData={setModelData}
-                        />
+                        <InfoForm modelData={modelData} setModelData={setModelData} />
                     </div>
                 )}
             </div>
@@ -213,7 +206,8 @@ export function ModelUpload() {
                     files.length > 0 && (
                         <button
                             onClick={() => setStep(2)}
-                            className="cta-button px-6 py-3 font-semibold transition-all">
+                            className="cta-button px-6 py-3 font-semibold transition-all"
+                        >
                             Next Step
                         </button>
                     )
@@ -221,13 +215,15 @@ export function ModelUpload() {
                     <>
                         <button
                             onClick={() => setStep(1)}
-                            className="secondary-button px-6 py-3">
+                            className="secondary-button px-6 py-3"
+                        >
                             Previous Step
                         </button>
                         <button
                             onClick={handleSubmit}
                             className="cta-button px-6 py-3"
-                            disabled={isUploading}>
+                            disabled={isUploading}
+                        >
                             {isUploading ? "Uploading..." : "Submit"}
                         </button>
                     </>
@@ -270,13 +266,13 @@ function StepIndicator({ stepNumber, label, currentStep }) {
         <div
             className={`flex items-center space-x-3 ${
                 isActive ? "text-accent" : "text-txt-secondary"
-            }`}>
+            }`}
+        >
             <div
                 className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
-                    isActive
-                        ? "bg-accent shadow-lg shadow-accent/20"
-                        : "bg-bg-surface"
-                } text-white font-bold`}>
+                    isActive ? "bg-accent shadow-lg shadow-accent/20" : "bg-bg-surface"
+                } text-white font-bold`}
+            >
                 {stepNumber}
             </div>
             <span className="font-semibold">{label}</span>
