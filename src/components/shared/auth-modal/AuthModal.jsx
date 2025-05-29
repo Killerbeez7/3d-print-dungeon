@@ -232,7 +232,7 @@ export function AuthModal() {
                                 {OAUTH_ICONS.map(({ fn, icon }) => (
                                     <button
                                         key={icon.iconName}
-                                        onClick={() => oauth(eval(fn))}
+                                        onClick={() => oauth(fn)}
                                         className="w-10 h-10 flex items-center justify-center
                                   rounded-full border border-br-primary
                                   hover:bg-[var(--color-btn-primary-hover)]
