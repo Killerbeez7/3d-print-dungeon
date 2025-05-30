@@ -2,7 +2,7 @@ import { Featured } from "../components/store/Featured";
 import { NewArrivals } from "../components/store/NewArrivals";
 import { BestSellers } from "../components/store/BestSellers";
 import { withMaintenance } from "../helpers/routeHelpers";
-import { ROUTES } from "../config/routeConstants";
+import { ROUTES } from "../constants/routeConstants";
 
 export const storeRoutes = [
     { path: ROUTES.MARKETPLACE_FEATURED, element: withMaintenance(<Featured />) },

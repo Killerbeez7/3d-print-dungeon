@@ -1,8 +1,7 @@
-import { Home } from "../components/home/Home";
 import { ArtistsList } from "../components/artists/ArtistsList";
 import { Collections } from "../components/collections/Collections";
 import { withMaintenance } from "../helpers/routeHelpers";
-import { ROUTES } from "../config/routeConstants";
+import { ROUTES } from "../constants/routeConstants";
 
 export const exploreRoutes = [
     { path: ROUTES.ARTISTS, element: withMaintenance(<ArtistsList />) },

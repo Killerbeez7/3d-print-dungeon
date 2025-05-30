@@ -1,3 +1,115 @@
+## 📱 Mobile Breakpoint Audit Checklist
+
+### General Layout
+  - [ ] No horizontal scroll at 320px, 375px, or 768px 
+  // components to fix at 320px:
+  model page
+  events home
+  forum home
+
+   // components to fix at 375px:
+   forum home
+   
+   // components to fix at 768px:
+   forum home
+
+
+  - [ ] Content fits within the viewport (no clipped text/images)
+  - [ ] Padding and margins are comfortable (not too tight or too wide)
+  - [ ] No fixed widths that break on small screens
+
+### Navigation
+  - [ ] Navigation/menu is accessible and usable
+  - [ ] Hamburger menu or mobile nav works as expected
+  - [ ] All links/tabs are tappable and not too small
+
+### Typography
+  - [ ] Headings are not too large or overflowing
+  - [ ] Body text is readable (not too small or too large)
+  - [ ] No text overlaps or is cut off
+
+### Buttons & Inputs
+  - [ ] Buttons are large enough to tap (min 44x44px)
+  - [ ] Inputs are full width or fit the screen
+  - [ ] No elements are too close together
+
+### Images & Cards
+  - [ ] Images scale down and keep aspect ratio
+  - [ ] Cards wrap and fill the space (no overflow)
+  - [ ] No fixed heights/widths that break layout
+
+### Grids & Lists
+  - [ ] Grids auto-wrap (e.g., use grid-cols-[repeat(auto-fill,minmax(14rem,1fr))])
+  - [ ] Lists are readable and not squished
+
+### Modals & Popups
+  - [ ] Modals fit the screen and are scrollable if needed
+  - [ ] No content is hidden off-screen
+
+### Special Components
+  - [ ] Carousels/swipers are swipeable and not clipped
+  - [ ] Custom components (e.g., model viewer) are usable on mobile
+
+### Accessibility
+  - [ ] Sufficient color contrast
+  - [ ] All images have alt text
+  - [ ] Can be navigated with keyboard (tab key)
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+- [ ] **CV-first roadmap**
+  - Focus on visible polish + code quality first; leave deep refactors until you need them.
+
+  🔥 **Do in the next 1-2 weeks**
+  - [ ] **1. Finish mobile breakpoints**
+    - [ ] Audit every page at 320 px / 375 px / 768 px.
+    - [ ] Replace fixed h-40, w-[300px], large paddings with aspect-[4/5], max-w-xs, p-2 md:p-4.
+    - [ ] Use grid-cols-[repeat(auto-fill,minmax(14rem,1fr))] patterns so cards auto-wrap.
+    - [ ] A full design-system refactor (e.g. moving to Tailwind or Chakra) can wait—small CSS utils get you 90% there.
+  - [ ] **2. Lazy-load heavy bundles**
+    - [ ] Dynamic‐import <ModelViewer> and Three.js only on the model details page (import(/* webpackChunkName: "viewer" */ '...')).
+    - [ ] Add React 18 <Suspense> fallback.
+    - [ ] Code splitting the entire app with Route level chunks (Vite PWA plugin) is nice but not urgent.
+  - [ ] **3. Add Lighthouse-clean PWA basics**
+    - [ ] @vite-pwa/plugin + manifest.webmanifest so the site installs on a phone.
+    - [ ] A 192×192 and 512×512 icon.
+    - [ ] Full offline mode (background syncing) is future work.
+  - [ ] **4. README + Architecture doc**
+    - [ ] Explain "why React-Query over Redux", the Storage resize pipeline, and folder layout. Recruiters love clear docs.
+    - [ ] Auto-generated Storybook docs—great later, not critical now.
+  - [ ] **5. GitHub Actions CI**
+    - [ ] On every push: npm ci && npm run lint && npm run test.
+    - [ ] Deploy preview to Firebase Hosting --channel pr-<num>.
+    - [ ] End-to-end Cypress tests running in CI—valuable, but after the basics are green.
+  - [ ] **6. Strong sample data & screenshots**
+    - [ ] Populate Firestore with 3-5 "showcase" models and events.
+    - [ ] Add gif/videos of upload flow to the repo's README.
+    - [ ] Admin dashboard for editing data can wait.
+  - [ ] **7. Accessibility pass (a11y)**
+    - [ ] npm i -D @axe-core/react, run in dev, fix obvious colour contrast & missing alt.
+    - [ ] Full WCAG 2.1 AA audit could be future freelance work.
+  - [ ] **8. Unit-test one slice**
+    - [ ] Pick modelsService.js; mock Firebase and test upload logic. Shows real-world testing skill in small time.
+    - [ ] 100% coverage everywhere is not needed for a portfolio.
+  - [ ] **9. Error boundaries & toast feedback**
+    - [ ] Wrap routes in <ErrorBoundary>; show a toast on Firestore errors. Polished UX for little code.
+    - [ ] Ce
+
+⏳ **Park for later** 
+
+
 # Maintenance Mode Enhancements
 
 ## 1. Maintenance Mode Settings UI
@@ -142,4 +254,5 @@
   - [ ] Implement service worker
   - [ ] Add cache headers
   - [ ] Implement stale-while-revalidate
-  - [ ] Add cache invalidation strategy 
+  - [ ] Add cache invalidation strategy
+
