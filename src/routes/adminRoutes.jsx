@@ -1,6 +1,6 @@
 import { AdminPanel } from "../components/admin/AdminPanel";
 import { withProtectedMaintenance } from "../helpers/routeHelpers";
-import { ROUTES } from "../config/routeConstants";
+import { ROUTES } from "../constants/routeConstants";
 
 export const adminRoutes = [
     {

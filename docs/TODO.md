@@ -52,7 +52,6 @@ Small UX update Navbar, Carousel
 - [x] update: move auth buttons out of navbar in separate component.hide sign up button on mobile, takes too much 
 - [x] add: logic to first item from carousel (featured models) now list all models that have the featured tag from admin dashboard
 
-
 27/04/2025
 Contexts refactoring
 - [x] split + tsx: authContext: authContext + authProvicer + useAuth
@@ -60,7 +59,6 @@ Contexts refactoring
 - [x] split + tsx (only context file): forumContext ==> forumContext + forumProvicer + useForum
 - [x] split + tsx (only context file): searchContext ==> searchContext + searchProvicer + useSearch
 - [x] split + tsx (only context file): commentsContext ==> commentsContext + commentsProvicer + useComments
-
 
 26/04/2025
 ModelViewer components fix
@@ -74,7 +72,6 @@ ModelViewer components fix
 - [x] fix: render images not properly centered in full screen mode
 - [x] fix: add default image on sign up, but keep image check in model view for better UI (find better solution later)
 - [x] call it a day :D
-
 
 Todays tasks
 ########################################################################################

@@ -10,6 +10,7 @@ import {
   where,
 } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
+import { STORAGE_PATHS } from '../../../constants/storagePaths';
 
 export async function deleteAllModelsAndRelated(onProgress) {
   // 1. Fetch all models
@@ -74,14 +75,14 @@ export async function deleteAllModelsAndRelated(onProgress) {
 
     // 7. Delete files from storage (try common paths)
     const storagePaths = [
-      `models/original/${fileNames[0]}`,
-      `models/converted/${fileNames[1]}`,
-      `models/renderPrimary/${fileNames[2]}`,
-      `models/posters/${fileNames[3]}`,
+      `${STORAGE_PATHS.ORIGINAL}/${fileNames[0]}`,
+      `${STORAGE_PATHS.CONVERTED}/${fileNames[1]}`,
+      `${STORAGE_PATHS.RENDER_PRIMARY}/${fileNames[2]}`,
+      `${STORAGE_PATHS.POSTERS}/${fileNames[3]}`,
     ];
     if (Array.isArray(model.renderExtraUrls)) {
       model.renderExtraUrls.forEach((url, i) => {
-        storagePaths.push(`models/renderExtras/${fileNames[4 + i]}`);
+        storagePaths.push(`${STORAGE_PATHS.RENDER_EXTRAS}/${fileNames[4 + i]}`);
       });
     }
     for (const path of storagePaths) {
@@ -166,14 +167,14 @@ export async function deleteModelAndRelated(modelId) {
     model.renderExtraUrls.forEach((url) => fileNames.push(url.split("/").pop().split("?")[0]));
   }
   const storagePaths = [
-    `models/original/${fileNames[0]}`,
-    `models/converted/${fileNames[1]}`,
-    `models/renderPrimary/${fileNames[2]}`,
-    `models/posters/${fileNames[3]}`,
+    `${STORAGE_PATHS.ORIGINAL}/${fileNames[0]}`,
+    `${STORAGE_PATHS.CONVERTED}/${fileNames[1]}`,
+    `${STORAGE_PATHS.RENDER_PRIMARY}/${fileNames[2]}`,
+    `${STORAGE_PATHS.POSTERS}/${fileNames[3]}`,
   ];
   if (Array.isArray(model.renderExtraUrls)) {
     model.renderExtraUrls.forEach((url, i) => {
-      storagePaths.push(`models/renderExtras/${fileNames[4 + i]}`);
+      storagePaths.push(`${STORAGE_PATHS.RENDER_EXTRAS}/${fileNames[4 + i]}`);
     });
   }
   for (const path of storagePaths) {

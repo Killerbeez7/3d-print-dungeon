@@ -1,4 +1,4 @@
-import { ROUTES } from "./routeConstants";
+import { ROUTES } from "../constants/routeConstants";
 
 export const NAV_SECTIONS = [
     {

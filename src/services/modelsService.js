@@ -15,6 +15,7 @@ import {
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { finalConvertFileToGLB } from "../utils/models/converter";
+import { STORAGE_PATHS } from '../constants/storagePaths';
 
 export async function createAdvancedModel({
     name,
@@ -35,7 +36,7 @@ export async function createAdvancedModel({
     progressFn(progress);
 
     // original 3D file
-    const origRef = ref(storage, `models/original/${file.name}`);
+    const origRef = ref(storage, `${STORAGE_PATHS.ORIGINAL}/${file.name}`);
     const origTask = uploadBytesResumable(origRef, file);
     const originalFileUrl = await new Promise((res, rej) => {
         origTask.on(
@@ -57,7 +58,7 @@ export async function createAdvancedModel({
             ? preConvertedFile
             : (await finalConvertFileToGLB(file)).blob;
         const base = file.name.replace(/\.[^.]+$/, "");
-        const convRef = ref(storage, `models/converted/${base}.glb`);
+        const convRef = ref(storage, `${STORAGE_PATHS.CONVERTED}/${base}.glb`);
         const convTask = uploadBytesResumable(convRef, blob);
         convertedFileUrl = await new Promise((res, rej) => {
             convTask.on(
@@ -82,7 +83,7 @@ export async function createAdvancedModel({
         // primary
         const primary = renderFiles[selectedRenderIndex];
         if (primary) {
-            const pRef = ref(storage, `models/renders/renderPrimary/${primary.name}`);
+            const pRef = ref(storage, `${STORAGE_PATHS.RENDER_PRIMARY}/${primary.name}`);
             const pTask = uploadBytesResumable(pRef, primary);
             renderPrimaryUrl = await new Promise((res, rej) => {
                 pTask.on(
@@ -103,7 +104,7 @@ export async function createAdvancedModel({
                 .map(async (extra) => {
                     const xRef = ref(
                         storage,
-                        `models/renders/renderExtras/${extra.name}`
+                        `${STORAGE_PATHS.RENDER_EXTRAS}/${extra.name}`
                     );
                     const xTask = uploadBytesResumable(xRef, extra);
                     return await new Promise((res, rej) => {
@@ -124,7 +125,7 @@ export async function createAdvancedModel({
     // create poster for model-viewer
     let posterUrl = null;
     if (posterBlob) {
-        const postRef = ref(storage, `models/posters/${file.name}.webp`);
+        const postRef = ref(storage, `${STORAGE_PATHS.POSTERS}/${file.name}.webp`);
         const postTask = uploadBytesResumable(postRef, posterBlob);
         posterUrl = await new Promise((res, rej) => {
             postTask.on(

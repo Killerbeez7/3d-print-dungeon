@@ -1,5 +1,5 @@
 import { useRoutes, Navigate } from "react-router-dom";
-import { ROUTES } from "./config/routeConstants";
+import { ROUTES } from "./constants/routeConstants";
 
 import { publicRoutes } from "./routes/publicRoutes";
 import { exploreRoutes } from "./routes/exploreRoutes";
