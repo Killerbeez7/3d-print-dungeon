@@ -1,5 +1,5 @@
-// src/components/shared/SequentialImage.jsx
 import { memo } from "react";
+import PropTypes from "prop-types";
 
 export const SequentialImage = memo(function SequentialImage({
     src,
@@ -9,8 +9,9 @@ export const SequentialImage = memo(function SequentialImage({
     className = "",
     onLoad,
     placeholderStyle = {},
+    width,
+    height,
 }) {
-    // Only images with index ≤ loadIndex get a real src
     const shouldLoad = index <= loadIndex;
 
     return (
@@ -18,8 +19,8 @@ export const SequentialImage = memo(function SequentialImage({
             style={{
                 position: "relative",
                 width: "100%",
-                paddingBottom: "100%", // force square aspect
-                background: "#333", // or your bg-surface
+                paddingBottom: "100%",
+                background: "#333",
                 ...(shouldLoad ? {} : placeholderStyle),
             }}
         >
@@ -28,8 +29,10 @@ export const SequentialImage = memo(function SequentialImage({
                     className={`${className} absolute inset-0 w-full h-full object-cover`}
                     src={src}
                     alt={alt}
+                    width={width}
+                    height={height}
                     onLoad={() => {
-                        // Only fire once, for the image that just turned live
+                        
                         if (index === loadIndex) onLoad();
                     }}
                 />
@@ -37,3 +40,15 @@ export const SequentialImage = memo(function SequentialImage({
         </div>
     );
 });
+
+SequentialImage.propTypes = {
+    src: PropTypes.string.isRequired,
+    alt: PropTypes.string.isRequired,
+    index: PropTypes.number.isRequired,
+    loadIndex: PropTypes.number.isRequired,
+    className: PropTypes.string,
+    onLoad: PropTypes.func,
+    placeholderStyle: PropTypes.object,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+};

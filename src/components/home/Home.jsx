@@ -72,15 +72,14 @@ export const Home = () => {
     const addThumb = (full) => {
         if (!full) return STATIC_ASSETS.PLACEHOLDER_IMAGE;
 
-        // Remove any old query string
         const [base] = full.split("?");
         // Make the 400 × 400 WEBP + add ?alt=media
         const dot = base.lastIndexOf(".");
-        if (dot === -1) return full; // safety
+        if (dot === -1) return full;
         return `${base.slice(0, dot)}_400x400.webp?alt=media`;
     };
 
-    // map to “artwork” shape
+    // map to "artwork" shape
     const artworks = raw.map((m) => {
         const thumbUrl = addThumb(m.renderPrimaryUrl);
 
@@ -185,13 +184,17 @@ export const Home = () => {
                         {filtered.map((art, idx) => (
                             <Link key={art.id} to={`/model/${art.id}`}>
                                 <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
-                                    <SequentialImage
-                                        index={idx}
-                                        loadIndex={loadIndex}
-                                        src={art.thumbnailUrl}
-                                        alt={art.title}
-                                        onLoad={bumpIndex}
-                                    />
+                                    <div className="aspect-square min-h-[1px]">
+                                        <SequentialImage
+                                            index={idx}
+                                            loadIndex={loadIndex}
+                                            src={art.thumbnailUrl}
+                                            alt={art.title}
+                                            onLoad={bumpIndex}
+                                            width={400}
+                                            height={400}
+                                        />
+                                    </div>
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end opacity-0 hover:opacity-100 transition-opacity rounded-md">
                                         <div className="text-white m-2">
                                             <h4 className="font-semibold">{art.title}</h4>
