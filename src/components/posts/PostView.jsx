@@ -4,6 +4,7 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { useState } from "react";
 import PropTypes from "prop-types";
+import { Spinner } from "@/components/shared/Spinner";
 
 export const PostView = ({ postId }) => {
     const { trackView } = useViewTracker();
@@ -29,7 +30,7 @@ export const PostView = ({ postId }) => {
     }, [postId]);
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return <Spinner size={24} />;
     }
 
     return (

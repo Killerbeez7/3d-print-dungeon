@@ -5,6 +5,7 @@ import { formatDistanceToNow } from "date-fns";
 import { FaComment, FaEye, FaTag, FaUser, FaCalendar } from "react-icons/fa";
 import Skeleton from "@/components/shared/Skeleton";
 import PropTypes from "prop-types";
+import { Spinner } from "@/components/shared/Spinner";
 
 export const ThreadList = ({
     categoryId,
@@ -183,7 +184,7 @@ export const ThreadList = ({
                         disabled={loadingMore}
                         className="px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] disabled:bg-[var(--accent-hover)] disabled:cursor-not-allowed transition"
                     >
-                        {loadingMore ? "Loading..." : "Load More"}
+                        {loadingMore ? <Spinner size={12} /> : "Load More"}
                     </button>
                 </div>
             )}

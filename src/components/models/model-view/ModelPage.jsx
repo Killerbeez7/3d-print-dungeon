@@ -12,6 +12,7 @@ import { ModelViewer } from "./ModelViewer";
 import { ModelSidebar } from "./ModelSidebar";
 import { CommentsProvider } from "@/providers/commentsProvider";
 import { ModelComments } from "./ModelComments";
+import { Spinner } from "@/components/shared/Spinner";
 
 export const ModelPage = () => {
     const { id } = useParams();
@@ -41,7 +42,9 @@ export const ModelPage = () => {
 
     if (loading)
         return (
-            <div className="min-h-screen flex items-center justify-center">Loading…</div>
+            <div className="min-h-screen flex items-center justify-center">
+                <Spinner size={24} />
+            </div>
         );
     if (!model)
         return (
