@@ -2,6 +2,8 @@ import { useRef, useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { createAdvancedModel } from "@/services/modelsService";
 import { finalConvertFileToGLB } from "@/utils/models/converter";
+import PropTypes from "prop-types";
+
 // components
 import { FilesUpload } from "./sections/FilesUpload";
 import { InfoForm } from "./sections/InfoForm";
@@ -279,3 +281,9 @@ function StepIndicator({ stepNumber, label, currentStep }) {
         </div>
     );
 }
+
+StepIndicator.propTypes = {
+    stepNumber: PropTypes.number.isRequired,
+    label: PropTypes.string.isRequired,
+    currentStep: PropTypes.number.isRequired,
+};
