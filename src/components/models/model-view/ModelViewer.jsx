@@ -81,7 +81,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
     const autoHideTimerRef = useRef(null);
 
     const fallback3DUrl = model?.convertedFileUrl || model?.originalFileUrl || "";
-    const renderFileUrls = model?.renderFileUrls || [];
+    const renderExtraUrls = model?.renderExtraUrls || [];
     const posterUrl = model?.posterUrl;
 
     //handlers
@@ -171,7 +171,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
 
     const handlePrevious = () => {
         if (selectedRenderIndex === -1) {
-            setSelectedRenderIndex(renderFileUrls.length - 1);
+            setSelectedRenderIndex(renderExtraUrls.length - 1);
         } else if (selectedRenderIndex === 0) {
             setSelectedRenderIndex(-1);
         } else {
@@ -182,7 +182,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
     const handleNext = () => {
         if (selectedRenderIndex === -1) {
             setSelectedRenderIndex(0);
-        } else if (selectedRenderIndex === renderFileUrls.length - 1) {
+        } else if (selectedRenderIndex === renderExtraUrls.length - 1) {
             setSelectedRenderIndex(-1);
         } else {
             setSelectedRenderIndex(selectedRenderIndex + 1);
@@ -331,13 +331,13 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                     ></model-viewer>
 
                     {/* Navigation Arrows and Dots */}
-                    {renderFileUrls.length > 0 && (
+                    {renderExtraUrls.length > 0 && (
                         <div>
                             <NavigationArrow direction="left" onClick={handlePrevious} />
                             <NavigationArrow direction="right" onClick={handleNext} />
                             <NavigationDots
                                 selectedIndex={selectedRenderIndex}
-                                totalItems={renderFileUrls.length}
+                                totalItems={renderExtraUrls.length}
                                 onSelect={setSelectedRenderIndex}
                             />
 
@@ -559,20 +559,20 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                 }`}
             >
                 <LazyImage
-                    src={renderFileUrls[selectedRenderIndex]}
+                    src={renderExtraUrls[selectedRenderIndex]}
                     alt={`Render ${selectedRenderIndex + 1}`}
                     loading="lazy"
                     className="w-full h-full object-contain rounded-md shadow-lg"
                 />
 
                 {/* Navigation Controls */}
-                {renderFileUrls.length > 0 && (
+                {renderExtraUrls.length > 0 && (
                     <div className="invisible md:visible">
                         <NavigationArrow direction="left" onClick={handlePrevious} />
                         <NavigationArrow direction="right" onClick={handleNext} />
                         <NavigationDots
                             selectedIndex={selectedRenderIndex}
-                            totalItems={renderFileUrls.length}
+                            totalItems={renderExtraUrls.length}
                             onSelect={setSelectedRenderIndex}
                         />
                     </div>
@@ -614,7 +614,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                             </div>
                         </div>
 
-                        {renderFileUrls.map((url, idx) => (
+                        {renderExtraUrls.map((url, idx) => (
                             <div
                                 key={idx}
                                 onClick={() => setSelectedRenderIndex(idx)}
@@ -644,7 +644,7 @@ ModelViewer.propTypes = {
         name: PropTypes.string,
         convertedFileUrl: PropTypes.string,
         originalFileUrl: PropTypes.string,
-        renderFileUrls: PropTypes.arrayOf(PropTypes.string),
+        renderExtraUrls: PropTypes.arrayOf(PropTypes.string),
         posterUrl: PropTypes.string,
     }).isRequired,
     selectedRenderIndex: PropTypes.number.isRequired,
