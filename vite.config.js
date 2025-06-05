@@ -36,5 +36,10 @@ export default defineConfig({
         },
         assetsDir: "assets",
         copyPublicDir: true,
+        sourcemap: false,
+        minify: 'terser',
     },
+    optimizeDeps: {
+        exclude: ['@firebase/firestore']
+    }
 });
