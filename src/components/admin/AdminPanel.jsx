@@ -9,6 +9,7 @@ import { Scripts } from "./tabs/Scripts";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "react-router-dom";
 import { isAdmin } from "@/services/adminService";
+import { Spinner } from "@/components/shared/Spinner";
 
 function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
@@ -39,7 +40,7 @@ export const AdminPanel = () => {
     }, [currentUser]);
 
     if (loading) {
-        return <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">Loading...</div>;
+        return <Spinner size={24} />;
     }
 
     // Redirect if user is not logged in or not an admin
