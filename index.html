@@ -1,27 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="/src/styles.css" rel="stylesheet">
-    <script>
-      (function() {
-        // Check the localStorage for a saved theme, or fall back to the system preference.
-        const savedTheme = localStorage.getItem("theme");
-        const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        
-        // Set theme to system if no saved theme exists or if it's set to 'system'.
-        const theme = savedTheme === "system" ? systemTheme : savedTheme || systemTheme;
-        
-        // Apply the theme to the document element.
-        document.documentElement.setAttribute("data-theme", theme);
-      })();
-    </script>
-    <title>3D Print Dungeon</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Michroma&display=swap"
+            rel="stylesheet"
+        />
+
+        <link href="/src/styles.css" rel="stylesheet" />
+        <script>
+            (function () {
+                // Check the localStorage for a saved theme, or fall back to the system preference.
+                const savedTheme = localStorage.getItem("theme");
+                const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+                    .matches
+                    ? "dark"
+                    : "light";
+
+                // Set theme to system if no saved theme exists or if it's set to 'system'.
+                const theme =
+                    savedTheme === "system" ? systemTheme : savedTheme || systemTheme;
+
+                // Apply the theme to the document element.
+                document.documentElement.setAttribute("data-theme", theme);
+            })();
+        </script>
+        <title>3D Print Dungeon</title>
+    </head>
+    <body>
+        <div id="root"></div>
+        <script type="module" src="/src/main.jsx"></script>
+    </body>
 </html>
