@@ -6,6 +6,7 @@ import { ArtworksTab } from "./ArtworksTab";
 import { ArtistsTab } from "./ArtistsTab";
 import { useModels } from "@/hooks/useModels";
 import { useSearch } from "@/hooks/useSearch";
+import { Spinner } from "@/components/shared/Spinner";
 
 export function DynamicSearch() {
     const { activeTab, setActiveTab } = useSearch();
@@ -93,7 +94,7 @@ export function DynamicSearch() {
             </div>
             {/* Render search results */}
             {modelsLoading ? (
-                <p className="text-sm text-txt-secondary mb-4">Loading...</p>
+                <Spinner size={24} />
             ) : activeTab === "artworks" ? (
                 <ArtworksTab searchTerm={debouncedQuery} models={models} />
             ) : noSearchNoFilters ? (
