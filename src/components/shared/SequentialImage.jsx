@@ -26,7 +26,7 @@ export const SequentialImage = memo(function SequentialImage({
         >
             {shouldLoad && (
                 <img
-                    className={`${className} absolute inset-0 w-full h-full object-cover`}
+                    className={`${className} absolute inset-0 w-full h-full object-cover aspect-ratio: 1 / 1`}
                     src={src}
                     alt={alt}
                     width={width}

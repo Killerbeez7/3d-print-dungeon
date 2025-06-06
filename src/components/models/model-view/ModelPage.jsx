@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams } from "react-router-dom";
 import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "@/config/firebase";
@@ -8,7 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { useModal } from "@/hooks/useModal";
 import { useViewTracker } from "@/services/viewService";
 //components
-import { ModelViewer } from "./ModelViewer";
+// import { ModelViewer } from "./ModelViewer"; // Keep commented out or remove
+const ModelViewer = lazy(() => import("./ModelViewer").then(module => ({ default: module.ModelViewer }))); // Correct lazy import for named export
 import { ModelSidebar } from "./ModelSidebar";
 import { CommentsProvider } from "@/providers/commentsProvider";
 import { ModelComments } from "./ModelComments";
@@ -56,11 +57,20 @@ export const ModelPage = () => {
     return (
         <div>
             <div className="text-txt-primary flex flex-col lg:flex-row gap-4 p-4 lg:p-6">
-                <ModelViewer
-                    model={model}
-                    selectedRenderIndex={selectedRenderIndex}
-                    setSelectedRenderIndex={setSelectedRenderIndex}
-                />
+                {/* VIEWER  --------------------------------------------------- */}
+                <Suspense
+                    fallback={
+                        <div className="relative w-full h-[40vh] lg:h-[calc(80vh-120px)] bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center contain-layout content-visibility-auto">
+                            <Spinner size={32} />
+                        </div>
+                    }
+                >
+                    <ModelViewer
+                        model={model}
+                        selectedRenderIndex={selectedRenderIndex}
+                        setSelectedRenderIndex={setSelectedRenderIndex}
+                    />
+                </Suspense>
 
                 <ModelSidebar
                     model={model}
@@ -72,6 +82,7 @@ export const ModelPage = () => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-6">
+                <h2 className="text-2xl text-txt-primary mb-4">Comments</h2>
                 <CommentsProvider modelId={model.id}>
                     <ModelComments
                         openAuthModal={(p) => open({ mode: p?.mode ?? "login" })}
