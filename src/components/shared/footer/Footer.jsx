@@ -10,11 +10,11 @@ export const Footer = () => {
     const handleSubscribe = (e) => {
         e.preventDefault();
         setIsModalOpen(true);
-        setEmail(""); // Clear the email input
+        setEmail("");
     };
 
     return (
-        <footer className="text-txt-secondary py-10 divider-top z-10">
+        <footer className="text-txt-secondary py-10 divider-top z-10 h-[160px] md:h-auto ">
             <div className="container mx-auto px-6 sm:px-8">
                 {/* Footer Top Section */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center sm:text-left">
@@ -24,9 +24,8 @@ export const Footer = () => {
                             3D Print Dungeon
                         </h3>
                         <p className="text-sm mt-2">
-                            Your one-stop shop for all things 3D printing.
-                            Innovating your designs with the power of 3D
-                            printing technology.
+                            Your one-stop shop for all things 3D printing. Innovating your
+                            designs with the power of 3D printing technology.
                         </p>
                     </div>
 
@@ -39,28 +38,32 @@ export const Footer = () => {
                             <li>
                                 <a
                                     href="#"
-                                    className="block hover:text-accent-hover transition-colors duration-300">
+                                    className="block hover:text-accent-hover transition-colors duration-300"
+                                >
                                     About Us
                                 </a>
                             </li>
                             <li>
                                 <a
                                     href="#"
-                                    className="block hover:text-accent-hover transition-colors duration-300">
+                                    className="block hover:text-accent-hover transition-colors duration-300"
+                                >
                                     Contact
                                 </a>
                             </li>
                             <li>
                                 <a
                                     href="#"
-                                    className="block hover:text-accent-hover transition-colors duration-300">
+                                    className="block hover:text-accent-hover transition-colors duration-300"
+                                >
                                     Privacy Policy
                                 </a>
                             </li>
                             <li>
                                 <a
                                     href="#"
-                                    className="block hover:text-accent-hover transition-colors duration-300">
+                                    className="block hover:text-accent-hover transition-colors duration-300"
+                                >
                                     Terms & Conditions
                                 </a>
                             </li>
@@ -69,16 +72,15 @@ export const Footer = () => {
 
                     {/* Contact Information */}
                     <div className="mb-6">
-                        <h3 className="text font-semibold text-txt-primary">
-                            Contact
-                        </h3>
+                        <h3 className="text font-semibold text-txt-primary">Contact</h3>
                         <ul className="mt-2 text-sm">
                             <li>123 3D Print St., Tech City, TX 75001</li>
                             <li>
                                 Email:{" "}
                                 <a
                                     href="mailto:contact@3dprintdungeon.com"
-                                    className="hover:text-accent-hover">
+                                    className="hover:text-accent-hover"
+                                >
                                     contact@3dprintdungeon.com
                                 </a>
                             </li>
@@ -88,32 +90,34 @@ export const Footer = () => {
 
                     {/* Social Media */}
                     <div className="mb-6">
-                        <h3 className="font-semibold text-txt-primary">
-                            Follow Us
-                        </h3>
+                        <h3 className="font-semibold text-txt-primary">Follow Us</h3>
                         <div className="flex justify-center sm:justify-start space-x-4 text-xl mt-2">
                             <a
                                 href="#"
                                 className="hover:text-accent-hover transition-colors duration-300"
-                                aria-label="Facebook">
+                                aria-label="Facebook"
+                            >
                                 <FaFacebook size={24} />
                             </a>
                             <a
                                 href="#"
                                 className="hover:text-accent-hover transition-colors duration-300"
-                                aria-label="Twitter">
+                                aria-label="Twitter"
+                            >
                                 <FaTwitter size={24} />
                             </a>
                             <a
                                 href="#"
                                 className="hover:text-accent-hover transition-colors duration-300"
-                                aria-label="Instagram">
+                                aria-label="Instagram"
+                            >
                                 <FaInstagram size={24} />
                             </a>
                             <a
                                 href="#"
                                 className="hover:text-accent-hover transition-colors duration-300"
-                                aria-label="LinkedIn">
+                                aria-label="LinkedIn"
+                            >
                                 <FaLinkedin size={24} />
                             </a>
                         </div>
@@ -126,12 +130,12 @@ export const Footer = () => {
                         Get the Latest Model Drops
                     </h3>
                     <p className="mt-2">
-                        Raid the 3D Print Dungeon: News, Models & Hidden
-                        Treasures Await!
+                        Raid the 3D Print Dungeon: News, Models & Hidden Treasures Await!
                     </p>
                     <form
                         className="mt-4 flex flex-col sm:flex-row justify-center items-center gap-4"
-                        onSubmit={handleSubscribe}>
+                        onSubmit={handleSubscribe}
+                    >
                         <input
                             type="email"
                             placeholder="Enter your email"
@@ -142,7 +146,8 @@ export const Footer = () => {
                         />
                         <button
                             type="submit"
-                            className="px-6 py-2 cta-button w-2/3 sm:w-auto">
+                            className="px-6 py-2 cta-button w-2/3 sm:w-auto"
+                        >
                             <AiOutlineMail className="inline mr-2 text-xl" />
                             Subscribe
                         </button>
@@ -154,7 +159,6 @@ export const Footer = () => {
                     <p>&copy; 2025 3D Print Dungeon — All rights reserved</p>
                 </div>
             </div>
-
             <AlertModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
