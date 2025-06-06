@@ -3,11 +3,12 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { fileURLToPath } from "url";
+import compression from "vite-plugin-compression"; // gzip+br
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), compression({ algorithm: "brotliCompress" })],
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
@@ -16,30 +17,15 @@ export default defineConfig({
     base: "/",
     build: {
         chunkSizeWarningLimit: 1500,
+        assetsInlineLimit: 4096,
         rollupOptions: {
             output: {
-                manualChunks(id) {
-                    if (id.includes("@google/model-viewer")) {
-                        return "model-viewer";
-                    }
-                    if (id.includes("three")) {
-                        return "three-js";
-                    }
-                    if (id.includes("firebase")) {
-                        return "firebase";
-                    }
-                    if (id.includes("node_modules")) {
-                        return "vendor";
-                    }
-                },
+                manualChunks: undefined, // leave Vite defaults
             },
         },
         assetsDir: "assets",
         copyPublicDir: true,
         sourcemap: false,
         minify: 'terser',
-    },
-    optimizeDeps: {
-        exclude: ['@firebase/firestore']
     }
 });
