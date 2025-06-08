@@ -111,13 +111,6 @@
             "collectionGroup": "forumThreads",
             "queryScope": "COLLECTION",
             "fields": [
-                { "fieldPath": "lastActivity", "order": "DESCENDING" }
-            ]
-        },
-        {
-            "collectionGroup": "forumThreads",
-            "queryScope": "COLLECTION",
-            "fields": [
                 { "fieldPath": "authorId", "order": "ASCENDING" },
                 { "fieldPath": "createdAt", "order": "DESCENDING" }
             ]
