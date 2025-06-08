@@ -4,135 +4,128 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check if user is signed in
-    function isSignedIn() {
-      return request.auth != null;
+    // ------------- Helpers --------------
+    function isSignedIn()   { return request.auth != null; }
+    function isAdmin()      { return request.auth.token.admin  == true; }
+    function isSuperAdmin() { return request.auth.token.super  == true; }
+
+    // -------------- Admins List--------------
+    match /admins/{uid} {
+    allow read : if isAdmin();
+    allow write: if isSuperAdmin(); 
     }
 
-    // Helper function to check if user is super admin
-    function isSuperAdmin() {
-      return request.auth != null && 
-        (request.auth.uid == 'yhxP3gGtqSUFkM6FUdDQrqZD5lm2' || // Plamen
-         request.auth.uid == '11wWKqMO3pQFaL48zciLrnMkFzd2');  // Vlado
-    }
-
-    // Helper function to check if user is admin
-    function isAdmin() {
-      return request.auth != null && 
-        (isSuperAdmin() || exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
-    }
-
-    // Admins collection - readable by any signed in user
-    match /admins/{userId} {
-      allow read: if isSignedIn();  // Allow any signed in user to check admin status
-      allow write: if isSuperAdmin();
-    }
-
-    // Users collection
+    // -------------- Users --------------
     match /users/{userId} {
-      allow read: if true;  // Public profiles
-      allow write: if isSignedIn() && 
-        (request.auth.uid == userId || isAdmin() || isSuperAdmin());
+      allow read: if true;
+      allow create: if request.auth.uid == userId;
+      // Allow user to update their own profile fields, but NOT 'roles'
+      allow update: if request.auth.uid == userId
+        && !('roles' in request.resource.data.diff(resource.data).affectedKeys())
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'displayName', 'photoURL', 'bio', 'city', 'country',
+          'coverURL',  'email', 'searchableName', 'socials',
+          'uploads', 'upscalePhotoURL', 'createdAt'
+        ]);
+      // Only admin or super admin can update roles field
+      allow update: if (isAdmin() || isSuperAdmin())
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['roles']);
+      allow delete: if false;
     }
 
-    // Models collection
+
+    // -------------- Models --------------
     match /models/{modelId} {
-      allow read: if true;  // Public models
+      allow read:   if true;
       allow create: if isSignedIn();
-      allow update: if isSignedIn() && 
-        (resource.data.uploaderId == request.auth.uid || isAdmin() || isSuperAdmin());
-      allow delete: if isSignedIn() && 
-        (resource.data.uploaderId == request.auth.uid || isAdmin() || isSuperAdmin());
+      allow update, delete: if isSignedIn()
+        && (resource.data.uploaderId == request.auth.uid || isAdmin());
     }
-
-    // Likes collection
+    
+    // -------------- Likes --------------
     match /likes/{likeId} {
       allow read: if true;
       allow write: if isSignedIn();
     }
 
-    // Comments collection
+    // -------------- Comments --------------
     match /comments/{commentId} {
       allow read: if true;
       allow create: if isSignedIn();
-      allow update, delete: if isSignedIn() && 
-        (resource.data.userId == request.auth.uid || isAdmin() || isSuperAdmin());
+      allow update, delete: if isSignedIn() 
+        && (resource.data.userId == request.auth.uid || isAdmin());
     }
 
-    // Site Settings collection
-    match /settings/{settingId} {
-      allow read: if true;  // Allow everyone to read settings
-      allow write: if isAdmin() || isSuperAdmin();
+    // -------------- Site Settings --------------
+    match /settings/{doc} {
+      allow read: if true;
+      allow write: if isAdmin();
     }
 
-    // Reports collection
+    // -------------- Reports --------------
     match /reports/{reportId} {
-      allow read: if isAdmin() || isSuperAdmin();
-      allow create: if isSignedIn();  // Allow users to create reports
-      allow update, delete: if isAdmin() || isSuperAdmin();
+      allow read: if isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
     }
 
-    // Analytics collection and subcollections
+    // -------------- Analytics --------------
     match /analytics/{analyticsId} {
-      allow read, write: if isAdmin() || isSuperAdmin();
+      allow read, write: if isAdmin();
     }
     match /analytics/{analyticsId}/{subcollection}/{subDocId} {
-      allow read, write: if isAdmin() || isSuperAdmin();
+      allow read, write: if isAdmin();
     }
 
 
-    // ViewTrackers collection
+    // -------------- ViewTrackers --------------
     match /viewTrackers/{viewId} {
-      allow read: if true;  // Allow public read for view counts
-      allow create: if true;  // Allow both authenticated and anonymous users
-      allow update: if isSignedIn();  // Only signed-in users can update
-      allow delete: if isAdmin() || isSuperAdmin();  // Only admins can delete
+      allow read: if true;
+      allow create: if true;
+      allow update: if isSignedIn();
+      allow delete: if isAdmin();
     }
 
-    // UserViews collection
+    // -------------- UserViews --------------
     match /userViews/{viewId} {
       allow read: if true;
       allow create, update: if isSignedIn();
-      allow delete: if isAdmin() || isSuperAdmin();
+      allow delete: if isAdmin();
     }
     
-    // FORUM COLLECTIONS
 
-    // Forum Categories
+    // -------------- Forum --------------
     match /forumCategories/{categoryId} {
       allow read: if true;  // Public categories
-      allow create, update, delete: if isAdmin() || isSuperAdmin();
+      allow create, update, delete: if isAdmin();
     }
 
-    // Forum Threads
     match /forumThreads/{threadId} {
       allow read: if true;  // Public threads
       allow create: if isSignedIn();
       // Only thread author, moderators or admins can update/delete
       allow update, delete: if isSignedIn() && 
-        (resource.data.authorId == request.auth.uid || isAdmin() || isSuperAdmin());
+        (resource.data.authorId == request.auth.uid || isAdmin());
     }
 
-    // Forum Replies
     match /forumReplies/{replyId} {
       allow read: if true;  // Public replies
       allow create: if isSignedIn();
       // Only reply author, moderators or admins can update/delete
       allow update, delete: if isSignedIn() && 
-        (resource.data.authorId == request.auth.uid || isAdmin() || isSuperAdmin());
+        (resource.data.authorId == request.auth.uid || isAdmin());
     }
 
-    // Thread Likes
     match /forumThreadLikes/{likeId} {
       allow read: if true;
       allow create, delete: if isSignedIn();
     }
 
-    // Forum User Profiles (Forum-specific user data)
     match /forumUserProfiles/{userId} {
       allow read: if true;
       allow write: if isSignedIn() && 
-        (request.auth.uid == userId || isAdmin() || isSuperAdmin());
+        (request.auth.uid == userId || isAdmin());
     }
   }
 }
+
