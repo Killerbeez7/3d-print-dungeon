@@ -1,78 +1,48 @@
-import { doc, setDoc, getDoc, deleteDoc } from "firebase/firestore";
-import { db } from "../config/firebase";
+// src/services/adminService.js
+import { doc, getDoc } from "firebase/firestore";
+import { httpsCallable } from "firebase/functions";
+import { db, functions } from "@/config/firebase";
+import { refreshIdToken } from "@/utils/auth/refreshClaims";
 
-// Cache admin status to reduce database reads
-const adminCache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+/* ── small in-memory cache just like before ─────────────────────────── */
+const adminCache = new Map(); // uid → { ok, t }
+const CACHE_TTL = 5 * 60 * 1_000; // 5 minutes
 
-// Add a user as admin
-export const addAdmin = async (userId, userEmail) => {
+export async function isAdmin(uid) {
+    if (!uid) return false;
+
+    const cached = adminCache.get(uid);
+    if (cached && Date.now() - cached.t < CACHE_TTL) return cached.ok;
+
+    const snap = await getDoc(doc(db, "users", uid));
+    const ok = snap.exists() && (snap.data().roles || []).includes("admin");
+    adminCache.set(uid, { ok, t: Date.now() });
+    return ok;
+}
+
+/* ── always build the Functions *after* Auth is initialised ─────────── */
+const setUserRole = httpsCallable(functions, "setUserRole");
+
+/* ── wrappers that guarantee a fresh token on every call ────────────── */
+async function callWithFreshToken(payload) {
     try {
-        const adminRef = doc(db, "admins", userId);
-        await setDoc(adminRef, {
-            email: userEmail,
-            addedAt: new Date(),
-            role: "admin"
-        });
-        // Update cache
-        adminCache.set(userId, {
-            status: true,
-            timestamp: Date.now()
-        });
-        return true;
-    } catch (error) {
-        console.error("Error adding admin:", error);
-        throw error;
-    }
-};
+        // First refresh token and get claims
+        const claims = await refreshIdToken();
+        console.debug("Current claims before operation:", claims);
 
-// Check if a user is admin
-export const isAdmin = async (userId) => {
-    if (!userId) return false;
-
-    // Check cache first
-    const cached = adminCache.get(userId);
-    if (cached && (Date.now() - cached.timestamp) < CACHE_DURATION) {
-        return cached.status;
-    }
-
-    try {
-        const adminRef = doc(db, "admins", userId);
-        const adminDoc = await getDoc(adminRef);
-        const isUserAdmin = adminDoc.exists();
-        
-        // Update cache with timestamp
-        adminCache.set(userId, {
-            status: isUserAdmin,
-            timestamp: Date.now()
-        });
-        
-        return isUserAdmin;
-    } catch (error) {
-        console.error("Error checking admin status:", error);
-        // If there's a cached value, use it even if expired
-        if (cached) {
-            return cached.status;
+        // Verify we have super admin
+        if (!claims.super) {
+            throw new Error("Only super-admins can change user roles");
         }
-        return false;
-    }
-};
 
-// Remove admin status
-export const removeAdmin = async (userId) => {
-    try {
-        const adminRef = doc(db, "admins", userId);
-        await deleteDoc(adminRef);
-        // Clear from cache
-        adminCache.delete(userId);
-        return true;
+        // Call the cloud function
+        return await setUserRole(payload);
     } catch (error) {
-        console.error("Error removing admin:", error);
+        console.error("Operation failed:", error);
         throw error;
     }
-};
+}
 
-// Clear admin cache
-export const clearAdminCache = () => {
-    adminCache.clear();
-}; 
+export const grantRole = (uid, role) => callWithFreshToken({ uid, role, enable: true });
+export const revokeRole = (uid, role) => callWithFreshToken({ uid, role, enable: false });
+export { callWithFreshToken as _debugForceRefresh }; // optional helper

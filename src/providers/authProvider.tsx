@@ -1,8 +1,8 @@
 import { useEffect, useState, useCallback } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
+import { onAuthStateChanged, User, getIdTokenResult } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { AuthContext } from "../contexts/authContext";
-import { RawUserData  } from "../types/auth";
+import { RawUserData, CustomClaims } from "../types/auth";
 import { MaintenanceStatus, UserId } from "../types/maintenance";
 import {
     signUpWithEmail,
@@ -19,12 +19,13 @@ import {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const [userData, setUserData] = useState<RawUserData  | null>(null);
+    const [userData, setUserData] = useState<RawUserData | null>(null);
     const [loading, setLoading] = useState(true);
-    const [authError, setAuthError] = useState<string | null>(null);  
+    const [authError, setAuthError] = useState<string | null>(null);
     const [maintenanceMode, setMaintenanceMode] = useState(false);
     const [maintenanceMessage, setMaintenanceMessage] = useState<string | null>(null);
     const [maintenanceEndTime, setMaintenanceEndTime] = useState<Date | null>(null);
+    const [claims, setClaims] = useState<CustomClaims | null>(null);
 
     const handleAuthError = (error: unknown, provider: string) => {
         const errorMessage =
@@ -51,15 +52,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
-    const fetchUserData = useCallback(async (): Promise<void> => {
+    const fetchUserData = useCallback(async () => {
         if (!currentUser) {
             setUserData(null);
+            setClaims(null);
             return;
         }
 
-        getUserFromDatabase(currentUser.uid, (data: RawUserData | null) => {
-            setUserData(data);
-        });
+        try {
+            // First get the token result to check claims
+            const idTok = await getIdTokenResult(currentUser, true);
+            console.debug("Current token claims:", idTok.claims);
+            setClaims(idTok.claims as CustomClaims);
+
+            // Get Firestore data
+            getUserFromDatabase(currentUser.uid, (data: RawUserData | null) => {
+                // Get roles from claims
+                const claimRoles = Object.entries(idTok.claims)
+                    .filter(([k, v]) => v === true && ["super", "admin", "moderator"].includes(k))
+                    .map(([k]) => k);
+
+                // Merge with Firestore roles
+                const mergedRoles = Array.from(
+                    new Set([...(data?.roles || []), ...claimRoles])
+                );
+
+                setUserData({ 
+                    ...(data || {}), 
+                    roles: mergedRoles,
+                    isSuper: idTok.claims.super === true
+                } as RawUserData);
+            });
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+            handleAuthError(error, "data fetch");
+        }
     }, [currentUser]);
 
     const handleEmailSignUp = async (email: string, password: string) => {
@@ -97,6 +124,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             await signOut();
             setCurrentUser(null);
             setUserData(null);
+            setClaims(null);
         } catch (error) {
             handleAuthError(error, "Sign-out");
         }
@@ -110,6 +138,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             } else {
                 setCurrentUser(null);
                 setUserData(null);
+                setClaims(null);
             }
             setLoading(false);
         });
@@ -141,11 +170,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }, [currentUser?.uid]);
 
     const roles = userData?.roles ?? [];
+    const isAdmin = roles.includes("admin");
+    const isSuper = claims?.super === true;
+    
     const value = {
         currentUser,
         userData,
         roles,
-        isAdmin: roles.includes("admin"),
+        isAdmin,
+        isSuper,
+        claims,
         authError,
         maintenanceMode,
         maintenanceMessage,
@@ -159,7 +193,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         changePassword,
         fetchUserData,
         handleAuthError,
-        // openAuthModal
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

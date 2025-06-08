@@ -1,215 +1,224 @@
 import { useState, useEffect } from "react";
-import { collection, query, getDocs, updateDoc, doc } from "firebase/firestore";
-import { db } from "../../../config/firebase";
+import { collection, query, getDocs } from "firebase/firestore";
+import { db } from "@/config/firebase";
+import { grantRole, revokeRole } from "@/services/adminService";
+
 import { MdEdit, MdCheck, MdClose } from "react-icons/md";
 
+const ALL_ROLES = ["admin", "moderator", "contributor", "premium"];
+
 export const UserManagement = () => {
-    const [users, setUsers] = useState([]);
+    /* ─────────────── internal state ─────────────── */
+    const [users, setUsers] = useState([]); // table rows
     const [loading, setLoading] = useState(true);
-    const [editingUser, setEditingUser] = useState(null);
+    const [editingUser, setEditingUser] = useState(null); // {id, roles:[]}
     const [searchQuery, setSearchQuery] = useState("");
 
-    // Fetch users from Firestore
+    /* ─────────────── initial load ─────────────── */
     useEffect(() => {
-        const fetchUsers = async () => {
+        (async () => {
             try {
-                const usersRef = collection(db, "users");
-                const q = query(usersRef);
-                const querySnapshot = await getDocs(q);
-                
-                const usersData = querySnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-                
-                setUsers(usersData);
-            } catch (error) {
-                console.error("Error fetching users:", error);
+                const q = query(collection(db, "users")); // TODO: add pagination
+                const docs = await getDocs(q);
+                const result = docs.docs.map((d) => ({ id: d.id, ...d.data() }));
+                setUsers(result);
+            } catch (err) {
+                console.error("Fetch users failed", err);
             } finally {
                 setLoading(false);
             }
-        };
-
-        fetchUsers();
+        })();
     }, []);
 
-    const handleEditUser = (user) => {
-        setEditingUser({
-            ...user,
-            roles: user.roles || [],
-            isAdmin: user.isAdmin || false
+    /* ─────────────── edit helpers ─────────────── */
+    const startEdit = (u) => setEditingUser({ id: u.id, roles: [...(u.roles || [])] });
+
+    const toggleRole = (role) =>
+        setEditingUser((prev) => {
+            if (!prev) return prev;
+            const has = prev.roles.includes(role);
+            return {
+                ...prev,
+                roles: has ? prev.roles.filter((r) => r !== role) : [...prev.roles, role],
+            };
         });
-    };
 
-    const handleSaveUser = async () => {
+    /* ─────────────── save / persist ─────────────── */
+    const handleSave = async () => {
+        if (!editingUser) return;
+
+        const original = users.find((u) => u.id === editingUser.id) || { roles: [] };
+        const origRoles = original.roles || [];
+        const newRoles = editingUser.roles || [];
+
         try {
-            const userRef = doc(db, "users", editingUser.id);
-            await updateDoc(userRef, {
-                roles: editingUser.roles,
-                isAdmin: editingUser.isAdmin
-            });
+            // Find roles to add and remove
+            const toAdd = newRoles.filter((r) => !origRoles.includes(r));
+            const toRemove = origRoles.filter((r) => !newRoles.includes(r));
 
-            setUsers(users.map(user => 
-                user.id === editingUser.id 
-                    ? { ...user, roles: editingUser.roles, isAdmin: editingUser.isAdmin }
-                    : user
-            ));
+            // Call cloud function for each change
+            for (const role of toAdd) {
+                try {
+                    await grantRole(editingUser.id, role);
+                    console.debug(`Successfully granted ${role} to ${editingUser.id}`);
+                } catch (err) {
+                    console.error(`Failed to grant ${role}:`, err);
+                    throw err;
+                }
+            }
+            
+            for (const role of toRemove) {
+                try {
+                    await revokeRole(editingUser.id, role);
+                    console.debug(`Successfully revoked ${role} from ${editingUser.id}`);
+                } catch (err) {
+                    console.error(`Failed to revoke ${role}:`, err);
+                    throw err;
+                }
+            }
 
+            // Update local list
+            setUsers((prev) =>
+                prev.map((u) =>
+                    u.id === editingUser.id ? { ...u, roles: editingUser.roles } : u
+                )
+            );
+            
+            // Clear edit state
             setEditingUser(null);
-        } catch (error) {
-            console.error("Error updating user:", error);
+        } catch (err) {
+            console.error("Failed to save user roles:", err);
+            alert(err.message || "Failed to update roles. Check console for details.");
         }
     };
 
-    const handleRoleToggle = (role) => {
-        if (!editingUser) return;
-
-        const roles = editingUser.roles || [];
-        const updatedRoles = roles.includes(role)
-            ? roles.filter(r => r !== role)
-            : [...roles, role];
-
-        setEditingUser({ ...editingUser, roles: updatedRoles });
-    };
-
-    const filteredUsers = users.filter(user => 
-        user.displayName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.email?.toLowerCase().includes(searchQuery.toLowerCase())
+    /* ─────────────── search filter ─────────────── */
+    const q = searchQuery.toLowerCase();
+    const filtered = users.filter(
+        (u) =>
+            u.displayName?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q)
     );
 
-    if (loading) {
-        return <div className="text-center py-4">Loading users...</div>;
-    }
-
-    const availableRoles = ["moderator", "contributor", "premium"];
+    /* ─────────────── render ─────────────── */
+    if (loading) return <p className="py-4 text-center">Loading users…</p>;
 
     return (
         <div className="space-y-6">
-            {/* Search Bar */}
-            <div className="mb-4">
-                <input
-                    type="text"
-                    placeholder="Search users..."
-                    className="w-full px-4 py-2 rounded-lg bg-bg-secondary text-txt-primary"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-            </div>
+            {/* search */}
+            <input
+                type="text"
+                placeholder="Search users…"
+                className="w-full px-4 py-2 rounded-lg bg-bg-secondary text-txt-primary"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+            />
 
-            {/* Users Table */}
+            {/* table */}
             <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-br-secondary">
                     <thead className="bg-bg-secondary">
                         <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-txt-secondary uppercase tracking-wider">User</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-txt-secondary uppercase tracking-wider">Email</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-txt-secondary uppercase tracking-wider">Roles</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-txt-secondary uppercase tracking-wider">Admin</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-txt-secondary uppercase tracking-wider">Actions</th>
+                            {["User", "Email", "Roles", "Actions"].map((h) => (
+                                <th
+                                    key={h}
+                                    className="px-6 py-3 text-left text-xs font-medium text-txt-secondary uppercase tracking-wider"
+                                >
+                                    {h}
+                                </th>
+                            ))}
                         </tr>
                     </thead>
+
                     <tbody className="divide-y divide-br-secondary">
-                        {filteredUsers.map((user) => (
-                            <tr key={user.id}>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="flex items-center">
-                                        <img
-                                            className="h-8 w-8 rounded-full"
-                                            src={user.photoURL || "/default-avatar.png"}
-                                            alt=""
-                                        />
-                                        <div className="ml-4">
-                                            <div className="text-sm font-medium text-txt-primary">
-                                                {user.displayName || "No name"}
+                        {filtered.map((u) => {
+                            const isEditing = editingUser?.id === u.id;
+                            const roles = isEditing ? editingUser.roles : u.roles || [];
+
+                            return (
+                                <tr key={u.id}>
+                                    {/* user + avatar */}
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-3">
+                                            <img
+                                                className="h-8 w-8 rounded-full"
+                                                src={u.photoURL || "/default-avatar.png"}
+                                                alt=""
+                                            />
+                                            <span className="text-sm font-medium">
+                                                {u.displayName || "Anonymous"}
+                                            </span>
+                                        </div>
+                                    </td>
+
+                                    {/* e-mail */}
+                                    <td className="px-6 py-4 text-sm text-txt-secondary">
+                                        {u.email}
+                                    </td>
+
+                                    {/* roles */}
+                                    <td className="px-6 py-4">
+                                        {isEditing ? (
+                                            <div className="flex flex-wrap gap-2">
+                                                {ALL_ROLES.map((r) => (
+                                                    <button
+                                                        key={r}
+                                                        onClick={() => toggleRole(r)}
+                                                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                                            roles.includes(r)
+                                                                ? "bg-accent text-white"
+                                                                : "bg-bg-secondary text-txt-secondary"
+                                                        }`}
+                                                    >
+                                                        {r}
+                                                    </button>
+                                                ))}
                                             </div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    <div className="text-sm text-txt-secondary">{user.email}</div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    {editingUser?.id === user.id ? (
-                                        <div className="flex flex-wrap gap-2">
-                                            {availableRoles.map((role) => (
+                                        ) : (
+                                            <div className="flex flex-wrap gap-1">
+                                                {roles.map((r) => (
+                                                    <span
+                                                        key={r}
+                                                        className="px-2 py-1 rounded-full text-xs font-medium bg-accent/10 text-txt-primary"
+                                                    >
+                                                        {r}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </td>
+
+                                    {/* actions */}
+                                    <td className="px-6 py-4 text-right">
+                                        {isEditing ? (
+                                            <span className="flex gap-2 justify-end">
                                                 <button
-                                                    key={role}
-                                                    onClick={() => handleRoleToggle(role)}
-                                                    className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                                        editingUser.roles?.includes(role)
-                                                            ? "bg-accent text-white"
-                                                            : "bg-bg-secondary text-txt-secondary"
-                                                    }`}
+                                                    onClick={handleSave}
+                                                    className="text-green-500 hover:text-green-600"
                                                 >
-                                                    {role}
+                                                    <MdCheck size={20} />
                                                 </button>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-wrap gap-1">
-                                            {user.roles?.map((role) => (
-                                                <span
-                                                    key={role}
-                                                    className="px-2 py-1 rounded-full text-xs font-medium bg-accent/10 text-txt-primary"
+                                                <button
+                                                    onClick={() => setEditingUser(null)}
+                                                    className="text-red-500 hover:text-red-600"
                                                 >
-                                                    {role}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    )}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap">
-                                    {editingUser?.id === user.id ? (
-                                        <button
-                                            onClick={() => setEditingUser({ ...editingUser, isAdmin: !editingUser.isAdmin })}
-                                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                                editingUser.isAdmin
-                                                    ? "bg-accent text-white"
-                                                    : "bg-bg-secondary text-txt-secondary"
-                                            }`}
-                                        >
-                                            {editingUser.isAdmin ? "Yes" : "No"}
-                                        </button>
-                                    ) : (
-                                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                            user.isAdmin
-                                                ? "bg-accent/10 text-txt-primary"
-                                                : "bg-bg-secondary text-txt-secondary"
-                                        }`}>
-                                            {user.isAdmin ? "Yes" : "No"}
-                                        </span>
-                                    )}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    {editingUser?.id === user.id ? (
-                                        <div className="flex items-center space-x-2">
+                                                    <MdClose size={20} />
+                                                </button>
+                                            </span>
+                                        ) : (
                                             <button
-                                                onClick={handleSaveUser}
-                                                className="text-green-500 hover:text-green-600"
+                                                onClick={() => startEdit(u)}
+                                                className="text-accent hover:text-accent-hover"
                                             >
-                                                <MdCheck size={20} />
+                                                <MdEdit size={20} />
                                             </button>
-                                            <button
-                                                onClick={() => setEditingUser(null)}
-                                                className="text-red-500 hover:text-red-600"
-                                            >
-                                                <MdClose size={20} />
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <button
-                                            onClick={() => handleEditUser(user)}
-                                            className="text-accent hover:text-accent-hover"
-                                        >
-                                            <MdEdit size={20} />
-                                        </button>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
+                                        )}
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>
         </div>
     );
-}; 
+};
