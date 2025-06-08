@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { duplicateModels } from "../scripts/duplicateModels";
 import { deleteAllModelsAndRelated } from "../scripts/deleteAllModels";
+import { auth } from "@/config/firebase";
+import { refreshIdToken } from "@/utils/auth/refreshClaims";
 
 export const Scripts = () => {
     // List of scripts (expandable in the future)
@@ -20,6 +22,8 @@ export const Scripts = () => {
     const [progress, setProgress] = useState(Array(scripts.length).fill(0));
     const [running, setRunning] = useState(Array(scripts.length).fill(false));
     const [complete, setComplete] = useState(Array(scripts.length).fill(false));
+    const [claims, setClaims] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const handleRun = async (idx) => {
         setRunning((r) => r.map((v, i) => (i === idx ? true : v)));
@@ -37,6 +41,19 @@ export const Scripts = () => {
             alert("Script failed: " + e.message);
         }
         setRunning((r) => r.map((v, i) => (i === idx ? false : v)));
+    };
+
+    const checkClaims = async () => {
+        setLoading(true);
+        try {
+            await refreshIdToken();
+            const token = await auth.currentUser?.getIdTokenResult();
+            console.log("Full token result:", token);
+            setClaims(token?.claims);
+        } catch (err) {
+            console.error("Error checking claims:", err);
+        }
+        setLoading(false);
     };
 
     return (
@@ -76,6 +93,21 @@ export const Scripts = () => {
                     </div>
                 ))}
             </div>
+            <div className="flex gap-4 items-center">
+                <button
+                    onClick={checkClaims}
+                    className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover"
+                    disabled={loading}
+                >
+                    {loading ? 'Checking...' : 'Check Current Claims'}
+                </button>
+            </div>
+
+            {claims && (
+                <pre className="p-4 bg-bg-secondary rounded-lg overflow-auto">
+                    {JSON.stringify(claims, null, 2)}
+                </pre>
+            )}
         </div>
     );
 };
