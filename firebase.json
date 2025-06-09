@@ -14,13 +14,19 @@
             {
                 "source": "/assets/**",
                 "headers": [
-                    { "key": "Cache-Control", "value": "public,max-age=31536000,immutable" }
+                    {
+                        "key": "Cache-Control",
+                        "value": "public,max-age=31536000,immutable"
+                    }
                 ]
             },
             {
                 "source": "/fonts/**",
                 "headers": [
-                    { "key": "Cache-Control", "value": "public,max-age=31536000,immutable" }
+                    {
+                        "key": "Cache-Control",
+                        "value": "public,max-age=31536000,immutable"
+                    }
                 ]
             }
         ],
@@ -53,8 +59,6 @@
         }
     ],
     "extensions": {
-        "storage-resize-images": {
-            "extension": "firebase/storage-resize-images@0.2.9"
-        }
+        "storage-resize-images": "firebase/storage-resize-images@0.2.9"
     }
 }
