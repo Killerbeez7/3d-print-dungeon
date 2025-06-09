@@ -1,5 +1,13 @@
 {
   "projects": {
     "default": "print-dungeon-3d"
+  },
+  "targets": {},
+  "etags": {
+    "print-dungeon-3d": {
+      "extensionInstances": {
+        "storage-resize-images": "0e6c9e3c685448ea712909d86df85571939985882c633b03f681170405e36599"
+      }
+    }
   }
 }
