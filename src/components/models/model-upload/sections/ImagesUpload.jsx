@@ -1,4 +1,5 @@
 import { TiDelete } from "react-icons/ti";
+import PropTypes from "prop-types";
 
 export function ImagesUpload({ modelData, setModelData }) {
     const handleImageUpload = (e, type) => {
@@ -48,7 +49,7 @@ export function ImagesUpload({ modelData, setModelData }) {
                 <span className="text-primary">real print photos</span>
             </p>
 
-            <div className="flex gap-4 mt-3">
+            <div className="flex gap-4 mt-3 bg-bg-surface">
                 {/* 4:3 Cover */}
                 <ImageUploadBox
                     label="Desktop cover 4:3"
@@ -83,13 +84,13 @@ export function ImagesUpload({ modelData, setModelData }) {
                 type="file"
                 multiple
                 accept="image/*"
-                className="hidden"
+                className="hidden "
                 id="modelImages"
                 onChange={(e) => handleImageUpload(e, "additional")}
             />
             <label
                 htmlFor="modelImages"
-                className="mt-2 border-dashed border-2 rounded-md w-full h-20 flex items-center justify-center text-primary cursor-pointer"
+                className=" bg-bg-surface mt-2 border-dashed border-2 rounded-md w-full h-20 flex items-center justify-center text-primary cursor-pointer"
             >
                 + Add Photo
             </label>
@@ -167,3 +168,27 @@ function ImagePreview({ url, onRemove }) {
         </div>
     );
 }
+
+ImagesUpload.propTypes = {
+    modelData: PropTypes.object.isRequired,
+    setModelData: PropTypes.func.isRequired,
+};
+
+ImageUploadBox.propTypes = {
+    label: PropTypes.string.isRequired,
+    image: PropTypes.string,
+};
+
+ImagePreview.propTypes = {
+    url: PropTypes.string.isRequired,
+    onRemove: PropTypes.func.isRequired,
+};
+
+ImageUploadBox.propTypes = {
+    label: PropTypes.string.isRequired,
+    image: PropTypes.string,
+    onUpload: PropTypes.func.isRequired,
+    onRemove: PropTypes.func.isRequired,
+    id: PropTypes.string.isRequired,
+    aspectRatio: PropTypes.string.isRequired,
+};

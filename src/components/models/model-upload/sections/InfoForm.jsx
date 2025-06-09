@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { TiDelete } from "react-icons/ti";
+import PropTypes from "prop-types";
 // components
 import { ImagesUpload } from "./ImagesUpload";
 
@@ -52,7 +53,7 @@ export function InfoForm({ modelData, setModelData }) {
                             name="name"
                             value={modelData.name}
                             onChange={handleModelDataChange}
-                            className="w-full p-2 border rounded-md"
+                            className="w-full p-2 border rounded-md bg-bg-surface"
                             placeholder="Enter model name"
                             required
                         />
@@ -66,7 +67,7 @@ export function InfoForm({ modelData, setModelData }) {
                             name="category"
                             value={modelData.category}
                             onChange={handleModelDataChange}
-                            className="w-full p-2 border rounded-md"
+                            className="w-full p-2 border rounded-md bg-bg-surface"
                             placeholder="Enter category"
                             required
                         />
@@ -80,7 +81,7 @@ export function InfoForm({ modelData, setModelData }) {
                             name="description"
                             value={modelData.description}
                             onChange={handleModelDataChange}
-                            className="w-full p-2 border rounded-md"
+                            className="w-full p-2 border rounded-md bg-bg-surface"
                             placeholder="Enter model description"
                             required
                         />
@@ -88,14 +89,14 @@ export function InfoForm({ modelData, setModelData }) {
 
                     {/* Tags Section */}
                     <div className="border rounded p-4">
-                        <h4 className="font-semibold mb-2">Add Tags</h4>
+                        <h4 className="font-semibold mb-2 text-txt-primary">Add Tags</h4>
                         <input
                             type="text"
                             value={newTag}
                             onChange={handleTagInputChange}
                             onKeyDown={handleTagAdd}
                             placeholder="Press enter to add tags"
-                            className="w-full px-4 py-2 text-sm border rounded mb-2"
+                            className="w-full px-4 py-2 text-sm border rounded mb-2 bg-bg-surface"
                         />
                         <div className="flex flex-wrap gap-2">
                             {modelData.tags.map((tag) => (
@@ -120,3 +121,13 @@ export function InfoForm({ modelData, setModelData }) {
         </section>
     );
 }
+
+InfoForm.propTypes = {
+    modelData: PropTypes.object.isRequired,
+    setModelData: PropTypes.func.isRequired,
+};
+
+InfoForm.propTypes = {
+    modelData: PropTypes.object.isRequired,
+    setModelData: PropTypes.func.isRequired,
+};
