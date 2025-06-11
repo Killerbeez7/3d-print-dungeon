@@ -17,6 +17,8 @@ export interface AuthContextValue {
     userData: RawUserData | null;
     roles: string[];
     isAdmin: boolean;
+    isSuper: boolean;
+    claims: CustomClaims | null;
     maintenanceMode: boolean;
     maintenanceMessage: string | null;
     maintenanceEndTime: Date | null;
@@ -30,5 +32,15 @@ export interface AuthContextValue {
     changePassword(currentPassword: string, newPassword: string): Promise<void>;
     fetchUserData(): Promise<void>;
     handleAuthError(error: unknown, provider: string): never;
-    // openAuthModal(mode?: "login" | "signup"): void;
 }
+
+
+export type CustomClaims = {
+    [key: string]: unknown;
+    super?: boolean;
+    admin?: boolean;
+    moderator?: boolean;
+    contributor?: boolean;
+    premium?: boolean;
+    // Add other roles if needed
+};
