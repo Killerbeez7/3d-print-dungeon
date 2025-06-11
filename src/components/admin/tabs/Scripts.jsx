@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { duplicateModels } from "../scripts/duplicateModels";
 import { deleteAllModelsAndRelated } from "../scripts/deleteAllModels";
-import { auth } from "@/config/firebase";
-import { refreshIdToken } from "@/utils/auth/refreshClaims";
+import { refreshIdToken } from "@/utils/auth/refreshIdToken";
 
 export const Scripts = () => {
-    // List of scripts (expandable in the future)
     const scripts = [
         {
             name: "Duplicate Models",
@@ -14,7 +12,8 @@ export const Scripts = () => {
         },
         {
             name: "Delete All Models",
-            description: "Delete ALL models and all related data (comments, likes, views, favorites, user uploads, and files in storage). This action is IRREVERSIBLE!",
+            description:
+                "Delete ALL models and all related data (comments, likes, views, favorites, user uploads, and files in storage). This action is IRREVERSIBLE!",
             run: deleteAllModelsAndRelated,
         },
     ];
@@ -46,10 +45,9 @@ export const Scripts = () => {
     const checkClaims = async () => {
         setLoading(true);
         try {
-            await refreshIdToken();
-            const token = await auth.currentUser?.getIdTokenResult();
-            console.log("Full token result:", token);
-            setClaims(token?.claims);
+            const claims = await refreshIdToken();
+            console.log("Current claims:", claims);
+            setClaims(claims);
         } catch (err) {
             console.error("Error checking claims:", err);
         }
@@ -88,7 +86,9 @@ export const Scripts = () => {
                             {progress[idx]}%
                         </span>
                         {complete[idx] && (
-                            <span className="ml-4 text-green-600 font-bold text-xs">Complete</span>
+                            <span className="ml-4 text-green-600 font-bold text-xs">
+                                Complete
+                            </span>
                         )}
                     </div>
                 ))}
@@ -99,7 +99,7 @@ export const Scripts = () => {
                     className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover"
                     disabled={loading}
                 >
-                    {loading ? 'Checking...' : 'Check Current Claims'}
+                    {loading ? "Checking..." : "Check Current Claims"}
                 </button>
             </div>
 
