@@ -3,19 +3,10 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getFunctions } from "firebase/functions";
 import { getStorage } from "firebase/storage";
-
-const firebaseConfig = {
-    apiKey: "AIzaSyCoi2MXjhLexZrM9ele_vyl9wBh7_QQlVs",
-    authDomain: "print-dungeon-3d.firebaseapp.com",
-    projectId: "print-dungeon-3d",
-    storageBucket: "print-dungeon-3d.firebasestorage.app",
-    messagingSenderId: "211931434725",
-    appId: "1:211931434725:web:34144ba859e9e8434b4e0c",
-    measurementId: "G-LMBWGFK6TF",
-};
+import firebase_key from "../keys/firebase_key.json";
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebase_key);
 
 // Initialize services
 export const auth = getAuth(app);
