@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
-import { onAuthStateChanged, User, getIdTokenResult } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "../config/firebase";
 import { AuthContext } from "../contexts/authContext";
 import { RawUserData, CustomClaims } from "../types/auth";
+import { refreshIdToken } from "../utils/auth/refreshIdToken";
 import { MaintenanceStatus, UserId } from "../types/maintenance";
 import {
     signUpWithEmail,
@@ -60,31 +61,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
 
         try {
-            // First get the token result to check claims
-            const idTok = await getIdTokenResult(currentUser, true);
-            console.debug("Current token claims:", idTok.claims);
-            setClaims(idTok.claims as CustomClaims);
+            const claims = await refreshIdToken();
+            setClaims(claims as CustomClaims);
 
-            // Get Firestore data
             getUserFromDatabase(currentUser.uid, (data: RawUserData | null) => {
-                // Get roles from claims
-                const claimRoles = Object.entries(idTok.claims)
-                    .filter(([k, v]) => v === true && ["super", "admin", "moderator"].includes(k))
-                    .map(([k]) => k);
-
-                // Merge with Firestore roles
-                const mergedRoles = Array.from(
-                    new Set([...(data?.roles || []), ...claimRoles])
-                );
-
-                setUserData({ 
-                    ...(data || {}), 
-                    roles: mergedRoles,
-                    isSuper: idTok.claims.super === true
-                } as RawUserData);
+                setUserData({ ...(data || {}), roles: data?.roles || [] } as RawUserData);
             });
         } catch (error) {
-            console.error("Error fetching user data:", error);
             handleAuthError(error, "data fetch");
         }
     }, [currentUser]);
@@ -169,10 +152,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return () => unsubscribe();
     }, [currentUser?.uid]);
 
-    const roles = userData?.roles ?? [];
-    const isAdmin = roles.includes("admin");
+    const claimRoles = claims
+        ? Object.entries(claims)
+              .filter(
+                  ([k, v]) =>
+                      v === true &&
+                      ["super", "admin", "moderator", "contributor", "premium"].includes(
+                          k
+                      )
+              )
+              .map(([k]) => k)
+        : [];
+    const roles = claimRoles;
+    const isAdmin = claims?.admin === true;
     const isSuper = claims?.super === true;
-    
+
     const value = {
         currentUser,
         userData,
@@ -194,6 +188,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         fetchUserData,
         handleAuthError,
     };
+
+    if (loading) return <div>Loading authentication...</div>;
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
