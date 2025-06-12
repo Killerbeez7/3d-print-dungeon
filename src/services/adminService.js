@@ -1,42 +1,60 @@
-// src/services/adminService.js
 import { doc, getDoc } from "firebase/firestore";
 import { httpsCallable } from "firebase/functions";
-import { db, functions } from "@/config/firebase";
-import { refreshIdToken } from "@/utils/auth/refreshClaims";
+import { db, functions, auth } from "@/config/firebase";
+import { refreshIdToken } from "@/utils/auth/refreshIdToken";
 
-/* ── small in-memory cache just like before ─────────────────────────── */
 const adminCache = new Map(); // uid → { ok, t }
-const CACHE_TTL = 5 * 60 * 1_000; // 5 minutes
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
+export async function isCurrentUserAdmin() {
+    const user = auth.currentUser;
+    if (!user) return false;
+    const claims = await refreshIdToken();
+    return !!claims.admin;
+}
+
+// For display and search
 export async function isAdmin(uid) {
     if (!uid) return false;
 
+    // Check cache first
     const cached = adminCache.get(uid);
-    if (cached && Date.now() - cached.t < CACHE_TTL) return cached.ok;
+    if (cached && Date.now() - cached.t < CACHE_TTL) {
+        return cached.ok;
+    }
 
+    // Cache miss or expired - fetch from Firestore
     const snap = await getDoc(doc(db, "users", uid));
     const ok = snap.exists() && (snap.data().roles || []).includes("admin");
     adminCache.set(uid, { ok, t: Date.now() });
     return ok;
 }
 
-/* ── always build the Functions *after* Auth is initialised ─────────── */
 const setUserRole = httpsCallable(functions, "setUserRole");
 
-/* ── wrappers that guarantee a fresh token on every call ────────────── */
 async function callWithFreshToken(payload) {
     try {
-        // First refresh token and get claims
-        const claims = await refreshIdToken();
-        console.debug("Current claims before operation:", claims);
+        const user = auth.currentUser;
+        if (!user) throw new Error("No user is currently signed in");
 
-        // Verify we have super admin
-        if (!claims.super) {
-            throw new Error("Only super-admins can change user roles");
+        const claims = await refreshIdToken();
+
+        if (!claims.admin) {
+            throw new Error("Only admins can change user roles");
         }
 
-        // Call the cloud function
-        return await setUserRole(payload);
+        // call the cloud function
+        const result = await setUserRole(payload);
+
+        // Clear cache for the affected user since their roles changed
+        adminCache.delete(payload.uid);
+
+        // if the current user changed their own role, refresh token
+        if (auth.currentUser && auth.currentUser.uid === payload.uid) {
+            await refreshIdToken();
+        }
+
+        return result;
     } catch (error) {
         console.error("Operation failed:", error);
         throw error;
@@ -45,4 +63,3 @@ async function callWithFreshToken(payload) {
 
 export const grantRole = (uid, role) => callWithFreshToken({ uid, role, enable: true });
 export const revokeRole = (uid, role) => callWithFreshToken({ uid, role, enable: false });
-export { callWithFreshToken as _debugForceRefresh }; // optional helper
