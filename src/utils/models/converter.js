@@ -1,18 +1,32 @@
-// Lazy imports for Three.js and its loaders
+// Dynamic imports for Three.js and its loaders (better for code splitting)
 const loadThree = async () => {
-    const three = await import("three");
-    const STLLoader = (await import("three/examples/jsm/loaders/STLLoader")).STLLoader;
-    const OBJLoader = (await import("three/examples/jsm/loaders/OBJLoader")).OBJLoader;
-    const GLTFExporter = (await import("three/examples/jsm/exporters/GLTFExporter"))
-        .GLTFExporter;
-    return { THREE: three, STLLoader, OBJLoader, GLTFExporter };
+    try {
+        console.log("Loading Three.js modules...");
+
+        const [three, stlLoader, objLoader, gltfExporter] = await Promise.all([
+            import("three"),
+            import("three/examples/jsm/loaders/STLLoader"),
+            import("three/examples/jsm/loaders/OBJLoader"),
+            import("three/examples/jsm/exporters/GLTFExporter"),
+        ]);
+
+        console.log("Three.js modules loaded successfully");
+
+        return {
+            THREE: three,
+            STLLoader: stlLoader.STLLoader,
+            OBJLoader: objLoader.OBJLoader,
+            GLTFExporter: gltfExporter.GLTFExporter,
+        };
+    } catch (error) {
+        console.error("Failed to load Three.js modules:", error);
+        console.error("Error details:", error.message, error.stack);
+        throw new Error(
+            "Failed to load 3D conversion libraries. This may be due to a network issue or browser compatibility. Please try refreshing the page and uploading again."
+        );
+    }
 };
 
-/**
- * finalConvertFileToGLB(file)
- * - Accepts .stl or .obj
- * - Returns { blob } for final .glb (binary)
- */
 export async function finalConvertFileToGLB(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -22,9 +36,6 @@ export async function finalConvertFileToGLB(file) {
                 const lowerExt = file.name.toLowerCase();
 
                 const { THREE, STLLoader, OBJLoader, GLTFExporter } = await loadThree();
-                if (!THREE) {
-                    throw new Error("Failed to load Three.js");
-                }
 
                 let scene = new THREE.Scene();
                 scene.background = new THREE.Color(0x616161);
