@@ -20,7 +20,14 @@ export default defineConfig({
         assetsInlineLimit: 4096,
         rollupOptions: {
             output: {
-                manualChunks: undefined, // leave Vite defaults
+                manualChunks: {
+                    'three-core': ['three'],
+                    'three-loaders': [
+                        'three/examples/jsm/loaders/STLLoader',
+                        'three/examples/jsm/loaders/OBJLoader',
+                        'three/examples/jsm/exporters/GLTFExporter'
+                    ]
+                }
             },
         },
         assetsDir: "assets",
