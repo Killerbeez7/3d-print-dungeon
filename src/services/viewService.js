@@ -1,84 +1,95 @@
-import { doc, setDoc, collection, query, where, getDocs, getDoc, writeBatch } from "firebase/firestore";
+import {
+    doc,
+    setDoc,
+    collection,
+    query,
+    where,
+    getDocs,
+    writeBatch,
+} from "firebase/firestore";
 import { db, auth } from "../config/firebase";
 import { useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
+import { refreshIdToken } from "../utils/auth/refreshIdToken";
 
 // 30 minutes
 const VIEW_COOLDOWN_MS = 30 * 60_000;
 
-/**
- * Generate or get a stable localStorage-based ID.
- * This is how we differentiate truly anonymous users.
- */
+// generate or get a stable localStorage-based ID
 function getAnonymousId() {
     const key = "anon_user_id";
     let anonId = localStorage.getItem(key);
     if (!anonId) {
-        anonId = crypto.randomUUID(); // or any UUID generator
+        anonId = crypto.randomUUID();
         localStorage.setItem(key, anonId);
     }
     return anonId;
 }
 
-/**
- * Check if there's a recent doc in viewTrackers for this (modelId,userId) within the past 30 minutes
- */
+// check if user has recently viewed this model
 async function hasRecentView(modelId, userId) {
-    // 1) Compute the cutoff time
-    const cutoffTime = Date.now() - VIEW_COOLDOWN_MS;
+    try {
+        const recentViews = await getDocs(
+            query(
+                collection(db, "viewTrackers"),
+                where("modelId", "==", modelId),
+                where("userId", "==", userId)
+            )
+        );
 
-    // 2) Query Firestore for docs with modelId,userId & timestamp >= cutoff
-    const viewTrackersRef = collection(db, "viewTrackers");
-    const q = query(
-        viewTrackersRef,
-        where("modelId", "==", modelId),
-        where("userId", "==", userId),
-        where("createdAt", ">=", new Date(cutoffTime))
-    );
+        if (recentViews.empty) return false;
 
-    const snapshot = await getDocs(q);
-    // If any doc is found, it means we already recorded a view in the last 30 mins
-    return !snapshot.empty;
+        // Check if any view is within the cooldown period
+        const now = Date.now();
+        for (const viewDoc of recentViews.docs) {
+            const viewData = viewDoc.data();
+            const createdAt =
+                viewData.createdAt?.toDate?.() || new Date(viewData.createdAt);
+            if (now - createdAt.getTime() < VIEW_COOLDOWN_MS) {
+                return true;
+            }
+        }
+        return false;
+    } catch (error) {
+        console.error("Error checking recent views:", error);
+        return false; // Allow the view if we can't check
+    }
 }
 
-/**
- * Track a view for a specific model if the user hasn't viewed it in the last 30 mins
- */
+// trakc view if user has not viewed in the last 30 mins
 export async function trackView(modelId) {
     if (!modelId) return;
 
     const currentUser = auth.currentUser;
 
-    // 1) Use real UID if logged in, else use stable "anon" ID from localStorage
+    // If logged in, use the real ID, else use the anonymous ID
     const userId = currentUser ? currentUser.uid : getAnonymousId();
-    // Just for display. Could store displayName or "Anonymous" – up to you.
+    // for display. Could store displayName or "Anonymous"
     const userDisplayName = currentUser
         ? currentUser.displayName || currentUser.email || "User"
         : "Anonymous";
 
-    // 2) Check if there's a recent view doc
+    // check if there is a recent view doc
     const recentlyViewed = await hasRecentView(modelId, userId);
     if (recentlyViewed) {
         console.log("Skipping: user still in cooldown for this model.");
         return false;
     }
 
-    // 3) Not in cooldown, create a doc (this triggers your Cloud Function to increment `views`)
+    // if not in cooldown, increment the view count
     const docId = `${modelId}_${userId}_${Date.now()}`;
     await setDoc(doc(db, "viewTrackers", docId), {
         modelId,
         userId,
         userDisplayName,
-        createdAt: new Date(), // or serverTimestamp() if you prefer
+        createdAt: new Date(),
     });
 
     console.log("View tracked:", docId);
     return true;
 }
 
-/**
- * React Hook: automatically track a view whenever the user visits the component
- */
+// automatically track a view whenever the user visits the component
 export function useViewTracker(modelId) {
     const { currentUser } = useAuth();
 
@@ -88,22 +99,11 @@ export function useViewTracker(modelId) {
     }, [modelId, currentUser]);
 }
 
-// Check if the current user is an admin
-const checkAdminStatus = async (userId) => {
-    if (!userId) return false;
-    const adminDoc = await getDoc(doc(db, "admins", userId));
-    return adminDoc.exists();
-};
-
-//  Clean up all view tracking data (for testing purposes only)
+// clean up all view tracking data (admin panel script)
 export const cleanupAllViews = async () => {
     try {
-        const user = auth.currentUser;
-        if (!user) {
-            throw new Error("You must be logged in to perform this action");
-        }
-        const isAdmin = await checkAdminStatus(user.uid);
-        if (!isAdmin) {
+        const claims = await refreshIdToken();
+        if (!claims.admin) {
             throw new Error("You must be an admin to perform this action");
         }
         // Delete all documents in viewTrackers collection
