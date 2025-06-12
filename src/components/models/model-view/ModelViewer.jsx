@@ -5,6 +5,7 @@ import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import { fullscreenConfig } from "@/config/fullscreenConfig";
 import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 import { Model3DIcon } from "@/components/shared/icons/Model3DIcon";
+import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
 
 const NavigationArrow = ({ direction, onClick }) => (
     <button
@@ -559,7 +560,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                 }`}
             >
                 <LazyImage
-                    src={renderExtraUrls[selectedRenderIndex]}
+                    src={getThumbnailUrl(renderExtraUrls[selectedRenderIndex], THUMBNAIL_SIZES.LARGE)}
                     alt={`Render ${selectedRenderIndex + 1}`}
                     loading="lazy"
                     className="w-full h-full object-contain rounded-md shadow-lg"
@@ -625,7 +626,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                                 }`}
                             >
                                 <LazyImage
-                                    src={url}
+                                    src={getThumbnailUrl(url, THUMBNAIL_SIZES.SMALL)}
                                     alt={`Render ${idx + 1}`}
                                     loading="lazy"
                                     className="w-full h-full object-cover"
