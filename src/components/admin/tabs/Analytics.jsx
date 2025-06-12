@@ -3,6 +3,7 @@ import { collection, query, getDocs, where, orderBy, limit } from "firebase/fire
 import { db } from "../../../config/firebase";
 import { MdPeople, MdFileUpload, MdRemoveRedEye, MdThumbUp, MdDelete } from "react-icons/md";
 import { cleanupAllViews } from "../../../services/viewService";
+import { getThumbnailUrl, THUMBNAIL_SIZES } from "../../../utils/imageUtils";
 
 // Cache duration in milliseconds (5 minutes)
 const CACHE_DURATION = 5 * 60 * 1000;
@@ -94,7 +95,7 @@ export const Analytics = () => {
             const recentUploads = recentUploadsSnapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data(),
-                thumbnail: doc.data().primaryRenderUrl || doc.data().posterUrl || "/placeholder.png"
+                thumbnail: getThumbnailUrl(doc.data().renderPrimaryUrl, THUMBNAIL_SIZES.SMALL) || doc.data().posterUrl || "/placeholder.png"
             }));
 
             // Get popular models with thumbnails
@@ -103,7 +104,7 @@ export const Analytics = () => {
                 .slice(0, 5)
                 .map(model => ({
                     ...model,
-                    thumbnail: model.primaryRenderUrl || model.posterUrl || "/placeholder.png"
+                    thumbnail: getThumbnailUrl(model.renderPrimaryUrl, THUMBNAIL_SIZES.SMALL) || model.posterUrl || "/placeholder.png"
                 }));
 
             // Get most active users based on uploads array length
