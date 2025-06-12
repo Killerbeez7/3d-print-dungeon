@@ -1,9 +1,9 @@
-import { onDocumentCreated, onDocumentDeleted } from "firebase-functions/v2/firestore";
-import { onSchedule } from "firebase-functions/v2/scheduler";
-import { initializeApp } from "firebase-admin/app";
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
-import { https } from "firebase-functions";
 import admin from "firebase-admin";
+import { initializeApp } from "firebase-admin/app";
+import { onSchedule } from "firebase-functions/v2/scheduler";
+import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { onDocumentCreated, onDocumentDeleted } from "firebase-functions/v2/firestore";
 
 const app = initializeApp();
 const db = getFirestore(app);
@@ -127,57 +127,71 @@ export const cleanupViewTrackers = onSchedule("0 0 * * *", async () => {
     }
 });
 
-export const setUserRole = https.onCall(async (data, context) => {
-    console.log("setUserRole called, context.auth:", context.auth, "data:", data);
-    
-    // First check: must be authenticated
-    if (!context.auth) {
-        throw new https.HttpsError(
-            "unauthenticated",
-            "You must be logged in to perform this action."
-        );
-    }
+export const setUserRole = onCall(async (request) => {
+    try {
+        const { data, auth } = request;
+        console.log("setUserRole called, auth:", auth);
 
-    // Second check: must be super admin
-    if (context.auth.token.super !== true) {
-        throw new https.HttpsError(
-            "permission-denied",
-            "Only super-admins can change user roles."
-        );
-    }
+        // is authenticated?
+        if (!auth) {
+            throw new HttpsError(
+                "unauthenticated",
+                "You must be logged in to perform this action."
+            );
+        }
 
-    // Validate input
-    const { uid, role, enable } = data || {};
-    if (typeof uid !== "string" || typeof role !== "string" || typeof enable !== "boolean") {
-        throw new https.HttpsError(
-            "invalid-argument",
-            'data must be { uid, role: string, enable: boolean }'
-        );
-    }
+        // is admin?
+        if (auth.token.admin !== true) {
+            throw new HttpsError(
+                "permission-denied",
+                "Only admins can change user roles."
+            );
+        }
 
-    // Only update custom claims for admin/moderator roles
-    if (["admin", "moderator"].includes(role)) {
+        // validate input
+        const { uid, role, enable } = data || {};
+        if (
+            typeof uid !== "string" ||
+            typeof role !== "string" ||
+            typeof enable !== "boolean"
+        ) {
+            throw new HttpsError(
+                "invalid-argument",
+                "data must be { uid, role: string, enable: boolean }"
+            );
+        }
+
+        // get current claims
         const user = await admin.auth().getUser(uid);
-        const claimsIn = user.customClaims || {};
-        const claims = { ...claimsIn };
+        const claims = { ...user.customClaims };
+
         if (enable) {
             claims[role] = true;
         } else {
             delete claims[role];
         }
+
         await admin.auth().setCustomUserClaims(uid, claims);
+
+        // mirror roles to firestore (for display/search)
+        const enabledRoles = Object.keys(claims).filter((k) => claims[k] === true);
+        const ref = admin.firestore().doc(`users/${uid}`);
+        await ref.set(
+            {
+                roles: enabledRoles,
+            },
+            { merge: true }
+        );
+
+        return { status: "ok" };
+    } catch (err) {
+        console.error("setUserRole INTERNAL ERROR:", err);
+        throw new HttpsError("internal", err.message || "Unknown error");
     }
+});
 
-    // Mirror to Firestore (for all roles)
-    const ref = admin.firestore().doc(`users/${uid}`);
-    await ref.set(
-        {
-            roles: enable
-                ? admin.firestore.FieldValue.arrayUnion(role)
-                : admin.firestore.FieldValue.arrayRemove(role)
-        },
-        { merge: true }
-    );
-
-    return { status: "ok" };
+export const debugAuth = onCall((request) => {
+    const { auth } = request;
+    console.log("debugAuth called, auth:", JSON.stringify(auth));
+    return { auth: auth };
 });
