@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../../config/firebase";
+import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
+import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 
 export const UploadsSection = ({ userId }) => {
     const [artworks, setArtworks] = useState([]);
@@ -10,18 +12,18 @@ export const UploadsSection = ({ userId }) => {
     useEffect(() => {
         const fetchUploads = async () => {
             if (!userId) return;
-            
+
             try {
                 setLoading(true);
                 const modelsRef = collection(db, "models");
                 const uploadsQuery = query(modelsRef, where("uploaderId", "==", userId));
                 const querySnapshot = await getDocs(uploadsQuery);
-                
-                const uploads = querySnapshot.docs.map(doc => ({
+
+                const uploads = querySnapshot.docs.map((doc) => ({
                     id: doc.id,
-                    ...doc.data()
+                    ...doc.data(),
                 }));
-                
+
                 setArtworks(uploads);
             } catch (error) {
                 console.error("Error fetching uploads:", error);
@@ -49,8 +51,13 @@ export const UploadsSection = ({ userId }) => {
                             key={art.id}
                             className="relative bg-bg-surface border border-br-primary rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                         >
-                            <img
-                                src={art.primaryRenderUrl || "/default-image.jpg"}
+                            <LazyImage
+                                src={
+                                    getThumbnailUrl(
+                                        art.renderPrimaryUrl,
+                                        THUMBNAIL_SIZES.MEDIUM
+                                    ) || "/default-image.jpg"
+                                }
                                 alt={art.name || "Untitled"}
                                 className="w-full h-auto object-cover"
                             />
@@ -78,5 +85,5 @@ export const UploadsSection = ({ userId }) => {
 };
 
 UploadsSection.propTypes = {
-    userId: PropTypes.string.isRequired
+    userId: PropTypes.string.isRequired,
 };

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getFirestore, collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
 import PropTypes from "prop-types";
+import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
 
 const db = getFirestore();
 
@@ -44,7 +45,7 @@ export const LikesSection = ({ userId }) => {
                                     id: modelDoc.id, 
                                     title: data.name || "Untitled",
                                     artist: data.uploaderDisplayName || "Unknown Artist",
-                                    imageUrl: data.primaryRenderUrl || "/default-artwork.png",
+                                    imageUrl: getThumbnailUrl(data.renderPrimaryUrl, THUMBNAIL_SIZES.MEDIUM) || "/default-artwork.png",
                                     likes: data.likes || 0,
                                     views: data.views || 0
                                 };
