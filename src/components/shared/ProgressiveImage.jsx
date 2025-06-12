@@ -1,7 +1,16 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
+import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
 
-export const ProgressiveImage = ({ lowResSrc, src, alt, className = "" }) => {
+export const ProgressiveImage = ({ src, alt, className = "", useCase = "card" }) => {
     const [highLoaded, setHighLoaded] = useState(false);
+
+    // Generate appropriate thumbnail for low-res placeholder
+    const lowResSrc = getThumbnailUrl(src, THUMBNAIL_SIZES.SMALL);
+    const highResSrc =
+        useCase === "hero" || useCase === "xlarge"
+            ? getThumbnailUrl(src, THUMBNAIL_SIZES.XLARGE)
+            : getThumbnailUrl(src, THUMBNAIL_SIZES.LARGE);
 
     return (
         <div
@@ -25,7 +34,7 @@ export const ProgressiveImage = ({ lowResSrc, src, alt, className = "" }) => {
 
             {/* high-res image */}
             <img
-                src={src}
+                src={highResSrc || src}
                 alt={alt}
                 loading="lazy"
                 onLoad={() => setHighLoaded(true)}
@@ -37,4 +46,11 @@ export const ProgressiveImage = ({ lowResSrc, src, alt, className = "" }) => {
             />
         </div>
     );
+};
+
+ProgressiveImage.propTypes = {
+    src: PropTypes.string.isRequired,
+    alt: PropTypes.string.isRequired,
+    className: PropTypes.string,
+    useCase: PropTypes.oneOf(["card", "hero", "xlarge", "grid", "thumbnail"]),
 };
