@@ -13,6 +13,7 @@ import { featuredMockData } from "./featuredMockData";
 import { ModelCardSkeleton } from "../models/parts/ModelCardSkeleton";
 import { InfiniteScrollList } from "@/components/shared/InfiniteScrollList";
 import { SequentialImage } from "@/components/shared/SequentialImage";
+import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
 
 function applySorting(items, sortBy) {
     switch (sortBy) {
@@ -69,19 +70,11 @@ export const Home = () => {
         return () => obs.disconnect();
     }, []);
 
-    const addThumb = (full) => {
-        if (!full) return STATIC_ASSETS.PLACEHOLDER_IMAGE;
-
-        const [base] = full.split("?");
-        // Make the 400 × 400 WEBP + add ?alt=media
-        const dot = base.lastIndexOf(".");
-        if (dot === -1) return full;
-        return `${base.slice(0, dot)}_400x400.webp?alt=media`;
-    };
-
     // map to "artwork" shape
     const artworks = raw.map((m) => {
-        const thumbUrl = addThumb(m.renderPrimaryUrl);
+        const thumbUrl =
+            getThumbnailUrl(m.renderPrimaryUrl, THUMBNAIL_SIZES.SMALL) ||
+            STATIC_ASSETS.PLACEHOLDER_IMAGE;
 
         return {
             id: m.id,
