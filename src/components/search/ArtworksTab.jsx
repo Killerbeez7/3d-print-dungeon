@@ -1,7 +1,8 @@
-import PropTypes from 'prop-types';
 import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import { LazyImage } from '../shared/lazy-image/LazyImage';
+import { LazyImage } from "../shared/lazy-image/LazyImage";
+import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
 
 const toggleArrayValue = (arr, value) =>
     arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
@@ -176,13 +177,18 @@ export const ArtworksTab = ({ searchTerm, models }) => {
                             <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
                                 <div className="relative w-full aspect-square">
                                     <LazyImage
-                                        src={m.primaryRenderUrl}
+                                        src={getThumbnailUrl(
+                                            m.renderPrimaryUrl,
+                                            THUMBNAIL_SIZES.MEDIUM
+                                        )}
                                         alt={m.name}
                                         className="absolute inset-0 w-full h-full object-cover rounded-lg"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end justify-start opacity-100 sm:opacity-0 sm:hover:opacity-100 transition-opacity">
                                         <div className="text-white p-2 sm:m-2">
-                                            <h4 className="font-semibold text-sm sm:text-base truncate">{m.name}</h4>
+                                            <h4 className="font-semibold text-sm sm:text-base truncate">
+                                                {m.name}
+                                            </h4>
                                             <p className="text-xs sm:text-sm truncate">
                                                 {m.uploaderDisplayName}
                                             </p>
@@ -204,7 +210,7 @@ ArtworksTab.propTypes = {
         PropTypes.shape({
             id: PropTypes.string.isRequired,
             name: PropTypes.string.isRequired,
-            primaryRenderUrl: PropTypes.string.isRequired,
+            renderPrimaryUrl: PropTypes.string.isRequired,
             uploaderDisplayName: PropTypes.string.isRequired,
         })
     ).isRequired,
