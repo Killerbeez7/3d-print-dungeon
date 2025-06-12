@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Tab } from "@headlessui/react";
 import { UserManagement } from "./tabs/UserManagement";
 import { ContentModeration } from "./tabs/ContentModeration";
@@ -8,7 +8,6 @@ import { MaintenanceSettings } from "./tabs/MaintenanceSettings";
 import { Scripts } from "./tabs/Scripts";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "react-router-dom";
-import { isAdmin } from "@/services/adminService";
 import { Spinner } from "@/components/shared/Spinner";
 
 function classNames(...classes) {
@@ -16,35 +15,15 @@ function classNames(...classes) {
 }
 
 export const AdminPanel = () => {
-    const { currentUser } = useAuth();
+    const { currentUser, isAdmin, loading } = useAuth();
     const [selectedTab, setSelectedTab] = useState(0);
-    const [loading, setLoading] = useState(true);
-    const [isAdminUser, setIsAdminUser] = useState(false);
-
-    useEffect(() => {
-        const checkAdminStatus = async () => {
-            if (!currentUser) {
-                setLoading(false);
-                return;
-            }
-            try {
-                const adminStatus = await isAdmin(currentUser.uid);
-                setIsAdminUser(adminStatus);
-            } catch (error) {
-                console.error("Error checking admin status:", error);
-            }
-            setLoading(false);
-        };
-
-        checkAdminStatus();
-    }, [currentUser]);
 
     if (loading) {
         return <Spinner size={24} />;
     }
 
     // Redirect if user is not logged in or not an admin
-    if (!currentUser || !isAdminUser) {
+    if (!currentUser || !isAdmin) {
         return <Navigate to="/" replace />;
     }
 
