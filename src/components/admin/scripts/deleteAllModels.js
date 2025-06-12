@@ -29,7 +29,7 @@ export async function deleteAllModelsAndRelated(onProgress) {
     // Try to extract file names from URLs (if present)
     if (model.originalFileUrl) fileNames.push(model.originalFileUrl.split("/").pop().split("?")[0]);
     if (model.convertedFileUrl) fileNames.push(model.convertedFileUrl.split("/").pop().split("?")[0]);
-    if (model.primaryRenderUrl) fileNames.push(model.primaryRenderUrl.split("/").pop().split("?")[0]);
+    if (model.renderPrimaryUrl) fileNames.push(model.renderPrimaryUrl.split("/").pop().split("?")[0]);
     if (model.posterUrl) fileNames.push(model.posterUrl.split("/").pop().split("?")[0]);
     if (Array.isArray(model.renderExtraUrls)) {
       model.renderExtraUrls.forEach((url) => fileNames.push(url.split("/").pop().split("?")[0]));
@@ -161,7 +161,7 @@ export async function deleteModelAndRelated(modelId) {
   const fileNames = [];
   if (model.originalFileUrl) fileNames.push(model.originalFileUrl.split("/").pop().split("?")[0]);
   if (model.convertedFileUrl) fileNames.push(model.convertedFileUrl.split("/").pop().split("?")[0]);
-  if (model.primaryRenderUrl) fileNames.push(model.primaryRenderUrl.split("/").pop().split("?")[0]);
+  if (model.renderPrimaryUrl) fileNames.push(model.renderPrimaryUrl.split("/").pop().split("?")[0]);
   if (model.posterUrl) fileNames.push(model.posterUrl.split("/").pop().split("?")[0]);
   if (Array.isArray(model.renderExtraUrls)) {
     model.renderExtraUrls.forEach((url) => fileNames.push(url.split("/").pop().split("?")[0]));
