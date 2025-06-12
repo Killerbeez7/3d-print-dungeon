@@ -26,6 +26,7 @@ export const withProtectedMaintenance = (element, options = {}) => (
   >
     <ProtectedRoute
       requireAdmin={options.requireAdmin}
+      allowedRoles={options.allowedRoles}
       redirectTo={options.authRedirect}
     >
       {element}
