@@ -1,20 +1,17 @@
 import { Link } from "react-router-dom";
 import { ReusableCarousel } from "../shared/carousel/ReusableCarousel";
+import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 import PropTypes from "prop-types";
 
 export const FeaturedCarousel = ({ items, itemHeight = 250, slidesToShow = 4 }) => {
     const renderItem = (item) => (
         <Link to={item.link} target="_blank" rel="noopener noreferrer">
             <div className="relative overflow-hidden rounded-xl group">
-                <img
+                <LazyImage
                     src={item.image}
                     alt={item.title}
                     className="w-full object-cover rounded-xl"
                     style={{ height: itemHeight }}
-                    onError={(e) => {
-                        console.error(`Failed to load image: ${item.image}`);
-                        e.target.src = "/assets/images/default-image.png"; // Fallback image
-                    }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                     <div className="text-center">
