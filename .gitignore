@@ -128,4 +128,12 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Firebase/Google Cloud credentials and keys
 src/scripts/key.json
+src/keys/
+src/keys/**
+*.json.key
+*service*.json
+*firebase*.json
+*key*.json
