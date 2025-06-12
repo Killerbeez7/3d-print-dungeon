@@ -25,7 +25,7 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'displayName', 'photoURL', 'bio', 'city', 'country',
           'coverURL',  'email', 'searchableName', 'socials',
-          'uploads', 'upscalePhotoURL', 'createdAt'
+          'uploads', 'upscalePhotoURL', 'createdAt', 'artist'
         ]);
       // Only admin or super admin can update roles field
       allow update: if (isAdmin() || isSuperAdmin())
