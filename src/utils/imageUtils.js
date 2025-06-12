@@ -1,10 +1,6 @@
-// thumbnail sizes from the resize extension
-export const THUMBNAIL_SIZES = {
-    SMALL: "150x150",
-    MEDIUM: "400x400",
-    LARGE: "800x800",
-    XLARGE: "1200x1200",
-};
+import { THUMBNAIL_SIZES } from "@/constants/thumbnailSizes";
+
+export { THUMBNAIL_SIZES };
 
 // convert original image URL to thumbnail URL
 export function getThumbnailUrl(originalUrl, size = THUMBNAIL_SIZES.MEDIUM) {
@@ -17,7 +13,6 @@ export function getThumbnailUrl(originalUrl, size = THUMBNAIL_SIZES.MEDIUM) {
 
         if (!pathParam) return originalUrl;
 
-        // decode the path
         const decodedPath = decodeURIComponent(pathParam);
 
         // extract directory and filename
