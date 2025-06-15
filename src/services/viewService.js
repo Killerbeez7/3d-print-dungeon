@@ -1,142 +1,115 @@
-import {
-    doc,
-    setDoc,
-    collection,
-    query,
-    where,
-    getDocs,
-    writeBatch,
-} from "firebase/firestore";
-import { db, auth } from "../config/firebase";
-import { useEffect } from "react";
-import { useAuth } from "../hooks/useAuth";
-import { refreshIdToken } from "../utils/auth/refreshIdToken";
+import { useEffect, useState } from "react";
+import { doc, onSnapshot } from "firebase/firestore";
+import { httpsCallable, getFunctions } from "firebase/functions";
+import { db } from "@/config/firebase";
+import { getViewerId } from "@/utils/getViewerId";
 
-// 30 minutes
-const VIEW_COOLDOWN_MS = 30 * 60_000;
+const functions = getFunctions();
 
-// generate or get a stable localStorage-based ID
-function getAnonymousId() {
-    const key = "anon_user_id";
-    let anonId = localStorage.getItem(key);
-    if (!anonId) {
-        anonId = crypto.randomUUID();
-        localStorage.setItem(key, anonId);
+// 1. Lightweight view tracking - just sends event to buffer
+export async function sendViewEvent(modelId, currentUser) {
+    if (!modelId) {
+        console.warn("sendViewEvent: modelId is required");
+        return;
     }
-    return anonId;
-}
 
-// check if user has recently viewed this model
-async function hasRecentView(modelId, userId) {
     try {
-        const recentViews = await getDocs(
-            query(
-                collection(db, "viewTrackers"),
-                where("modelId", "==", modelId),
-                where("userId", "==", userId)
-            )
-        );
+        const viewerId = await getViewerId(currentUser);
+        console.log(`Tracking view event for model: ${modelId}, viewer: ${viewerId}`);
 
-        if (recentViews.empty) return false;
+        const trackView = httpsCallable(functions, "trackModelView");
+        const result = await trackView({ modelId, viewerId });
 
-        // Check if any view is within the cooldown period
-        const now = Date.now();
-        for (const viewDoc of recentViews.docs) {
-            const viewData = viewDoc.data();
-            const createdAt =
-                viewData.createdAt?.toDate?.() || new Date(viewData.createdAt);
-            if (now - createdAt.getTime() < VIEW_COOLDOWN_MS) {
-                return true;
-            }
+        if (result.data.success) {
+            console.log("View event tracked:", result.data.message);
+        } else {
+            console.log("View event skipped:", result.data.reason);
         }
-        return false;
+
+        return result.data;
     } catch (error) {
-        console.error("Error checking recent views:", error);
-        return false; // Allow the view if we can't check
+        // Handle specific error cases
+        if (error?.code === "not-found") {
+            console.warn("Model not found for view tracking:", modelId);
+        } else {
+            console.error("Error tracking view event:", error);
+        }
+
+        // Don't throw - view tracking should be non-blocking
+        return null;
     }
 }
 
-// trakc view if user has not viewed in the last 30 mins
-export async function trackView(modelId) {
-    if (!modelId) return;
-
-    const currentUser = auth.currentUser;
-
-    // If logged in, use the real ID, else use the anonymous ID
-    const userId = currentUser ? currentUser.uid : getAnonymousId();
-    // for display. Could store displayName or "Anonymous"
-    const userDisplayName = currentUser
-        ? currentUser.displayName || currentUser.email || "User"
-        : "Anonymous";
-
-    // check if there is a recent view doc
-    const recentlyViewed = await hasRecentView(modelId, userId);
-    if (recentlyViewed) {
-        console.log("Skipping: user still in cooldown for this model.");
-        return false;
-    }
-
-    // if not in cooldown, increment the view count
-    const docId = `${modelId}_${userId}_${Date.now()}`;
-    await setDoc(doc(db, "viewTrackers", docId), {
-        modelId,
-        userId,
-        userDisplayName,
-        createdAt: new Date(),
-    });
-
-    console.log("View tracked:", docId);
-    return true;
-}
-
-// automatically track a view whenever the user visits the component
-export function useViewTracker(modelId) {
-    const { currentUser } = useAuth();
-
+// 2. Hook - call from any page that shows a model
+export function useViewTracker(modelId, currentUser) {
     useEffect(() => {
         if (!modelId) return;
-        trackView(modelId).catch(console.error);
-    }, [modelId, currentUser]);
+
+        // Track view event when component mounts or modelId changes
+        sendViewEvent(modelId, currentUser);
+    }, [modelId, currentUser?.uid]); // Only re-track if modelId or user ID changes
 }
 
-// clean up all view tracking data (admin panel script)
-export const cleanupAllViews = async () => {
-    try {
-        const claims = await refreshIdToken();
-        if (!claims.admin) {
-            throw new Error("You must be an admin to perform this action");
+// 3. Hook - simple real-time view count from model document
+export function useModelViewCount(modelId) {
+    const [count, setCount] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        if (!modelId) {
+            setCount(0);
+            setLoading(false);
+            return;
         }
-        // Delete all documents in viewTrackers collection
-        const viewTrackersRef = collection(db, "viewTrackers");
-        const viewTrackersSnapshot = await getDocs(viewTrackersRef);
-        // Delete all documents in userViews collection
-        const userViewsRef = collection(db, "userViews");
-        const userViewsSnapshot = await getDocs(userViewsRef);
-        // Get all models to reset their view counts
-        const modelsRef = collection(db, "models");
-        const modelsSnapshot = await getDocs(modelsRef);
-        // Use batched writes for better performance
-        const batch = writeBatch(db);
 
-        // Delete view trackers
-        viewTrackersSnapshot.docs.forEach((doc) => {
-            batch.delete(doc.ref);
-        });
+        setLoading(true);
+        setError(null);
 
-        // Delete user views
-        userViewsSnapshot.docs.forEach((doc) => {
-            batch.delete(doc.ref);
-        });
+        // Listen to model document for view count changes
+        const unsubscribe = onSnapshot(
+            doc(db, "models", modelId),
+            (docSnapshot) => {
+                try {
+                    if (docSnapshot.exists()) {
+                        const data = docSnapshot.data();
+                        setCount(data.views || 0);
+                    } else {
+                        setCount(0);
+                    }
+                    setLoading(false);
+                    setError(null);
+                } catch (err) {
+                    console.error("Error reading view count:", err);
+                    setError(err);
+                    setLoading(false);
+                }
+            },
+            (err) => {
+                console.error("Error listening to model document:", err);
+                setError(err);
+                setLoading(false);
+            }
+        );
 
-        // Reset view counts in models
-        modelsSnapshot.docs.forEach((doc) => {
-            batch.update(doc.ref, { views: 0 });
-        });
-        await batch.commit();
-        console.log("Successfully cleaned up all view data");
-        return true;
+        return () => {
+            unsubscribe();
+        };
+    }, [modelId]);
+
+    return { count, loading, error };
+}
+
+// 4. Utility function to get view count via Cloud Function (for one-time queries)
+export async function getModelViewCount(modelId) {
+    if (!modelId) return 0;
+
+    try {
+        const getViewCount = httpsCallable(functions, "getModelViewCount");
+        const result = await getViewCount({ modelId });
+        return result.data.viewCount || 0;
     } catch (error) {
-        console.error("Error cleaning up views:", error);
-        throw error;
+        console.error("Error getting view count:", error);
+        return 0;
     }
-};
+}
