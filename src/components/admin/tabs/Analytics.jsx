@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { collection, query, getDocs, where, orderBy, limit } from "firebase/firestore";
 import { db } from "../../../config/firebase";
 import { MdPeople, MdFileUpload, MdRemoveRedEye, MdThumbUp, MdDelete } from "react-icons/md";
-import { cleanupAllViews } from "../../../services/viewService";
+// import { cleanupViewData } from "@/functions/index";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "../../../utils/imageUtils";
 
 // Cache duration in milliseconds (5 minutes)
@@ -154,7 +154,7 @@ export const Analytics = () => {
 
         setIsCleaningViews(true);
         try {
-            await cleanupAllViews();
+            // await cleanupViewData();
             // Refresh stats after cleanup
             await fetchAnalytics();
             alert('Successfully reset all view counts!');
