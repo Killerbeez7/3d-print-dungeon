@@ -1,8 +1,9 @@
 import FingerprintJS from "@fingerprintjs/fingerprintjs";
 
 export async function getViewerId(user) {
-    if (user && user.uid) return user.uid; // logged in: use ID 
-    // anonymous: use fingerprint
+    if (typeof user === "string") return user;
+    if (user && user.uid) return user.uid;
+
     let viewerId = localStorage.getItem("viewerId");
     if (!viewerId) {
         const fp = await FingerprintJS.load();
