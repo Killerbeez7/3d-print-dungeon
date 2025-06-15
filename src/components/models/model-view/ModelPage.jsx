@@ -1,15 +1,15 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams } from "react-router-dom";
-import { doc, onSnapshot } from "firebase/firestore";
-import { db } from "@/config/firebase";
 //hooks
 import { useModels } from "@/hooks/useModels";
 import { useAuth } from "@/hooks/useAuth";
 import { useModal } from "@/hooks/useModal";
-import { useViewTracker } from "@/services/viewService";
+import { useViewTracker, useModelViewCount } from "@/services/viewService";
 //components
 // import { ModelViewer } from "./ModelViewer"; // Keep commented out or remove
-const ModelViewer = lazy(() => import("./ModelViewer").then(module => ({ default: module.ModelViewer }))); // Correct lazy import for named export
+const ModelViewer = lazy(() =>
+    import("./ModelViewer").then((module) => ({ default: module.ModelViewer }))
+); // Correct lazy import for named export
 import { ModelSidebar } from "./ModelSidebar";
 import { CommentsProvider } from "@/providers/commentsProvider";
 import { ModelComments } from "./ModelComments";
@@ -21,18 +21,11 @@ export const ModelPage = () => {
     const { currentUser } = useAuth();
     const { open } = useModal("auth");
 
-    const [viewCount, setViewCount] = useState(0);
     const [selectedRenderIndex, setSelectedRenderIndex] = useState(-1);
 
-    useViewTracker(id);
-
-    useEffect(() => {
-        if (!id) return;
-        const unsub = onSnapshot(doc(db, "models", id), (snap) =>
-            setViewCount(snap.exists() ? snap.data().views ?? 0 : 0)
-        );
-        return unsub;
-    }, [id]);
+    // Use new lightweight view tracking system
+    useViewTracker(id, currentUser);
+    const { count: viewCount, loading: viewCountLoading } = useModelViewCount(id);
 
     useEffect(() => {
         const m = models.find((m) => m.id === id);
@@ -76,6 +69,7 @@ export const ModelPage = () => {
                     model={model}
                     uploader={uploader}
                     viewCount={viewCount}
+                    viewCountLoading={viewCountLoading}
                     currentUser={currentUser}
                     openAuthModal={(p) => open({ mode: p?.mode ?? "login" })}
                 />

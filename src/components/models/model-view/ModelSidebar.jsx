@@ -12,6 +12,7 @@ export const ModelSidebar = ({
     model,
     uploader,
     viewCount,
+    viewCountLoading,
     currentUser,
     openAuthModal,
 }) => {
@@ -243,7 +244,7 @@ export const ModelSidebar = ({
                                 Follow
                             </button>
                             <span className="text-sm text-txt-secondary">
-                                {viewCount} views
+                                {viewCountLoading ? "Loading..." : `${viewCount} views`}
                             </span>
                         </div>
                     </div>
@@ -271,6 +272,7 @@ ModelSidebar.propTypes = {
         displayName: PropTypes.string,
     }),
     viewCount: PropTypes.number.isRequired,
+    viewCountLoading: PropTypes.bool,
     currentUser: PropTypes.object,
     openAuthModal: PropTypes.func.isRequired,
 };
