@@ -73,7 +73,7 @@ export const Home = () => {
     // map to "artwork" shape
     const artworks = raw.map((m) => {
         const thumbUrl =
-            getThumbnailUrl(m.renderPrimaryUrl, THUMBNAIL_SIZES.SMALL) ||
+            getThumbnailUrl(m.renderPrimaryUrl, THUMBNAIL_SIZES.MEDIUM) ||
             STATIC_ASSETS.PLACEHOLDER_IMAGE;
 
         return {
