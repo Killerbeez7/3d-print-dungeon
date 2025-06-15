@@ -1,13 +1,12 @@
 import { Link } from "react-router-dom";
 import { ReusableCarousel } from "../shared/carousel/ReusableCarousel";
-import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 import PropTypes from "prop-types";
 
 export const FeaturedCarousel = ({ items, itemHeight = 250, slidesToShow = 4 }) => {
     const renderItem = (item) => (
         <Link to={item.link} target="_blank" rel="noopener noreferrer">
             <div className="relative overflow-hidden rounded-xl group">
-                <LazyImage
+                <img
                     src={item.image}
                     alt={item.title}
                     className="w-full object-cover rounded-xl"
