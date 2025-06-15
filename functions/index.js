@@ -1,132 +1,204 @@
 import admin from "firebase-admin";
 import { initializeApp } from "firebase-admin/app";
-import { onSchedule } from "firebase-functions/v2/scheduler";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
-import { onDocumentCreated, onDocumentDeleted } from "firebase-functions/v2/firestore";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 
 const app = initializeApp();
 const db = getFirestore(app);
 
-// Track views using Firestore triggers
-export const trackView = onDocumentCreated("viewTrackers/{viewId}", async (event) => {
-    const viewId = event.params.viewId;
-    console.log("Processing view for document:", viewId);
+// Constants
+const COOLDOWN_MS = 60 * 60 * 1000;
+const BATCH_SIZE = 100;
+const VIEW_BUFFER_COLLECTION = "viewBuffer";
 
-    // Extract modelId and userId from the viewId (format: modelId_userId_timestamp)
-    const parts = viewId.split("_");
-    if (parts.length < 2) {
-        console.error("Invalid viewId format:", viewId);
-        return null;
+// Cache for recent views
+const recentViewsCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000;
+
+// Clean cache periodically
+setInterval(() => {
+    const now = Date.now();
+    for (const [key, timestamp] of recentViewsCache.entries()) {
+        if (now - timestamp > CACHE_TTL) {
+            recentViewsCache.delete(key);
+        }
     }
+}, CACHE_TTL);
 
-    const modelId = parts[0];
-    const userId = parts[1];
-    const viewData = event.data.data();
-
+// Hybrid view tracking - immediate update + buffer for analytics
+export const trackModelView = onCall(async (request) => {
     try {
-        console.log(`Updating view count for model: ${modelId}, user: ${userId}`);
+        const { modelId, viewerId } = request.data;
 
-        // Get the model document
-        const modelRef = db.collection("models").doc(modelId);
-        const modelDoc = await modelRef.get();
+        if (!modelId || !viewerId) {
+            throw new HttpsError("invalid-argument", "modelId and viewerId required");
+        }
 
-        if (!modelDoc.exists) {
-            console.error(`Model ${modelId} not found`);
+        const viewKey = `${modelId}_${viewerId}`;
+        const now = Date.now();
+
+        // Check in-memory cache first (super fast)
+        const lastView = recentViewsCache.get(viewKey);
+        if (lastView && now - lastView < COOLDOWN_MS) {
+            return { success: false, reason: "cooldown" };
+        }
+
+        // Use transaction for immediate update + buffer logging
+        await db.runTransaction(async (transaction) => {
+            // 1. Immediate view count increment (real-time UI)
+            const modelRef = db.collection("models").doc(modelId);
+            transaction.update(modelRef, {
+                views: FieldValue.increment(1),
+                lastViewedAt: FieldValue.serverTimestamp(),
+            });
+
+            // 2. Log to buffer for analytics/deduplication (optional)
+            const viewBufferRef = db.collection(VIEW_BUFFER_COLLECTION).doc();
+            transaction.set(viewBufferRef, {
+                modelId,
+                viewerId,
+                timestamp: FieldValue.serverTimestamp(),
+                processed: false,
+            });
+        });
+
+        // Update cache
+        recentViewsCache.set(viewKey, now);
+
+        return { success: true, message: "View tracked immediately" };
+    } catch (error) {
+        console.error("Error tracking view:", error);
+        throw new HttpsError("internal", "Failed to track view");
+    }
+});
+
+// Analytics processor - runs every 5 minutes for user engagement analytics ONLY
+// NOTE: This does NOT affect the main model view count - only analytics
+export const processViewAnalytics = onSchedule("*/5 * * * *", async () => {
+    try {
+        console.log(
+            "Starting view analytics processing (analytics only, no view count changes)..."
+        );
+
+        // Get unprocessed view events from buffer
+        const pendingViews = await db
+            .collection(VIEW_BUFFER_COLLECTION)
+            .where("processed", "==", false)
+            .limit(BATCH_SIZE)
+            .get();
+
+        if (pendingViews.empty) {
+            console.log("No pending view events for analytics processing");
             return null;
         }
 
-        // Update view count
-        await modelRef.update({
-            views: FieldValue.increment(1),
-            lastViewedAt: FieldValue.serverTimestamp(),
+        const batch = db.batch();
+        const viewerEngagement = new Map();
+
+        // Process events for user engagement analytics (NOT main view counts)
+        pendingViews.docs.forEach((doc) => {
+            const data = doc.data();
+            const { modelId, viewerId, timestamp } = data;
+
+            // Aggregate viewer engagement data for analytics
+            const engagementKey = `${modelId}_${viewerId}`;
+            if (!viewerEngagement.has(engagementKey)) {
+                viewerEngagement.set(engagementKey, {
+                    modelId,
+                    viewerId,
+                    sessionViews: 0,
+                    lastViewAt: timestamp,
+                });
+            }
+            viewerEngagement.get(engagementKey).sessionViews++;
+
+            // Mark buffer entry as processed
+            batch.update(doc.ref, { processed: true });
         });
 
-        console.log(`Successfully updated view count for model: ${modelId}`);
-
-        // If user is logged in, track their view with display name
-        if (userId && userId !== "anonymous" && viewData.userDisplayName) {
-            const userViewRef = db.collection("userViews").doc(`${modelId}_${userId}`);
-            await userViewRef.set(
+        // Update viewer engagement analytics (separate from main view counts)
+        for (const [key, engagement] of viewerEngagement.entries()) {
+            const analyticsRef = db.collection("viewerActivity").doc(key);
+            batch.set(
+                analyticsRef,
                 {
-                    modelId,
-                    userId,
-                    userDisplayName: viewData.userDisplayName,
-                    viewedAt: FieldValue.serverTimestamp(),
+                    modelId: engagement.modelId,
+                    viewerId: engagement.viewerId,
+                    // This is analytics data - NOT the main model view count
+                    totalEngagements: FieldValue.increment(engagement.sessionViews),
+                    lastEngagementAt: engagement.lastViewAt,
+                    updatedAt: FieldValue.serverTimestamp(),
                 },
                 { merge: true }
             );
-            console.log(`Tracked view for user: ${viewData.userDisplayName} (${userId})`);
         }
 
-        return null;
-    } catch (error) {
-        console.error("Error tracking view:", error, error.stack);
-        return null;
-    }
-});
-
-// Clean up views when a model is deleted
-export const cleanupModelViews = onDocumentDeleted("models/{modelId}", async (event) => {
-    const modelId = event.params.modelId;
-    console.log(`Cleaning up views for deleted model: ${modelId}`);
-
-    try {
-        // Delete all view trackers for this model
-        const viewTrackersRef = db.collection("viewTrackers");
-        const viewTrackersQuery = await viewTrackersRef
-            .where("modelId", "==", modelId)
-            .get();
-
-        const batch = db.batch();
-        viewTrackersQuery.docs.forEach((doc) => {
-            batch.delete(doc.ref);
-        });
-
-        // Delete all user views for this model
-        const userViewsRef = db.collection("userViews");
-        const userViewsQuery = await userViewsRef.where("modelId", "==", modelId).get();
-
-        userViewsQuery.docs.forEach((doc) => {
-            batch.delete(doc.ref);
-        });
-
         await batch.commit();
+
         console.log(
-            `Successfully cleaned up ${viewTrackersQuery.size} view trackers and ${userViewsQuery.size} user views for model ${modelId}`
+            `✅ Processed ${pendingViews.size} view events for analytics (main view counts unchanged)`
         );
         return null;
     } catch (error) {
-        console.error("Error cleaning up model views:", error);
+        console.error("Error processing view analytics:", error);
         return null;
     }
 });
 
-// Clean up old view trackers periodically
-export const cleanupViewTrackers = onSchedule("0 0 * * *", async () => {
-    const oneDayAgo = new Date();
-    oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-
+// Get view count (simple read from model document)
+export const getModelViewCount = onCall(async (request) => {
     try {
-        const oldTrackers = await db
-            .collection("viewTrackers")
+        const { modelId } = request.data;
+
+        if (!modelId) {
+            throw new HttpsError("invalid-argument", "modelId required");
+        }
+
+        const modelDoc = await db.collection("models").doc(modelId).get();
+
+        if (!modelDoc.exists) {
+            throw new HttpsError("not-found", "Model not found");
+        }
+
+        return { viewCount: modelDoc.data().views || 0 };
+    } catch (error) {
+        console.error("Error getting view count:", error);
+        throw new HttpsError("internal", "Failed to get view count");
+    }
+});
+
+// Cleanup old processed view buffer entries (daily)
+export const cleanupViewBuffer = onSchedule("0 2 * * *", async () => {
+    try {
+        const oneDayAgo = new Date();
+        oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+
+        const oldViews = await db
+            .collection(VIEW_BUFFER_COLLECTION)
+            .where("processed", "==", true)
             .where("timestamp", "<", oneDayAgo)
+            .limit(500)
             .get();
 
-        const batch = db.batch();
-        oldTrackers.docs.forEach((doc) => {
-            batch.delete(doc.ref);
-        });
+        if (oldViews.empty) {
+            console.log("No old view buffer entries to clean up");
+            return null;
+        }
 
+        const batch = db.batch();
+        oldViews.docs.forEach((doc) => batch.delete(doc.ref));
         await batch.commit();
-        console.log(`Cleaned up ${oldTrackers.size} old view trackers`);
+
+        console.log(`Cleaned up ${oldViews.size} old view buffer entries`);
         return null;
     } catch (error) {
-        console.error("Error cleaning up view trackers:", error);
+        console.error("Error cleaning up view buffer:", error);
         return null;
     }
 });
 
+// user roles
 export const setUserRole = onCall(async (request) => {
     try {
         const { data, auth } = request;
@@ -188,10 +260,4 @@ export const setUserRole = onCall(async (request) => {
         console.error("setUserRole INTERNAL ERROR:", err);
         throw new HttpsError("internal", err.message || "Unknown error");
     }
-});
-
-export const debugAuth = onCall((request) => {
-    const { auth } = request;
-    console.log("debugAuth called, auth:", JSON.stringify(auth));
-    return { auth: auth };
 });
