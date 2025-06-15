@@ -38,22 +38,21 @@ export const trackModelView = onCall(async (request) => {
         const viewKey = `${modelId}_${viewerId}`;
         const now = Date.now();
 
-        // Check in-memory cache first (super fast)
+        // Check cache first
         const lastView = recentViewsCache.get(viewKey);
         if (lastView && now - lastView < COOLDOWN_MS) {
             return { success: false, reason: "cooldown" };
         }
 
-        // Use transaction for immediate update + buffer logging
+        // Use transaction for immediate update
         await db.runTransaction(async (transaction) => {
-            // 1. Immediate view count increment (real-time UI)
             const modelRef = db.collection("models").doc(modelId);
             transaction.update(modelRef, {
                 views: FieldValue.increment(1),
                 lastViewedAt: FieldValue.serverTimestamp(),
             });
 
-            // 2. Log to buffer for analytics/deduplication (optional)
+            // Log to buffer for analytics/deduplication
             const viewBufferRef = db.collection(VIEW_BUFFER_COLLECTION).doc();
             transaction.set(viewBufferRef, {
                 modelId,
@@ -63,7 +62,6 @@ export const trackModelView = onCall(async (request) => {
             });
         });
 
-        // Update cache
         recentViewsCache.set(viewKey, now);
 
         return { success: true, message: "View tracked immediately" };
@@ -73,8 +71,7 @@ export const trackModelView = onCall(async (request) => {
     }
 });
 
-// Analytics processor - runs every 5 minutes for user engagement analytics ONLY
-// NOTE: This does NOT affect the main model view count - only analytics
+// Analytics processor - runs every 5 minutes for user engagement analytics
 export const processViewAnalytics = onSchedule("*/5 * * * *", async () => {
     try {
         console.log(
@@ -96,7 +93,7 @@ export const processViewAnalytics = onSchedule("*/5 * * * *", async () => {
         const batch = db.batch();
         const viewerEngagement = new Map();
 
-        // Process events for user engagement analytics (NOT main view counts)
+        // Process events for user engagement analytics
         pendingViews.docs.forEach((doc) => {
             const data = doc.data();
             const { modelId, viewerId, timestamp } = data;
@@ -113,11 +110,10 @@ export const processViewAnalytics = onSchedule("*/5 * * * *", async () => {
             }
             viewerEngagement.get(engagementKey).sessionViews++;
 
-            // Mark buffer entry as processed
             batch.update(doc.ref, { processed: true });
         });
 
-        // Update viewer engagement analytics (separate from main view counts)
+        // Update viewer engagement analytics
         for (const [key, engagement] of viewerEngagement.entries()) {
             const analyticsRef = db.collection("viewerActivity").doc(key);
             batch.set(
@@ -125,7 +121,6 @@ export const processViewAnalytics = onSchedule("*/5 * * * *", async () => {
                 {
                     modelId: engagement.modelId,
                     viewerId: engagement.viewerId,
-                    // This is analytics data - NOT the main model view count
                     totalEngagements: FieldValue.increment(engagement.sessionViews),
                     lastEngagementAt: engagement.lastViewAt,
                     updatedAt: FieldValue.serverTimestamp(),
@@ -137,7 +132,7 @@ export const processViewAnalytics = onSchedule("*/5 * * * *", async () => {
         await batch.commit();
 
         console.log(
-            `✅ Processed ${pendingViews.size} view events for analytics (main view counts unchanged)`
+            `✅ Processed ${pendingViews.size} view events for analytics`
         );
         return null;
     } catch (error) {
@@ -146,7 +141,7 @@ export const processViewAnalytics = onSchedule("*/5 * * * *", async () => {
     }
 });
 
-// Get view count (simple read from model document)
+// Get view count (for analytics)
 export const getModelViewCount = onCall(async (request) => {
     try {
         const { modelId } = request.data;
@@ -168,7 +163,7 @@ export const getModelViewCount = onCall(async (request) => {
     }
 });
 
-// Cleanup old processed view buffer entries (daily)
+// Cleanup old processed view buffer entries
 export const cleanupViewBuffer = onSchedule("0 2 * * *", async () => {
     try {
         const oneDayAgo = new Date();
@@ -198,7 +193,7 @@ export const cleanupViewBuffer = onSchedule("0 2 * * *", async () => {
     }
 });
 
-// user roles
+// User roles (admin only)
 export const setUserRole = onCall(async (request) => {
     try {
         const { data, auth } = request;
