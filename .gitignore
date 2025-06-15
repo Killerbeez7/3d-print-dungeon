@@ -129,11 +129,16 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# Firebase/Google Cloud credentials and keys
-src/scripts/key.json
+# Firebase/Google Cloud credentials and keys - NEVER COMMIT THESE!
 src/keys/
-src/keys/**
-*.json.key
-*service*.json
-*firebase*.json
-*key*.json
+src/keys/**/*
+*.service-account.json
+*firebase-adminsdk*.json
+*service-account-key*.json
+*private-key*.json
+*service-key*.json
+*firebase-key*.json
+
+# Build files
+dist/
+build/
