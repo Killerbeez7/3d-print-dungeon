@@ -5,6 +5,7 @@ import { db } from "@/config/firebase";
 //components
 import { LikeButton } from "../action-buttons/likeButton";
 import { FavoritesButton } from "../action-buttons/favoritesButton";
+import { PurchaseButton } from "@/components/payment/PurchaseButton";
 //contexts
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 
@@ -142,6 +143,25 @@ export const ModelSidebar = ({
                 )}
             </div>
 
+            {/* Pricing Section */}
+            {model.isPaid && model.price > 0 && (
+                <div className="px-6 pb-4">
+                    <div className="bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-txt-secondary">Price</p>
+                                <p className="text-2xl font-bold text-accent">${model.price}</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-xs text-txt-muted">Platform fee (5%)</p>
+                                <p className="text-sm text-txt-secondary">-${(model.price * 0.05).toFixed(2)}</p>
+                                <p className="text-sm font-medium text-txt-primary">Seller earns: ${(model.price * 0.95).toFixed(2)}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Action Buttons Section */}
             <div className="p-6 divider-top">
                 <div className="flex gap-4 mb-4">
@@ -158,51 +178,12 @@ export const ModelSidebar = ({
                     />
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 pb-6">
-                    {model.originalFileUrl && (
-                        <button
-                            onClick={() =>
-                                window.open(model.originalFileUrl, "_blank")
-                            }
-                            className="cta-button flex items-center justify-center gap-2 py-4 px-2.5 text-sm">
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5"
-                                viewBox="0 0 20 20"
-                                fill="currentColor">
-                                <path
-                                    fillRule="evenodd"
-                                    d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                                    clipRule="evenodd"
-                                />
-                            </svg>
-                            Download (STL)
-                        </button>
-                    )}
-                    {model.convertedFileUrl &&
-                        model.convertedFileUrl !== model.originalFileUrl && (
-                            <button
-                                onClick={() =>
-                                    window.open(
-                                        model.convertedFileUrl,
-                                        "_blank"
-                                    )
-                                }
-                                className="secondary-button flex items-center justify-center gap-2 py-4 px-2.5 text-sm">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-5 w-5"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor">
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
-                                        clipRule="evenodd"
-                                    />
-                                </svg>
-                                Download (glTF)
-                            </button>
-                        )}
+                {/* Purchase/Download Button */}
+                <div className="mb-6">
+                    <PurchaseButton 
+                        model={model} 
+                        className="w-full py-4 text-base font-medium"
+                    />
                 </div>
 
                 {/* Edit Button for Owner */}
@@ -266,6 +247,8 @@ ModelSidebar.propTypes = {
         uploaderId: PropTypes.string,
         originalFileUrl: PropTypes.string,
         convertedFileUrl: PropTypes.string,
+        isPaid: PropTypes.bool,
+        price: PropTypes.number,
     }).isRequired,
     uploader: PropTypes.shape({
         photoURL: PropTypes.string,
