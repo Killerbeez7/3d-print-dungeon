@@ -1,0 +1,232 @@
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { paymentService } from "@/services/paymentService";
+import { PaymentModal } from "./PaymentModal";
+import { paymentDebugger } from "@/utils/paymentDebugger";
+import PropTypes from "prop-types";
+
+export const PurchaseButton = ({ model, className = "" }) => {
+    const { currentUser } = useAuth();
+    const [userPurchases, setUserPurchases] = useState([]);
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        if (currentUser) {
+            loadUserPurchases();
+        }
+        
+        // Add debug button for development
+        if (import.meta.env.DEV) {
+            window.debugCurrentModel = () => {
+                console.log("🚀 Starting payment debug for current model...");
+                paymentDebugger.debugPaymentFlow(model.id, model.price);
+            };
+            
+            window.quickDebugAuth = () => paymentDebugger.quickAuth();
+            window.quickDebugPurchases = () => paymentDebugger.quickPurchases();
+            
+            console.log(`🔍 Debug functions available:
+- window.debugCurrentModel() - Debug this model (${model.id})
+- window.quickDebugAuth() - Test authentication
+- window.quickDebugPurchases() - Test purchases
+- window.paymentDebugger.help() - Full debugger help`);
+        }
+    }, [currentUser, model.id, model.price]);
+
+    const loadUserPurchases = async () => {
+        try {
+            setIsLoading(true);
+            paymentDebugger.log('info', 'PURCHASE_BUTTON', 'Loading user purchases...');
+            
+            const purchases = await paymentService.getUserPurchases();
+            const purchasedModelIds = purchases.map(p => p.modelId);
+            setUserPurchases(purchasedModelIds);
+            
+            paymentDebugger.log('success', 'PURCHASE_BUTTON', 'Purchases loaded', {
+                totalPurchases: purchases.length,
+                currentModelPurchased: purchasedModelIds.includes(model.id)
+            });
+        } catch (error) {
+            console.error("Error loading user purchases:", error);
+            paymentDebugger.log('error', 'PURCHASE_BUTTON', 'Failed to load purchases', {
+                message: error.message,
+                code: error.code
+            });
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleDownload = async () => {
+        if (!currentUser) {
+            // Redirect to login or show login modal
+            alert("Please log in to download models");
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            // For free models, directly provide download link
+            if (model.originalFileUrl) {
+                const link = document.createElement('a');
+                link.href = model.originalFileUrl;
+                link.download = `${model.name}.${model.originalFileUrl.split('.').pop()}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        } catch (error) {
+            console.error("Download error:", error);
+            alert("Download failed. Please try again.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handlePurchaseClick = async () => {
+        try {
+            paymentDebugger.log('info', 'PURCHASE_BUTTON', 'Purchase button clicked', {
+                modelId: model.id,
+                price: model.price,
+                userLoggedIn: !!currentUser
+            });
+            
+            if (!currentUser) {
+                paymentDebugger.log('warning', 'PURCHASE_BUTTON', 'User not logged in');
+                alert("Please log in to purchase models");
+                return;
+            }
+
+            setIsPaymentModalOpen(true);
+            paymentDebugger.log('success', 'PURCHASE_BUTTON', 'Payment modal opened');
+        } catch (error) {
+            console.error("Error handling purchase click:", error);
+            paymentDebugger.log('error', 'PURCHASE_BUTTON', 'Purchase click failed', {
+                message: error.message
+            });
+        }
+    };
+
+    const isOwner = currentUser?.uid === model.uploaderId;
+    const hasPurchased = userPurchases.includes(model.id);
+    const isFree = !model.isPaid || model.price === 0;
+
+    // Owner can always download
+    if (isOwner) {
+        return (
+            <button
+                onClick={handleDownload}
+                disabled={isLoading}
+                className={`flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${className}`}
+            >
+                {isLoading ? (
+                    <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Downloading...
+                    </div>
+                ) : (
+                    <>
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download (Owner)
+                    </>
+                )}
+            </button>
+        );
+    }
+
+    // User has already purchased
+    if (hasPurchased) {
+        return (
+            <button
+                onClick={handleDownload}
+                disabled={isLoading}
+                className={`flex items-center justify-center px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${className}`}
+            >
+                {isLoading ? (
+                    <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Downloading...
+                    </div>
+                ) : (
+                    <>
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Download
+                    </>
+                )}
+            </button>
+        );
+    }
+
+    // Free model
+    if (isFree) {
+        return (
+            <button
+                onClick={handleDownload}
+                disabled={isLoading}
+                className={`flex items-center justify-center px-6 py-3 bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${className}`}
+            >
+                {isLoading ? (
+                    <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Downloading...
+                    </div>
+                ) : (
+                    <>
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Free Download
+                    </>
+                )}
+            </button>
+        );
+    }
+
+    // Paid model - show purchase button
+    return (
+        <>
+            <button
+                onClick={handlePurchaseClick}
+                className={`flex items-center justify-center px-6 py-3 bg-accent text-white rounded-md hover:bg-accent-hover transition-colors ${className}`}
+                disabled={!currentUser}
+            >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-1.5 5M7 13l-1.5-5M17 13v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+                </svg>
+                Buy for {paymentService.formatPrice(model.price)}
+            </button>
+
+            {isPaymentModalOpen && (
+                <PaymentModal
+                    model={model}
+                    onClose={() => {
+                        setIsPaymentModalOpen(false);
+                        paymentDebugger.log('info', 'PURCHASE_BUTTON', 'Payment modal closed');
+                    }}
+                    onSuccess={() => {
+                        setIsPaymentModalOpen(false);
+                        loadUserPurchases(); // Refresh purchases
+                        paymentDebugger.log('success', 'PURCHASE_BUTTON', 'Payment successful, refreshing purchases');
+                    }}
+                />
+            )}
+        </>
+    );
+};
+
+PurchaseButton.propTypes = {
+    model: PropTypes.shape({
+        id: PropTypes.string.isRequired,
+        name: PropTypes.string.isRequired,
+        uploaderId: PropTypes.string.isRequired,
+        isPaid: PropTypes.bool,
+        price: PropTypes.number,
+        originalFileUrl: PropTypes.string,
+    }).isRequired,
+    className: PropTypes.string,
+}; 
