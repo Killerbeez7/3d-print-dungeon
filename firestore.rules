@@ -25,7 +25,9 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           'displayName', 'photoURL', 'bio', 'city', 'country',
           'coverURL',  'email', 'searchableName', 'socials',
-          'uploads', 'upscalePhotoURL', 'createdAt', 'artist'
+          'uploads', 'upscalePhotoURL', 'createdAt', 'artist',
+          'stripeCustomerId', 'stripeAccountId', 'sellerEnabled',
+          'purchasedModels', 'totalSales', 'salesCount'
         ]);
       // Only admin or super admin can update roles field
       allow update: if (isAdmin() || isSuperAdmin())
@@ -54,6 +56,36 @@ service cloud.firestore {
       allow create: if isSignedIn();
       allow update, delete: if isSignedIn() 
         && (resource.data.userId == request.auth.uid || isAdmin());
+    }
+
+    // -------------- Payment Collections --------------
+    
+    // Purchases - users can read their own purchases, admins can read all
+    match /purchases/{purchaseId} {
+      allow read: if isSignedIn() && 
+        (resource.data.buyerId == request.auth.uid || 
+         resource.data.sellerId == request.auth.uid || 
+         isAdmin());
+      allow create, update: if false; // Only cloud functions can write
+      allow delete: if isAdmin();
+    }
+
+    // Payment Intents - users can read their own, admins can read all
+    match /paymentIntents/{paymentIntentId} {
+      allow read: if isSignedIn() && 
+        (resource.data.buyerId == request.auth.uid || 
+         resource.data.sellerId == request.auth.uid || 
+         isAdmin());
+      allow create, update: if false; // Only cloud functions can write
+      allow delete: if isAdmin();
+    }
+
+    // Subscriptions - users can read their own, admins can read all
+    match /subscriptions/{subscriptionId} {
+      allow read: if isSignedIn() && 
+        (resource.data.userId == request.auth.uid || isAdmin());
+      allow create, update: if false; // Only cloud functions can write
+      allow delete: if isAdmin();
     }
 
     // -------------- Site Settings --------------
