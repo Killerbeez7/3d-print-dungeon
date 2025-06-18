@@ -33,11 +33,83 @@
             ]
         },
         {
+            "collectionGroup": "models",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "isPaid", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "models",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "isPaid", "order": "ASCENDING" },
+                { "fieldPath": "purchaseCount", "order": "DESCENDING" }
+            ]
+        },
+        {
             "collectionGroup": "comments",
             "queryScope": "COLLECTION",
             "fields": [
                 { "fieldPath": "modelId", "order": "ASCENDING" },
                 { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "purchases",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "buyerId", "order": "ASCENDING" },
+                { "fieldPath": "purchasedAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "purchases",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "sellerId", "order": "ASCENDING" },
+                { "fieldPath": "purchasedAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "purchases",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "modelId", "order": "ASCENDING" },
+                { "fieldPath": "purchasedAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "paymentIntents",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "buyerId", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "paymentIntents",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "status", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "subscriptions",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "userId", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "subscriptions",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "status", "order": "ASCENDING" },
+                { "fieldPath": "currentPeriodEnd", "order": "ASCENDING" }
             ]
         },
         {
@@ -50,15 +122,6 @@
             ]
         },
         {
-            "collectionGroup": "viewTrackers",
-            "queryScope": "COLLECTION",
-            "fields": [
-                { "fieldPath": "modelId", "order": "ASCENDING" },
-                { "fieldPath": "userId", "order": "ASCENDING" },
-                { "fieldPath": "createdAt", "order": "ASCENDING" }
-            ]
-        },
-        {
             "collectionGroup": "forumThreads",
             "queryScope": "COLLECTION",
             "fields": [
@@ -71,48 +134,8 @@
             "queryScope": "COLLECTION",
             "fields": [
                 { "fieldPath": "categoryId", "order": "ASCENDING" },
-                { "fieldPath": "lastActivity", "order": "DESCENDING" }
-            ]
-        },
-        {
-            "collectionGroup": "forumThreads",
-            "queryScope": "COLLECTION",
-            "fields": [
-                { "fieldPath": "categoryId", "order": "ASCENDING" },
-                { "fieldPath": "views", "order": "DESCENDING" }
-            ]
-        },
-        {
-            "collectionGroup": "forumThreads",
-            "queryScope": "COLLECTION",
-            "fields": [
-                { "fieldPath": "categoryId", "order": "ASCENDING" },
-                { "fieldPath": "replyCount", "order": "ASCENDING" },
-                { "fieldPath": "createdAt", "order": "DESCENDING" }
-            ]
-        },
-        {
-            "collectionGroup": "forumThreads",
-            "queryScope": "COLLECTION",
-            "fields": [
-                { "fieldPath": "replyCount", "order": "ASCENDING" },
-                { "fieldPath": "createdAt", "order": "DESCENDING" }
-            ]
-        },
-        {
-            "collectionGroup": "forumThreads",
-            "queryScope": "COLLECTION",
-            "fields": [
-                { "fieldPath": "views", "order": "DESCENDING" },
-                { "fieldPath": "createdAt", "order": "DESCENDING" }
-            ]
-        },
-        {
-            "collectionGroup": "forumThreads",
-            "queryScope": "COLLECTION",
-            "fields": [
-                { "fieldPath": "authorId", "order": "ASCENDING" },
-                { "fieldPath": "createdAt", "order": "DESCENDING" }
+                { "fieldPath": "isPinned", "order": "DESCENDING" },
+                { "fieldPath": "lastActivityAt", "order": "DESCENDING" }
             ]
         },
         {
@@ -124,11 +147,11 @@
             ]
         },
         {
-            "collectionGroup": "forumReplies",
+            "collectionGroup": "forumThreadLikes",
             "queryScope": "COLLECTION",
             "fields": [
-                { "fieldPath": "authorId", "order": "ASCENDING" },
-                { "fieldPath": "createdAt", "order": "DESCENDING" }
+                { "fieldPath": "threadId", "order": "ASCENDING" },
+                { "fieldPath": "userId", "order": "ASCENDING" }
             ]
         }
     ],
