@@ -7,7 +7,9 @@ import PropTypes from "prop-types";
 // components
 import { FilesUpload } from "./sections/FilesUpload";
 import { InfoForm } from "./sections/InfoForm";
+import { PricingForm } from "./sections/PricingForm";
 import AlertModal from "@/components/shared/alert-modal/AlertModal";
+import { SellerVerification } from "@/components/payment/SellerVerification";
 
 export function ModelUpload() {
     const { currentUser } = useAuth();
@@ -20,6 +22,7 @@ export function ModelUpload() {
     const [posterDataUrl, setPosterDataUrl] = useState(null);
     const [convertedBlob, setConvertedBlob] = useState(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showSellerVerification, setShowSellerVerification] = useState(false);
 
     const [modelData, setModelData] = useState({
         name: "",
@@ -30,6 +33,8 @@ export function ModelUpload() {
         renderFiles: [],
         renderPreviewUrls: [],
         selectedRenderIndex: 0,
+        price: 0,
+        isPaid: false,
     });
 
     const modelViewerRef = useRef();
@@ -115,6 +120,22 @@ export function ModelUpload() {
             return;
         }
 
+        // Validate pricing if it's a paid model
+        if (modelData.isPaid && (!modelData.price || modelData.price < 0.5)) {
+            setError("Paid models must have a price of at least $0.50.");
+            return;
+        }
+
+        // Check if user needs seller verification for paid models
+        if (modelData.isPaid && modelData.price > 0) {
+            // Check if user has completed seller verification
+            // This would typically check user.stripeAccountId or user.sellerEnabled
+            if (!currentUser?.stripeAccountId && !currentUser?.sellerEnabled) {
+                setShowSellerVerification(true);
+                return;
+            }
+        }
+
         setIsUploading(true);
 
         try {
@@ -141,96 +162,123 @@ export function ModelUpload() {
                 onProgress: setUploadProgress,
                 posterBlob,
                 preConvertedFile: convertedBlob,
+                price: modelData.price,
+                isPaid: modelData.isPaid,
             });
 
             setShowSuccessModal(true);
-
-            setFiles([]);
-            setModelData({
-                name: "",
-                description: "",
-                category: "",
-                tags: [],
-                convertedUrl: null,
-                renderFiles: [],
-                renderPreviewUrls: [],
-                selectedRenderIndex: 0,
-            });
-            setTimeout(() => setUploadProgress(0), 500);
         } catch (err) {
-            console.error("Publish error:", err);
-            setError("Upload failed. Check console for details.");
+            console.error("Upload error:", err);
+            setError(err.message || "Upload failed. Please try again.");
         } finally {
             setIsUploading(false);
         }
     };
 
+    const nextStep = () => {
+        if (step < 3) setStep(step + 1);
+    };
+
+    const prevStep = () => {
+        if (step > 1) setStep(step - 1);
+    };
+
+    const canProceedToStep2 = files.length > 0;
+    const canProceedToStep3 = modelData.name.trim() && 
+                              modelData.category.trim() && 
+                              modelData.description.trim() && 
+                              modelData.renderFiles.length > 0;
+
+    const handleSellerVerificationClose = () => {
+        setShowSellerVerification(false);
+    };
+
+
+
     return (
-        <div className="container mx-auto p-6 space-y-6 max-w-6xl">
-            {/* Step Indicator */}
-            <div className="flex items-center w-full max-w-md mx-auto mb-8">
-                <StepIndicator stepNumber={1} label="Upload" currentStep={step} />
-                <div className="flex-1 mx-4 border-t border-dashed border-br-surface"></div>
-                <StepIndicator
-                    stepNumber={2}
-                    label="Model Information"
-                    currentStep={step}
-                />
+        <div className="max-w-4xl mx-auto py-8 px-4">
+            <div className="mb-8">
+                <h1 className="text-3xl font-bold text-txt-primary mb-4">
+                    Upload Your 3D Model
+                </h1>
+                <div className="flex items-center space-x-8 mb-8">
+                    <StepIndicator stepNumber={1} label="Files" currentStep={step} />
+                    <StepIndicator stepNumber={2} label="Details" currentStep={step} />
+                    <StepIndicator stepNumber={3} label="Pricing" currentStep={step} />
+                </div>
             </div>
 
             {error && (
-                <div className="bg-error/10 border border-error/20 rounded-lg p-4 text-error font-semibold text-center">
-                    {error}
+                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+                    <p className="text-red-800">{error}</p>
                 </div>
             )}
 
-            <div className="rounded-xl p-6">
-                <FilesUpload step={step} files={files} setFiles={setFiles} />
+            <div className="bg-bg-surface rounded-lg p-6 shadow-sm">
+                {step === 1 && (
+                    <div>
+                        <FilesUpload step={step} files={files} setFiles={setFiles} />
+                        <div className="flex justify-end mt-6">
+                            <button
+                                onClick={nextStep}
+                                disabled={!canProceedToStep2}
+                                className="px-6 py-2 bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                Next: Add Details
+                            </button>
+                        </div>
+                    </div>
+                )}
 
                 {step === 2 && (
-                    <div className="mt-6 pt-6 border-t border-br-secondary">
+                    <div>
                         <InfoForm modelData={modelData} setModelData={setModelData} />
+                        <div className="flex justify-between mt-6">
+                            <button
+                                onClick={prevStep}
+                                className="px-6 py-2 border border-br-secondary rounded-md text-txt-secondary hover:bg-bg-hover transition-colors"
+                            >
+                                Back
+                            </button>
+                            <button
+                                onClick={nextStep}
+                                disabled={!canProceedToStep3}
+                                className="px-6 py-2 bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                Next: Set Pricing
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {step === 3 && (
+                    <div>
+                        <PricingForm modelData={modelData} setModelData={setModelData} />
+                        <div className="flex justify-between mt-6">
+                            <button
+                                onClick={prevStep}
+                                className="px-6 py-2 border border-br-secondary rounded-md text-txt-secondary hover:bg-bg-hover transition-colors"
+                            >
+                                Back
+                            </button>
+                            <button
+                                onClick={handleSubmit}
+                                disabled={isUploading}
+                                className="px-6 py-2 bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                            >
+                                {isUploading ? (
+                                    <div className="flex items-center">
+                                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                        Uploading... {Math.round(uploadProgress)}%
+                                    </div>
+                                ) : (
+                                    "Upload Model"
+                                )}
+                            </button>
+                        </div>
                     </div>
                 )}
             </div>
-
-            {isUploading && (
-                <div className="w-full bg-bg-surface rounded-lg overflow-hidden">
-                    <div
-                        className="bg-accent h-2 transition-all duration-300 ease-in-out"
-                        style={{ width: `${uploadProgress}%` }}
-                    />
-                </div>
-            )}
-
-            <section className="flex justify-center gap-4 mt-8">
-                {step === 1 ? (
-                    files.length > 0 && (
-                        <button
-                            onClick={() => setStep(2)}
-                            className="cta-button px-6 py-3 font-semibold transition-all"
-                        >
-                            Next Step
-                        </button>
-                    )
-                ) : (
-                    <>
-                        <button
-                            onClick={() => setStep(1)}
-                            className="secondary-button px-6 py-3"
-                        >
-                            Previous Step
-                        </button>
-                        <button
-                            onClick={handleSubmit}
-                            className="cta-button px-6 py-3"
-                            disabled={isUploading}
-                        >
-                            {isUploading ? "Uploading..." : "Submit"}
-                        </button>
-                    </>
-                )}
-            </section>
 
             {/* HIDDEN model-viewer for capturing the screenshot */}
             <model-viewer
@@ -256,7 +304,12 @@ export function ModelUpload() {
                 isOpen={showSuccessModal}
                 onClose={() => setShowSuccessModal(false)}
                 title="Upload Successful!"
-                message="Your model has been successfully uploaded!"
+                message={`Your model has been successfully uploaded${modelData.isPaid ? ' and is now available for purchase' : ' and is now available for download'}!`}
+            />
+
+            <SellerVerification
+                isOpen={showSellerVerification}
+                onClose={handleSellerVerificationClose}
             />
         </div>
     );
@@ -264,18 +317,30 @@ export function ModelUpload() {
 
 function StepIndicator({ stepNumber, label, currentStep }) {
     const isActive = currentStep === stepNumber;
+    const isCompleted = currentStep > stepNumber;
+    
     return (
         <div
             className={`flex items-center space-x-3 ${
-                isActive ? "text-accent" : "text-txt-secondary"
+                isActive ? "text-accent" : isCompleted ? "text-green-600" : "text-txt-secondary"
             }`}
         >
             <div
                 className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
-                    isActive ? "bg-accent shadow-lg shadow-accent/20" : "bg-bg-surface"
+                    isActive 
+                        ? "bg-accent shadow-lg shadow-accent/20" 
+                        : isCompleted 
+                        ? "bg-green-600" 
+                        : "bg-bg-surface"
                 } text-white font-bold`}
             >
-                {stepNumber}
+                {isCompleted ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                ) : (
+                    stepNumber
+                )}
             </div>
             <span className="font-semibold">{label}</span>
         </div>
