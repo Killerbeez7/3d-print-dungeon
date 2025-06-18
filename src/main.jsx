@@ -20,14 +20,16 @@ const queryClient = new QueryClient({
 });
 // ----------
 
-console.log("Starting app initialization");
+console.log("Starting app initialization...");
 
 const container = document.getElementById("root");
-console.log("Root element found:", !!container);
+console.log("=========== Main.jsx ===========");
+console.log("Root element:", container? "✅ Found" : "❌ Missing");
+// Initialize Stripe with your publishable key
 
 try {
     const root = createRoot(container);
-    console.log("Root created");
+    console.log("Root created: ✅ True");
 
     root.render(
         <ErrorBoundary>
