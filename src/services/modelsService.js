@@ -30,6 +30,8 @@ export async function createAdvancedModel({
     onProgress,
     posterBlob,
     preConvertedFile,
+    price = 0,
+    isPaid = false,
 }) {
     const progressFn = onProgress || (() => {});
     let progress = 0;
@@ -153,9 +155,14 @@ export async function createAdvancedModel({
         renderPrimaryUrl,
         renderExtraUrls,
         posterUrl,
+        price: parseFloat(price) || 0,
+        isPaid: Boolean(isPaid),
+        currency: "usd",
         createdAt: serverTimestamp(),
         views: 0,
         likes: 0,
+        purchaseCount: 0,
+        totalRevenue: 0,
     });
 
     // link to user
