@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { paymentService } from "@/services/paymentService";
 import { PaymentModal } from "./PaymentModal";
-import { paymentDebugger } from "@/utils/paymentDebugger";
 import PropTypes from "prop-types";
 
 export const PurchaseButton = ({ model, className = "" }) => {
@@ -15,44 +14,18 @@ export const PurchaseButton = ({ model, className = "" }) => {
         if (currentUser) {
             loadUserPurchases();
         }
-        
-        // Add debug button for development
-        if (import.meta.env.DEV) {
-            window.debugCurrentModel = () => {
-                console.log("🚀 Starting payment debug for current model...");
-                paymentDebugger.debugPaymentFlow(model.id, model.price);
-            };
-            
-            window.quickDebugAuth = () => paymentDebugger.quickAuth();
-            window.quickDebugPurchases = () => paymentDebugger.quickPurchases();
-            
-            console.log(`🔍 Debug functions available:
-- window.debugCurrentModel() - Debug this model (${model.id})
-- window.quickDebugAuth() - Test authentication
-- window.quickDebugPurchases() - Test purchases
-- window.paymentDebugger.help() - Full debugger help`);
-        }
-    }, [currentUser, model.id, model.price]);
+    }, [currentUser]);
 
     const loadUserPurchases = async () => {
         try {
             setIsLoading(true);
-            paymentDebugger.log('info', 'PURCHASE_BUTTON', 'Loading user purchases...');
             
             const purchases = await paymentService.getUserPurchases();
             const purchasedModelIds = purchases.map(p => p.modelId);
             setUserPurchases(purchasedModelIds);
             
-            paymentDebugger.log('success', 'PURCHASE_BUTTON', 'Purchases loaded', {
-                totalPurchases: purchases.length,
-                currentModelPurchased: purchasedModelIds.includes(model.id)
-            });
         } catch (error) {
             console.error("Error loading user purchases:", error);
-            paymentDebugger.log('error', 'PURCHASE_BUTTON', 'Failed to load purchases', {
-                message: error.message,
-                code: error.code
-            });
         } finally {
             setIsLoading(false);
         }
@@ -86,25 +59,14 @@ export const PurchaseButton = ({ model, className = "" }) => {
 
     const handlePurchaseClick = async () => {
         try {
-            paymentDebugger.log('info', 'PURCHASE_BUTTON', 'Purchase button clicked', {
-                modelId: model.id,
-                price: model.price,
-                userLoggedIn: !!currentUser
-            });
-            
             if (!currentUser) {
-                paymentDebugger.log('warning', 'PURCHASE_BUTTON', 'User not logged in');
                 alert("Please log in to purchase models");
                 return;
             }
 
             setIsPaymentModalOpen(true);
-            paymentDebugger.log('success', 'PURCHASE_BUTTON', 'Payment modal opened');
         } catch (error) {
             console.error("Error handling purchase click:", error);
-            paymentDebugger.log('error', 'PURCHASE_BUTTON', 'Purchase click failed', {
-                message: error.message
-            });
         }
     };
 
@@ -206,12 +168,10 @@ export const PurchaseButton = ({ model, className = "" }) => {
                     model={model}
                     onClose={() => {
                         setIsPaymentModalOpen(false);
-                        paymentDebugger.log('info', 'PURCHASE_BUTTON', 'Payment modal closed');
                     }}
                     onSuccess={() => {
                         setIsPaymentModalOpen(false);
                         loadUserPurchases(); // Refresh purchases
-                        paymentDebugger.log('success', 'PURCHASE_BUTTON', 'Payment successful, refreshing purchases');
                     }}
                 />
             )}
