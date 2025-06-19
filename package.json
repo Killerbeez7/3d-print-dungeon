@@ -29,7 +29,7 @@
         "@tanstack/react-query": "^5.77.2",
         "date-fns": "^4.1.0",
         "firebase": "^11.8.1",
-        "firebase-admin": "^13.2.0",
+        "firebase-admin": "^13.4.0",
         "firebase-functions": "^6.3.2",
         "lazysizes": "^5.3.2",
         "prop-types": "^15.8.1",
