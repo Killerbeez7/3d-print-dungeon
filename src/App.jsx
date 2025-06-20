@@ -4,6 +4,7 @@ import { ModelsProvider } from "./providers/modelsProvider";
 import { SearchProvider } from "./providers/searchProvider";
 import { ForumProvider } from "./providers/forumProvider";
 import { StripeProvider } from "./providers/StripeProvider";
+import TestStripeButton from "./test/testStripeConnection";
 
 import { AppRoutes } from "./AppRoutes";
 
@@ -15,6 +16,7 @@ export const App = () => {
                     <ModelsProvider>
                         <SearchProvider>
                             <ForumProvider>
+                                <TestStripeButton />
                                 <AppRoutes />
                             </ForumProvider>
                         </SearchProvider>
