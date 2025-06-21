@@ -11,8 +11,10 @@ import { PricingForm } from "./sections/PricingForm";
 import AlertModal from "@/components/shared/alert-modal/AlertModal";
 import { SellerVerification } from "@/components/payment/SellerVerification";
 
+const UPLOAD_STATE_KEY = "pendingUploadState";
+
 export function ModelUpload() {
-    const { currentUser } = useAuth();
+    const { currentUser, userData } = useAuth();
 
     const [step, setStep] = useState(1);
     const [error, setError] = useState("");
@@ -38,6 +40,25 @@ export function ModelUpload() {
     });
 
     const modelViewerRef = useRef();
+
+    useEffect(() => {
+        const savedStateJSON = sessionStorage.getItem(UPLOAD_STATE_KEY);
+        if (savedStateJSON) {
+            console.log("Found pending upload state, restoring form data...");
+            const savedModelData = JSON.parse(savedStateJSON);
+            setModelData(prevData => ({
+                ...prevData,
+                name: savedModelData.name || "",
+                description: savedModelData.description || "",
+                category: savedModelData.category || "",
+                tags: savedModelData.tags || [],
+                price: savedModelData.price || 0,
+                isPaid: savedModelData.isPaid || false,
+            }));
+            sessionStorage.removeItem(UPLOAD_STATE_KEY);
+            setError("Welcome back! To complete your upload, please re-select your 3D model file and any render images.");
+        }
+    }, []);
 
     useEffect(() => {
         if (!files || files.length === 0) return;
@@ -128,9 +149,11 @@ export function ModelUpload() {
 
         // Check if user needs seller verification for paid models
         if (modelData.isPaid && modelData.price > 0) {
-            // Check if user has completed seller verification
-            // This would typically check user.stripeAccountId or user.sellerEnabled
-            if (!currentUser?.stripeAccountId && !currentUser?.sellerEnabled) {
+            // Check if user has completed seller verification.
+            // If they don't have a connect ID in their profile, prompt to create one.
+            if (!userData?.stripeConnectId) {
+                console.log("Seller verification required. Saving upload state to sessionStorage.");
+                sessionStorage.setItem(UPLOAD_STATE_KEY, JSON.stringify(modelData));
                 setShowSellerVerification(true);
                 return;
             }
@@ -193,8 +216,6 @@ export function ModelUpload() {
         setShowSellerVerification(false);
     };
 
-
-
     return (
         <div className="max-w-4xl mx-auto py-8 px-4">
             <div className="mb-8">
@@ -253,7 +274,11 @@ export function ModelUpload() {
 
                 {step === 3 && (
                     <div>
-                        <PricingForm modelData={modelData} setModelData={setModelData} />
+                        <PricingForm 
+                            modelData={modelData} 
+                            setModelData={setModelData} 
+                            currentUser={currentUser}
+                        />
                         <div className="flex justify-between mt-6">
                             <button
                                 onClick={prevStep}
@@ -310,6 +335,7 @@ export function ModelUpload() {
             <SellerVerification
                 isOpen={showSellerVerification}
                 onClose={handleSellerVerificationClose}
+                returnUrl={window.location.href}
             />
         </div>
     );
