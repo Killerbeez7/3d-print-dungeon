@@ -1,238 +1,131 @@
-import { httpsCallable } from "firebase/functions";
-import { functions, auth } from "../config/firebase";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { app } from "@/config/firebase"; // your initialized Firebase app
+// import { functions } from "@/config/firebase";
+// import { httpsCallable } from "firebase/functions";
+import { auth } from "@/config/firebase";
+const functions = getFunctions(app, "us-central1"); // or "europe-west1" if that's what you deployed to
+
 
 class PaymentService {
     constructor() {
-        this.retryAttempts = new Map(); // Track retry attempts per function
-        this.maxRetries = 2; // Reduce from 3 to 2
-        this.retryDelay = 1000; // 1 second delay between retries
+        this.maxRetries = 2;
+        this.retryDelay = 1000;
     }
 
-    /**
-     * Enhanced retry wrapper with exponential backoff and attempt tracking
-     */
-    async withRetry(operation, operationName) {
+    async withRetry(operation, name) {
         let lastError;
-
         for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
             try {
-                console.log(`🔄 ${operationName} - Attempt ${attempt + 1}/${this.maxRetries + 1}`);
-                
                 if (attempt > 0) {
-                    const delay = this.retryDelay * Math.pow(2, attempt - 1); // Exponential backoff
-                    console.log(`⏳ Waiting ${delay}ms before retry...`);
-                    await new Promise(resolve => setTimeout(resolve, delay));
+                    const delay = this.retryDelay * Math.pow(2, attempt - 1);
+                    console.log(`Retrying ${name} in ${delay}ms...`);
+                    await new Promise((r) => setTimeout(r, delay));
                 }
-
                 const result = await operation();
-                
-                if (attempt > 0) {
-                    console.log(`✅ ${operationName} succeeded on attempt ${attempt + 1}`);
-                }
-                
                 return result;
             } catch (error) {
                 lastError = error;
-                console.error(`❌ ${operationName} failed on attempt ${attempt + 1}:`, {
-                    message: error.message,
-                    code: error.code,
-                });
-
-                // Don't retry auth errors or invalid argument errors
-                if (error.code === 'unauthenticated' || 
-                    error.code === 'permission-denied' ||
-                    error.code === 'invalid-argument') {
-                    console.log(`🚫 Not retrying ${operationName} due to auth/validation error`);
+                if (
+                    ["unauthenticated", "permission-denied", "invalid-argument"].includes(
+                        error?.code
+                    )
+                )
                     break;
-                }
-
-                // Don't retry on last attempt
-                if (attempt === this.maxRetries) {
-                    console.log(`🚫 Max retries reached for ${operationName}`);
-                    break;
-                }
             }
         }
-
         throw lastError;
     }
 
-    async createCustomer() {
+
+    async callWithAuth(fnName, data) {
         try {
-            const createStripeCustomerFunc = httpsCallable(functions, "createStripeCustomer");
-            const result = await createStripeCustomerFunc();
-            console.log("🔐 Customer created:", result.data);
+            if (!auth.currentUser) {
+                throw new Error("User not authenticated. Please log in.");
+            }
+            console.log("currentUser", auth.currentUser);
+            console.log("currentToken", auth.currentUser.getIdToken());
+            console.log("refreshing token...");
+            
+            // Force a token refresh to ensure it's not stale.
+            await auth.currentUser.getIdToken(true);
+            console.log("token refreshed", auth.currentUser);
+            console.log("newToken", auth.currentUser.getIdToken());
+            
+            const callable = httpsCallable(functions, fnName);
+            const result = await callable(data);
+            console.log("result", result);
+            
             return result.data;
         } catch (error) {
-            console.error("Error creating customer:", error);
+            console.error(`❌ [${fnName}] Error:`, error.message || error);
             throw error;
         }
     }
 
-    /**
-     * Create payment intent for model purchase
-     * @param {string} modelId - The model ID to purchase
-     * @param {number} amount - The amount in dollars
-     * @param {string} currency - The currency (default: usd)
-     */
+    async createConnectAccount() {
+        return this.withRetry(
+            () => this.callWithAuth("createConnectAccount"),
+            "createConnectAccount"
+        );
+    }
+
+    async createAccountLink(accountId, refreshUrl, returnUrl) {
+        const data = { accountId, refreshUrl, returnUrl };
+        const result = await this.withRetry(
+            () => this.callWithAuth("createAccountLink", data),
+            "createAccountLink"
+        );
+        return result.url;
+    }
+
+    // async createStripeCustomer() {
+    //     return this.withRetry(async () => {
+    //         const fn = httpsCallable(functions, "createStripeCustomer");
+    //         const res = await fn();
+    //         return res.data;
+    //     }, "createStripeCustomer");
+    // }
+
     async createPaymentIntent(modelId, amount, currency = "usd") {
         return this.withRetry(async () => {
-            console.log("💳 Creating payment intent...", { modelId, amount, currency });
-
-            if (!auth.currentUser) {
-                throw new Error("User must be logged in to make purchases");
-            }
-
-            // Force token refresh before payment
-            await auth.currentUser.getIdToken(true);
-            
-            const createPaymentIntentFunc = httpsCallable(functions, "createPaymentIntent");
-            const result = await createPaymentIntentFunc({
-                modelId,
-                amount,
-                currency,
-            });
-
-            console.log("✅ Payment intent created successfully");
-            return result.data;
+            const fn = httpsCallable(functions, "createPaymentIntent");
+            const res = await fn({ modelId, amount, currency });
+            return res.data;
         }, "createPaymentIntent");
     }
 
-    /**
-     * Create subscription for premium features
-     * @param {string} priceId - Stripe price ID
-     * @param {string} paymentMethodId - Payment method ID (optional)
-     */
-    async createSubscription(priceId, paymentMethodId = null) {
-        return this.withRetry(async () => {
-            if (!auth.currentUser) {
-                throw new Error("User must be logged in to subscribe");
-            }
+    // async createSubscription(priceId, paymentMethodId = null) {
+    //     return this.withRetry(async () => {
+    //         const fn = httpsCallable(functions, "createSubscription");
+    //         const res = await fn({ priceId, paymentMethodId });
+    //         return res.data;
+    //     }, "createSubscription");
+    // }
 
-            const createSubscriptionFunc = httpsCallable(functions, "createSubscription");
-            const result = await createSubscriptionFunc({
-                priceId,
-                paymentMethodId,
-            });
-
-            return result.data;
-        }, "createSubscription");
-    }
-
-    /**
-     * Handle successful payment completion
-     * @param {string} paymentIntentId - The payment intent ID
-     */
     async handlePaymentSuccess(paymentIntentId) {
         return this.withRetry(async () => {
-            console.log("🎉 Handling payment success...", { paymentIntentId });
-
-            if (!auth.currentUser) {
-                throw new Error("User must be logged in");
-            }
-
-            const handlePaymentSuccessFunc = httpsCallable(functions, "handlePaymentSuccess");
-            const result = await handlePaymentSuccessFunc({ paymentIntentId });
-
-            console.log("✅ Payment success handled");
-            return result.data;
+            const fn = httpsCallable(functions, "handlePaymentSuccess");
+            const res = await fn({ paymentIntentId });
+            return res.data;
         }, "handlePaymentSuccess");
     }
 
-    /**
-     * Get user's purchase history
-     */
     async getUserPurchases() {
         return this.withRetry(async () => {
-            console.log("🔐 getUserPurchases - Starting auth check...");
-            
-            if (!auth.currentUser) {
-                throw new Error("User must be logged in to view purchases");
-            }
-
-            // Force refresh the ID token to ensure it's valid
-            console.log("🔄 Refreshing ID token for purchases...");
-            const token = await auth.currentUser.getIdToken(true);
-            
-            console.log("✅ Token refreshed:", {
-                hasToken: !!token,
-                uid: auth.currentUser.uid,
-                email: auth.currentUser.email?.substring(0, 10) + "...",
-            });
-
-            const getUserPurchasesFunc = httpsCallable(functions, "getUserPurchases");
-            const result = await getUserPurchasesFunc({});
-            
-            console.log("✅ getUserPurchases completed successfully");
-            return result.data.purchases || [];
+            const fn = httpsCallable(functions, "getUserPurchases");
+            const res = await fn();
+            return res.data.purchases || [];
         }, "getUserPurchases");
     }
 
-    /**
-     * Get seller's sales history
-     */
     async getSellerSales() {
         return this.withRetry(async () => {
-            if (!auth.currentUser) {
-                throw new Error("User must be logged in to view sales");
-            }
-
-            const getSellerSalesFunc = httpsCallable(functions, "getSellerSales");
-            const result = await getSellerSalesFunc({});
-            
-            return result.data.sales || [];
+            const fn = httpsCallable(functions, "getSellerSales");
+            const res = await fn();
+            return res.data.sales || [];
         }, "getSellerSales");
     }
 
-    /**
-     * Create Stripe Connect account for sellers
-     * @param {string} country - Country code (default: US)
-     * @param {string} type - Account type (default: express)
-     */
-    async createConnectAccount(country = "US", type = "express") {
-        return this.withRetry(async () => {
-            if (!auth.currentUser) {
-                throw new Error("User must be logged in to become a seller");
-            }
-
-            const createConnectAccountFunc = httpsCallable(functions, "createConnectAccount");
-            const result = await createConnectAccountFunc({
-                country,
-                type,
-            });
-
-            return result.data;
-        }, "createConnectAccount");
-    }
-
-    /**
-     * Create account link for seller onboarding
-     * @param {string} accountId - Stripe account ID
-     * @param {string} refreshUrl - URL to redirect on refresh
-     * @param {string} returnUrl - URL to redirect on completion
-     */
-    async createAccountLink(accountId, refreshUrl, returnUrl) {
-        return this.withRetry(async () => {
-            if (!auth.currentUser) {
-                throw new Error("User must be logged in");
-            }
-
-            const createAccountLinkFunc = httpsCallable(functions, "createAccountLink");
-            const result = await createAccountLinkFunc({
-                accountId,
-                refreshUrl,
-                returnUrl,
-            });
-
-            return result.data;
-        }, "createAccountLink");
-    }
-
-    /**
-     * Format price for display
-     * @param {number} amount - Amount in dollars
-     * @param {string} currency - Currency code
-     */
     formatPrice(amount, currency = "USD") {
         return new Intl.NumberFormat("en-US", {
             style: "currency",
@@ -240,10 +133,6 @@ class PaymentService {
         }).format(amount);
     }
 
-    /**
-     * Validate price input
-     * @param {string|number} price - Price to validate
-     */
     validatePrice(price) {
         const numPrice = parseFloat(price);
         if (isNaN(numPrice) || numPrice < 0) {
@@ -255,13 +144,8 @@ class PaymentService {
         return numPrice;
     }
 
-    /**
-     * Check if user has purchased a model
-     * @param {string} modelId - Model ID to check
-     * @param {Array} userPurchases - User's purchase array
-     */
-    hasPurchased(modelId, userPurchases = []) {
-        return userPurchases.includes(modelId);
+    hasPurchased(modelId, purchases = []) {
+        return purchases.some((item) => item.modelId === modelId);
     }
 }
 
