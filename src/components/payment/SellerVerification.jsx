@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { paymentService } from "@/services/paymentService";
 import PropTypes from "prop-types";
 
-export const SellerVerification = ({ isOpen, onClose }) => {
+export const SellerVerification = ({ isOpen, onClose, returnUrl }) => {
     const { currentUser } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
@@ -23,27 +23,42 @@ export const SellerVerification = ({ isOpen, onClose }) => {
         }
 
         setIsLoading(true);
+        console.log("Starting verification for user:", currentUser.uid);
         setError("");
         setStep("creating");
 
         try {
             // Create Stripe Connect account
+            console.log("Attempting to create Stripe Connect account via paymentService...");
             const { accountId } = await paymentService.createConnectAccount();
-            
+            if (!accountId) {
+                throw new Error("createConnectAccount did not return an accountId.");
+            }
+            console.log("accountId", accountId);
+            console.log("Successfully created Stripe Connect account with ID:", accountId);
             setStep("linking");
 
+            // Define the URLs for the account link
+            const finalReturnUrl = returnUrl || `${window.location.origin}/seller/dashboard`;
+            const finalRefreshUrl = returnUrl || `${window.location.origin}/seller/onboarding`;
+
             // Create account link for onboarding
-            const { url } = await paymentService.createAccountLink(
+            console.log("Attempting to create account link for accountId:", accountId);
+            const url = await paymentService.createAccountLink(
                 accountId,
-                `${window.location.origin}/seller/onboarding`,
-                `${window.location.origin}/seller/dashboard`
+                finalRefreshUrl,
+                finalReturnUrl
             );
+            if (!url) {
+                throw new Error("createAccountLink did not return a URL.");
+            }
 
             // Redirect to Stripe onboarding
+            console.log("Successfully created account link. Redirecting to Stripe...");
             window.location.href = url;
             
         } catch (error) {
-            console.error("Error setting up seller account:", error);
+            console.error("Error during the seller verification process:", error);
             setError(error.message || "Failed to set up seller account. Please try again.");
             setStep("info");
         } finally {
@@ -204,4 +219,5 @@ export const SellerVerification = ({ isOpen, onClose }) => {
 SellerVerification.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
+    returnUrl: PropTypes.string,
 }; 
