@@ -23,25 +23,53 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [userData, setUserData] = useState<RawUserData | null>(null);
     const [loading, setLoading] = useState(true);
     const [authError, setAuthError] = useState<string | null>(null);
+    const [claims, setClaims] = useState<CustomClaims | null>(null);
     const [maintenanceMode, setMaintenanceMode] = useState(false);
     const [maintenanceMessage, setMaintenanceMessage] = useState<string | null>(null);
     const [maintenanceEndTime, setMaintenanceEndTime] = useState<Date | null>(null);
-    const [claims, setClaims] = useState<CustomClaims | null>(null);
 
-    const handleAuthError = (error: unknown, provider: string) => {
+    const handleAuthError = useCallback((error: unknown, provider: string) => {
         const errorMessage =
             error instanceof Error ? error.message : `Unknown error with ${provider}`;
         console.error(`${provider} error:`, error);
         setAuthError(errorMessage);
+        setLoading(false);
         throw error;
-    };
+    }, []);
 
     const changePassword = async (currentPassword: string, newPassword: string) => {
         if (!currentUser) throw new Error("No user is currently signed in");
         try {
             await changeUserPassword(currentUser, currentPassword, newPassword);
         } catch (error) {
-            handleAuthError(error, "password change");
+            handleAuthError(error, "Password Change");
+        }
+    };
+
+    const handleEmailSignUp = async (email: string, password: string) => {
+        // setLoading(true);
+        try {
+            await signUpWithEmail(email, password);
+        } catch (error) {
+            handleAuthError(error, "Email Sign-up");
+        }
+    };
+
+    const handleEmailSignIn = async (email: string, password: string) => {
+        // setLoading(true);
+        try {
+            await signInWithEmail(email, password);
+        } catch (error) {
+            handleAuthError(error, "Email Sign-in");
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        // setLoading(true);
+        try {
+            await signInWithGoogle();
+        } catch (error) {
+            handleAuthError(error, "Google Sign-in");
         }
     };
 
@@ -53,61 +81,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
-    const fetchUserData = useCallback(async () => {
-        if (!currentUser) {
-            setUserData(null);
-            setClaims(null);
-            return;
-        }
-
-        try {
-            const claims = await refreshIdToken();
-            setClaims(claims as CustomClaims);
-
-            getUserFromDatabase(currentUser.uid, (data: RawUserData | null) => {
-                setUserData({ ...(data || {}), roles: data?.roles || [] } as RawUserData);
-            });
-        } catch (error) {
-            handleAuthError(error, "data fetch");
-        }
-    }, [currentUser]);
-
-    const handleEmailSignUp = async (email: string, password: string) => {
-        try {
-            const user = await signUpWithEmail(email, password);
-            setCurrentUser(user);
-            await fetchUserData();
-        } catch (error) {
-            handleAuthError(error, "Email Sign-up");
-        }
-    };
-
-    const handleEmailSignIn = async (email: string, password: string) => {
-        try {
-            const user = await signInWithEmail(email, password);
-            setCurrentUser(user);
-            await fetchUserData();
-        } catch (error) {
-            handleAuthError(error, "Email Sign-in");
-        }
-    };
-
-    const handleGoogleSignIn = async () => {
-        try {
-            const user = await signInWithGoogle();
-            setCurrentUser(user);
-            await fetchUserData();
-        } catch (error) {
-            handleAuthError(error, "Google Sign-in");
-        }
-    };
-
     const handleSignOut = async () => {
+        // setLoading(true);
         try {
             await signOut();
-            setCurrentUser(null);
-            setUserData(null);
-            setClaims(null);
         } catch (error) {
             handleAuthError(error, "Sign-out");
         }
@@ -117,17 +94,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
                 setCurrentUser(user);
-                await fetchUserData();
+                try {
+                    const claims = await refreshIdToken();
+                    setClaims(claims as CustomClaims);
+
+                    getUserFromDatabase(user.uid, (data: RawUserData | null) => {
+                        setUserData({
+                            ...(data || {}),
+                            roles: data?.roles || [],
+                        } as RawUserData);
+                        setLoading(false);
+                    });
+                } catch (error) {
+                    console.error("Failed to fetch user data on auth change", error);
+                    await signOut();
+                }
             } else {
                 setCurrentUser(null);
                 setUserData(null);
                 setClaims(null);
+                setLoading(false);
             }
-            setLoading(false);
         });
 
         return () => unsubscribe();
-    }, [fetchUserData]);
+    }, [handleAuthError]);
 
     useEffect(() => {
         const checkMaintenance = async () => {
@@ -163,16 +154,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               )
               .map(([k]) => k)
         : [];
-    const roles = claimRoles;
-    const isAdmin = claims?.admin === true;
-    const isSuper = claims?.super === true;
 
     const value = {
         currentUser,
         userData,
-        roles,
-        isAdmin,
-        isSuper,
+        roles: claimRoles,
+        isAdmin: claims?.admin === true,
+        isSuper: claims?.super === true,
         claims,
         authError,
         maintenanceMode,
@@ -185,8 +173,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         handleGithubSignIn,
         handleSignOut,
         changePassword,
-        fetchUserData,
         handleAuthError,
+        fetchUserData: () => Promise.resolve(), // placeholder if needed
     };
 
     if (loading) return <div>Loading authentication...</div>;
