@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { grantRole, revokeRole } from "@/services/adminService";
+import { Spinner } from "@/components/shared/spinner";
 
 import { MdEdit, MdCheck, MdClose } from "react-icons/md";
 
@@ -52,7 +53,7 @@ export const UserManagement = () => {
         const newRoles = editingUser.roles || [];
 
         try {
-            // Find roles to add and remove
+            setLoading(true);
             const toAdd = newRoles.filter((r) => !origRoles.includes(r));
             const toRemove = origRoles.filter((r) => !newRoles.includes(r));
 
@@ -66,7 +67,7 @@ export const UserManagement = () => {
                     throw err;
                 }
             }
-            
+
             for (const role of toRemove) {
                 try {
                     await revokeRole(editingUser.id, role);
@@ -83,12 +84,14 @@ export const UserManagement = () => {
                     u.id === editingUser.id ? { ...u, roles: editingUser.roles } : u
                 )
             );
-            
+
             // Clear edit state
             setEditingUser(null);
         } catch (err) {
             console.error("Failed to save user roles:", err);
             alert(err.message || "Failed to update roles. Check console for details.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -100,8 +103,6 @@ export const UserManagement = () => {
     );
 
     /* ─────────────── render ─────────────── */
-    if (loading) return <p className="py-4 text-center">Loading users…</p>;
-
     return (
         <div className="space-y-6">
             {/* search */}
@@ -191,18 +192,26 @@ export const UserManagement = () => {
                                     <td className="px-6 py-4 text-right">
                                         {isEditing ? (
                                             <span className="flex gap-2 justify-end">
-                                                <button
-                                                    onClick={handleSave}
-                                                    className="text-green-500 hover:text-green-600"
-                                                >
-                                                    <MdCheck size={20} />
-                                                </button>
-                                                <button
-                                                    onClick={() => setEditingUser(null)}
-                                                    className="text-red-500 hover:text-red-600"
-                                                >
-                                                    <MdClose size={20} />
-                                                </button>
+                                                {loading ? (
+                                                    <Spinner />
+                                                ) : (
+                                                    <>
+                                                        <button
+                                                            onClick={handleSave}
+                                                            className="text-green-500 hover:text-green-600"
+                                                        >
+                                                            <MdCheck size={20} />
+                                                        </button>
+                                                        <button
+                                                            onClick={() =>
+                                                                setEditingUser(null)
+                                                            }
+                                                            className="text-red-500 hover:text-red-600"
+                                                        >
+                                                            <MdClose size={20} />
+                                                        </button>
+                                                    </>
+                                                )}
                                             </span>
                                         ) : (
                                             <button
