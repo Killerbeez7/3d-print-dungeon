@@ -73,14 +73,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
-    const handleGithubSignIn = async () => {
-        try {
-            throw new Error("GitHub sign-in not implemented");
-        } catch (error) {
-            handleAuthError(error, "GitHub sign-in");
-        }
-    };
-
     const handleSignOut = async () => {
         // setLoading(true);
         try {
@@ -118,7 +110,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
 
         return () => unsubscribe();
-    }, [handleAuthError]);
+    }, []);
 
     useEffect(() => {
         const checkMaintenance = async () => {
@@ -170,7 +162,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         handleEmailSignUp,
         handleEmailSignIn,
         handleGoogleSignIn,
-        handleGithubSignIn,
         handleSignOut,
         changePassword,
         handleAuthError,

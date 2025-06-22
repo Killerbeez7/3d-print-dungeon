@@ -16,7 +16,6 @@ export const AuthContext = createContext<AuthContextValue>({
     handleEmailSignUp: async () => {},
     handleEmailSignIn: async () => {},
     handleGoogleSignIn: async () => {},
-    handleGithubSignIn: async () => {},
     handleSignOut: async () => {},
     changePassword: async () => {},
     fetchUserData: async () => {},
