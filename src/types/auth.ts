@@ -27,6 +27,8 @@ export interface AuthContextValue {
     handleEmailSignUp(email: string, password: string): Promise<void>;
     handleEmailSignIn(email: string, password: string): Promise<void>;
     handleGoogleSignIn(): Promise<void>;
+    handleFacebookSignIn(): Promise<void>;
+    handleTwitterSignIn(): Promise<void>;
     handleSignOut(): Promise<void>;
     changePassword(currentPassword: string, newPassword: string): Promise<void>;
     fetchUserData(): Promise<void>;
