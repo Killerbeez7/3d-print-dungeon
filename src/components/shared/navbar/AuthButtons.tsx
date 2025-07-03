@@ -1,6 +1,9 @@
-import PropTypes from "prop-types";
+interface AuthButtonsProps {
+    onLoginClick: () => void;
+    onSignUpClick: () => void;
+}
 
-export const AuthButtons = ({ onLoginClick, onSignUpClick }) => {
+export const AuthButtons = ({ onLoginClick, onSignUpClick }: AuthButtonsProps) => {
     return (
         <>
             {/* Desktop Version */}
@@ -21,9 +24,4 @@ export const AuthButtons = ({ onLoginClick, onSignUpClick }) => {
             </div>
         </>
     );
-};
-
-AuthButtons.propTypes = {
-    onLoginClick: PropTypes.func.isRequired,
-    onSignUpClick: PropTypes.func.isRequired,
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, FormEvent, MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import FocusLock from "react-focus-lock";
 //hooks
@@ -10,9 +10,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle, faTwitter, faFacebook } from "@fortawesome/free-brands-svg-icons";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
+interface OAuthIcon {
+    fn: () => Promise<void>;
+    icon: typeof faGoogle;
+}
+
 export function AuthModal() {
     const { isOpen, payload, close, toggle } = useModal("auth");
-    const mode = payload?.mode === "signup" ? "signup" : "login";
+    const mode: "signup" | "login" = payload?.mode === "signup" ? "signup" : "login";
 
     /* auth handlers */
     const {
@@ -23,37 +28,37 @@ export function AuthModal() {
         handleTwitterSignIn,
     } = useAuth();
 
-    const OAUTH_ICONS = [
+    const OAUTH_ICONS: OAuthIcon[] = [
         { fn: handleFacebookSignIn, icon: faFacebook },
         { fn: handleGoogleSignIn, icon: faGoogle },
         { fn: handleTwitterSignIn, icon: faTwitter },
     ];
 
     /* form state */
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPass] = useState("");
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [email, setEmail] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
+    const [confirmPassword, setConfirmPass] = useState<string>("");
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
-    /* ── keyboard: ESC closes ── */
+    /* keyboard: ESC closes */
     useEffect(() => {
         if (!isOpen) return;
-        const onKey = (e) => e.key === "Escape" && handleClose();
+        const onKey = (e: KeyboardEvent) => e.key === "Escape" && handleClose();
         window.addEventListener("keydown", onKey);
         return () => window.removeEventListener("keydown", onKey);
     }, [isOpen]);
 
-    /* ── block background scroll ── */
+    /* block background scroll */
     useEffect(() => {
         if (!isOpen) return;
-        const block = (e) => {
-            const el = document.activeElement;
+        const block = (e: Event) => {
+            const el = document.activeElement as HTMLElement | null;
             if (
                 el &&
                 (el.tagName === "INPUT" ||
                     el.tagName === "TEXTAREA" ||
-                    el.isContentEditable)
+                    (el as HTMLElement).isContentEditable)
             )
                 return;
             e.preventDefault();
@@ -69,18 +74,18 @@ export function AuthModal() {
     if (!isOpen) return null;
 
     /* helpers */
-    function resetFields() {
+    function resetFields(): void {
         setEmail("");
         setPassword("");
         setConfirmPass("");
         setError(null);
     }
-    function handleClose() {
+    function handleClose(): void {
         resetFields();
         close();
     }
 
-    async function handleSubmit(e) {
+    async function handleSubmit(e: FormEvent<HTMLFormElement>): Promise<void> {
         e.preventDefault();
         setError(null);
         setLoading(true);
@@ -99,24 +104,23 @@ export function AuthModal() {
             }
             handleClose();
         } catch (err) {
-            setError(err.message);
+            setError((err as Error).message);
             setLoading(false);
         }
     }
 
-    async function oauth(fn) {
+    async function oauth(fn: () => Promise<void>): Promise<void> {
         try {
             setError(null);
             setLoading(true);
             await fn();
             handleClose();
         } catch (err) {
-            setError(err.message);
+            setError((err as Error).message);
             setLoading(false);
         }
     }
 
-    /* ───────────────── render ───────────────── */
     return createPortal(
         <div
             className="fixed inset-0 z-[11000]"
@@ -127,7 +131,7 @@ export function AuthModal() {
 
             <FocusLock returnFocus>
                 <div
-                    onClick={(e) => e.stopPropagation()}
+                    onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
                     className="
                fixed z-[11001] w-full max-w-md p-6
                bg-bg-surface text-txt-primary
