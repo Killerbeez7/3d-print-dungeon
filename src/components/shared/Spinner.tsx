@@ -1,6 +1,9 @@
-import PropTypes from "prop-types";
+interface SpinnerProps {
+    size?: number;
+    className?: string;
+}
 
-export function Spinner({ size = 24, className = "" }) {
+export function Spinner({ size = 24, className = "" }: SpinnerProps) {
     const ring = `${size}px`;
     const thickness = size / 8;
 
@@ -21,8 +24,3 @@ export function Spinner({ size = 24, className = "" }) {
         />
     );
 }
-
-Spinner.propTypes = {
-    size: PropTypes.number,
-    className: PropTypes.string,
-};

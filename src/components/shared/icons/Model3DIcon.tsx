@@ -1,6 +1,14 @@
-import PropTypes from 'prop-types';
+import React from "react";
 
-export const Model3DIcon = ({ className = "", size = 24 }) => {
+interface Model3DIconProps {
+    className?: string;
+    size?: number;
+}
+
+export const Model3DIcon: React.FC<Model3DIconProps> = ({
+    className = "",
+    size = 24,
+}) => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -21,8 +29,3 @@ export const Model3DIcon = ({ className = "", size = 24 }) => {
         </svg>
     );
 };
-
-Model3DIcon.propTypes = {
-    className: PropTypes.string,
-    size: PropTypes.number,
-}; 

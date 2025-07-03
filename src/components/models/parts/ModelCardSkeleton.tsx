@@ -9,4 +9,4 @@ export function ModelCardSkeleton() {
             <div className="bg-gray-400 h-4 w-1/2 mt-2 mx-auto rounded" />
         </div>
     );
-}
+} 
