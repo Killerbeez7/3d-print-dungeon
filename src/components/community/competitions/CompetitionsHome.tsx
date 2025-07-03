@@ -1,6 +1,17 @@
 import { Link } from "react-router-dom";
 
-const mockCompetitions = [
+interface Competition {
+  id: string;
+  title: string;
+  description: string;
+  bannerUrl: string;
+  startDate: string;
+  endDate: string;
+  status: "ongoing" | "upcoming" | "ended";
+  prizes: string;
+}
+
+const mockCompetitions: Competition[] = [
   {
     id: "spring2024",
     title: "Spring 2024 Print-Off",
@@ -33,7 +44,7 @@ const mockCompetitions = [
   },
 ];
 
-const statusColors = {
+const statusColors: Record<Competition["status"], string> = {
   ongoing: "bg-green-100 text-green-700",
   upcoming: "bg-yellow-100 text-yellow-700",
   ended: "bg-gray-200 text-gray-500",
