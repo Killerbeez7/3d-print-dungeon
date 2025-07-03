@@ -7,7 +7,7 @@ import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
 
 // React-Query
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools"; 
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -24,7 +24,7 @@ console.log("Starting app initialization...");
 
 const container = document.getElementById("root");
 console.log("=========== Main.jsx ===========");
-console.log("Root element:", container? "✅ Found" : "❌ Missing");
+console.log("Root element:", container ? "✅ Found" : "❌ Missing");
 // Initialize Stripe with your publishable key
 
 try {
@@ -41,7 +41,7 @@ try {
                 </BrowserRouter>
 
                 {/* Devtools overlay - remove in production */}
-                <ReactQueryDevtools initialIsOpen={false} />
+                {/* <ReactQueryDevtools initialIsOpen={false} /> */}
             </QueryClientProvider>
         </ErrorBoundary>
     );
