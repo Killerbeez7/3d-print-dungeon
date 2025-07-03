@@ -4,7 +4,28 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
 
-export const FavoritesButton = ({ modelId, currentUser, openAuthModal }) => {
+/**
+ * Minimal user type for favorites button context
+ */
+export interface FavoritesButtonUser {
+    uid: string;
+    [key: string]: unknown;
+}
+
+/**
+ * Props for FavoritesButton component
+ */
+export interface FavoritesButtonProps {
+    modelId: string;
+    currentUser?: FavoritesButtonUser | null;
+    openAuthModal?: () => void;
+}
+
+/**
+ * FavoritesButton component
+ * Allows users to favorite/unfavorite a model and displays the status.
+ */
+export const FavoritesButton = ({ modelId, currentUser, openAuthModal }: FavoritesButtonProps) => {
     const [favorited, setFavorited] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -27,7 +48,7 @@ export const FavoritesButton = ({ modelId, currentUser, openAuthModal }) => {
 
     const handleToggle = async () => {
         if (!currentUser) {
-            openAuthModal && openAuthModal();
+            if (openAuthModal) openAuthModal();
             return;
         }
         setLoading(true);
@@ -53,4 +74,4 @@ export const FavoritesButton = ({ modelId, currentUser, openAuthModal }) => {
             <span className="text-sm">{favorited ? "Favorited" : "Favorite"}</span>
         </div>
     );
-};
+}; 

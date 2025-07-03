@@ -3,13 +3,23 @@ import { toggleLike, isLiked } from "../../../services/likesService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as solidHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons";
-import PropTypes from "prop-types";
 
-export const LikeButton = ({ modelId, initialLikes, currentUser, openAuthModal }) => {
+export interface LikeButtonUser {
+    uid: string;
+    [key: string]: unknown;
+}
+
+export interface LikeButtonProps {
+    modelId: string;
+    initialLikes?: number;
+    currentUser?: LikeButtonUser | null;
+    openAuthModal?: () => void;
+}
+
+export const LikeButton = ({ modelId, initialLikes = 0, currentUser, openAuthModal }: LikeButtonProps) => {
     const [liked, setLiked] = useState(false);
-    const [likesCount, setLikesCount] = useState(initialLikes || 0);
+    const [likesCount, setLikesCount] = useState(initialLikes);
 
-    // Check user like status
     useEffect(() => {
         const checkLikeStatus = async () => {
             if (currentUser) {
@@ -28,7 +38,6 @@ export const LikeButton = ({ modelId, initialLikes, currentUser, openAuthModal }
 
     const handleToggle = async () => {
         if (!currentUser) {
-            console.log("No current user");
             openAuthModal && openAuthModal();
             return;
         }
@@ -41,7 +50,7 @@ export const LikeButton = ({ modelId, initialLikes, currentUser, openAuthModal }
         }
     };
 
-    const formatLikesCount = (count) => (count === 1 ? "1 Like" : `${count} Likes`);
+    const formatLikesCount = (count: number) => (count === 1 ? "1 Like" : `${count} Likes`);
 
     return (
         <div className="flex items-center space-x-2">
@@ -54,11 +63,4 @@ export const LikeButton = ({ modelId, initialLikes, currentUser, openAuthModal }
             <span className="text-sm">{formatLikesCount(likesCount)}</span>
         </div>
     );
-};
-
-LikeButton.propTypes = {
-    modelId: PropTypes.string.isRequired,
-    initialLikes: PropTypes.number,
-    currentUser: PropTypes.object,
-    openAuthModal: PropTypes.func,
-};
+}; 

@@ -1,5 +1,16 @@
 import { memo } from "react";
-import PropTypes from "prop-types";
+
+export interface SequentialImageProps {
+    src: string;
+    alt: string;
+    index: number;
+    loadIndex: number;
+    className?: string;
+    onLoad?: () => void;
+    placeholderStyle?: React.CSSProperties;
+    width: number;
+    height: number;
+}
 
 export const SequentialImage = memo(function SequentialImage({
     src,
@@ -11,7 +22,7 @@ export const SequentialImage = memo(function SequentialImage({
     placeholderStyle = {},
     width,
     height,
-}) {
+}: SequentialImageProps) {
     const shouldLoad = index <= loadIndex;
 
     return (
@@ -32,23 +43,10 @@ export const SequentialImage = memo(function SequentialImage({
                     width={width}
                     height={height}
                     onLoad={() => {
-                        
-                        if (index === loadIndex) onLoad();
+                        if (index === loadIndex && onLoad) onLoad();
                     }}
                 />
             )}
         </div>
     );
 });
-
-SequentialImage.propTypes = {
-    src: PropTypes.string.isRequired,
-    alt: PropTypes.string.isRequired,
-    index: PropTypes.number.isRequired,
-    loadIndex: PropTypes.number.isRequired,
-    className: PropTypes.string,
-    onLoad: PropTypes.func,
-    placeholderStyle: PropTypes.object,
-    width: PropTypes.number.isRequired,
-    height: PropTypes.number.isRequired,
-};

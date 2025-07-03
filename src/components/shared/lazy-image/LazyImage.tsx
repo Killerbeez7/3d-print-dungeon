@@ -1,17 +1,23 @@
 import { useRef, useState, useEffect } from "react";
 
-/**
- * LazyImage:
- * - Takes { src, alt, className, ...props }
- * - Renders a placeholder, then loads the real image when in view
- */
-export const LazyImage = ({ src, alt = "", className = "", ...props }) => {
-    const imgRef = useRef(null);
-    const [inView, setInView] = useState(false); // is element in viewport?
-    const [loaded, setLoaded] = useState(false); // did the real img fully load?
+export interface LazyImageProps extends React.HTMLAttributes<HTMLDivElement> {
+    src: string;
+    alt?: string;
+    className?: string;
+}
+
+export const LazyImage = ({
+    src,
+    alt = "",
+    className = "",
+    ...props
+}: LazyImageProps) => {
+    const imgRef = useRef<HTMLDivElement>(null);
+    const [inView, setInView] = useState(false);
+    const [loaded, setLoaded] = useState(false);
 
     useEffect(() => {
-        const observer = new IntersectionObserver(
+        const observer = new window.IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting) {
@@ -21,9 +27,9 @@ export const LazyImage = ({ src, alt = "", className = "", ...props }) => {
                 });
             },
             {
-                root: null, // viewport
+                root: null,
                 rootMargin: "0px",
-                threshold: 0.1, // trigger when 10% is in view
+                threshold: 0.1,
             }
         );
 
@@ -39,12 +45,11 @@ export const LazyImage = ({ src, alt = "", className = "", ...props }) => {
     }, []);
 
     const handleLoad = () => {
-        setLoaded(true); // real image loaded
+        setLoaded(true);
     };
 
     return (
         <div ref={imgRef} className={`relative overflow-hidden ${className}`} {...props}>
-            {/* Placeholder with animated pulse effect while image is loading */}
             {!loaded && (
                 <div
                     className="absolute inset-0 bg-gray-200 animate-pulse"
@@ -52,7 +57,6 @@ export const LazyImage = ({ src, alt = "", className = "", ...props }) => {
                 ></div>
             )}
 
-            {/* The real image (only sets real src if inView) */}
             {inView && (
                 <img
                     src={src}
