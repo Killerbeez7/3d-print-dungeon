@@ -1,6 +1,15 @@
-import PropTypes from "prop-types";
+interface UserData {
+    bio?: string;
+    location?: string;
+    website?: string;
+    socialLinks?: {
+        twitter?: string;
+        instagram?: string;
+        website?: string;
+    };
+}
 
-export const AboutSection = ({ userData }) => {
+export const AboutSection = ({ userData }: { userData: UserData }) => {
     return (
         <div className="bg-bg-surface p-8 rounded-lg shadow-md mt-8 max-w-6xl mx-auto">
             {/* Bio Section */}
@@ -80,17 +89,4 @@ export const AboutSection = ({ userData }) => {
             </div>
         </div>
     );
-};
-
-AboutSection.propTypes = {
-    userData: PropTypes.shape({
-        bio: PropTypes.string,
-        location: PropTypes.string,
-        website: PropTypes.string,
-        socialLinks: PropTypes.shape({
-            twitter: PropTypes.string,
-            instagram: PropTypes.string,
-            website: PropTypes.string,
-        }),
-    }),
 };

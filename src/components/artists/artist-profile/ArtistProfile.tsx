@@ -4,15 +4,32 @@ import { getUserFromDatabase } from "../../../services/authService";
 import { UploadsSection } from "./UploadsSection";
 import { LikesSection } from "./LikesSection";
 import { AboutSection } from "./AboutSection";
+import type { RawUserData } from "@/types/auth";
+
+interface Tab {
+    id: "uploads" | "likes" | "about";
+    label: string;
+}
+
+interface ProfileUserData extends RawUserData {
+    bio?: string;
+    location?: string;
+    website?: string;
+    socialLinks?: {
+        twitter?: string;
+        instagram?: string;
+        website?: string;
+    };
+}
 
 export const ArtistProfile = () => {
-    const { id } = useParams();
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const [userData, setUserData] = useState(null);
-    const [activeTab, setActiveTab] = useState("uploads");
-    const [error, setError] = useState(null);
+    const [userData, setUserData] = useState<ProfileUserData | null>(null);
+    const [activeTab, setActiveTab] = useState<Tab["id"]>("uploads");
+    const [error, setError] = useState<string | null>(null);
 
-    const tabs = [
+    const tabs: Tab[] = [
         { id: "uploads", label: "Uploads" },
         { id: "likes", label: "Likes" },
         { id: "about", label: "About" },
@@ -25,7 +42,7 @@ export const ArtistProfile = () => {
             return;
         }
 
-        const unsubscribe = getUserFromDatabase(id, (data) => {
+        const unsubscribe = getUserFromDatabase(id, (data: ProfileUserData | null) => {
             if (data) {
                 setUserData(data);
                 setError(null);
@@ -65,16 +82,16 @@ export const ArtistProfile = () => {
             {/* Profile Header */}
             <div className="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 sm:p-6 bg-bg-surface shadow-md rounded-lg">
                 <img
-                    src={userData?.photoURL || "/user.png"}
+                    src={userData.photoURL || "/user.png"}
                     alt="User Avatar"
                     className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 border-br-primary mx-auto sm:mx-0"
                 />
                 <div className="text-center sm:text-left">
                     <h1 className="text-xl sm:text-2xl font-semibold text-txt-primary">
-                        {userData?.displayName || "Anonymous"}
+                        {userData.displayName || "Anonymous"}
                     </h1>
                     <p className="text-sm sm:text-base text-txt-secondary">
-                        {userData?.bio || "No bio available"}
+                        {userData.bio ? userData.bio : "No bio available"}
                     </p>
                 </div>
             </div>
@@ -98,9 +115,11 @@ export const ArtistProfile = () => {
 
             {/* Content Section */}
             <div className="mt-4 sm:mt-6">
-                {activeTab === "uploads" && <UploadsSection userId={id} />}
-                {activeTab === "likes" && <LikesSection userId={id} />}
-                {activeTab === "about" && <AboutSection userData={userData} />}
+                {activeTab === "uploads" && id && <UploadsSection userId={id} />}
+                {activeTab === "likes" && id && <LikesSection userId={id} />}
+                {activeTab === "about" && userData && (
+                    <AboutSection userData={userData} />
+                )}
             </div>
         </div>
     );

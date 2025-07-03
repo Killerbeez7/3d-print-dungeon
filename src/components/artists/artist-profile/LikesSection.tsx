@@ -1,12 +1,32 @@
 import { useEffect, useState } from "react";
-import { getFirestore, collection, query, where, getDocs, getDoc, doc } from "firebase/firestore";
-import PropTypes from "prop-types";
+import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs,
+    getDoc,
+    doc,
+} from "firebase/firestore";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
+
+interface LikesSectionProps {
+    userId: string;
+}
+
+interface LikedArtwork {
+    id: string;
+    title: string;
+    artist: string;
+    imageUrl: string;
+    likes: number;
+    views: number;
+}
 
 const db = getFirestore();
 
-export const LikesSection = ({ userId }) => {
-    const [likedArtworks, setLikedArtworks] = useState([]);
+export const LikesSection = ({ userId }: LikesSectionProps) => {
+    const [likedArtworks, setLikedArtworks] = useState<LikedArtwork[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -16,17 +36,15 @@ export const LikesSection = ({ userId }) => {
                 setLoading(false);
                 return;
             }
-            
+
             setLoading(true);
             try {
-                // Query to fetch all likes by the user
-                const q = query(
-                    collection(db, "likes"),
-                    where("userId", "==", userId)
-                );
+                const q = query(collection(db, "likes"), where("userId", "==", userId));
 
                 const querySnapshot = await getDocs(q);
-                const likedModelIds = querySnapshot.docs.map(doc => doc.data().modelId).filter(Boolean);
+                const likedModelIds = querySnapshot.docs
+                    .map((doc) => doc.data().modelId)
+                    .filter(Boolean);
 
                 if (!likedModelIds || likedModelIds.length === 0) {
                     setLikedArtworks([]);
@@ -34,20 +52,23 @@ export const LikesSection = ({ userId }) => {
                     return;
                 }
 
-                // Now, fetch the corresponding models by their IDs
                 const artworks = await Promise.all(
-                    likedModelIds.map(async (modelId) => {
+                    likedModelIds.map(async (modelId: string) => {
                         try {
                             const modelDoc = await getDoc(doc(db, "models", modelId));
                             if (modelDoc.exists()) {
                                 const data = modelDoc.data();
-                                return { 
-                                    id: modelDoc.id, 
+                                return {
+                                    id: modelDoc.id,
                                     title: data.name || "Untitled",
                                     artist: data.uploaderDisplayName || "Unknown Artist",
-                                    imageUrl: getThumbnailUrl(data.renderPrimaryUrl, THUMBNAIL_SIZES.MEDIUM) || "/default-artwork.png",
+                                    imageUrl:
+                                        getThumbnailUrl(
+                                            data.renderPrimaryUrl,
+                                            THUMBNAIL_SIZES.MEDIUM
+                                        ) || "/default-artwork.png",
                                     likes: data.likes || 0,
-                                    views: data.views || 0
+                                    views: data.views || 0,
                                 };
                             }
                             return null;
@@ -58,8 +79,9 @@ export const LikesSection = ({ userId }) => {
                     })
                 );
 
-                // Filter out any null values from artworks that might not exist
-                setLikedArtworks(artworks.filter(art => art !== null));
+                setLikedArtworks(
+                    artworks.filter((art): art is LikedArtwork => art !== null)
+                );
             } catch (error) {
                 console.error("Error fetching liked artworks:", error);
                 setLikedArtworks([]);
@@ -116,8 +138,3 @@ export const LikesSection = ({ userId }) => {
         </div>
     );
 };
-
-LikesSection.propTypes = {
-    userId: PropTypes.string.isRequired
-};
-
