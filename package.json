@@ -57,6 +57,7 @@
         "@types/node": "^22.15.30",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
+        "@types/react-slick": "^0.23.13",
         "@typescript-eslint/eslint-plugin": "^8.33.1",
         "@typescript-eslint/parser": "^8.33.1",
         "@vitejs/plugin-react": "^4.3.4",
