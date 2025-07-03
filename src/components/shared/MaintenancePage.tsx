@@ -3,19 +3,32 @@ import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { subscribeToMaintenanceStatus } from "@/services/maintenanceService";
 
+interface MaintenanceState {
+    inMaintenance: boolean;
+    message: string;
+    endTime: Date | null;
+    isAdmin: boolean;
+}
+
+interface TimeLeft {
+    hours: number;
+    minutes: number;
+    seconds: number;
+}
+
 export const MaintenancePage = () => {
     const navigate = useNavigate();
     const { currentUser } = useAuth();
-    const [maintenanceState, setMaintenanceState] = useState({
+    const [maintenanceState, setMaintenanceState] = useState<MaintenanceState>({
         inMaintenance: false,
         message: "We're currently performing some updates to improve your experience.",
         endTime: null,
-        isAdmin: false
+        isAdmin: false,
     });
-    const [timeLeft, setTimeLeft] = useState(null);
+    const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
     useEffect(() => {
-        const unsubscribe = subscribeToMaintenanceStatus((state) => {
+        const unsubscribe = subscribeToMaintenanceStatus((state: MaintenanceState) => {
             setMaintenanceState(state);
         }, currentUser?.uid);
 
@@ -28,9 +41,11 @@ export const MaintenancePage = () => {
             const updateTimer = () => {
                 const now = new Date();
                 // Adjust for GMT+3
-                const adjustedNow = new Date(now.getTime() + (3 * 60 * 60 * 1000));
-                const adjustedEnd = new Date(maintenanceState.endTime.getTime() + (3 * 60 * 60 * 1000));
-                const diff = adjustedEnd - adjustedNow;
+                const adjustedNow = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+                const adjustedEnd = new Date(
+                    maintenanceState.endTime!.getTime() + 3 * 60 * 60 * 1000
+                );
+                const diff = adjustedEnd.getTime() - adjustedNow.getTime();
 
                 if (diff <= 0) {
                     setTimeLeft(null);
@@ -54,9 +69,9 @@ export const MaintenancePage = () => {
         <div className="fixed inset-0 bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center">
             <div className="max-w-lg w-full mx-4 p-8 bg-white rounded-xl shadow-2xl text-center">
                 <div className="mb-8">
-                    <img 
-                        src="/logo.png" 
-                        alt="Site Logo" 
+                    <img
+                        src="/logo.png"
+                        alt="Site Logo"
                         className="h-16 w-auto mx-auto mb-6"
                     />
                     <h1 className="text-4xl font-bold text-gray-800 mb-4">
@@ -67,7 +82,8 @@ export const MaintenancePage = () => {
                     </div>
                     {timeLeft && (
                         <div className="text-lg font-medium text-accent mb-6">
-                            Expected completion in: {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
+                            Expected completion in: {timeLeft.hours}h {timeLeft.minutes}m{" "}
+                            {timeLeft.seconds}s
                         </div>
                     )}
                     {maintenanceState.isAdmin && (
@@ -79,10 +95,11 @@ export const MaintenancePage = () => {
                         </button>
                     )}
                 </div>
-                
+
                 <div className="border-t border-gray-200 pt-6">
                     <div className="text-sm text-gray-600">
-                        If you&apos;re an administrator, please sign in to access the site.
+                        If you&apos;re an administrator, please sign in to access the
+                        site.
                     </div>
                 </div>
             </div>
