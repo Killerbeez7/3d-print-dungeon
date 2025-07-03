@@ -2,12 +2,12 @@ import { Outlet, useLocation } from "react-router-dom";
 
 export const Business = () => {
     const location = useLocation();
-    const isRootPath = location.pathname === '/business';
+    const isRootPath: boolean = location.pathname === "/business";
 
     return (
         <div className="container mx-auto px-4 py-8">
             <h1 className="text-3xl font-bold mb-6">Business Solutions</h1>
-            
+
             {isRootPath ? (
                 // Show business landing content when on root business path
                 <div>

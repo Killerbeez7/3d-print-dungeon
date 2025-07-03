@@ -6,10 +6,19 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
 
+interface FeaturedModel {
+    id: string;
+    name: string;
+    category: string;
+    uploaderDisplayName: string;
+    renderPrimaryUrl: string;
+    [key: string]: unknown;
+}
+
 export const Featured = () => {
     const { models, loading } = useModels();
-    const [featuredModels, setFeaturedModels] = useState([]);
-    const [featuredCategories, setFeaturedCategories] = useState([]);
+    const [featuredModels, setFeaturedModels] = useState<FeaturedModel[]>([]);
+    const [featuredCategories, setFeaturedCategories] = useState<string[]>([]);
 
     useEffect(() => {
         const fetchFeaturedCategories = async () => {
@@ -19,10 +28,6 @@ export const Featured = () => {
 
                 if (settingsDoc.exists()) {
                     const settings = settingsDoc.data();
-                    console.log(
-                        "Fetched featured categories:",
-                        settings.featuredCategories
-                    );
                     setFeaturedCategories(settings.featuredCategories || []);
                 }
             } catch (error) {
@@ -35,19 +40,10 @@ export const Featured = () => {
 
     useEffect(() => {
         if (models.length > 0 && featuredCategories.length > 0) {
-            console.log("All models:", models);
-            console.log("Featured categories:", featuredCategories);
-
             // Filter models that belong to featured categories
-            const featured = models.filter((model) => {
-                const isFeatured = featuredCategories.includes(model.category);
-                console.log(
-                    `Model ${model.id} category: ${model.category}, isFeatured: ${isFeatured}`
-                );
-                return isFeatured;
-            });
-
-            console.log("Filtered featured models:", featured);
+            const featured = models.filter((model: FeaturedModel) =>
+                featuredCategories.includes(model.category)
+            );
             setFeaturedModels(featured);
         }
     }, [models, featuredCategories]);
