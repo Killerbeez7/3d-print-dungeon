@@ -6,6 +6,7 @@ import { Navbar } from "./navbar/Navbar";
 import { Footer } from "./footer/Footer";
 import { AuthModal } from "./auth-modal/AuthModal";
 import { Spinner } from "@/components/shared/Spinner";
+import { ScrollToTopButton } from "@/components/shared/ScrollToTopButton";
 
 export const Layout: React.FC = () => (
     <div className="flex flex-col min-h-screen">
@@ -20,6 +21,7 @@ export const Layout: React.FC = () => (
                 }
             >
                 <Outlet />
+                <ScrollToTopButton />
             </Suspense>
         </main>
 
