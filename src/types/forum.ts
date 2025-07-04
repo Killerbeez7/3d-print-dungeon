@@ -1,4 +1,4 @@
-import { User } from "@/types/user";
+import { RawUserData } from "@/types/auth";
 
 export interface ForumCategory {
     id: string;
@@ -41,7 +41,7 @@ export interface ForumReply {
     parentReplyId?: string; // For nested replies
 }
 
-export interface ForumUser extends User {
+export interface ForumUser extends RawUserData {
     threadCount?: number;
     replyCount?: number;
     lastActivity?: Date;
