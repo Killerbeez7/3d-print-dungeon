@@ -3,8 +3,9 @@ import { ArtistProfile } from "../components/artists/artist-profile/ArtistProfil
 import { ArtistsList } from "../components/artists/ArtistsList";
 import { withMaintenance, withProtectedMaintenance } from "../helpers/routeHelpers";
 import { ROUTES } from "../constants/routeConstants";
+import type { RouteObject } from "react-router-dom";
 
-export const userRoutes = [
+export const userRoutes: RouteObject[] = [
     { path: ROUTES.SETTINGS, element: withProtectedMaintenance(<SettingsPage />, { allowedRoles: ["admin", "artist", "user"] }) },
     { path: ROUTES.USER_ARTISTS, element: withMaintenance(<ArtistsList />) },
     { path: ROUTES.USER_ARTIST_PROFILE, element: withMaintenance(<ArtistProfile />) },

@@ -1,14 +1,20 @@
-import { useContext } from "react";
+import { useContext, ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import PropTypes from "prop-types";
 import { AuthContext } from "@/contexts/authContext";
 
-export const ProtectedRoute = ({
+interface ProtectedRouteProps {
+    children: ReactNode;
+    requireAdmin?: boolean;
+    allowedRoles?: string[];
+    redirectTo?: string;
+}
+
+export function ProtectedRoute({
     children,
     requireAdmin = false,
     allowedRoles = [],
     redirectTo = "/login",
-}) => {
+}: ProtectedRouteProps): React.ReactNode | null {
     const { currentUser, roles = [], isAdmin, loading } = useContext(AuthContext);
     const location = useLocation();
 
@@ -31,18 +37,4 @@ export const ProtectedRoute = ({
     }
 
     return children;
-};
-
-ProtectedRoute.propTypes = {
-    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node])
-        .isRequired,
-    requireAdmin: PropTypes.bool,
-    allowedRoles: PropTypes.arrayOf(PropTypes.string),
-    redirectTo: PropTypes.string,
-};
-
-ProtectedRoute.defaultProps = {
-    requireAdmin: false,
-    allowedRoles: [],
-    redirectTo: "/login",
-};
+}

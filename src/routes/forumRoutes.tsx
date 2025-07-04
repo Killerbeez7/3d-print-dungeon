@@ -1,5 +1,6 @@
 import { ForumProvider } from "@/providers/forumProvider";
 import { withProtectedMaintenance } from "@/helpers/routeHelpers";
+import type { RouteObject } from "react-router-dom";
 
 //components
 import { ForumLayout } from "@/components/community/forum/ForumLayout";
@@ -21,7 +22,7 @@ const FORUM_ROUTES = {
     FORUM_REPLY_EDIT: "/forum/reply/:replyId/edit",
 };
 
-export const forumRoutes = [
+export const forumRoutes: RouteObject[] = [
     {
         path: FORUM_ROUTES.FORUM,
         element: (

@@ -1,34 +1,39 @@
 import { Navigate } from "react-router-dom";
-import PropTypes from "prop-types";
 import { useAuth } from "@/hooks/useAuth";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { subscribeToMaintenanceStatus } from "@/services/maintenanceService";
+import { MaintenanceStatus } from "@/types/maintenance";
 
-export const MaintenanceRoute = ({
+interface MaintenanceRouteProps {
+    children: ReactNode;
+    fallback?: ReactNode;
+    redirectTo?: string;
+}
+
+export function MaintenanceRoute({
     children,
     fallback = null,
     redirectTo = "/maintenance",
-}) => {
+}: MaintenanceRouteProps): ReactNode {
     const { isAdmin } = useAuth();
-    const [maintenanceState, setMaintenanceState] = useState({
+    const [maintenanceState, setMaintenanceState] = useState<MaintenanceStatus>({
         inMaintenance: false,
         message: null,
         endTime: null,
+        isAdmin: false,
     });
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<unknown>(null);
 
     useEffect(() => {
         let isMounted = true;
-
         try {
-            const unsubscribe = subscribeToMaintenanceStatus((state) => {
+            const unsubscribe = subscribeToMaintenanceStatus((state: MaintenanceStatus) => {
                 if (isMounted) {
                     setMaintenanceState(state);
                     setLoading(false);
                 }
             });
-
             return () => {
                 isMounted = false;
                 unsubscribe();
@@ -43,7 +48,7 @@ export const MaintenanceRoute = ({
     // Handle errors gracefully
     if (error) {
         console.error("MaintenanceRoute error:", error);
-        return children; // Fall back to showing the content if maintenance check fails
+        return children;
     }
 
     if (loading) {
@@ -52,7 +57,6 @@ export const MaintenanceRoute = ({
 
     // If maintenance is on and user is not admin, redirect to maintenance page
     if (maintenanceState.inMaintenance && !isAdmin) {
-        // Prevent infinite loops by not redirecting if we're already on the maintenance page
         if (window.location.pathname !== redirectTo) {
             return <Navigate to={redirectTo} replace />;
         }
@@ -60,16 +64,4 @@ export const MaintenanceRoute = ({
 
     // If maintenance is off or user is admin, allow access
     return children;
-};
-
-MaintenanceRoute.propTypes = {
-    children: PropTypes.oneOfType([PropTypes.arrayOf(PropTypes.node), PropTypes.node])
-        .isRequired,
-    fallback: PropTypes.node,
-    redirectTo: PropTypes.string,
-};
-
-MaintenanceRoute.defaultProps = {
-    fallback: null,
-    redirectTo: "/maintenance",
-};
+}
