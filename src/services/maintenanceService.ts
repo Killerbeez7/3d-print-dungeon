@@ -1,12 +1,13 @@
 import { doc, getDoc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { isAdmin } from "./adminService";
+import type { MaintenanceStatus, MaintenanceSettings } from "@/types/maintenance";
 
 const MAINTENANCE_SETTINGS_REF = doc(db, "settings", "maintenance");
 const OLD_SETTINGS_REF = doc(db, "settings", "global");
 
-const adjustToGMT3 = (date) => {
-    return new Date(date.getTime() + (3 * 60 * 60 * 1000));
+const adjustToGMT3 = (date: Date) => {
+    return new Date(date.getTime() + 3 * 60 * 60 * 1000);
 };
 
 // Clean up old maintenance settings
@@ -16,22 +17,27 @@ export const cleanupOldMaintenanceSettings = async () => {
         const oldSettingsDoc = await getDoc(OLD_SETTINGS_REF);
         if (oldSettingsDoc.exists()) {
             const oldData = oldSettingsDoc.data();
-            
+
             // If old settings had maintenance mode enabled, migrate it
             if (oldData.siteMaintenanceMode) {
-                await setDoc(MAINTENANCE_SETTINGS_REF, {
-                    isMaintenanceMode: true,
-                    maintenanceMessage: oldData.maintenanceMessage || "Site is under maintenance",
-                    maintenanceEndTime: null,
-                    lastUpdated: serverTimestamp()
-                }, { merge: true });
+                await setDoc(
+                    MAINTENANCE_SETTINGS_REF,
+                    {
+                        isMaintenanceMode: true,
+                        maintenanceMessage:
+                            oldData.maintenanceMessage || "Site is under maintenance",
+                        maintenanceEndTime: null,
+                        lastUpdated: serverTimestamp(),
+                    },
+                    { merge: true }
+                );
             }
 
             // Create new settings object without maintenance fields
             const newSettings = { ...oldData };
             delete newSettings.siteMaintenanceMode;
             delete newSettings.maintenanceMessage;
-            
+
             // Update global settings without maintenance fields
             await setDoc(OLD_SETTINGS_REF, newSettings);
         }
@@ -40,12 +46,13 @@ export const cleanupOldMaintenanceSettings = async () => {
     }
 };
 
-const checkScheduledMaintenance = (settings) => {
+
+const checkScheduledMaintenance = (settings: MaintenanceSettings) => {
     if (!settings.scheduledMaintenance?.isScheduled) return false;
 
     const now = new Date();
-    const startTime = settings.scheduledMaintenance.startTime?.toDate();
-    const endTime = settings.scheduledMaintenance.endTime?.toDate();
+    const startTime = settings.scheduledMaintenance.startTime;
+    const endTime = settings.scheduledMaintenance.endTime;
 
     if (!startTime || !endTime) return false;
 
@@ -59,13 +66,13 @@ const checkScheduledMaintenance = (settings) => {
 export const checkMaintenanceStatus = async (userId = null) => {
     try {
         const settingsDoc = await getDoc(MAINTENANCE_SETTINGS_REF);
-        
+
         if (!settingsDoc.exists()) {
             return {
                 inMaintenance: false,
                 message: null,
                 endTime: null,
-                isAdmin: false
+                isAdmin: false,
             };
         }
 
@@ -78,18 +85,18 @@ export const checkMaintenanceStatus = async (userId = null) => {
                 inMaintenance: true,
                 message: settings.maintenanceMessage,
                 endTime: settings.maintenanceEndTime?.toDate() || null,
-                isAdmin: adminStatus
+                isAdmin: adminStatus,
             };
         }
 
         // Check scheduled maintenance
-        const isInScheduledMaintenance = checkScheduledMaintenance(settings);
+        const isInScheduledMaintenance = checkScheduledMaintenance(settings as MaintenanceSettings);
         if (isInScheduledMaintenance) {
             return {
                 inMaintenance: true,
                 message: settings.scheduledMaintenance.message,
                 endTime: settings.scheduledMaintenance.endTime.toDate(),
-                isAdmin: adminStatus
+                isAdmin: adminStatus,
             };
         }
 
@@ -97,7 +104,7 @@ export const checkMaintenanceStatus = async (userId = null) => {
             inMaintenance: false,
             message: null,
             endTime: null,
-            isAdmin: adminStatus
+            isAdmin: adminStatus,
         };
     } catch (error) {
         console.error("Error checking maintenance status:", error);
@@ -105,19 +112,22 @@ export const checkMaintenanceStatus = async (userId = null) => {
             inMaintenance: false,
             message: null,
             endTime: null,
-            isAdmin: false
+            isAdmin: false,
         };
     }
 };
 
-export const subscribeToMaintenanceStatus = (callback, userId = null) => {
+export const subscribeToMaintenanceStatus = (
+    callback: (status: MaintenanceStatus) => void,
+    userId: string | null = null
+) => {
     return onSnapshot(MAINTENANCE_SETTINGS_REF, async (doc) => {
         if (!doc.exists()) {
             callback({
                 inMaintenance: false,
                 message: null,
                 endTime: null,
-                isAdmin: false
+                isAdmin: false,
             });
             return;
         }
@@ -131,19 +141,19 @@ export const subscribeToMaintenanceStatus = (callback, userId = null) => {
                 inMaintenance: true,
                 message: settings.maintenanceMessage,
                 endTime: settings.maintenanceEndTime?.toDate() || null,
-                isAdmin: adminStatus
+                isAdmin: adminStatus,
             });
             return;
         }
 
         // Check scheduled maintenance
-        const isInScheduledMaintenance = checkScheduledMaintenance(settings);
+        const isInScheduledMaintenance = checkScheduledMaintenance(settings as MaintenanceSettings);
         if (isInScheduledMaintenance) {
             callback({
                 inMaintenance: true,
                 message: settings.scheduledMaintenance.message,
                 endTime: settings.scheduledMaintenance.endTime.toDate(),
-                isAdmin: adminStatus
+                isAdmin: adminStatus,
             });
             return;
         }
@@ -152,7 +162,7 @@ export const subscribeToMaintenanceStatus = (callback, userId = null) => {
             inMaintenance: false,
             message: null,
             endTime: null,
-            isAdmin: adminStatus
+            isAdmin: adminStatus,
         });
     });
-}; 
+};
