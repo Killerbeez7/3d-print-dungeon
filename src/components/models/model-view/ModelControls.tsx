@@ -1,6 +1,14 @@
-import PropTypes from "prop-types";
 import { useState } from "react";
 import { VscSettings } from "react-icons/vsc";
+
+interface ModelControlsProps {
+    offset: number;
+    setOffset: (value: number) => void;
+    shadowIntensity: number;
+    setShadowIntensity: (value: number) => void;
+    exposure: number;
+    setExposure: (value: number) => void;
+}
 
 export const ModelControls = ({
     offset,
@@ -9,11 +17,11 @@ export const ModelControls = ({
     setShadowIntensity,
     exposure,
     setExposure,
-}) => {
-    const [isOpen, setIsOpen] = useState(false);
+}: ModelControlsProps) => {
+    const [isOpen, setIsOpen] = useState<boolean>(false);
 
     return (
-        <div className={`fixed right-0 top-1/2 transform -translate-y-1/2 z-50`}>
+        <div className="fixed right-0 top-1/2 transform -translate-y-1/2 z-50">
             {/* Controls Panel */}
             <div
                 className={`relative bg-bg-surface rounded-l-lg shadow-lg p-6 space-y-6 transform transition-transform duration-300 ease-in-out ${
@@ -48,9 +56,9 @@ export const ModelControls = ({
                     <input
                         id="yOffsetSlider"
                         type="range"
-                        min="-1"
-                        max="1"
-                        step="0.01"
+                        min={-1}
+                        max={1}
+                        step={0.01}
                         value={offset}
                         onChange={(e) => setOffset(parseFloat(e.target.value))}
                         className="w-full accent-accent"
@@ -73,9 +81,9 @@ export const ModelControls = ({
                     <input
                         id="shadowSlider"
                         type="range"
-                        min="0"
-                        max="1"
-                        step="0.01"
+                        min={0}
+                        max={1}
+                        step={0.01}
                         value={shadowIntensity}
                         onChange={(e) => setShadowIntensity(parseFloat(e.target.value))}
                         className="w-full accent-accent"
@@ -98,9 +106,9 @@ export const ModelControls = ({
                     <input
                         id="exposureSlider"
                         type="range"
-                        min="0"
-                        max="2"
-                        step="0.1"
+                        min={0}
+                        max={2}
+                        step={0.1}
                         value={exposure}
                         onChange={(e) => setExposure(parseFloat(e.target.value))}
                         className="w-full accent-accent"
@@ -109,13 +117,4 @@ export const ModelControls = ({
             </div>
         </div>
     );
-};
-
-ModelControls.propTypes = {
-    offset: PropTypes.number.isRequired,
-    setOffset: PropTypes.func.isRequired,
-    shadowIntensity: PropTypes.number.isRequired,
-    setShadowIntensity: PropTypes.func.isRequired,
-    exposure: PropTypes.number.isRequired,
-    setExposure: PropTypes.func.isRequired,
 };
