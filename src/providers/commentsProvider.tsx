@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { db } from "../config/firebase";
 import {
     collection,
@@ -12,12 +12,16 @@ import {
     doc,
     updateDoc,
 } from "firebase/firestore";
-import PropTypes from "prop-types";
-import { CommentsContext } from "../contexts/commentsContext.tsx";
+import { CommentsContext, Comment, CommentsContextType } from "../contexts/commentsContext";
 
-export const CommentsProvider = ({ modelId, children }) => {
-    const [comments, setComments] = useState([]);
-    const [loading, setLoading] = useState(true);
+interface CommentsProviderProps {
+    modelId: string;
+    children: ReactNode;
+}
+
+export const CommentsProvider = ({ modelId, children }: CommentsProviderProps) => {
+    const [comments, setComments] = useState<Comment[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         if (!modelId) return;
@@ -30,10 +34,10 @@ export const CommentsProvider = ({ modelId, children }) => {
         const unsubscribe = onSnapshot(
             q,
             (snapshot) => {
-                const fetched = snapshot.docs.map((doc) => ({
+                const fetched: Comment[] = snapshot.docs.map((doc) => ({
                     id: doc.id,
                     ...doc.data(),
-                }));
+                }) as Comment);
                 setComments(fetched);
                 setLoading(false);
             },
@@ -45,7 +49,7 @@ export const CommentsProvider = ({ modelId, children }) => {
         return () => unsubscribe();
     }, [modelId]);
 
-    const submitComment = async (commentData) => {
+    const submitComment: CommentsContextType["submitComment"] = async (commentData) => {
         try {
             await addDoc(collection(db, "comments"), {
                 ...commentData,
@@ -58,7 +62,7 @@ export const CommentsProvider = ({ modelId, children }) => {
         }
     };
 
-    const removeComment = async (commentId) => {
+    const removeComment: CommentsContextType["removeComment"] = async (commentId) => {
         try {
             await deleteDoc(doc(db, "comments", commentId));
         } catch (error) {
@@ -67,7 +71,7 @@ export const CommentsProvider = ({ modelId, children }) => {
         }
     };
 
-    const updateComment = async (commentId, newData) => {
+    const updateComment: CommentsContextType["updateComment"] = async (commentId, newData) => {
         try {
             await updateDoc(doc(db, "comments", commentId), newData);
         } catch (error) {
@@ -89,9 +93,4 @@ export const CommentsProvider = ({ modelId, children }) => {
             {children}
         </CommentsContext.Provider>
     );
-};
-
-CommentsProvider.propTypes = {
-    modelId: PropTypes.string.isRequired,
-    children: PropTypes.node.isRequired,
 }; 
