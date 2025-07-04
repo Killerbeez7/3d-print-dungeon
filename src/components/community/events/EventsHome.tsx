@@ -17,7 +17,7 @@ export const EventsHome = () => {
     return (
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* title */}
-            <h1 className="text-2xl sm:text-xl lg:text-4xl font-bold mb-8 text-center">
+            <h1 className="text-[var(--txt-primary)] text-2xl sm:text-xl lg:text-4xl font-bold mb-8 text-center">
                 Events & Competitions
             </h1>
 
