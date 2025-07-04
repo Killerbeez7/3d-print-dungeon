@@ -5,7 +5,7 @@ import { subscribeToMaintenanceStatus } from "@/services/maintenanceService";
 
 interface MaintenanceState {
     inMaintenance: boolean;
-    message: string;
+    message: string | null;
     endTime: Date | null;
     isAdmin: boolean;
 }
@@ -18,10 +18,10 @@ interface TimeLeft {
 
 export const MaintenancePage = () => {
     const navigate = useNavigate();
-    const { currentUser } = useAuth();
+    const { currentUser, isAdmin } = useAuth();
     const [maintenanceState, setMaintenanceState] = useState<MaintenanceState>({
         inMaintenance: false,
-        message: "We're currently performing some updates to improve your experience.",
+        message: null,
         endTime: null,
         isAdmin: false,
     });
@@ -30,7 +30,7 @@ export const MaintenancePage = () => {
     useEffect(() => {
         const unsubscribe = subscribeToMaintenanceStatus((state: MaintenanceState) => {
             setMaintenanceState(state);
-        }, currentUser?.uid);
+        }, currentUser?.uid as string | null | undefined);
 
         return () => unsubscribe();
     }, [currentUser?.uid]);
@@ -65,8 +65,19 @@ export const MaintenancePage = () => {
         }
     }, [maintenanceState.endTime]);
 
+    const AccessSiteBtn = () => {
+        return (
+            <button
+                onClick={() => navigate("/")}
+                className="mt-6 px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors"
+            >
+                Access Site
+            </button>
+        );
+    };
+
     return (
-        <div className="fixed inset-0 bg-gradient-to-b from-gray-900 to-gray-800 flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] py-12">
             <div className="max-w-lg w-full mx-4 p-8 bg-white rounded-xl shadow-2xl text-center">
                 <div className="mb-8">
                     <img
@@ -78,7 +89,8 @@ export const MaintenancePage = () => {
                         Under Maintenance
                     </h1>
                     <div className="text-xl text-gray-600 mb-6">
-                        {maintenanceState.message}
+                        {maintenanceState.message ??
+                            "We're currently performing some updates to improve your experience."}
                     </div>
                     {timeLeft && (
                         <div className="text-lg font-medium text-accent mb-6">
@@ -86,14 +98,7 @@ export const MaintenancePage = () => {
                             {timeLeft.seconds}s
                         </div>
                     )}
-                    {maintenanceState.isAdmin && (
-                        <button
-                            onClick={() => navigate("/")}
-                            className="mt-6 px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors"
-                        >
-                            Access Site
-                        </button>
-                    )}
+                    {(isAdmin || maintenanceState.isAdmin) && <AccessSiteBtn />}
                 </div>
 
                 <div className="border-t border-gray-200 pt-6">
