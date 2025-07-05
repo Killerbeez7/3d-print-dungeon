@@ -1,47 +1,52 @@
 import { useState, useEffect } from "react";
-import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { LazyImage } from "../shared/lazy-image/LazyImage";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
+import type { Model, SortBy, Medium, Subject } from "@/types/search";
 
-const toggleArrayValue = (arr, value) =>
+interface ArtworksTabProps {
+    searchTerm: string;
+    models: Model[];
+}
+
+const toggleArrayValue = (arr: string[], value: string): string[] =>
     arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
 
-export const ArtworksTab = ({ searchTerm, models }) => {
-    const [sortBy, setSortBy] = useState("relevance");
-    const [selectedMedia, setSelectedMedia] = useState([]);
-    const [selectedSubjects, setSelectedSubjects] = useState([]);
-    const [hideAI, setHideAI] = useState(false);
-    const [filteredModels, setFilteredModels] = useState([]);
+export const ArtworksTab = ({ searchTerm, models }: ArtworksTabProps) => {
+    const [sortBy, setSortBy] = useState<SortBy>("relevance");
+    const [selectedMedia, setSelectedMedia] = useState<Medium[]>([]);
+    const [selectedSubjects, setSelectedSubjects] = useState<Subject[]>([]);
+    const [hideAI, setHideAI] = useState<boolean>(false);
+    const [filteredModels, setFilteredModels] = useState<Model[]>([]);
 
-    const sortOptions = [
+    const sortOptions: { value: SortBy; label: string }[] = [
         { value: "relevance", label: "Relevance" },
         { value: "likes", label: "Most Liked" },
         { value: "latest", label: "Newest" },
     ];
-    const mediumOptions = [
-        { value: "digital2d", label: "Digital 2D" },
-        { value: "digital3d", label: "Digital 3D" },
-        { value: "animation", label: "Animation" },
+    const mediumOptions: { value: Medium; label: string }[] = [
+        { value: "2D", label: "2D" },
+        { value: "3D", label: "3D" },
+        { value: "miniatures", label: "Miniatures" },
     ];
-    const subjectOptions = [
+    const subjectOptions: { value: Subject; label: string }[] = [
         { value: "abstract", label: "Abstract" },
         { value: "anatomy", label: "Anatomy" },
         { value: "animals", label: "Animals & Wildlife" },
         { value: "props", label: "Props" },
     ];
 
-    const applyAdvancedFilters = (list) => {
+    const applyAdvancedFilters = (list: Model[]): Model[] => {
         let filtered = [...list];
         if (selectedMedia.length > 0) {
-            filtered = filtered.filter((m) => selectedMedia.includes(m.medium));
+            filtered = filtered.filter((m) => m.medium && selectedMedia.includes(m.medium as Medium));
         }
         if (selectedSubjects.length > 0) {
             filtered = filtered.filter((m) => {
                 if (Array.isArray(m.subjects)) {
-                    return m.subjects.some((sub) => selectedSubjects.includes(sub));
+                    return m.subjects.some((sub) => selectedSubjects.includes(sub as Subject));
                 }
-                return selectedSubjects.includes(m.subject);
+                return m.subject && selectedSubjects.includes(m.subject as Subject);
             });
         }
         if (hideAI) {
@@ -53,7 +58,11 @@ export const ArtworksTab = ({ searchTerm, models }) => {
                 break;
             case "latest":
                 filtered.sort(
-                    (a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0)
+                    (a, b) => {
+                        const aTime = typeof a.createdAt === "object" && "seconds" in a.createdAt ? a.createdAt.seconds : 0;
+                        const bTime = typeof b.createdAt === "object" && "seconds" in b.createdAt ? b.createdAt.seconds : 0;
+                        return bTime - aTime;
+                    }
                 );
                 break;
             default:
@@ -86,8 +95,8 @@ export const ArtworksTab = ({ searchTerm, models }) => {
                         </label>
                         <select
                             value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value)}
-                            className="w-full border border-br-primary rounded px-2 py-1 focus:outline-none focus:border-accent"
+                            onChange={(e) => setSortBy(e.target.value as SortBy)}
+                            className="w-full bg-bg-primary border border-br-primary rounded px-2 py-1 focus:outline-none focus:border-accent"
                         >
                             {sortOptions.map((opt) => (
                                 <option key={opt.value} value={opt.value}>
@@ -112,7 +121,7 @@ export const ArtworksTab = ({ searchTerm, models }) => {
                                         checked={selectedMedia.includes(opt.value)}
                                         onChange={() =>
                                             setSelectedMedia((prev) =>
-                                                toggleArrayValue(prev, opt.value)
+                                                toggleArrayValue(prev, opt.value) as Medium[]
                                             )
                                         }
                                     />
@@ -137,7 +146,7 @@ export const ArtworksTab = ({ searchTerm, models }) => {
                                         checked={selectedSubjects.includes(opt.value)}
                                         onChange={() =>
                                             setSelectedSubjects((prev) =>
-                                                toggleArrayValue(prev, opt.value)
+                                                toggleArrayValue(prev, opt.value) as Subject[]
                                             )
                                         }
                                     />
@@ -202,16 +211,4 @@ export const ArtworksTab = ({ searchTerm, models }) => {
             )}
         </div>
     );
-};
-
-ArtworksTab.propTypes = {
-    searchTerm: PropTypes.string.isRequired,
-    models: PropTypes.arrayOf(
-        PropTypes.shape({
-            id: PropTypes.string.isRequired,
-            name: PropTypes.string.isRequired,
-            renderPrimaryUrl: PropTypes.string.isRequired,
-            uploaderDisplayName: PropTypes.string.isRequired,
-        })
-    ).isRequired,
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
     getFirestore,
@@ -10,10 +10,15 @@ import {
     endAt,
     limit,
 } from "firebase/firestore";
+import type { Artist } from "@/types/search";
 
-export const ArtistsTab = ({ searchTerm }) => {
-    const [artistResults, setArtistResults] = useState([]);
-    const [loading, setLoading] = useState(false);
+interface ArtistsTabProps {
+    searchTerm: string;
+}
+
+export const ArtistsTab = ({ searchTerm }: ArtistsTabProps) => {
+    const [artistResults, setArtistResults] = useState<Artist[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
     const db = getFirestore();
 
     useEffect(() => {
@@ -31,7 +36,7 @@ export const ArtistsTab = ({ searchTerm }) => {
                     limit(50)
                 );
                 const snap = await getDocs(q);
-                const matchedArtists = snap.docs.map((doc) => ({
+                const matchedArtists: Artist[] = snap.docs.map((doc) => ({
                     uid: doc.id,
                     ...doc.data(),
                 }));

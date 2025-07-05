@@ -1,19 +1,20 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ChangeEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ArtworksTab } from "./ArtworksTab";
 import { ArtistsTab } from "./ArtistsTab";
 import { useModels } from "@/hooks/useModels";
 import { useSearch } from "@/hooks/useSearch";
 import { Spinner } from "@/components/shared/Spinner";
+import type { Model } from "@/types/search";
 
 export function DynamicSearch() {
     const { activeTab, setActiveTab } = useSearch();
     const { models, loading: modelsLoading } = useModels();
     // Local state for dynamic search input, independent from the global search input.
-    const [localQuery, setLocalQuery] = useState("");
-    const [debouncedQuery, setDebouncedQuery] = useState("");
+    const [localQuery, setLocalQuery] = useState<string>("");
+    const [debouncedQuery, setDebouncedQuery] = useState<string>("");
     const [searchParams, setSearchParams] = useSearchParams();
     // On mount, initialize local query from URL query parameter.
     useEffect(() => {
@@ -34,7 +35,7 @@ export function DynamicSearch() {
     const noSearchNoFilters = !debouncedQuery.trim();
 
     // Only update the local state on input change.
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setLocalQuery(e.target.value);
     };
 
@@ -44,7 +45,7 @@ export function DynamicSearch() {
     };
 
     // Switch active tabs without affecting the query.
-    const handleTabSwitch = (tab) => {
+    const handleTabSwitch = (tab: string) => {
         setActiveTab(tab);
     };
 
@@ -96,7 +97,7 @@ export function DynamicSearch() {
             {modelsLoading ? (
                 <Spinner size={24} />
             ) : activeTab === "artworks" ? (
-                <ArtworksTab searchTerm={debouncedQuery} models={models} />
+                <ArtworksTab searchTerm={debouncedQuery} models={models as Model[]} />
             ) : noSearchNoFilters ? (
                 <div className="flex flex-col items-center justify-center text-center py-20">
                     <FontAwesomeIcon

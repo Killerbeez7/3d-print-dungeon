@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type ChangeEvent, type FormEvent, type MouseEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearch } from "@/hooks/useSearch";
 import {
@@ -11,20 +11,20 @@ import {
     limit,
     getDocs,
 } from "firebase/firestore";
+import type { Artist } from "@/types/search";
 
 export function GlobalSearch() {
     const {
         searchTerm,
         setSearchTerm,
         setActiveTab,
-        activeTab,
         showDropdown,
         setShowDropdown,
         handleClearSearch,
     } = useSearch();
-    const [artistResults, setArtistResults] = useState([]);
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-    const containerRef = useRef(null);
+    const [artistResults, setArtistResults] = useState<Artist[]>([]);
+    const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
+    const containerRef = useRef<HTMLFormElement>(null);
     const navigate = useNavigate();
     const db = getFirestore();
 
@@ -42,7 +42,7 @@ export function GlobalSearch() {
     }, [setShowDropdown]);
 
     // Update global search term as the user types.
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
     };
 
@@ -58,7 +58,7 @@ export function GlobalSearch() {
                 const colRef = collection(db, "users");
                 const q = firestoreQuery(colRef, orderBy("displayName"), limit(50));
                 const snap = await getDocs(q);
-                const allArtists = snap.docs.map((doc) => ({
+                const allArtists: Artist[] = snap.docs.map((doc) => ({
                     uid: doc.id,
                     ...doc.data(),
                 }));
@@ -75,18 +75,20 @@ export function GlobalSearch() {
     }, [showDropdown, searchTerm, db]);
 
     // On submit, update URL (static query) and clear the global input.
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const queryValue = searchTerm.trim();
         navigate(`/search?query=${encodeURIComponent(queryValue)}`);
         setSearchTerm("");
         setShowDropdown(false);
-        document.activeElement.blur();
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
     };
 
     // Clicking a preset link sets the active tab accordingly,
     // navigates to Dynamic Search with the current query, and clears the global input.
-    const handlePresetClick = (preset) => {
+    const handlePresetClick = (preset: string) => {
         setActiveTab(preset);
         const currentQuery = searchTerm.trim();
         navigate(`/search?query=${encodeURIComponent(currentQuery)}`);
@@ -96,8 +98,8 @@ export function GlobalSearch() {
 
     // Close dropdown on click outside (but do not reset the input).
     useEffect(() => {
-        function handleClickOutside(e) {
-            if (containerRef.current && !containerRef.current.contains(e.target)) {
+        function handleClickOutside(e: MouseEvent | globalThis.MouseEvent) {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
                 setShowDropdown(false);
             }
         }
@@ -112,7 +114,7 @@ export function GlobalSearch() {
     };
 
     // Clicking on an artist in the dropdown navigates to their profile.
-    const handleArtistSelect = (uid) => {
+    const handleArtistSelect = (uid: string) => {
         navigate(`/artist/${uid}`);
         setShowDropdown(false);
     };
@@ -132,7 +134,7 @@ export function GlobalSearch() {
                 value={searchTerm}
                 onChange={handleInputChange}
                 onFocus={handleFocus}
-                className="border-2 border-br-secondary rounded-full w-full text-sm focus:outline-none focus:border-accent-hover py-2 pl-10 pr-10"
+                className="border-2 text-txt-primary border-br-secondary rounded-full w-full text-sm focus:outline-none focus:border-accent-hover py-2 pl-10 pr-10"
             />
             {searchTerm && (
                 <button
@@ -144,7 +146,7 @@ export function GlobalSearch() {
                 </button>
             )}
             {!isMobile && showDropdown && (
-                <div className="absolute top-[110%] left-0 w-full bg-bg-primary border border-br-secondary rounded-md shadow-lg mt-1 z-50">
+                <div className="absolute top-[110%] left-0 w-full text-txt-primary bg-bg-primary border border-br-secondary rounded-md shadow-lg mt-1 z-50">
                     <ul className="py-2 max-h-80 overflow-auto text-sm">
                         {searchTerm.trim() && artistResults.length > 0 && (
                             <>
