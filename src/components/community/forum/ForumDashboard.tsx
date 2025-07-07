@@ -3,13 +3,14 @@ import { Link } from "react-router-dom";
 import { useForum } from "@/hooks/useForum";
 import { useAuth } from "@/hooks/useAuth";
 import { Spinner } from "@/components/shared/Spinner";
+import type { ForumThread, ForumReply } from "@/types/forum";
 
 export const ForumDashboard = () => {
     const { currentUser } = useAuth();
     const { getUserThreads, getUserReplies } = useForum();
-    const [userThreads, setUserThreads] = useState([]);
-    const [userReplies, setUserReplies] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [userThreads, setUserThreads] = useState<ForumThread[]>([]);
+    const [userReplies, setUserReplies] = useState<ForumReply[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -85,7 +86,7 @@ export const ForumDashboard = () => {
                     </div>
                 ) : (
                     <ul className="space-y-2">
-                        {userThreads.map((thread) => (
+                        {userThreads.map((thread: ForumThread) => (
                             <li key={thread.id}>
                                 <Link
                                     to={`/forum/thread/${thread.id}`}
@@ -116,14 +117,14 @@ export const ForumDashboard = () => {
                     </div>
                 ) : (
                     <ul className="space-y-2">
-                        {userReplies.map((reply) => (
+                        {userReplies.map((reply: ForumReply) => (
                             <li key={reply.id}>
                                 <span className="text-[var(--txt-muted)]">On </span>
                                 <Link
                                     to={`/forum/thread/${reply.threadId}`}
                                     className="font-medium hover:text-[var(--accent)]"
                                 >
-                                    {reply.threadTitle || "Thread"}
+                                    {"Thread"}
                                 </Link>
                                 <span className="ml-2 text-xs text-[var(--txt-muted)]">
                                     {/* Optionally show date or stats here */}

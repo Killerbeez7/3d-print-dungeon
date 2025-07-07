@@ -1,14 +1,22 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LuPanelLeftClose, LuPanelLeftOpen } from "react-icons/lu";
 import { MdHome, MdDashboard } from "react-icons/md";
 import { FaPlusSquare, FaUser, FaInfoCircle, FaQuestionCircle } from "react-icons/fa";
-import PropTypes from "prop-types";
-//hooks
-import { useNavigate } from "react-router-dom";
 import { useModal } from "@/hooks/useModal";
 import { useAuth } from "@/hooks/useAuth";
+import type { ForumSidebarProps } from "./ForumLayout";
+import type { IconType } from "react-icons";
+import type { FC, ReactNode } from "react";
 
-const SidebarLink = ({ icon: Icon, label, to, onClick, className = "" }) => (
+interface SidebarLinkProps {
+    icon?: IconType;
+    label?: ReactNode;
+    to: string;
+    onClick?: () => void;
+    className?: string;
+}
+
+const SidebarLink: FC<SidebarLinkProps> = ({ icon: Icon, label, to, onClick, className = "" }) => (
     <Link
         to={to}
         onClick={onClick}
@@ -19,25 +27,17 @@ const SidebarLink = ({ icon: Icon, label, to, onClick, className = "" }) => (
     </Link>
 );
 
-SidebarLink.propTypes = {
-    icon: PropTypes.elementType,
-    label: PropTypes.node,
-    to: PropTypes.string.isRequired,
-    onClick: PropTypes.func,
-    className: PropTypes.string,
-};
-
-export default function ForumSidebar({
+export const ForumSidebar: FC<ForumSidebarProps> = ({
     isSidebarOpen,
     toggleSidebar,
     handleSidebarClick,
     categories,
-}) {
+}) => {
     const { currentUser } = useAuth();
     const { open } = useModal("auth");
     const navigate = useNavigate();
-
     const location = useLocation();
+
     return (
         <div className="sticky top-20 h-[calc(100vh-120px)]">
             {/* Compact Sidebar */}
@@ -273,11 +273,4 @@ export default function ForumSidebar({
             </div>
         </div>
     );
-}
-
-ForumSidebar.propTypes = {
-    isSidebarOpen: PropTypes.bool.isRequired,
-    toggleSidebar: PropTypes.func.isRequired,
-    handleSidebarClick: PropTypes.func.isRequired,
-    categories: PropTypes.array.isRequired,
 };

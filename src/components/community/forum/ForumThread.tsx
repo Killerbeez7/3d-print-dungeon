@@ -7,11 +7,15 @@ import { FaEdit, FaTrash, FaReply, FaEye, FaCalendar, FaUser } from "react-icons
 import Skeleton from "@/components/shared/Skeleton";
 import { ThreadEditor } from "./ThreadEditor";
 import { ReplyEditor } from "./ReplyEditor";
-import PropTypes from "prop-types";
 import { Spinner } from "@/components/shared/Spinner";
+import type { FC } from "react";
 
-export const ForumThread = ({ isNew = false }) => {
-    const { threadId } = useParams();
+interface ForumThreadProps {
+    isNew?: boolean;
+}
+
+export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
+    const { threadId } = useParams<Record<string, string | undefined>>();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
@@ -34,8 +38,8 @@ export const ForumThread = ({ isNew = false }) => {
         categoryId: searchParams.get("category") || "",
     };
 
-    const [isReplying, setIsReplying] = useState(false);
-    const [loadingMore, setLoadingMore] = useState(false);
+    const [isReplying, setIsReplying] = useState<boolean>(false);
+    const [loadingMore, setLoadingMore] = useState<boolean>(false);
 
     useEffect(() => {
         if (!isNew && threadId) {
@@ -43,7 +47,21 @@ export const ForumThread = ({ isNew = false }) => {
         }
     }, [isNew, threadId, loadThread]);
 
-    const handleNewThreadSubmit = async (data) => {
+    const handleNewThreadSubmit = async (data: {
+        title?: string;
+        content?: string;
+        categoryId?: string;
+        authorId?: string;
+        authorName?: string;
+        authorPhotoURL?: string;
+        createdAt?: Date;
+        lastActivity?: Date;
+        views?: number;
+        replyCount?: number;
+        isPinned?: boolean;
+        isLocked?: boolean;
+        tags?: string[];
+    }) => {
         try {
             const threadId = await createThread(data);
             navigate(`/forum/thread/${threadId}`);
@@ -61,7 +79,7 @@ export const ForumThread = ({ isNew = false }) => {
             )
         ) {
             try {
-                await deleteThread(threadId, currentThread.categoryId);
+                await deleteThread(threadId as string, currentThread.categoryId);
                 navigate("/forum");
             } catch (error) {
                 console.error("Error deleting thread:", error);
@@ -82,9 +100,12 @@ export const ForumThread = ({ isNew = false }) => {
         }
     };
 
-    const formatDate = (timestamp) => {
+    const formatDate = (timestamp: unknown): string => {
         if (!timestamp) return "Unknown date";
-        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        const ts = timestamp as { toDate?: () => Date } | Date;
+        const date = typeof ts === "object" && typeof (ts as { toDate?: () => Date }).toDate === "function"
+            ? (ts as { toDate: () => Date }).toDate()
+            : new Date(ts as string | number | Date);
         return formatDistanceToNow(date, { addSuffix: true });
     };
 
@@ -183,7 +204,7 @@ export const ForumThread = ({ isNew = false }) => {
                     to={`/forum/category/${currentThread.categoryId}`}
                     className="hover:text-[var(--accent)]"
                 >
-                    {currentThread.categoryName || "Category"}
+                    {categories.find((cat) => cat.id === currentThread.categoryId)?.name || "Category"}
                 </Link>
             </div>
 
@@ -265,8 +286,9 @@ export const ForumThread = ({ isNew = false }) => {
                 <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
                     <h3 className="text-lg font-medium mb-4">Post a Reply</h3>
                     <ReplyEditor
-                        threadId={threadId}
+                        threadId={threadId ?? ""}
                         onSuccess={() => setIsReplying(false)}
+                        onCancel={() => setIsReplying(false)}
                     />
                 </div>
             )}
@@ -277,7 +299,7 @@ export const ForumThread = ({ isNew = false }) => {
                     {currentThread.replyCount || 0} Replies
                 </h2>
 
-                {currentThread.replies?.length > 0 ? (
+                {Array.isArray(currentThread.replies) && currentThread.replies.length > 0 ? (
                     <div className="space-y-4">
                         {currentThread.replies.map((reply) => (
                             <div
@@ -355,8 +377,4 @@ export const ForumThread = ({ isNew = false }) => {
             </div>
         </div>
     );
-};
-
-ForumThread.propTypes = {
-    isNew: PropTypes.bool,
 };

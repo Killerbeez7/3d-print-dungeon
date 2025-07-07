@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, ChangeEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FORUM_CATEGORIES } from "@/config/forumCategories";
 import { ThreadList } from "./ThreadList";
 
 export const ForumCategory = () => {
-    const { categoryId } = useParams();
-    const [sortBy, setSortBy] = useState("lastActivity");
+    const { categoryId } = useParams<Record<string, string | undefined>>();
+    const [sortBy, setSortBy] = useState<string>("lastActivity");
     const currentCategory = FORUM_CATEGORIES.find((cat) => cat.id === categoryId);
 
-    const handleSortChange = (e) => {
+    const handleSortChange = (e: ChangeEvent<HTMLSelectElement>) => {
         setSortBy(e.target.value);
     };
 
@@ -63,7 +63,7 @@ export const ForumCategory = () => {
             </div>
 
             {/* Thread List */}
-            <ThreadList categoryId={categoryId} sortBy={sortBy} />
+            <ThreadList categoryId={categoryId ?? ""} sortBy={sortBy} />
         </div>
     );
 };

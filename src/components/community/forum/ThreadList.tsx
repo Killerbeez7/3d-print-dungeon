@@ -4,30 +4,39 @@ import { useForum } from "@/hooks/useForum";
 import { formatDistanceToNow } from "date-fns";
 import { FaComment, FaEye, FaTag, FaUser, FaCalendar } from "react-icons/fa";
 import Skeleton from "@/components/shared/Skeleton";
-import PropTypes from "prop-types";
 import { Spinner } from "@/components/shared/Spinner";
+import type { ForumThread } from "@/types/forum";
 
-export const ThreadList = ({
+export interface ThreadListProps {
+    categoryId: string;
+    sortBy?: string;
+    showCategory?: boolean;
+    isCompact?: boolean;
+}
+
+type ThreadWithCategoryName = ForumThread & { categoryName?: string };
+
+export function ThreadList({
     categoryId,
     sortBy = "lastActivity",
     showCategory = false,
     isCompact = false,
-}) => {
+}: ThreadListProps) {
     const { getThreadsByCategory, loadMoreThreads, threads, pagination, loading, error } =
         useForum();
 
-    const [localThreads, setLocalThreads] = useState([]);
-    const [loadingMore, setLoadingMore] = useState(false);
+    const [localThreads, setLocalThreads] = useState<ForumThread[]>([]);
+    const [loadingMore, setLoadingMore] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchThreads = async () => {
             try {
                 await getThreadsByCategory(categoryId, sortBy);
-            } catch (error) {
-                console.error("Error fetching threads:", error);
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : String(err);
+                console.error("Error fetching threads:", msg);
             }
         };
-
         fetchThreads();
     }, [categoryId, sortBy, getThreadsByCategory]);
 
@@ -41,16 +50,22 @@ export const ThreadList = ({
         setLoadingMore(true);
         try {
             await loadMoreThreads(categoryId, sortBy);
-        } catch (error) {
-            console.error("Error loading more threads:", error);
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.error("Error loading more threads:", msg);
         } finally {
             setLoadingMore(false);
         }
     };
 
-    const formatDate = (timestamp) => {
+    const formatDate = (timestamp: unknown): string => {
         if (!timestamp) return "Unknown date";
-        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        const ts = timestamp as { toDate?: () => Date } | Date;
+        const date =
+            typeof ts === "object" &&
+            typeof (ts as { toDate?: () => Date }).toDate === "function"
+                ? (ts as { toDate: () => Date }).toDate()
+                : new Date(ts as string | number | Date);
         return formatDistanceToNow(date, { addSuffix: true });
     };
 
@@ -82,7 +97,7 @@ export const ThreadList = ({
         );
     }
 
-    if (localThreads?.length === 0) {
+    if (!localThreads || localThreads.length === 0) {
         return (
             <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
                 <p className="text-[var(--txt-muted)]">
@@ -100,7 +115,7 @@ export const ThreadList = ({
 
     return (
         <div className="space-y-4">
-            {localThreads?.map((thread) => (
+            {(localThreads as ThreadWithCategoryName[]).map((thread) => (
                 <div
                     key={thread.id}
                     className={`bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow ${
@@ -115,7 +130,6 @@ export const ThreadList = ({
                             >
                                 {thread.title}
                             </Link>
-
                             {!isCompact && thread.tags && thread.tags.length > 0 && (
                                 <div className="flex flex-wrap gap-1 mt-1">
                                     {thread.tags.map((tag) => (
@@ -133,14 +147,12 @@ export const ThreadList = ({
                                 </div>
                             )}
                         </div>
-
                         {thread.isLocked && (
                             <span className="inline-flex items-center px-2 py-1 text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-full ml-2">
                                 Locked
                             </span>
                         )}
                     </div>
-
                     <div
                         className={`flex flex-wrap ${
                             isCompact ? "mt-1" : "mt-2"
@@ -150,33 +162,28 @@ export const ThreadList = ({
                             <FaUser className="mr-1" size={12} />
                             {thread.authorName}
                         </span>
-
                         <span className="inline-flex items-center">
                             <FaComment className="mr-1" size={12} />
                             {thread.replyCount || 0} replies
                         </span>
-
                         <span className="inline-flex items-center">
                             <FaEye className="mr-1" size={12} />
                             {thread.views || 0} views
                         </span>
-
                         <span className="inline-flex items-center">
                             <FaCalendar className="mr-1" size={12} />
                             {formatDate(thread.lastActivity || thread.createdAt)}
                         </span>
-
                         {showCategory && (
                             <span className="inline-flex items-center ml-auto text-blue-600 dark:text-blue-400">
                                 <Link to={`/forum/category/${thread.categoryId}`}>
-                                    {thread.categoryName || "Category"}
+                                    {thread.categoryName ?? "Category"}
                                 </Link>
                             </span>
                         )}
                     </div>
                 </div>
             ))}
-
             {pagination.threads.hasMore && (
                 <div className="flex justify-center mt-4">
                     <button
@@ -190,11 +197,4 @@ export const ThreadList = ({
             )}
         </div>
     );
-};
-
-ThreadList.propTypes = {
-    categoryId: PropTypes.string,
-    sortBy: PropTypes.string,
-    showCategory: PropTypes.bool,
-    isCompact: PropTypes.bool,
-};
+}

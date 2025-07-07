@@ -1,11 +1,19 @@
 import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { useForum } from "@/hooks/useForum";
-import ForumSidebar from "./ForumSidebar";
+import { ForumSidebar } from "./ForumSidebar";
+import type { ForumCategory } from "@/types/forum";
+
+export interface ForumSidebarProps {
+    isSidebarOpen: boolean;
+    toggleSidebar: () => void;
+    handleSidebarClick: () => void;
+    categories: ForumCategory[];
+}
 
 export const ForumLayout = () => {
     const { categories } = useForum();
-    const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(window.innerWidth >= 768);
 
     useEffect(() => {
         const handleResize = () => {
@@ -17,7 +25,7 @@ export const ForumLayout = () => {
     }, []);
 
     const toggleSidebar = () => {
-        setIsSidebarOpen(!isSidebarOpen);
+        setIsSidebarOpen((prev) => !prev);
     };
 
     const handleSidebarClick = () => {

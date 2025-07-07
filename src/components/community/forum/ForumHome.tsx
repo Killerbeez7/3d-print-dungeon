@@ -1,26 +1,31 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import { formatDistanceToNow } from "date-fns";
-import PropTypes from "prop-types";
-// context, srv, hooks
 import { useForum } from "@/hooks/useForum";
 import { forumService } from "@/services/forumService";
-//components
 import Skeleton from "@/components/shared/Skeleton";
 import { Spinner } from "@/components/shared/Spinner";
+import type { ForumThread, ForumCategory } from "@/types/forum";
+
+interface ThreadCardProps {
+    thread: ForumThread;
+    categories: ForumCategory[];
+    isNewThread: (thread: ForumThread) => boolean;
+    formatRelativeTime: (timestamp: unknown) => string;
+}
 
 export const ForumHome = () => {
     const { categories, threads, loading, error, searchThreads } = useForum();
-    const [displayedThreads, setDisplayedThreads] = useState([]);
-    const [lastVisible, setLastVisible] = useState(null);
-    const [hasMore, setHasMore] = useState(true);
-    const [loadingMore, setLoadingMore] = useState(false);
-    const [activeTab, setActiveTab] = useState("recent");
-    const [searchQuery, setSearchQuery] = useState("");
-    const [searchResults, setSearchResults] = useState([]);
-    const [isSearching, setIsSearching] = useState(false);
-    const scrollTimeoutRef = useRef(null);
+    const [displayedThreads, setDisplayedThreads] = useState<ForumThread[]>([]);
+    const [lastVisible, setLastVisible] = useState<unknown>(null);
+    const [hasMore, setHasMore] = useState<boolean>(true);
+    const [loadingMore, setLoadingMore] = useState<boolean>(false);
+    const [activeTab, setActiveTab] = useState<string>("recent");
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [searchResults, setSearchResults] = useState<ForumThread[]>([]);
+    const [isSearching, setIsSearching] = useState<boolean>(false);
+    const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         // Reset search when tab changes
@@ -48,8 +53,7 @@ export const ForumHome = () => {
             setLoadingMore(true);
             try {
                 const result = await forumService.getNewestThreads(10);
-                console.log("Initial threads fetch:", result);
-                const threads = Array.isArray(result) ? result : result.threads || [];
+                const threads: ForumThread[] = Array.isArray(result) ? result : result.threads || [];
                 setDisplayedThreads(threads);
                 setLastVisible(result.lastVisible || null);
                 setHasMore(
@@ -76,26 +80,15 @@ export const ForumHome = () => {
                 const scrolled = scrollY + innerHeight;
                 const scrollPercent = scrolled / totalHeight;
 
-                console.log("Scroll position:", {
-                    scrollY,
-                    innerHeight,
-                    totalHeight,
-                    scrollPercent: Math.round(scrollPercent * 100) + "%",
-                    hasMore,
-                    loadingMore,
-                    hasLastVisible: !!lastVisible,
-                });
-
                 // trigger loading when user has scrolled past 80% of the page
                 if (scrollPercent > 0.8 && hasMore && !loadingMore && lastVisible) {
-                    console.log("Triggering loadMoreThreads at 80% scroll");
                     try {
                         setLoadingMore(true);
                         const result = await forumService.getMoreNewestThreads(
                             lastVisible,
                             5
                         );
-                        const threads = Array.isArray(result)
+                        const threads: ForumThread[] = Array.isArray(result)
                             ? result
                             : result.threads || [];
                         if (threads.length === 0) {
@@ -131,31 +124,36 @@ export const ForumHome = () => {
     }, [hasMore, loadingMore, lastVisible]);
 
     // Format relative time
-    const formatRelativeTime = (timestamp) => {
+    const formatRelativeTime = (timestamp: unknown): string => {
         if (!timestamp) return "Unknown time";
-        const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+        // Firestore Timestamp or Date
+        const ts = timestamp as { toDate?: () => Date } | Date;
+        const date = typeof ts === "object" && typeof (ts as { toDate?: () => Date }).toDate === "function"
+            ? (ts as { toDate: () => Date }).toDate()
+            : new Date(ts as string | number | Date);
         return formatDistanceToNow(date, { addSuffix: true });
     };
 
     // Check if a thread is new (less than 24 hours old)
-    const isNewThread = (thread) => {
+    const isNewThread = (thread: ForumThread): boolean => {
         if (!thread.createdAt) return false;
-        const createdAt = thread.createdAt.toDate
-            ? thread.createdAt.toDate()
-            : new Date(thread.createdAt);
+        const ts = thread.createdAt as { toDate?: () => Date } | Date;
+        const createdAt = typeof ts === "object" && typeof (ts as { toDate?: () => Date }).toDate === "function"
+            ? (ts as { toDate: () => Date }).toDate()
+            : new Date(ts as string | number | Date);
         const now = new Date();
-        const hoursDiff = (now - createdAt) / (1000 * 60 * 60);
+        const hoursDiff = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
         return hoursDiff < 24;
     };
 
-    const handleSearch = async (e) => {
+    const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (!searchQuery.trim()) return;
 
         setIsSearching(true);
         try {
-            const results = await searchThreads(searchQuery);
+            const results: ForumThread[] = await searchThreads(searchQuery);
             setSearchResults(results);
         } catch (error) {
             console.error("Error searching threads:", error);
@@ -165,7 +163,7 @@ export const ForumHome = () => {
     };
 
     // Thread card component for reuse
-    const ThreadCard = ({ thread }) => (
+    const ThreadCard = ({ thread, categories, isNewThread, formatRelativeTime }: ThreadCardProps) => (
         <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
             <div className="flex justify-between items-start">
                 <Link
@@ -195,8 +193,7 @@ export const ForumHome = () => {
                 {thread.replyCount !== undefined && (
                     <>
                         {" · "}
-                        {thread.replyCount}{" "}
-                        {thread.replyCount === 1 ? "reply" : "replies"}
+                        {thread.replyCount} {thread.replyCount === 1 ? "reply" : "replies"}
                     </>
                 )}
                 {thread.views !== undefined && (
@@ -209,21 +206,6 @@ export const ForumHome = () => {
         </div>
     );
 
-    ThreadCard.propTypes = {
-        thread: PropTypes.shape({
-            id: PropTypes.string.isRequired,
-            title: PropTypes.string.isRequired,
-            categoryId: PropTypes.string,
-            createdAt: PropTypes.oneOfType([
-                PropTypes.string,
-                PropTypes.object, // Firestore timestamp
-                PropTypes.instanceOf(Date),
-            ]),
-            replyCount: PropTypes.number,
-            views: PropTypes.number,
-        }).isRequired,
-    };
-
     const renderThreadListForTab = () => {
         if (searchQuery && searchResults.length > 0) {
             return (
@@ -233,7 +215,7 @@ export const ForumHome = () => {
                     </h2>
                     <div className="space-y-4">
                         {searchResults.map((thread) => (
-                            <ThreadCard key={thread.id} thread={thread} />
+                            <ThreadCard key={thread.id} thread={thread} categories={categories} isNewThread={isNewThread} formatRelativeTime={formatRelativeTime} />
                         ))}
                     </div>
                 </div>
@@ -258,7 +240,7 @@ export const ForumHome = () => {
                     {displayedThreads.length > 0 ? (
                         <div className="space-y-4">
                             {displayedThreads.map((thread) => (
-                                <ThreadCard key={thread.id} thread={thread} />
+                                <ThreadCard key={thread.id} thread={thread} categories={categories} isNewThread={isNewThread} formatRelativeTime={formatRelativeTime} />
                             ))}
                         </div>
                     ) : (
@@ -285,7 +267,7 @@ export const ForumHome = () => {
                         {threads.popular?.length > 0 ? (
                             <div className="space-y-4">
                                 {threads.popular.map((thread) => (
-                                    <ThreadCard key={thread.id} thread={thread} />
+                                    <ThreadCard key={thread.id} thread={thread} categories={categories} isNewThread={isNewThread} formatRelativeTime={formatRelativeTime} />
                                 ))}
                             </div>
                         ) : (
@@ -307,7 +289,7 @@ export const ForumHome = () => {
                         {threads.unanswered?.length > 0 ? (
                             <div className="space-y-4">
                                 {threads.unanswered.map((thread) => (
-                                    <ThreadCard key={thread.id} thread={thread} />
+                                    <ThreadCard key={thread.id} thread={thread} categories={categories} isNewThread={isNewThread} formatRelativeTime={formatRelativeTime} />
                                 ))}
                             </div>
                         ) : (

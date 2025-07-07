@@ -1,8 +1,18 @@
 import { useState, useEffect } from "react";
 import { FaSave, FaTimes } from "react-icons/fa";
-import PropTypes from "prop-types";
+import type { ForumCategory } from "@/types/forum";
+import type { FC } from "react";
 
-export const ThreadEditor = ({
+interface ThreadEditorProps {
+    initialData: { title: string; content: string; categoryId: string; tags?: string[] };
+    categories: ForumCategory[];
+    onSubmit: (data: { title: string; content: string; categoryId: string; tags?: string[] }) => void;
+    onCancel?: () => void;
+    isLoading?: boolean;
+    isEdit?: boolean;
+}
+
+export const ThreadEditor: FC<ThreadEditorProps> = ({
     initialData = { title: "", content: "", categoryId: "" },
     categories = [],
     onSubmit,
@@ -11,7 +21,7 @@ export const ThreadEditor = ({
     isEdit = false,
 }) => {
     const [formData, setFormData] = useState(initialData);
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState<Record<string, string | null>>({});
     const [tags, setTags] = useState(initialData.tags?.join(", ") || "");
 
     useEffect(() => {
@@ -19,7 +29,7 @@ export const ThreadEditor = ({
         setTags(initialData.tags?.join(", ") || "");
     }, [initialData]);
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
 
@@ -30,7 +40,7 @@ export const ThreadEditor = ({
     };
 
     const validateForm = () => {
-        const newErrors = {};
+        const newErrors: Record<string, string> = {};
 
         if (!formData.title.trim()) {
             newErrors.title = "Title is required";
@@ -52,7 +62,7 @@ export const ThreadEditor = ({
         return Object.keys(newErrors).length === 0;
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (!validateForm()) {
@@ -207,13 +217,4 @@ export const ThreadEditor = ({
             </div>
         </form>
     );
-};
-
-ThreadEditor.propTypes = {
-    initialData: PropTypes.object.isRequired,
-    categories: PropTypes.array.isRequired,
-    onSubmit: PropTypes.func.isRequired,
-    onCancel: PropTypes.func,
-    isLoading: PropTypes.bool,
-    isEdit: PropTypes.bool,
 };

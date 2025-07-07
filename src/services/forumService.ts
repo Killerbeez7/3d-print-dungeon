@@ -14,7 +14,11 @@ import {
     serverTimestamp,
     startAfter,
     increment,
+    QueryDocumentSnapshot,
+    DocumentData,
+    writeBatch,
 } from "firebase/firestore";
+import type { ForumThread, ForumReply } from "@/types/forum";
 
 /**
  * Forum Service
@@ -24,7 +28,7 @@ export const forumService = {
     /**
      * Get threads by category with pagination
      */
-    async getThreadsByCategory(categoryId, sortBy = "lastActivity", pageSize = 20) {
+    async getThreadsByCategory(categoryId: string, sortBy: string = "lastActivity", pageSize: number = 20): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const threadsRef = collection(db, "forumThreads");
             const q = query(
@@ -33,14 +37,11 @@ export const forumService = {
                 orderBy(sortBy, "desc"),
                 limit(pageSize)
             );
-            
+
             const snapshot = await getDocs(q);
-            
+
             return {
-                threads: snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                })),
+                threads: snapshot.docs.map(normalizeThread),
                 lastVisible: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
                 hasMore: snapshot.docs.length === pageSize
             };
@@ -53,7 +54,7 @@ export const forumService = {
     /**
      * Get more threads by category (pagination)
      */
-    async getMoreThreadsByCategory(categoryId, sortBy = "lastActivity", lastVisible, pageSize = 20) {
+    async getMoreThreadsByCategory(categoryId: string, sortBy: string = "lastActivity", lastVisible: unknown, pageSize: number = 20): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const threadsRef = collection(db, "forumThreads");
             const q = query(
@@ -63,14 +64,11 @@ export const forumService = {
                 startAfter(lastVisible),
                 limit(pageSize)
             );
-            
+
             const snapshot = await getDocs(q);
-            
+
             return {
-                threads: snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                })),
+                threads: snapshot.docs.map(normalizeThread),
                 lastVisible: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
                 hasMore: snapshot.docs.length === pageSize
             };
@@ -83,7 +81,7 @@ export const forumService = {
     /**
      * Get recent threads
      */
-    async getRecentThreads(limitCount = 10) {
+    async getRecentThreads(limitCount: number = 10): Promise<ForumThread[]> {
         try {
             const threadsRef = collection(db, "forumThreads");
             const q = query(
@@ -91,13 +89,10 @@ export const forumService = {
                 orderBy("lastActivity", "desc"),
                 limit(limitCount)
             );
-            
+
             const snapshot = await getDocs(q);
-            
-            return snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+
+            return snapshot.docs.map(normalizeThread);
         } catch (error) {
             console.error("Error getting recent threads:", error);
             throw error;
@@ -107,7 +102,7 @@ export const forumService = {
     /**
      * Get popular threads
      */
-    async getPopularThreads(limitCount = 10) {
+    async getPopularThreads(limitCount: number = 10): Promise<ForumThread[]> {
         try {
             const threadsRef = collection(db, "forumThreads");
             const q = query(
@@ -115,13 +110,10 @@ export const forumService = {
                 orderBy("views", "desc"),
                 limit(limitCount)
             );
-            
+
             const snapshot = await getDocs(q);
-            
-            return snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+
+            return snapshot.docs.map(normalizeThread);
         } catch (error) {
             console.error("Error getting popular threads:", error);
             throw error;
@@ -131,7 +123,7 @@ export const forumService = {
     /**
      * Get unanswered threads
      */
-    async getUnansweredThreads(limitCount = 10) {
+    async getUnansweredThreads(limitCount: number = 10): Promise<ForumThread[]> {
         try {
             const threadsRef = collection(db, "forumThreads");
             const q = query(
@@ -140,13 +132,10 @@ export const forumService = {
                 orderBy("createdAt", "desc"),
                 limit(limitCount)
             );
-            
+
             const snapshot = await getDocs(q);
-            
-            return snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+
+            return snapshot.docs.map(normalizeThread);
         } catch (error) {
             console.error("Error getting unanswered threads:", error);
             throw error;
@@ -156,19 +145,16 @@ export const forumService = {
     /**
      * Get thread by ID
      */
-    async getThreadById(threadId) {
+    async getThreadById(threadId: string): Promise<ForumThread> {
         try {
             const threadRef = doc(db, "forumThreads", threadId);
             const threadSnap = await getDoc(threadRef);
-            
+
             if (!threadSnap.exists()) {
                 throw new Error("Thread not found");
             }
 
-            return {
-                id: threadSnap.id,
-                ...threadSnap.data()
-            };
+            return normalizeThread(threadSnap);
         } catch (error) {
             console.error("Error getting thread:", error);
             throw error;
@@ -178,7 +164,7 @@ export const forumService = {
     /**
      * Create new thread
      */
-    async createThread(threadData) {
+    async createThread(threadData: Partial<ForumThread>): Promise<string> {
         try {
             const threadsRef = collection(db, "forumThreads");
             const newThread = {
@@ -190,7 +176,7 @@ export const forumService = {
                 isLocked: false,
                 isPinned: false
             };
-            
+
             const docRef = await addDoc(threadsRef, newThread);
             return docRef.id;
         } catch (error) {
@@ -202,7 +188,7 @@ export const forumService = {
     /**
      * Update thread
      */
-    async updateThread(threadId, threadData) {
+    async updateThread(threadId: string, threadData: Partial<ForumThread>): Promise<string> {
         try {
             const threadRef = doc(db, "forumThreads", threadId);
             await updateDoc(threadRef, {
@@ -219,22 +205,22 @@ export const forumService = {
     /**
      * Delete thread
      */
-    async deleteThread(threadId) {
+    async deleteThread(threadId: string): Promise<string> {
         try {
             // Delete all replies first
             const repliesRef = collection(db, "forumReplies");
             const q = query(repliesRef, where("threadId", "==", threadId));
             const snapshot = await getDocs(q);
-            
-            const batch = db.batch();
+
+            const batch = writeBatch(db)
             snapshot.docs.forEach((doc) => {
                 batch.delete(doc.ref);
             });
-            
+
             // Delete thread
             const threadRef = doc(db, "forumThreads", threadId);
             batch.delete(threadRef);
-            
+
             await batch.commit();
             return threadId;
         } catch (error) {
@@ -246,11 +232,11 @@ export const forumService = {
     /**
      * Add reply to thread
      */
-    async addReply(threadId, replyData) {
+    async addReply(threadId: string, replyData: Record<string, unknown>): Promise<string> {
         try {
             const threadRef = doc(db, "forumThreads", threadId);
             const repliesRef = collection(db, "forumReplies");
-            
+
             const newReply = {
                 ...replyData,
                 threadId,
@@ -258,9 +244,9 @@ export const forumService = {
                 updatedAt: serverTimestamp(),
                 isEdited: false
             };
-            
+
             const replyRef = await addDoc(repliesRef, newReply);
-            
+
             // Update thread's lastActivity and replyCount
             await updateDoc(threadRef, {
                 lastActivity: serverTimestamp(),
@@ -277,7 +263,7 @@ export const forumService = {
     /**
      * Update reply
      */
-    async updateReply(replyId, replyData) {
+    async updateReply(replyId: string, replyData: Record<string, unknown>): Promise<string> {
         try {
             const replyRef = doc(db, "forumReplies", replyId);
             await updateDoc(replyRef, {
@@ -295,17 +281,17 @@ export const forumService = {
     /**
      * Delete reply
      */
-    async deleteReply(replyId, threadId) {
+    async deleteReply(replyId: string, threadId: string): Promise<string> {
         try {
             const replyRef = doc(db, "forumReplies", replyId);
             await deleteDoc(replyRef);
-            
+
             // Update thread's replyCount
             const threadRef = doc(db, "forumThreads", threadId);
             await updateDoc(threadRef, {
                 replyCount: increment(-1)
             });
-            
+
             return replyId;
         } catch (error) {
             console.error("Error deleting reply:", error);
@@ -316,7 +302,7 @@ export const forumService = {
     /**
      * Get thread replies with pagination
      */
-    async getThreadReplies(threadId, pageSize = 20) {
+    async getThreadReplies(threadId: string, pageSize: number = 20): Promise<{ replies: ForumReply[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const repliesRef = collection(db, "forumReplies");
             const q = query(
@@ -325,14 +311,11 @@ export const forumService = {
                 orderBy("createdAt", "asc"),
                 limit(pageSize)
             );
-            
+
             const snapshot = await getDocs(q);
-            
+
             return {
-                replies: snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                })),
+                replies: snapshot.docs.map((doc) => ({ ...(doc.data() as ForumReply), id: doc.id })),
                 lastVisible: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
                 hasMore: snapshot.docs.length === pageSize
             };
@@ -345,7 +328,7 @@ export const forumService = {
     /**
      * Get more thread replies (pagination)
      */
-    async getMoreThreadReplies(threadId, lastVisible, pageSize = 20) {
+    async getMoreThreadReplies(threadId: string, lastVisible: unknown, pageSize: number = 20): Promise<{ replies: ForumReply[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const repliesRef = collection(db, "forumReplies");
             const q = query(
@@ -355,14 +338,11 @@ export const forumService = {
                 startAfter(lastVisible),
                 limit(pageSize)
             );
-            
+
             const snapshot = await getDocs(q);
-            
+
             return {
-                replies: snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                })),
+                replies: snapshot.docs.map((doc) => ({ ...(doc.data() as ForumReply), id: doc.id })),
                 lastVisible: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
                 hasMore: snapshot.docs.length === pageSize
             };
@@ -375,7 +355,7 @@ export const forumService = {
     /**
      * Increment thread views
      */
-    async incrementThreadViews(threadId) {
+    async incrementThreadViews(threadId: string): Promise<void> {
         try {
             const threadRef = doc(db, "forumThreads", threadId);
             await updateDoc(threadRef, {
@@ -390,26 +370,23 @@ export const forumService = {
     /**
      * Search threads
      */
-    async searchThreads(query, pageSize = 20) {
+    async searchThreads(queryStr: string, pageSize: number = 20): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             // Due to Firestore limitations, we can't do full-text search
             // We'll search by title for now (for production, consider Algolia or similar)
             const threadsRef = collection(db, "forumThreads");
             const q = query(
                 threadsRef,
-                where("title", ">=", query),
-                where("title", "<=", query + '\uf8ff'),
+                where("title", ">=", queryStr),
+                where("title", "<=", queryStr + '\uf8ff'),
                 orderBy("title"),
                 limit(pageSize)
             );
-            
+
             const snapshot = await getDocs(q);
-            
+
             return {
-                threads: snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                })),
+                threads: snapshot.docs.map(normalizeThread),
                 lastVisible: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
                 hasMore: snapshot.docs.length === pageSize
             };
@@ -422,7 +399,7 @@ export const forumService = {
     /**
      * Get user's threads
      */
-    async getUserThreads(userId, pageSize = 20) {
+    async getUserThreads(userId: string, pageSize: number = 20): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const threadsRef = collection(db, "forumThreads");
             const q = query(
@@ -431,14 +408,11 @@ export const forumService = {
                 orderBy("createdAt", "desc"),
                 limit(pageSize)
             );
-            
+
             const snapshot = await getDocs(q);
-            
+
             return {
-                threads: snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                })),
+                threads: snapshot.docs.map(normalizeThread),
                 lastVisible: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
                 hasMore: snapshot.docs.length === pageSize
             };
@@ -451,7 +425,7 @@ export const forumService = {
     /**
      * Get user's replies
      */
-    async getUserReplies(userId, pageSize = 20) {
+    async getUserReplies(userId: string, pageSize: number = 20): Promise<{ replies: ForumReply[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const repliesRef = collection(db, "forumReplies");
             const q = query(
@@ -460,14 +434,11 @@ export const forumService = {
                 orderBy("createdAt", "desc"),
                 limit(pageSize)
             );
-            
+
             const snapshot = await getDocs(q);
-            
+
             return {
-                replies: snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                })),
+                replies: snapshot.docs.map((doc) => ({ ...(doc.data() as ForumReply), id: doc.id })),
                 lastVisible: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
                 hasMore: snapshot.docs.length === pageSize
             };
@@ -480,7 +451,7 @@ export const forumService = {
     /**
      * Get newest threads (by creation date, descending)
      */
-    async getNewestThreads(limitCount = 10) {
+    async getNewestThreads(limitCount: number = 10): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const threadsRef = collection(db, "forumThreads");
             const q = query(
@@ -490,12 +461,9 @@ export const forumService = {
             );
             const snapshot = await getDocs(q);
             console.log(`[forumService] Fetched ${snapshot.docs.length} newest threads`);
-            
+
             return {
-                threads: snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                })),
+                threads: snapshot.docs.map(normalizeThread),
                 lastVisible: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
                 hasMore: snapshot.docs.length === limitCount
             };
@@ -508,13 +476,13 @@ export const forumService = {
     /**
      * Get more newest threads (pagination)
      */
-    async getMoreNewestThreads(lastVisible, limitCount = 5) {
+    async getMoreNewestThreads(lastVisible: unknown, limitCount: number = 5): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             if (!lastVisible) {
                 console.error("[forumService] No lastVisible document provided for pagination");
                 return { threads: [], lastVisible: null, hasMore: false };
             }
-            
+
             const threadsRef = collection(db, "forumThreads");
             const q = query(
                 threadsRef,
@@ -524,12 +492,9 @@ export const forumService = {
             );
             const snapshot = await getDocs(q);
             console.log(`[forumService] Fetched ${snapshot.docs.length} more threads`);
-            
+
             return {
-                threads: snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                })),
+                threads: snapshot.docs.map(normalizeThread),
                 lastVisible: snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null,
                 hasMore: snapshot.docs.length === limitCount
             };
@@ -538,4 +503,24 @@ export const forumService = {
             return { threads: [], lastVisible: null, hasMore: false };
         }
     }
-}; 
+};
+
+function normalizeThread(doc: QueryDocumentSnapshot<DocumentData>): ForumThread {
+    const data = doc.data();
+    return {
+        id: doc.id,
+        title: typeof data.title === "string" ? data.title : "Untitled",
+        content: typeof data.content === "string" ? data.content : "",
+        categoryId: typeof data.categoryId === "string" ? data.categoryId : "",
+        authorId: typeof data.authorId === "string" ? data.authorId : "",
+        authorName: typeof data.authorName === "string" ? data.authorName : "",
+        authorPhotoURL: typeof data.authorPhotoURL === "string" ? data.authorPhotoURL : "",
+        createdAt: data.createdAt instanceof Date ? data.createdAt : new Date(0),
+        lastActivity: data.lastActivity instanceof Date ? data.lastActivity : new Date(0),
+        views: typeof data.views === "number" ? data.views : 0,
+        replyCount: typeof data.replyCount === "number" ? data.replyCount : 0,
+        isPinned: Boolean(data.isPinned),
+        isLocked: Boolean(data.isLocked),
+        tags: Array.isArray(data.tags) ? data.tags : [],
+    };
+} 
