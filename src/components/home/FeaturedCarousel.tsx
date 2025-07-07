@@ -1,9 +1,28 @@
 import { Link } from "react-router-dom";
 import { ReusableCarousel } from "../shared/carousel/ReusableCarousel";
-import PropTypes from "prop-types";
+import type { FC } from "react";
 
-export const FeaturedCarousel = ({ items, itemHeight = 250, slidesToShow = 4 }) => {
-    const renderItem = (item) => (
+export interface FeaturedCarouselItem {
+    id: string;
+    title: string;
+    subtitle?: string;
+    badge?: string;
+    image: string;
+    link: string;
+}
+
+export interface FeaturedCarouselProps {
+    items: FeaturedCarouselItem[];
+    itemHeight?: number;
+    slidesToShow?: number;
+}
+
+export const FeaturedCarousel: FC<FeaturedCarouselProps> = ({
+    items,
+    itemHeight = 250,
+    slidesToShow = 4,
+}) => {
+    const renderItem = (item: FeaturedCarouselItem) => (
         <Link to={item.link} target="_blank" rel="noopener noreferrer">
             <div className="relative overflow-hidden rounded-xl group">
                 <img
@@ -17,7 +36,9 @@ export const FeaturedCarousel = ({ items, itemHeight = 250, slidesToShow = 4 }) 
                         <h3 className="text-white text-xl font-bold mb-1">
                             {item.title}
                         </h3>
-                        <p className="text-white text-xs mb-2">{item.subtitle}</p>
+                        {item.subtitle && (
+                            <p className="text-white text-xs mb-2">{item.subtitle}</p>
+                        )}
                         {item.badge && (
                             <div className="inline-block bg-white text-black text-xs font-semibold px-2 py-1 rounded-full">
                                 {item.badge}
@@ -30,7 +51,7 @@ export const FeaturedCarousel = ({ items, itemHeight = 250, slidesToShow = 4 }) 
     );
 
     return (
-        <ReusableCarousel
+        <ReusableCarousel<FeaturedCarouselItem>
             items={items}
             renderItem={renderItem}
             slidesToShow={slidesToShow}
@@ -39,19 +60,4 @@ export const FeaturedCarousel = ({ items, itemHeight = 250, slidesToShow = 4 }) 
             speed={500}
         />
     );
-};
-
-FeaturedCarousel.propTypes = {
-    items: PropTypes.arrayOf(
-        PropTypes.shape({
-            id: PropTypes.string.isRequired,
-            title: PropTypes.string.isRequired,
-            subtitle: PropTypes.string,
-            badge: PropTypes.string,
-            image: PropTypes.string.isRequired,
-            link: PropTypes.string.isRequired,
-        })
-    ).isRequired,
-    itemHeight: PropTypes.number,
-    slidesToShow: PropTypes.number,
 };

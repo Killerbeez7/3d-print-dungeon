@@ -14,14 +14,29 @@ import { ModelCardSkeleton } from "../models/parts/ModelCardSkeleton";
 import { InfiniteScrollList } from "@/components/shared/InfiniteScrollList";
 import { SequentialImage } from "@/components/shared/SequentialImage";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
+import { Artwork, SortBy } from "@/types/home";
+import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
+import type { InfiniteData } from "@tanstack/react-query";
 
-function applySorting(items, sortBy) {
+// Firestore model doc type (adjust as needed)
+type ModelDoc = { id: string; name?: string; uploaderDisplayName?: string; tags?: string[]; renderPrimaryUrl?: string; likes?: number; views?: number; createdAt?: { seconds?: number } | number | string | null; };
+type Page = { models: ModelDoc[]; nextCursor: QueryDocumentSnapshot<DocumentData> | undefined };
+
+function getCreatedAtSeconds(val: Artwork["createdAt"]): number {
+    if (val && typeof val === "object" && "seconds" in val && typeof val.seconds === "number") {
+        return val.seconds;
+    }
+    if (typeof val === "number") return val;
+    return 0;
+}
+
+function applySorting(items: Artwork[], sortBy: SortBy): Artwork[] {
     switch (sortBy) {
         case "popular":
             return [...items].sort((a, b) => b.likes - a.likes);
         case "latest":
             return [...items].sort(
-                (a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0)
+                (a, b) => getCreatedAtSeconds(b.createdAt) - getCreatedAtSeconds(a.createdAt)
             );
         case "views":
             return [...items].sort((a, b) => b.views - a.views);
@@ -30,37 +45,38 @@ function applySorting(items, sortBy) {
     }
 }
 
-function applyCategoryFilter(items, category) {
+function applyCategoryFilter(items: Artwork[], category: string): Artwork[] {
     if (category === "all") return items;
     return items.filter((a) =>
-        a.tags.some((tag) => tag.toLowerCase() === category.toLowerCase())
+        Array.isArray(a.tags) && a.tags.some((tag) => tag.toLowerCase() === category.toLowerCase())
     );
 }
 
-export const Home = () => {
+export const Home = (): React.ReactNode => {
     // UI state
-    const [sortBy, setSortBy] = useState("community");
-    const [categoryFilter, setCategoryFilter] = useState("all");
-    const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const [sortBy, setSortBy] = useState<SortBy>("community");
+    const [categoryFilter, setCategoryFilter] = useState<string>("all");
+    const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
 
     // sequential loader index
-    const [loadIndex, setLoadIndex] = useState(0);
+    const [loadIndex, setLoadIndex] = useState<number>(0);
     const bumpIndex = useCallback(() => setLoadIndex((i) => i + 1), []);
 
     // infinite scroll via TanStack Query
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-        useInfiniteQuery({
+        useInfiniteQuery<Page, Error, Page, string[], QueryDocumentSnapshot<DocumentData> | undefined>({
             queryKey: ["models", sortBy, categoryFilter],
             queryFn: ({ pageParam }) => fetchModels(pageParam),
             getNextPageParam: (last) => last.nextCursor,
+            initialPageParam: undefined,
         });
 
     // flatten pages
-    const raw = data?.pages.flatMap((p) => p.models) ?? [];
+    const raw: ModelDoc[] = (data as InfiniteData<Page> | undefined)?.pages.flatMap((p: Page) => p.models) ?? [];
 
     // FAB hide/show on scroll
-    const mainRef = useRef(null);
-    const [fabVisible, setFabVisible] = useState(true);
+    const mainRef = useRef<HTMLDivElement>(null);
+    const [fabVisible, setFabVisible] = useState<boolean>(true);
     useEffect(() => {
         const obs = new IntersectionObserver(([e]) => setFabVisible(e.isIntersecting), {
             threshold: 0.1,
@@ -71,26 +87,26 @@ export const Home = () => {
     }, []);
 
     // map to "artwork" shape
-    const artworks = raw.map((m) => {
+    const artworks: Artwork[] = raw.map((m) => {
         const thumbUrl =
             getThumbnailUrl(m.renderPrimaryUrl, THUMBNAIL_SIZES.MEDIUM) ||
             STATIC_ASSETS.PLACEHOLDER_IMAGE;
 
         return {
-            id: m.id,
-            title: m.name,
-            artist: m.uploaderDisplayName,
-            tags: m.tags || [],
-            thumbnailUrl: thumbUrl,
-            likes: m.likes || 0,
-            views: m.views || 0,
+            id: String(m.id),
+            title: typeof m.name === "string" ? m.name : "Untitled",
+            artist: typeof m.uploaderDisplayName === "string" ? m.uploaderDisplayName : "Unknown",
+            tags: Array.isArray(m.tags) ? m.tags : [],
+            thumbnailUrl: typeof thumbUrl === "string" ? thumbUrl : STATIC_ASSETS.PLACEHOLDER_IMAGE,
+            likes: typeof m.likes === "number" ? m.likes : 0,
+            views: typeof m.views === "number" ? m.views : 0,
             createdAt: m.createdAt,
         };
     });
 
     // apply sort & filter
-    const sorted = applySorting(artworks, sortBy);
-    const filtered = applyCategoryFilter(sorted, categoryFilter);
+    const sorted: Artwork[] = applySorting(artworks, sortBy);
+    const filtered: Artwork[] = applyCategoryFilter(sorted, categoryFilter);
 
     // fetch next page
     const loadMore = useCallback(() => {
@@ -149,7 +165,7 @@ export const Home = () => {
                 categoryFilter={categoryFilter}
                 setCategoryFilter={setCategoryFilter}
                 sortBy={sortBy}
-                setSortBy={setSortBy}
+                setSortBy={(sort) => setSortBy(sort as SortBy)}
             />
 
             {/* featured carousel */}

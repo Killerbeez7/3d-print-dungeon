@@ -1,6 +1,16 @@
 import { createPortal } from "react-dom";
+import type { FC, MouseEvent } from "react";
 
-export const FilterPanel = ({
+export interface FilterPanelProps {
+    isOpen: boolean;
+    onClose: () => void;
+    categoryFilter: string;
+    setCategoryFilter: (category: string) => void;
+    sortBy: string;
+    setSortBy: (sort: string) => void;
+}
+
+export const FilterPanel: FC<FilterPanelProps> = ({
     isOpen,
     onClose,
     categoryFilter,
@@ -10,18 +20,24 @@ export const FilterPanel = ({
 }) => {
     if (!isOpen) return null;
 
+    const handlePanelClick = (e: MouseEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+    };
+
     return createPortal(
         <div
             className="fixed inset-0 z-50"
             onClick={onClose}
-            style={{ pointerEvents: "auto" }}>
+            style={{ pointerEvents: "auto" }}
+        >
             {/* Backdrop */}
             <div className="absolute inset-0 bg-black/60" />
 
             {/* Panel */}
             <div
-                onClick={(e) => e.stopPropagation()} // Prevent closing on panel clicks
-                className="fixed left-5 bottom-20 w-80 bg-bg-surface text-txt-primary border border-br-primary rounded-lg shadow-xl">
+                onClick={handlePanelClick} // Prevent closing on panel clicks
+                className="fixed left-5 bottom-20 w-80 bg-bg-surface text-txt-primary border border-br-primary rounded-lg shadow-xl"
+            >
                 <div className="p-4">
                     <h2 className="text-lg font-bold">Filters</h2>
 
@@ -31,22 +47,19 @@ export const FilterPanel = ({
                             Categories
                         </h3>
                         <div className="flex flex-wrap gap-2">
-                            {["all", "2D", "3D", "Concept", "Fantasy"].map(
-                                (category) => (
-                                    <button
-                                        key={category}
-                                        onClick={() =>
-                                            setCategoryFilter(category)
-                                        }
-                                        className={`py-1.5 px-3 rounded-full text-sm font-medium transition-all ${
-                                            categoryFilter === category
-                                                ? "bg-accent text-white"
-                                                : "bg-bg-hover hover:bg-accent-hover text-txt-secondary hover:text-white"
-                                        }`}>
-                                        {category}
-                                    </button>
-                                )
-                            )}
+                            {["all", "2D", "3D", "Concept", "Fantasy"].map((category) => (
+                                <button
+                                    key={category}
+                                    onClick={() => setCategoryFilter(category)}
+                                    className={`py-1.5 px-3 rounded-full text-sm font-medium transition-all ${
+                                        categoryFilter === category
+                                            ? "bg-accent text-white"
+                                            : "bg-bg-hover hover:bg-accent-hover text-txt-secondary hover:text-white"
+                                    }`}
+                                >
+                                    {category}
+                                </button>
+                            ))}
                         </div>
                     </div>
 
@@ -69,7 +82,8 @@ export const FilterPanel = ({
                                         sortBy === option.id
                                             ? "bg-accent text-white"
                                             : "bg-bg-hover hover:bg-accent-hover text-txt-secondary hover:text-white"
-                                    }`}>
+                                    }`}
+                                >
                                     {option.label}
                                 </button>
                             ))}
