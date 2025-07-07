@@ -1,11 +1,18 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-// import { MdDelete } from "react-icons/md";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
-export function FilesUpload({ step, files, setFiles }) {
-    const removeFile = (fileName) => {
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import type { FC, Dispatch, SetStateAction } from "react";
+
+export interface FilesUploadProps {
+    step: number;
+    files: File[];
+    setFiles: Dispatch<SetStateAction<File[]>>;
+}
+
+export const FilesUpload: FC<FilesUploadProps> = ({ step, files, setFiles }) => {
+    const removeFile = (fileName: string): void => {
         setFiles((prev) => prev.filter((file) => file.name !== fileName));
     };
 
@@ -41,7 +48,7 @@ export function FilesUpload({ step, files, setFiles }) {
     ];
 
     const onDrop = useCallback(
-        (acceptedFiles) => {
+        (acceptedFiles: File[]) => {
             const validFiles = acceptedFiles.filter((file) => {
                 const lower = file.name.toLowerCase();
                 return allowedExtensions.some((ext) => lower.endsWith(ext));
@@ -58,8 +65,6 @@ export function FilesUpload({ step, files, setFiles }) {
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        // Don't pass accept for unknown MIME types
-        // You can optionally pass `accept: '*/*'` if needed
     });
 
     return (
@@ -69,7 +74,11 @@ export function FilesUpload({ step, files, setFiles }) {
                 <div
                     {...getRootProps()}
                     className={`border-2 mb-4 border-dashed rounded-md p-8 text-center cursor-pointer transition-colors
-          ${isDragActive ? "border-green-500 bg-green-50" : "border-br-secondary bg-bg-surface"}`}
+          ${
+              isDragActive
+                  ? "border-green-500 bg-green-50"
+                  : "border-br-secondary bg-bg-surface"
+          }`}
                 >
                     <input {...getInputProps()} />
                     <p className="font-semibold mb-2">Drag your files here</p>
@@ -80,12 +89,8 @@ export function FilesUpload({ step, files, setFiles }) {
                         .svg, .tcw, .x_t, .x_b
                     </p>
                     <div className="flex justify-center space-x-4">
-                        <button className="cta-button px-4 py-2">
-                            Browse
-                        </button>
-                        <button className="secondary-button px-4 py-2">
-                            New Folder
-                        </button>
+                        <button className="cta-button px-4 py-2">Browse</button>
+                        <button className="secondary-button px-4 py-2">New Folder</button>
                     </div>
                 </div>
             )}
@@ -94,14 +99,19 @@ export function FilesUpload({ step, files, setFiles }) {
             {files.length > 0 && (
                 <UploadedFilesList
                     files={files}
-                    removeFile={step === 1 ? removeFile : null}
+                    removeFile={step === 1 ? removeFile : undefined}
                 />
             )}
         </section>
     );
+};
+
+interface UploadedFilesListProps {
+    files: File[];
+    removeFile?: (fileName: string) => void;
 }
 
-function UploadedFilesList({ files, removeFile }) {
+const UploadedFilesList: FC<UploadedFilesListProps> = ({ files, removeFile }) => {
     return (
         <div className="border-2 border-br-secondary rounded-md p-4 mt-4">
             <ul className="flex flex-col gap-2">
@@ -131,4 +141,4 @@ function UploadedFilesList({ files, removeFile }) {
             </ul>
         </div>
     );
-}
+};

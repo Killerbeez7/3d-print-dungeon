@@ -1,36 +1,46 @@
-import { useState } from "react";
+import { useState, ChangeEvent, KeyboardEvent, FC } from "react";
 import { TiDelete } from "react-icons/ti";
-import PropTypes from "prop-types";
-// components
-import { ImagesUpload } from "./ImagesUpload";
+import { ImagesUpload, ModelData } from "./ImagesUpload";
 
-export function InfoForm({ modelData, setModelData }) {
-    const [newTag, setNewTag] = useState("");
+export interface InfoFormProps {
+    modelData: ModelData;
+    setModelData: (updater: (prev: ModelData) => ModelData) => void;
+}
 
-    const handleTagInputChange = (e) => setNewTag(e.target.value);
+export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
+    const [newTag, setNewTag] = useState<string>("");
 
-    const handleTagAdd = (e) => {
+    const handleTagInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
+        setNewTag(e.target.value);
+    };
+
+    const handleTagAdd = (e: KeyboardEvent<HTMLInputElement>): void => {
         if (
             e.key === "Enter" &&
             newTag.trim() !== "" &&
+            Array.isArray(modelData.tags) &&
             !modelData.tags.includes(newTag.trim())
         ) {
             setModelData((prev) => ({
                 ...prev,
-                tags: [...prev.tags, newTag.trim()],
+                tags: [...(Array.isArray(prev.tags) ? prev.tags : []), newTag.trim()],
             }));
             setNewTag("");
         }
     };
 
-    const handleTagRemove = (tagToRemove) => {
+    const handleTagRemove = (tagToRemove: string): void => {
         setModelData((prev) => ({
             ...prev,
-            tags: prev.tags.filter((tag) => tag !== tagToRemove),
+            tags: (Array.isArray(prev.tags) ? prev.tags : []).filter(
+                (tag) => tag !== tagToRemove
+            ),
         }));
     };
 
-    const handleModelDataChange = (e) => {
+    const handleModelDataChange = (
+        e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ): void => {
         const { name, value } = e.target;
         setModelData((prev) => ({ ...prev, [name]: value }));
     };
@@ -51,7 +61,9 @@ export function InfoForm({ modelData, setModelData }) {
                         <input
                             type="text"
                             name="name"
-                            value={modelData.name}
+                            value={
+                                typeof modelData.name === "string" ? modelData.name : ""
+                            }
                             onChange={handleModelDataChange}
                             className="w-full p-2 border rounded-md bg-bg-surface"
                             placeholder="Enter model name"
@@ -65,7 +77,11 @@ export function InfoForm({ modelData, setModelData }) {
                         </label>
                         <input
                             name="category"
-                            value={modelData.category}
+                            value={
+                                typeof modelData.category === "string"
+                                    ? modelData.category
+                                    : ""
+                            }
                             onChange={handleModelDataChange}
                             className="w-full p-2 border rounded-md bg-bg-surface"
                             placeholder="Enter category"
@@ -79,7 +95,11 @@ export function InfoForm({ modelData, setModelData }) {
                         </label>
                         <textarea
                             name="description"
-                            value={modelData.description}
+                            value={
+                                typeof modelData.description === "string"
+                                    ? modelData.description
+                                    : ""
+                            }
                             onChange={handleModelDataChange}
                             className="w-full p-2 border rounded-md bg-bg-surface"
                             placeholder="Enter model description"
@@ -99,35 +119,26 @@ export function InfoForm({ modelData, setModelData }) {
                             className="w-full px-4 py-2 text-sm border rounded mb-2 bg-bg-surface"
                         />
                         <div className="flex flex-wrap gap-2">
-                            {modelData.tags.map((tag) => (
-                                <div
-                                    key={tag}
-                                    className="flex items-center bg-accent text-white px-3 py-1 rounded-full"
-                                >
-                                    <span>{tag}</span>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleTagRemove(tag)}
-                                        className="ml-2 text-white"
+                            {Array.isArray(modelData.tags) &&
+                                modelData.tags.map((tag: string) => (
+                                    <div
+                                        key={tag}
+                                        className="flex items-center bg-accent text-white px-3 py-1 rounded-full"
                                     >
-                                        <TiDelete size={18} />
-                                    </button>
-                                </div>
-                            ))}
+                                        <span>{tag}</span>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleTagRemove(tag)}
+                                            className="ml-2 text-white"
+                                        >
+                                            <TiDelete size={18} />
+                                        </button>
+                                    </div>
+                                ))}
                         </div>
                     </div>
                 </form>
             </section>
         </section>
     );
-}
-
-InfoForm.propTypes = {
-    modelData: PropTypes.object.isRequired,
-    setModelData: PropTypes.func.isRequired,
-};
-
-InfoForm.propTypes = {
-    modelData: PropTypes.object.isRequired,
-    setModelData: PropTypes.func.isRequired,
 };

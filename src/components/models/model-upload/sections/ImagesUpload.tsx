@@ -1,15 +1,33 @@
 import { TiDelete } from "react-icons/ti";
-import PropTypes from "prop-types";
+import type { FC, ChangeEvent } from "react";
 
-export function ImagesUpload({ modelData, setModelData }) {
-    const handleImageUpload = (e, type) => {
-        const files = Array.from(e.target.files);
+/**
+ * Model data type for image upload section.
+ */
+export interface ModelData {
+    renderFiles: File[];
+    renderPreviewUrls: string[];
+    [key: string]: unknown;
+}
+
+/**
+ * Props for ImagesUpload component
+ */
+export interface ImagesUploadProps {
+    modelData: ModelData;
+    setModelData: (updater: (prev: ModelData) => ModelData) => void;
+}
+
+/**
+ * Image upload section for model upload flow.
+ */
+export const ImagesUpload: FC<ImagesUploadProps> = ({ modelData, setModelData }) => {
+    const handleImageUpload = (e: ChangeEvent<HTMLInputElement>, type: string): void => {
+        const files = Array.from(e.target.files ?? []);
         if (!files.length) return;
-
         setModelData((prev) => {
-            let updatedFiles = [...prev.renderFiles];
-            let updatedPreviews = [...prev.renderPreviewUrls];
-
+            let updatedFiles = [...(prev.renderFiles as File[])];
+            let updatedPreviews = [...(prev.renderPreviewUrls as string[])];
             if (type === "cover4_3") {
                 updatedFiles[0] = files[0];
                 updatedPreviews[0] = URL.createObjectURL(files[0]);
@@ -24,7 +42,6 @@ export function ImagesUpload({ modelData, setModelData }) {
                     }
                 });
             }
-
             return {
                 ...prev,
                 renderFiles: updatedFiles,
@@ -32,15 +49,15 @@ export function ImagesUpload({ modelData, setModelData }) {
             };
         });
     };
-
-    const handleRemoveImage = (index) => {
+    const handleRemoveImage = (index: number): void => {
         setModelData((prev) => ({
             ...prev,
-            renderFiles: prev.renderFiles.filter((_, i) => i !== index),
-            renderPreviewUrls: prev.renderPreviewUrls.filter((_, i) => i !== index),
+            renderFiles: (prev.renderFiles as File[]).filter((_, i) => i !== index),
+            renderPreviewUrls: (prev.renderPreviewUrls as string[]).filter(
+                (_, i) => i !== index
+            ),
         }));
     };
-
     return (
         <div className="border rounded p-4 mb-2">
             <h4 className="font-semibold mb-2">Model Covers</h4>
@@ -48,7 +65,6 @@ export function ImagesUpload({ modelData, setModelData }) {
                 jpg/gif/png, ≤ 30MB. Please use{" "}
                 <span className="text-primary">real print photos</span>
             </p>
-
             <div className="flex gap-4 mt-3 bg-bg-surface">
                 {/* 4:3 Cover */}
                 <ImageUploadBox
@@ -59,7 +75,6 @@ export function ImagesUpload({ modelData, setModelData }) {
                     id="cover4_3"
                     aspectRatio="4/3"
                 />
-
                 {/* 3:4 Cover */}
                 <ImageUploadBox
                     label="Mobile cover 3:4"
@@ -70,7 +85,6 @@ export function ImagesUpload({ modelData, setModelData }) {
                     aspectRatio="3/4"
                 />
             </div>
-
             {/* Additional Model Images */}
             <h4 className="font-semibold mt-4 mb-2">
                 Model Pictures ({modelData.renderPreviewUrls.length} / 16)
@@ -79,7 +93,6 @@ export function ImagesUpload({ modelData, setModelData }) {
                 Photos of the printed model, png/jpg/webp/gif, ≤ 30MB/piece, 4:3 ratio
                 recommended
             </p>
-
             <input
                 type="file"
                 multiple
@@ -94,7 +107,6 @@ export function ImagesUpload({ modelData, setModelData }) {
             >
                 + Add Photo
             </label>
-
             <div className="flex flex-wrap gap-2 mt-3">
                 {modelData.renderPreviewUrls.slice(2).map((url, index) => (
                     <ImagePreview
@@ -106,9 +118,31 @@ export function ImagesUpload({ modelData, setModelData }) {
             </div>
         </div>
     );
+};
+
+/**
+ * Props for ImageUploadBox component
+ */
+interface ImageUploadBoxProps {
+    label: string;
+    image?: string;
+    onUpload: (e: ChangeEvent<HTMLInputElement>) => void;
+    onRemove: () => void;
+    id: string;
+    aspectRatio: string;
 }
 
-function ImageUploadBox({ label, image, onUpload, onRemove, id, aspectRatio }) {
+/**
+ * Upload box for a single image.
+ */
+const ImageUploadBox: FC<ImageUploadBoxProps> = ({
+    label,
+    image,
+    onUpload,
+    onRemove,
+    id,
+    aspectRatio,
+}) => {
     return (
         <div className="flex flex-col items-center border rounded p-2 h-full w-[150px]">
             <label className="mb-2 text-sm font-medium">{label}</label>
@@ -148,9 +182,20 @@ function ImageUploadBox({ label, image, onUpload, onRemove, id, aspectRatio }) {
             </div>
         </div>
     );
+};
+
+/**
+ * Props for ImagePreview component
+ */
+interface ImagePreviewProps {
+    url: string;
+    onRemove: () => void;
 }
 
-function ImagePreview({ url, onRemove }) {
+/**
+ * Preview for an uploaded image.
+ */
+const ImagePreview: FC<ImagePreviewProps> = ({ url, onRemove }) => {
     return (
         <div className="relative w-24 h-24">
             <img
@@ -167,28 +212,4 @@ function ImagePreview({ url, onRemove }) {
             </button>
         </div>
     );
-}
-
-ImagesUpload.propTypes = {
-    modelData: PropTypes.object.isRequired,
-    setModelData: PropTypes.func.isRequired,
-};
-
-ImageUploadBox.propTypes = {
-    label: PropTypes.string.isRequired,
-    image: PropTypes.string,
-};
-
-ImagePreview.propTypes = {
-    url: PropTypes.string.isRequired,
-    onRemove: PropTypes.func.isRequired,
-};
-
-ImageUploadBox.propTypes = {
-    label: PropTypes.string.isRequired,
-    image: PropTypes.string,
-    onUpload: PropTypes.func.isRequired,
-    onRemove: PropTypes.func.isRequired,
-    id: PropTypes.string.isRequired,
-    aspectRatio: PropTypes.string.isRequired,
 };
