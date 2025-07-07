@@ -277,7 +277,7 @@ export const Navbar = () => {
                                             )}
                                             <div className="divider-top">
                                                 <Link
-                                                    to={`/artist/${currentUser?.uid}`}
+                                                    to={`/artists/${currentUser?.uid}`}
                                                     className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)

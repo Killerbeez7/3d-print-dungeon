@@ -20,7 +20,7 @@ export const ArtistsList = () => {
     // Determine if we're in the explore section
     const isExplore = location.pathname.startsWith("/explore");
     const getArtistPath = (artistId: string) => {
-        return isExplore ? `/explore/artists/${artistId}` : `/artist/${artistId}`;
+        return isExplore ? `/explore/artists/${artistId}` : `/artists/${artistId}`;
     };
 
     useEffect(() => {
