@@ -28,26 +28,31 @@ import {
     faCog,
     faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
+import type { NavSection } from "@/types/navbar";
 
-export const Navbar = () => {
+/**
+ * Navbar component for site navigation, authentication, and search.
+ * Strictly typed with TypeScript.
+ */
+export const Navbar = (): React.ReactNode => {
     const { isAdmin } = useUserRole();
     const { currentUser, handleSignOut } = useAuth();
     const { setShowDropdown } = useSearch();
     const { open } = useModal("auth");
 
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [activeDropdown, setActiveDropdown] = useState(null);
-    const [mobileDropdown, setMobileDropdown] = useState(null);
-    const [isSearchVisible, setIsSearchVisible] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+    const [mobileDropdown, setMobileDropdown] = useState<string | null>(null);
+    const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
 
     const navigate = useNavigate();
     const location = useLocation();
-    const dropdownRef = useRef(null); //desktop dropdown
-    const mobileDropdownRef = useRef(null); //mobile dropdown
-    const searchOverlayRef = useRef(null); //search overlay
+    const dropdownRef = useRef<HTMLDivElement | null>(null);
+    const mobileDropdownRef = useRef<HTMLDivElement | null>(null);
+    const searchOverlayRef = useRef<HTMLDivElement | null>(null);
 
     // helpers
-    const closeAll = () => {
+    const closeAll = (): void => {
         setActiveDropdown(null);
         setMobileDropdown(null);
         setIsMobileMenuOpen(false);
@@ -55,36 +60,36 @@ export const Navbar = () => {
         setShowDropdown(false);
     };
 
-    const toggleDropdown = (dropdownName) => {
-        if (activeDropdown === dropdownName) {
-            setActiveDropdown(null);
-        } else {
-            setActiveDropdown(dropdownName);
-        }
+    const toggleDropdown = (dropdownName: string): void => {
+        setActiveDropdown((prev) => (prev === dropdownName ? null : dropdownName));
     };
 
-    const toggleMobileMenu = () => {
-        setIsMobileMenuOpen(!isMobileMenuOpen);
-        if (isMobileMenuOpen) {
-            setMobileDropdown(null);
-        }
+    const toggleMobileMenu = (): void => {
+        setIsMobileMenuOpen((prev) => {
+            if (prev) setMobileDropdown(null);
+            return !prev;
+        });
     };
 
-    const toggleMobileDropdown = (dropdownName, e) => {
+    const toggleMobileDropdown = (
+        dropdownName: string,
+        e: React.MouseEvent<HTMLButtonElement>
+    ): void => {
         e.stopPropagation();
         setMobileDropdown((prev) => (prev === dropdownName ? null : dropdownName));
     };
 
-    const handleLogout = async () => {
+    const handleLogout = async (): Promise<void> => {
         try {
             await handleSignOut();
             navigate("/");
         } catch (error) {
+            // eslint-disable-next-line no-console
             console.error("Failed to log out", error);
         }
     };
 
-    const handleSearchClick = () => {
+    const handleSearchClick = (): void => {
         navigate("/search?query=");
     };
 
@@ -104,7 +109,7 @@ export const Navbar = () => {
 
     useEffect(() => {
         closeAll();
-    }, [location.pathname, setShowDropdown]);
+    }, [location.pathname]);
 
     return (
         <div className="sticky top-0 left-0 right-0 z-50">
@@ -152,7 +157,7 @@ export const Navbar = () => {
 
                             {/* desktop nav */}
                             <nav className="hidden md:flex items-center space-x-6">
-                                {NAV_SECTIONS.map((section) => (
+                                {(NAV_SECTIONS as NavSection[]).map((section) => (
                                     <div
                                         key={section.label}
                                         className="relative group"
@@ -377,7 +382,7 @@ export const Navbar = () => {
                 </div>
 
                 <div className="px-2 pt-2 h-auto pb-3 space-y-1" ref={mobileDropdownRef}>
-                    {NAV_SECTIONS.map((section) => (
+                    {(NAV_SECTIONS as NavSection[]).map((section) => (
                         <div key={section.label}>
                             <button
                                 className={`w-full text-left px-4 py-2 text-txt-secondary hover:rounded-md hover:bg-bg-secondary hover:text-txt-primary flex items-center justify-between ${
