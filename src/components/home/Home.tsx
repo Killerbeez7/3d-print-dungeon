@@ -19,11 +19,28 @@ import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import type { InfiniteData } from "@tanstack/react-query";
 
 // Firestore model doc type (adjust as needed)
-type ModelDoc = { id: string; name?: string; uploaderDisplayName?: string; tags?: string[]; renderPrimaryUrl?: string; likes?: number; views?: number; createdAt?: { seconds?: number } | number | string | null; };
-type Page = { models: ModelDoc[]; nextCursor: QueryDocumentSnapshot<DocumentData> | undefined };
+type ModelDoc = {
+    id: string;
+    name?: string;
+    uploaderDisplayName?: string;
+    tags?: string[];
+    renderPrimaryUrl?: string;
+    likes?: number;
+    views?: number;
+    createdAt?: { seconds?: number } | number | string | null;
+};
+type Page = {
+    models: ModelDoc[];
+    nextCursor: QueryDocumentSnapshot<DocumentData> | undefined;
+};
 
 function getCreatedAtSeconds(val: Artwork["createdAt"]): number {
-    if (val && typeof val === "object" && "seconds" in val && typeof val.seconds === "number") {
+    if (
+        val &&
+        typeof val === "object" &&
+        "seconds" in val &&
+        typeof val.seconds === "number"
+    ) {
         return val.seconds;
     }
     if (typeof val === "number") return val;
@@ -36,7 +53,8 @@ function applySorting(items: Artwork[], sortBy: SortBy): Artwork[] {
             return [...items].sort((a, b) => b.likes - a.likes);
         case "latest":
             return [...items].sort(
-                (a, b) => getCreatedAtSeconds(b.createdAt) - getCreatedAtSeconds(a.createdAt)
+                (a, b) =>
+                    getCreatedAtSeconds(b.createdAt) - getCreatedAtSeconds(a.createdAt)
             );
         case "views":
             return [...items].sort((a, b) => b.views - a.views);
@@ -47,8 +65,10 @@ function applySorting(items: Artwork[], sortBy: SortBy): Artwork[] {
 
 function applyCategoryFilter(items: Artwork[], category: string): Artwork[] {
     if (category === "all") return items;
-    return items.filter((a) =>
-        Array.isArray(a.tags) && a.tags.some((tag) => tag.toLowerCase() === category.toLowerCase())
+    return items.filter(
+        (a) =>
+            Array.isArray(a.tags) &&
+            a.tags.some((tag) => tag.toLowerCase() === category.toLowerCase())
     );
 }
 
@@ -64,7 +84,13 @@ export const Home = (): React.ReactNode => {
 
     // infinite scroll via TanStack Query
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-        useInfiniteQuery<Page, Error, Page, string[], QueryDocumentSnapshot<DocumentData> | undefined>({
+        useInfiniteQuery<
+            Page,
+            Error,
+            Page,
+            string[],
+            QueryDocumentSnapshot<DocumentData> | undefined
+        >({
             queryKey: ["models", sortBy, categoryFilter],
             queryFn: ({ pageParam }) => fetchModels(pageParam),
             getNextPageParam: (last) => last.nextCursor,
@@ -72,7 +98,9 @@ export const Home = (): React.ReactNode => {
         });
 
     // flatten pages
-    const raw: ModelDoc[] = (data as InfiniteData<Page> | undefined)?.pages.flatMap((p: Page) => p.models) ?? [];
+    const raw: ModelDoc[] =
+        (data as InfiniteData<Page> | undefined)?.pages.flatMap((p: Page) => p.models) ??
+        [];
 
     // FAB hide/show on scroll
     const mainRef = useRef<HTMLDivElement>(null);
@@ -95,9 +123,13 @@ export const Home = (): React.ReactNode => {
         return {
             id: String(m.id),
             title: typeof m.name === "string" ? m.name : "Untitled",
-            artist: typeof m.uploaderDisplayName === "string" ? m.uploaderDisplayName : "Unknown",
+            artist:
+                typeof m.uploaderDisplayName === "string"
+                    ? m.uploaderDisplayName
+                    : "Unknown",
             tags: Array.isArray(m.tags) ? m.tags : [],
-            thumbnailUrl: typeof thumbUrl === "string" ? thumbUrl : STATIC_ASSETS.PLACEHOLDER_IMAGE,
+            thumbnailUrl:
+                typeof thumbUrl === "string" ? thumbUrl : STATIC_ASSETS.PLACEHOLDER_IMAGE,
             likes: typeof m.likes === "number" ? m.likes : 0,
             views: typeof m.views === "number" ? m.views : 0,
             createdAt: m.createdAt,
