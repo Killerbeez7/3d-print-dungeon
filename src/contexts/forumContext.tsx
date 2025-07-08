@@ -1,9 +1,11 @@
 import { createContext } from "react";
-import type { ForumContextValue} from "@/types/forum";
+import type { ForumContextValue } from "@/types/forum";
+
+export type ForumContextType = ForumContextValue;
 
 const noop = () => { throw new Error("ForumContext: Not implemented") };
 
-export const ForumContext = createContext<ForumContextValue>({
+export const ForumContext = createContext<ForumContextType>({
     categories: [],
     threads: { recent: [], popular: [], unanswered: [], byCategory: {} },
     currentThread: null,
