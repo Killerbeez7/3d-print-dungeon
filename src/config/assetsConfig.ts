@@ -1,12 +1,40 @@
-export const getAssetPath = (path) => {
+export function getAssetPath(path: string): string {
     const cleanPath = path.startsWith("/") ? path.slice(1) : path;
     const baseUrl = import.meta.env.BASE_URL;
     return `${baseUrl}${cleanPath}`;
-};
+}
 
-export const STATIC_ASSETS = {
-    
-    // General images
+export interface CarouselImages {
+    SPRING_SALE: string;
+    SCHEDULED_PROJECTS: string;
+    TRENDING_PROJECTS: string;
+    NEW_ARRIVALS: string;
+    STORE_3D: string;
+    PROJECT_IDEAS: string;
+    MINIATURES_COMPETITION: string;
+    SCHEDULED_MODELS: string;
+    TRENDING_MODELS: string;
+    UPCOMING_MODELS: string;
+    ARENA_MODELS: string;
+    DUNGEON_MODELS: string;
+    BATTLE_MODELS: string;
+}
+
+export interface ThreeDViewImages {
+    THUMBNAIL: string;
+}
+
+export interface StaticAssets {
+    LOGO: string;
+    USER_DEFAULT: string;
+    DEFAULT_AVATAR: string;
+    PLACEHOLDER_IMAGE: string;
+    FAVICON: string;
+    CAROUSEL: CarouselImages;
+    THREE_D_VIEW: ThreeDViewImages;
+}
+
+export const STATIC_ASSETS: StaticAssets = {
     LOGO: "/assets/images/logo.png",
     USER_DEFAULT: "/assets/images/user.png",
     DEFAULT_AVATAR: "/assets/images/user.png",

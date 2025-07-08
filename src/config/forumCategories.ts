@@ -1,8 +1,17 @@
+import { IconType } from "react-icons";
 import { HiShoppingCart, HiUsers, HiOutlineGlobeAlt } from "react-icons/hi";
 import { HiWrenchScrewdriver, HiPaintBrush } from "react-icons/hi2";
 import { HiOutlineCalendar } from "react-icons/hi";
 
-export const FORUM_CATEGORIES = [
+export interface ForumCategory {
+  id: string;
+  name: string;
+  description: string;
+  icon: IconType;
+  order: number;
+}
+
+export const FORUM_CATEGORIES: ForumCategory[] = [
   {
     id: "general",
     name: "General",

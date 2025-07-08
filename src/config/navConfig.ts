@@ -1,6 +1,17 @@
 import { ROUTES } from "../constants/routeConstants";
 
-export const NAV_SECTIONS = [
+export interface NavItem {
+    label: string;
+    to: string;
+}
+
+export interface NavSection {
+    label: string;
+    to: string;
+    items: NavItem[];
+}
+
+export const NAV_SECTIONS: NavSection[] = [
     {
         label: "Explore",
         to: ROUTES.HOME,
