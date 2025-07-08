@@ -3,31 +3,25 @@ import { toggleFavorite, getFavoritesForUser } from "../../../services/favorites
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
+import type { CurrentUser } from "@/types/auth";
 
-/**
- * Minimal user type for favorites button context
- */
 export interface FavoritesButtonUser {
     uid: string;
     [key: string]: unknown;
 }
 
-/**
- * Props for FavoritesButton component
- */
 export interface FavoritesButtonProps {
     modelId: string;
-    currentUser?: FavoritesButtonUser | null;
+    currentUser: CurrentUser | null;
     openAuthModal?: () => void;
 }
 
-/**
- * FavoritesButton component
- * Allows users to favorite/unfavorite a model and displays the status.
- */
-export const FavoritesButton = ({ modelId, currentUser, openAuthModal }: FavoritesButtonProps) => {
+export const FavoritesButton = ({
+    modelId,
+    currentUser,
+    openAuthModal,
+}: FavoritesButtonProps) => {
     const [favorited, setFavorited] = useState(false);
-    const [loading, setLoading] = useState(false);
 
     // Check if the model is favorited by the user
     useEffect(() => {
@@ -51,14 +45,12 @@ export const FavoritesButton = ({ modelId, currentUser, openAuthModal }: Favorit
             if (openAuthModal) openAuthModal();
             return;
         }
-        setLoading(true);
         try {
             const newStatus = await toggleFavorite(currentUser.uid, modelId);
             setFavorited(newStatus);
         } catch (error) {
             console.error("Error toggling favorite:", error);
         }
-        setLoading(false);
     };
 
     return (
@@ -74,4 +66,4 @@ export const FavoritesButton = ({ modelId, currentUser, openAuthModal }: Favorit
             <span className="text-sm">{favorited ? "Favorited" : "Favorite"}</span>
         </div>
     );
-}; 
+};

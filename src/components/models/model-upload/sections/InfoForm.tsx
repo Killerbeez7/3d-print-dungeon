@@ -1,10 +1,11 @@
 import { useState, ChangeEvent, KeyboardEvent, FC } from "react";
 import { TiDelete } from "react-icons/ti";
-import { ImagesUpload, ModelData } from "./ImagesUpload";
+import { ImagesUpload } from "./ImagesUpload";
+import type { ModelData } from "@/types/model";
 
-export interface InfoFormProps {
+interface InfoFormProps {
     modelData: ModelData;
-    setModelData: (updater: (prev: ModelData) => ModelData) => void;
+    setModelData: React.Dispatch<React.SetStateAction<ModelData>>;
 }
 
 export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {

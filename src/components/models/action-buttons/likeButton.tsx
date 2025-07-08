@@ -3,6 +3,7 @@ import { toggleLike, isLiked } from "../../../services/likesService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as solidHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons";
+import type { CurrentUser } from "@/types/auth";
 
 export interface LikeButtonUser {
     uid: string;
@@ -12,7 +13,7 @@ export interface LikeButtonUser {
 export interface LikeButtonProps {
     modelId: string;
     initialLikes?: number;
-    currentUser?: LikeButtonUser | null;
+    currentUser: CurrentUser | null;
     openAuthModal?: () => void;
 }
 
@@ -38,7 +39,7 @@ export const LikeButton = ({ modelId, initialLikes = 0, currentUser, openAuthMod
 
     const handleToggle = async () => {
         if (!currentUser) {
-            openAuthModal && openAuthModal();
+            if (openAuthModal) openAuthModal();
             return;
         }
         try {

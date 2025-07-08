@@ -5,34 +5,35 @@ import { useModels } from "@/hooks/useModels";
 import { useAuth } from "@/hooks/useAuth";
 import { useModal } from "@/hooks/useModal";
 import { useViewTracker, useModelViewCount } from "@/services/viewService";
-//components
-// import { ModelViewer } from "./ModelViewer"; // Keep commented out or remove
+
 const ModelViewer = lazy(() =>
     import("./ModelViewer").then((module) => ({ default: module.ModelViewer }))
-); // Correct lazy import for named export
+);
+
+//components
 import { ModelSidebar } from "./ModelSidebar";
 import { CommentsProvider } from "@/providers/commentsProvider";
 import { ModelComments } from "./ModelComments";
 import { Spinner } from "@/components/shared/Spinner";
+import type { Model } from "@/types/model";
 
-export const ModelPage = () => {
-    const { id } = useParams();
+export function ModelPage() {
+    const { id } = useParams<{ id: string }>();
     const { models, loading, uploader, fetchUploader } = useModels();
     const { currentUser } = useAuth();
     const { open } = useModal("auth");
-
-    const [selectedRenderIndex, setSelectedRenderIndex] = useState(-1);
+    const [selectedRenderIndex, setSelectedRenderIndex] = useState<number>(-1);
 
     // Use new lightweight view tracking system
     useViewTracker(id, currentUser);
     const { count: viewCount, loading: viewCountLoading } = useModelViewCount(id);
 
     useEffect(() => {
-        const m = models.find((m) => m.id === id);
+        const m = models.find((m: Model) => m.id === id);
         if (m?.uploaderId) fetchUploader(m.uploaderId);
     }, [id, models, fetchUploader]);
 
-    const model = models.find((m) => m.id === id);
+    const model: Model | undefined = models.find((m: Model) => m.id === id);
 
     if (loading)
         return (
@@ -71,18 +72,16 @@ export const ModelPage = () => {
                     viewCount={viewCount}
                     viewCountLoading={viewCountLoading}
                     currentUser={currentUser}
-                    openAuthModal={(p) => open({ mode: p?.mode ?? "login" })}
+                    openAuthModal={() => open({ mode: "login" })}
                 />
             </div>
 
             <div className="flex-1 overflow-y-auto p-6">
                 <h2 className="text-2xl text-txt-primary mb-4">Comments</h2>
                 <CommentsProvider modelId={model.id}>
-                    <ModelComments
-                        openAuthModal={(p) => open({ mode: p?.mode ?? "login" })}
-                    />
+                    <ModelComments openAuthModal={() => open({ mode: "login" })} />
                 </CommentsProvider>
             </div>
         </div>
     );
-};
+}

@@ -1,21 +1,13 @@
 import { TiDelete } from "react-icons/ti";
 import type { FC, ChangeEvent } from "react";
-
-/**
- * Model data type for image upload section.
- */
-export interface ModelData {
-    renderFiles: File[];
-    renderPreviewUrls: string[];
-    [key: string]: unknown;
-}
+import type { ModelData } from "@/types/model";
 
 /**
  * Props for ImagesUpload component
  */
-export interface ImagesUploadProps {
+interface ImagesUploadProps {
     modelData: ModelData;
-    setModelData: (updater: (prev: ModelData) => ModelData) => void;
+    setModelData: React.Dispatch<React.SetStateAction<ModelData>>;
 }
 
 /**

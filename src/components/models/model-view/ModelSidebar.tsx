@@ -7,6 +7,8 @@ import { FavoritesButton } from "../action-buttons/favoritesButton";
 import { PurchaseButton } from "@/components/payment/PurchaseButton";
 //contexts
 import { STATIC_ASSETS } from "@/config/assetsConfig";
+//types
+import type { CurrentUser } from "@/types/auth";
 
 interface Model {
     id: string;
@@ -26,17 +28,12 @@ interface Uploader {
     displayName?: string;
 }
 
-interface CurrentUser {
-    uid: string;
-    [key: string]: unknown;
-}
-
 interface ModelSidebarProps {
     model: Model;
     uploader?: Uploader;
     viewCount: number;
     viewCountLoading?: boolean;
-    currentUser?: CurrentUser | null;
+    currentUser: CurrentUser | null;
     openAuthModal: () => void;
 }
 

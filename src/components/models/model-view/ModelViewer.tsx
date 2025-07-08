@@ -1,19 +1,25 @@
 import { useState, useRef, useEffect } from "react";
-import PropTypes from "prop-types";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
-//components
 import { fullscreenConfig } from "@/config/fullscreenConfig";
 import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 import { Model3DIcon } from "@/components/shared/icons/Model3DIcon";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
+import type { ModelViewerElement } from "@google/model-viewer";
 
-const NavigationArrow = ({ direction, onClick }) => (
+import type {
+    ModelViewerProps,
+    NavigationArrowProps,
+    NavigationDotsProps,
+} from "@/types/modelViewer";
+
+const NavigationArrow = ({ direction, onClick }: NavigationArrowProps) => (
     <button
         onClick={onClick}
         className={`absolute ${
             direction === "left" ? "left-4" : "right-4"
         } top-1/2 transform -translate-y-1/2 flex items-center justify-center w-[35px] h-[35px] rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 z-40 group invisible md:visible`}
-        aria-label={`${direction === "left" ? "Previous" : "Next"} view`}
+        aria-label={direction === "left" ? "Previous view" : "Next view"}
+        type="button"
     >
         {direction === "left" ? (
             <FaArrowLeft className="text-white text-xl group-hover:scale-110 transition-transform" />
@@ -23,7 +29,7 @@ const NavigationArrow = ({ direction, onClick }) => (
     </button>
 );
 
-const NavigationDots = ({ selectedIndex, totalItems, onSelect }) => (
+const NavigationDots = ({ selectedIndex, totalItems, onSelect }: NavigationDotsProps) => (
     <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2 z-40 invisible md:visible">
         <button
             onClick={() => onSelect(-1)}
@@ -33,6 +39,7 @@ const NavigationDots = ({ selectedIndex, totalItems, onSelect }) => (
                     : "bg-white/50 hover:bg-white/70"
             }`}
             aria-label="View 3D model"
+            type="button"
         />
         {Array.from({ length: totalItems }, (_, index) => (
             <button
@@ -44,46 +51,46 @@ const NavigationDots = ({ selectedIndex, totalItems, onSelect }) => (
                         : "bg-white/50 hover:bg-white/70"
                 }`}
                 aria-label={`View image ${index + 1}`}
+                type="button"
             />
         ))}
     </div>
 );
 
-NavigationArrow.propTypes = {
-    direction: PropTypes.oneOf(["left", "right"]).isRequired,
-    onClick: PropTypes.func.isRequired,
-};
-
-NavigationDots.propTypes = {
-    selectedIndex: PropTypes.number.isRequired,
-    totalItems: PropTypes.number.isRequired,
-    onSelect: PropTypes.func.isRequired,
-};
-
 const isIOS =
-    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
+    typeof navigator !== "undefined" &&
+    (/iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
 const isMobile =
     typeof window !== "undefined" && /Mobi|Android/i.test(navigator.userAgent);
-
 const getTimeoutDuration = () => (isMobile ? 5000 : 3000);
 
-export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex }) => {
-    const [modelLoaded, setModelLoaded] = useState(false);
-    const [loadProgress, setLoadProgress] = useState(0);
-    const [isFullscreen, setIsFullscreen] = useState(false);
-    const [customFullscreen, setCustomFullscreen] = useState(false);
-    const [autoRotate, setAutoRotate] = useState(true);
-    const [controlsVisible, setControlsVisible] = useState(true);
-    const [isHovering, setIsHovering] = useState(false);
-    const modelViewerRef = useRef(null);
-    const containerRef = useRef(null);
-    const autoHideTimerRef = useRef(null);
+export const ModelViewer = ({
+    model,
+    selectedRenderIndex,
+    setSelectedRenderIndex,
+}: ModelViewerProps) => {
+    const [modelLoaded, setModelLoaded] = useState<boolean>(false);
+    const [loadProgress, setLoadProgress] = useState<number>(0);
+    const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+    const [customFullscreen, setCustomFullscreen] = useState<boolean>(false);
+    const [autoRotate, setAutoRotate] = useState<boolean>(true);
+    const [controlsVisible, setControlsVisible] = useState<boolean>(true);
+    const [isHovering, setIsHovering] = useState<boolean>(false);
+    const modelViewerRef = useRef<ModelViewerElement | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const autoHideTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-    const fallback3DUrl = model?.convertedFileUrl || model?.originalFileUrl || "";
-    const renderExtraUrls = model?.renderExtraUrls || [];
-    const posterUrl = model?.posterUrl;
+    const fallback3DUrl =
+        typeof model.convertedFileUrl === "string" && model.convertedFileUrl.length > 0
+            ? model.convertedFileUrl
+            : typeof model.originalFileUrl === "string"
+            ? model.originalFileUrl
+            : "";
+    const renderExtraUrls = Array.isArray(model.renderExtraUrls)
+        ? model.renderExtraUrls
+        : [];
+    const posterUrl = typeof model.posterUrl === "string" ? model.posterUrl : undefined;
 
     //handlers
     const handleTouchStart = () => {
@@ -135,15 +142,37 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
         } else {
             // Use native fullscreen for other devices
             if (!fullscreenConfig.isFullscreen()) {
-                fullscreenConfig.enter(container).catch((err) => {
-                    console.error(
-                        `Error attempting to enable fullscreen: ${err.message}`
-                    );
-                });
+                const result = fullscreenConfig.enter(container);
+                if (result && typeof (result as Promise<void>).catch === "function") {
+                    (result as Promise<void>).catch((err: unknown) => {
+                        if (err instanceof Error) {
+                            console.error(
+                                `Error attempting to enable fullscreen: ${err.message}`
+                            );
+                        } else {
+                            console.error(
+                                "Unknown error attempting to enable fullscreen",
+                                err
+                            );
+                        }
+                    });
+                }
             } else {
-                fullscreenConfig.exit().catch((err) => {
-                    console.error(`Error attempting to exit fullscreen: ${err.message}`);
-                });
+                const result = fullscreenConfig.exit();
+                if (result && typeof (result as Promise<void>).catch === "function") {
+                    (result as Promise<void>).catch((err: unknown) => {
+                        if (err instanceof Error) {
+                            console.error(
+                                `Error attempting to exit fullscreen: ${err.message}`
+                            );
+                        } else {
+                            console.error(
+                                "Unknown error attempting to exit fullscreen",
+                                err
+                            );
+                        }
+                    });
+                }
                 // Always show controls when exiting fullscreen
                 setControlsVisible(true);
             }
@@ -195,8 +224,17 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
         const viewer = modelViewerRef.current;
         if (!viewer) return;
 
-        const handleProgress = (event) => {
-            setLoadProgress(event.detail.totalProgress);
+        const handleProgress = (event: Event) => {
+            // Type guard for CustomEvent with detail
+            if (
+                "detail" in event &&
+                typeof (event as CustomEvent<{ totalProgress: number }>).detail
+                    ?.totalProgress === "number"
+            ) {
+                setLoadProgress(
+                    (event as CustomEvent<{ totalProgress: number }>).detail.totalProgress
+                );
+            }
         };
 
         const handleLoad = () => {
@@ -243,7 +281,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
     }, []);
 
     useEffect(() => {
-        const handleKeyPress = (e) => {
+        const handleKeyPress = (e: KeyboardEvent) => {
             const container = containerRef.current;
             if (!container) return;
 
@@ -304,6 +342,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
         selectedRenderIndex === -1 ? (
             fallback3DUrl ? (
                 <div className={getContainerClasses()}>
+                    {/* @ts-expect-error - model-viewer is not a valid HTML element */}
                     <model-viewer
                         ref={modelViewerRef}
                         poster={posterUrl}
@@ -323,13 +362,23 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                                     : "0.5rem",
                             "--poster-color": "transparent",
                         }}
-                        camera-orbit="0deg 75deg 105%"
-                        min-camera-orbit="auto auto 50%"
-                        max-camera-orbit="auto auto 200%"
-                        min-field-of-view="10deg"
-                        max-field-of-view="70deg"
-                        field-of-view="50deg"
-                    ></model-viewer>
+                    />
+
+                    {!modelLoaded && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-40">
+                            <div className="bg-black/40 p-6 rounded-lg backdrop-blur-md">
+                                <p className="text-lg text-white animate-pulse mb-3">
+                                    Loading 3D model
+                                </p>
+                                <div className="w-52 h-2 bg-white/20 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-cyan-300 transition-all duration-300"
+                                        style={{ width: `${loadProgress * 100}%` }}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Navigation Arrows and Dots */}
                     {renderExtraUrls.length > 0 && (
@@ -560,7 +609,10 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                 }`}
             >
                 <LazyImage
-                    src={getThumbnailUrl(renderExtraUrls[selectedRenderIndex], THUMBNAIL_SIZES.LARGE)}
+                    src={getThumbnailUrl(
+                        renderExtraUrls[selectedRenderIndex],
+                        THUMBNAIL_SIZES.LARGE
+                    )}
                     alt={`Render ${selectedRenderIndex + 1}`}
                     loading="lazy"
                     className="w-full h-full object-contain rounded-md shadow-lg"
@@ -615,6 +667,7 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
                             </div>
                         </div>
 
+                        {/* @ts-expect-error - renderExtraUrls is not a valid HTML element */}
                         {renderExtraUrls.map((url, idx) => (
                             <div
                                 key={idx}
@@ -638,16 +691,4 @@ export const ModelViewer = ({ model, selectedRenderIndex, setSelectedRenderIndex
             )}
         </div>
     );
-};
-
-ModelViewer.propTypes = {
-    model: PropTypes.shape({
-        name: PropTypes.string,
-        convertedFileUrl: PropTypes.string,
-        originalFileUrl: PropTypes.string,
-        renderExtraUrls: PropTypes.arrayOf(PropTypes.string),
-        posterUrl: PropTypes.string,
-    }).isRequired,
-    selectedRenderIndex: PropTypes.number.isRequired,
-    setSelectedRenderIndex: PropTypes.func.isRequired,
 };

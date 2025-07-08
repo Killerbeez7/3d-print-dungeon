@@ -1,23 +1,22 @@
-import type { ModelViewerElement } from "@google/model-viewer";
+import '@google/model-viewer';
+
+interface ModelViewerElement extends HTMLElement {
+    src: string;
+    poster?: string;
+    cameraControls?: boolean;
+    environmentImage?: string;
+    /** Resolves when the model is fully rendered */
+    updateComplete?: Promise<void>;
+    pause: () => void;
+    toDataURL: (type?: string) => string;
+    addEventListener: HTMLElement["addEventListener"];
+    removeEventListener: HTMLElement["removeEventListener"];
+}
 
 declare global {
     namespace JSX {
         interface IntrinsicElements {
-            "model-viewer": React.DetailedHTMLProps<React.HTMLAttributes<ModelViewerElement>, ModelViewerElement> & {
-                src?: string;
-                poster?: string;
-                alt?: string;
-                "camera-controls"?: boolean;
-                "interaction-prompt"?: string;
-                "environment-image"?: string;
-                "auto-rotate"?: boolean;
-                "camera-orbit"?: string;
-                "min-camera-orbit"?: string;
-                "max-camera-orbit"?: string;
-                "min-field-of-view"?: string;
-                "max-field-of-view"?: string;
-                "field-of-view"?: string;
-            };
+            "model-viewer": React.DetailedHTMLProps<React.HTMLAttributes<ModelViewerElement>, ModelViewerElement>;
         }
     }
 }

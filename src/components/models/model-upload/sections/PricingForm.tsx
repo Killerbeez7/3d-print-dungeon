@@ -1,11 +1,11 @@
 import { useState, ChangeEvent, FC } from "react";
 import { paymentService } from "@/services/paymentService";
 import { useAuth } from "@/hooks/useAuth";
-import type { ModelData } from "./ImagesUpload";
+import type { ModelData } from "@/types/model";
 
 export interface PricingFormProps {
     modelData: ModelData;
-    setModelData: (updater: (prev: ModelData) => ModelData) => void;
+    setModelData: React.Dispatch<React.SetStateAction<ModelData>>;
 }
 
 export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) => {
@@ -16,7 +16,7 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
         userData &&
             typeof userData === "object" &&
             "stripeConnectId" in userData &&
-            (userData as Record<string, unknown>).stripeConnectId
+            (userData as { stripeConnectId?: string }).stripeConnectId
     );
 
     const handlePriceChange = (e: ChangeEvent<HTMLInputElement>): void => {

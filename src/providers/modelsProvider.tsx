@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, ReactNode } from "react";
 import { db } from "../config/firebase";
 import {
     collection,
@@ -9,15 +9,15 @@ import {
     doc,
     getDoc,
 } from "firebase/firestore";
-import PropTypes from "prop-types";
 import { ModelsContext } from "../contexts/modelsContext";
+import type { Model } from "@/types/model";
 
-export const ModelsProvider = ({ children }) => {
-    const [models, setModels] = useState([]);
-    const [userModels, setUserModels] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [uploader, setUploader] = useState(null);
-    const [selectedRenderIndex, setSelectedRenderIndex] = useState(-1);
+export function ModelsProvider({ children }: { children: ReactNode }) {
+    const [models, setModels] = useState<Model[]>([]);
+    const [userModels, setUserModels] = useState<Model[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [uploader, setUploader] = useState<Record<string, unknown> | null>(null);
+    const [selectedRenderIndex, setSelectedRenderIndex] = useState<number>(-1);
 
     // listener to fetch all models
     useEffect(() => {
@@ -26,10 +26,13 @@ export const ModelsProvider = ({ children }) => {
         const unsubscribe = onSnapshot(
             q,
             (snapshot) => {
-                const items = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
+                const items: Model[] = snapshot.docs.map(
+                    (doc) =>
+                        ({
+                            id: doc.id,
+                            ...doc.data(),
+                        } as Model)
+                );
                 setModels(items);
                 setLoading(false);
             },
@@ -42,7 +45,7 @@ export const ModelsProvider = ({ children }) => {
     }, []);
 
     // fetch models by userId
-    const fetchModelsByUser = (userId) => {
+    const fetchModelsByUser = (userId: string): (() => void) => {
         setLoading(true);
         const q = query(
             collection(db, "models"),
@@ -52,10 +55,13 @@ export const ModelsProvider = ({ children }) => {
         const unsubscribe = onSnapshot(
             q,
             (snapshot) => {
-                const items = snapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
+                const items: Model[] = snapshot.docs.map(
+                    (doc) =>
+                        ({
+                            id: doc.id,
+                            ...doc.data(),
+                        } as Model)
+                );
                 setUserModels(items);
                 setLoading(false);
             },
@@ -68,12 +74,12 @@ export const ModelsProvider = ({ children }) => {
         return () => unsubscribe();
     };
 
-    const fetchUploader = useCallback(async (uploaderId) => {
+    const fetchUploader = useCallback(async (uploaderId: string) => {
         try {
             const userDocRef = doc(db, "users", uploaderId);
             const userDoc = await getDoc(userDocRef);
             if (userDoc.exists()) {
-                setUploader(userDoc.data());
+                setUploader(userDoc.data() as Record<string, unknown>);
             }
         } catch (err) {
             console.error("Error fetching uploader data:", err);
@@ -96,8 +102,4 @@ export const ModelsProvider = ({ children }) => {
             {children}
         </ModelsContext.Provider>
     );
-};
-
-ModelsProvider.propTypes = {
-    children: PropTypes.node.isRequired,
-}; 
+}

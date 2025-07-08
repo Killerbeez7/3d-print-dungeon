@@ -1,27 +1,33 @@
 {
     "compilerOptions": {
-        /* language and environment ------------------------------------------ */
-        "target": "ES2022", // modern output for Node >= 18 & evergreen browsers
+        "target": "ES2022",
         "module": "ESNext",
-        "jsx": "react-jsx", // the React 19 automatic runtime
-        "allowJs": true, // keeps the old .js/.jsx compiling
-        "checkJs": false, // (switch to true when you want errors in JS too)
+        "jsx": "react-jsx",
+        "allowJs": true,
+        "checkJs": false,
         "isolatedModules": true,
         "moduleResolution": "node",
         "resolveJsonModule": true,
-        "noEmit": true, // ← stops TypeScript from emitting files
-        "types": ["vitest/globals"],
+        "noEmit": true,
+        // "types": ["vitest/globals"],
 
         /* paths / aliases -------------------------------------------------- */
         "baseUrl": ".",
-        "paths": { "@/*": ["src/*"] }, // matches the Vite alias in vite.config.js
+        "paths": { "@/*": ["src/*"] },
 
         /* type-safety & ergonomics ---------------------------------------- */
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "typeRoots": ["node_modules/@types", "src/types"]
     },
-    "include": ["src", "vite.config.ts", "tests", "functions", "__tests__", "vitest.config.ts"],
+    "include": [
+        "src",
+        "functions",
+        "vite.config.ts",
+        "__tests__",
+        "src/types/react.d.ts"
+    ],
     "exclude": ["dist", "node_modules"]
 }
