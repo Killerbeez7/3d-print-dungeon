@@ -3,6 +3,7 @@ import type { Timestamp } from "firebase/firestore";
 
 export interface RawUserData {
     uid: string;
+    stripeConnectId?: string;
     email: string | null;
     displayName: string | null;
     photoURL: string | null;
@@ -12,8 +13,10 @@ export interface RawUserData {
     lastLogin?: Timestamp | Date;
 }
 
+export type CurrentUser = FirebaseUser;
+
 export interface AuthContextValue {
-    currentUser: FirebaseUser | null;
+    currentUser: CurrentUser | null;
     userData: RawUserData | null;
     roles: string[];
     isAdmin: boolean;
@@ -34,7 +37,6 @@ export interface AuthContextValue {
     fetchUserData(): Promise<void>;
     handleAuthError(error: unknown, provider: string): never;
 }
-
 
 export type CustomClaims = {
     [key: string]: unknown;
