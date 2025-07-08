@@ -1,4 +1,5 @@
 /// <reference types="@google/model-viewer" />
+/// <reference types="vite/client" />
 
 export declare global {
     namespace JSX {
