@@ -1,16 +1,14 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, ImgHTMLAttributes } from "react";
 
-export interface LazyImageProps extends React.HTMLAttributes<HTMLDivElement> {
-    src: string;
-    alt?: string;
+export interface LazyImageProps extends ImgHTMLAttributes<HTMLImageElement> {
     className?: string;
+    wrapperClassName?: string;
 }
 
 export const LazyImage = ({
-    src,
-    alt = "",
     className = "",
-    ...props
+    wrapperClassName = "",
+    ...imgProps
 }: LazyImageProps) => {
     const imgRef = useRef<HTMLDivElement>(null);
     const [inView, setInView] = useState(false);
@@ -49,7 +47,7 @@ export const LazyImage = ({
     };
 
     return (
-        <div ref={imgRef} className={`relative overflow-hidden ${className}`} {...props}>
+        <div ref={imgRef} className={`relative overflow-hidden ${wrapperClassName}`}>
             {!loaded && (
                 <div
                     className="absolute inset-0 bg-gray-200 animate-pulse"
@@ -59,13 +57,11 @@ export const LazyImage = ({
 
             {inView && (
                 <img
-                    src={src}
-                    alt={alt}
-                    loading="lazy"
+                    {...imgProps}
                     onLoad={handleLoad}
                     className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
                         loaded ? "opacity-100" : "opacity-0"
-                    }`}
+                    } ${className}`}
                 />
             )}
         </div>
