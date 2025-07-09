@@ -3,13 +3,13 @@ import { useParams, useNavigate } from "react-router-dom";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { useModels } from "@/hooks/useModels";
-import type { Model } from "@/types/model";
+import type { ModelData } from "@/types/model";
 
 export function ModelEdit() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { models } = useModels();
-    const model: Model | undefined = models.find((m) => m.id === id);
+    const model: ModelData | undefined = models.find((m) => m.id === id);
 
     const [formData, setFormData] = useState<{
         name: string;

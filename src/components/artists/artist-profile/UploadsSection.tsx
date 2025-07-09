@@ -65,7 +65,7 @@ export const UploadsSection = ({ userId }: UploadsSectionProps) => {
                             <LazyImage
                                 src={
                                     getThumbnailUrl(
-                                        art.renderPrimaryUrl,
+                                        art.renderPrimaryUrl ?? null,
                                         THUMBNAIL_SIZES.MEDIUM
                                     ) || "/default-image.jpg"
                                 }

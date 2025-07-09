@@ -236,7 +236,7 @@ export const PAGE_SIZE = 30;
  */
 export async function fetchModels(pageParam?: QueryDocumentSnapshot<DocumentData>): Promise<{
     models: ModelData[];
-    nextCursor?: QueryDocumentSnapshot<DocumentData>;
+    nextCursor: QueryDocumentSnapshot<DocumentData> | undefined;
 }> {
     const base = query(collection(db, "models"), orderBy("createdAt", "desc"));
     const q = pageParam

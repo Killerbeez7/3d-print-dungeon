@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getUserFromDatabase } from "../../../services/authService.ts";
+import { getUserFromDatabase } from "@/services/authService";
 import { UploadsSection } from "./UploadsSection";
 import { LikesSection } from "./LikesSection";
 import { AboutSection } from "./AboutSection";

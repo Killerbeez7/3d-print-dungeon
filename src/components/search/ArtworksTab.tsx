@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { LazyImage } from "../shared/lazy-image/LazyImage";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
-import type { Model, SortBy, Medium, Subject } from "@/types/search";
+import type { SortBy, Medium, Subject } from "@/types/search";
+import type { ModelData } from "@/types/model";
 
 interface ArtworksTabProps {
     searchTerm: string;
-    models: Model[];
+    models: ModelData[];
 }
 
 const toggleArrayValue = (arr: string[], value: string): string[] =>
@@ -17,7 +18,7 @@ export const ArtworksTab = ({ searchTerm, models }: ArtworksTabProps) => {
     const [selectedMedia, setSelectedMedia] = useState<Medium[]>([]);
     const [selectedSubjects, setSelectedSubjects] = useState<Subject[]>([]);
     const [hideAI, setHideAI] = useState<boolean>(false);
-    const [filteredModels, setFilteredModels] = useState<Model[]>([]);
+    const [filteredModels, setFilteredModels] = useState<ModelData[]>([]);
 
     const sortOptions: { value: SortBy; label: string }[] = [
         { value: "relevance", label: "Relevance" },
@@ -36,7 +37,7 @@ export const ArtworksTab = ({ searchTerm, models }: ArtworksTabProps) => {
         { value: "props", label: "Props" },
     ];
 
-    const applyAdvancedFilters = (list: Model[]): Model[] => {
+    const applyAdvancedFilters = (list: ModelData[]): ModelData[] => {
         let filtered = [...list];
         if (selectedMedia.length > 0) {
             filtered = filtered.filter((m) => m.medium && selectedMedia.includes(m.medium as Medium));
@@ -59,8 +60,18 @@ export const ArtworksTab = ({ searchTerm, models }: ArtworksTabProps) => {
             case "latest":
                 filtered.sort(
                     (a, b) => {
-                        const aTime = typeof a.createdAt === "object" && "seconds" in a.createdAt ? a.createdAt.seconds : 0;
-                        const bTime = typeof b.createdAt === "object" && "seconds" in b.createdAt ? b.createdAt.seconds : 0;
+                        const aTime =
+                            a.createdAt && typeof a.createdAt === "object" && "seconds" in a.createdAt && a.createdAt.seconds != null
+                                ? a.createdAt.seconds
+                                : typeof a.createdAt === "number"
+                                ? a.createdAt
+                                : 0;
+                        const bTime =
+                            b.createdAt && typeof b.createdAt === "object" && "seconds" in b.createdAt && b.createdAt.seconds != null
+                                ? b.createdAt.seconds
+                                : typeof b.createdAt === "number"
+                                ? b.createdAt
+                                : 0;
                         return bTime - aTime;
                     }
                 );
@@ -186,10 +197,9 @@ export const ArtworksTab = ({ searchTerm, models }: ArtworksTabProps) => {
                             <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
                                 <div className="relative w-full aspect-square">
                                     <LazyImage
-                                        src={getThumbnailUrl(
-                                            m.renderPrimaryUrl,
-                                            THUMBNAIL_SIZES.MEDIUM
-                                        )}
+                                        src={
+                                            getThumbnailUrl(m.renderPrimaryUrl, THUMBNAIL_SIZES.MEDIUM) || undefined
+                                        }
                                         alt={m.name}
                                         className="absolute inset-0 w-full h-full object-cover rounded-lg"
                                     />

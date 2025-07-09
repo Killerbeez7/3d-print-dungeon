@@ -29,7 +29,7 @@ export const SellerVerification = ({
         setError("");
         setStep("creating");
         try {
-            const { accountId } = await paymentService.createConnectAccount();
+            const { accountId } = await paymentService.createConnectAccount() as { accountId: string };
             if (!accountId) {
                 throw new Error("createConnectAccount did not return an accountId.");
             }

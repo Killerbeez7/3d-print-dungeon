@@ -609,10 +609,12 @@ export const ModelViewer = ({
                 }`}
             >
                 <LazyImage
-                    src={getThumbnailUrl(
-                        renderExtraUrls[selectedRenderIndex],
-                        THUMBNAIL_SIZES.LARGE
-                    )}
+                    src={
+                        getThumbnailUrl(
+                            renderExtraUrls[selectedRenderIndex],
+                            THUMBNAIL_SIZES.LARGE
+                        ) ?? undefined
+                    }
                     alt={`Render ${selectedRenderIndex + 1}`}
                     loading="lazy"
                     className="w-full h-full object-contain rounded-md shadow-lg"
@@ -667,7 +669,6 @@ export const ModelViewer = ({
                             </div>
                         </div>
 
-                        {/* @ts-expect-error - renderExtraUrls is not a valid HTML element */}
                         {renderExtraUrls.map((url, idx) => (
                             <div
                                 key={idx}
@@ -679,7 +680,10 @@ export const ModelViewer = ({
                                 }`}
                             >
                                 <LazyImage
-                                    src={getThumbnailUrl(url, THUMBNAIL_SIZES.SMALL)}
+                                    src={
+                                        getThumbnailUrl(url, THUMBNAIL_SIZES.SMALL) ??
+                                        undefined
+                                    }
                                     alt={`Render ${idx + 1}`}
                                     loading="lazy"
                                     className="w-full h-full object-cover"

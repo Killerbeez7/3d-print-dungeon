@@ -9,4 +9,29 @@ export interface ModelData {
     selectedRenderIndex: number;
     price: number;
     isPaid: boolean;
-} 
+    uploaderId: string;
+    uploaderDisplayName: string;
+    convertedFileUrl: string;
+    originalFileUrl: string;
+    renderExtraUrls: string[];
+    posterUrl?: string;
+    renderPrimaryUrl: string;
+    likes?: number;
+    views?: number;
+    createdAt?: { seconds?: number } | number | string | null;
+    medium?: string;
+    subjects?: string[];
+    subject?: string;
+    isAI?: boolean;
+    [key: string]: unknown;
+}
+
+
+
+
+
+
+
+
+
+

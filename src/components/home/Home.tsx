@@ -16,7 +16,7 @@ import { SequentialImage } from "@/components/shared/SequentialImage";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
 import { Artwork, SortBy } from "@/types/home";
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
-import type { InfiniteData } from "@tanstack/react-query";
+import { InfiniteData } from "@tanstack/react-query";
 
 // Firestore model doc type (adjust as needed)
 type ModelDoc = {
@@ -87,7 +87,7 @@ export const Home = (): React.ReactNode => {
         useInfiniteQuery<
             Page,
             Error,
-            Page,
+            InfiniteData<Page>,
             string[],
             QueryDocumentSnapshot<DocumentData> | undefined
         >({
@@ -98,9 +98,7 @@ export const Home = (): React.ReactNode => {
         });
 
     // flatten pages
-    const raw: ModelDoc[] =
-        (data as InfiniteData<Page> | undefined)?.pages.flatMap((p: Page) => p.models) ??
-        [];
+    const raw: ModelDoc[] = data?.pages.flatMap((p) => p.models) ?? [];
 
     // FAB hide/show on scroll
     const mainRef = useRef<HTMLDivElement>(null);
@@ -117,7 +115,7 @@ export const Home = (): React.ReactNode => {
     // map to "artwork" shape
     const artworks: Artwork[] = raw.map((m) => {
         const thumbUrl =
-            getThumbnailUrl(m.renderPrimaryUrl, THUMBNAIL_SIZES.MEDIUM) ||
+            getThumbnailUrl(m.renderPrimaryUrl ?? null, THUMBNAIL_SIZES.MEDIUM) ||
             STATIC_ASSETS.PLACEHOLDER_IMAGE;
 
         return {

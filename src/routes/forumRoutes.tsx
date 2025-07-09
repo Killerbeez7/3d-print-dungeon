@@ -40,15 +40,11 @@ export const forumRoutes: RouteObject[] = [
             { path: "help", element: <ForumHelp /> },
             {
                 path: "new-thread",
-                element: withProtectedMaintenance(<ForumThread isNew />, {
-                    redirectTo: "/login",
-                }),
+                element: withProtectedMaintenance(<ForumThread isNew />),
             },
             {
                 path: "thread/:threadId/edit",
-                element: withProtectedMaintenance(<ForumThread isEdit />, {
-                    redirectTo: "/login",
-                }),
+                element: withProtectedMaintenance(<ForumThread />),
             },
         ],
     },

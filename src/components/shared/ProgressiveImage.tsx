@@ -32,7 +32,7 @@ export const ProgressiveImage = ({
             aria-label={alt}
         >
             <img
-                src={lowResSrc}
+                src={lowResSrc ?? undefined}
                 alt=""
                 aria-hidden="true"
                 className={`

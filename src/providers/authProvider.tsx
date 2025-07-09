@@ -1,10 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
-import { auth } from "../config/firebase";
-import { AuthContext } from "../contexts/authContext";
-import { RawUserData, CustomClaims } from "../types/auth";
-import { refreshIdToken } from "../utils/auth/refreshIdToken";
-import { MaintenanceStatus, UserId } from "../types/maintenance";
+import { auth } from "@/config/firebase";
+import { AuthContext } from "@/contexts/authContext";
+import { RawUserData, CustomClaims } from "@/types/auth";
+import { refreshIdToken } from "@/utils/auth/refreshIdToken";
+import { MaintenanceStatus, UserId } from "@/types/maintenance";
 import {
     signUpWithEmail,
     signInWithEmail,
@@ -12,11 +12,11 @@ import {
     signOutUser as signOut,
     changePassword as changeUserPassword,
     getUserFromDatabase,
-} from "../services/authService.ts";
+} from "@/services/authService";
 import {
     checkMaintenanceStatus,
     subscribeToMaintenanceStatus,
-} from "../services/maintenanceService";
+} from "@/services/maintenanceService";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -147,6 +147,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .map(([k]) => k)
         : [];
 
+    const handleFacebookSignIn = async () => {
+        throw new Error("Facebook sign-in not implemented");
+    };
+    const handleTwitterSignIn = async () => {
+        throw new Error("Twitter sign-in not implemented");
+    };
+
     const value = {
         currentUser,
         userData,
@@ -166,6 +173,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         changePassword,
         handleAuthError,
         fetchUserData: () => Promise.resolve(), // placeholder if needed
+        handleFacebookSignIn,
+        handleTwitterSignIn,
     };
 
     if (loading) return <div>Loading authentication...</div>;

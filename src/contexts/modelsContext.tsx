@@ -1,9 +1,9 @@
 import { createContext } from "react";
-import type { Model } from "@/types/model";
+import type { ModelData } from "@/types/model";
 
 export interface ModelsContextType {
-    models: Model[];
-    userModels: Model[];
+    models: ModelData[];
+    userModels: ModelData[];
     loading: boolean;
     uploader: Record<string, unknown> | undefined;
     selectedRenderIndex: number;

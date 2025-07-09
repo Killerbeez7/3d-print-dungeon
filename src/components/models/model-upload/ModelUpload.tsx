@@ -23,7 +23,7 @@ export function ModelUpload() {
     const [uploadProgress, setUploadProgress] = useState(0);
     const [files, setFiles] = useState<File[]>([]);
     const [posterDataUrl, setPosterDataUrl] = useState<string | null>(null);
-    const [convertedBlob, setConvertedBlob] = useState(null);
+    const [convertedBlob, setConvertedBlob] = useState<Blob | null>(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showSellerVerification, setShowSellerVerification] = useState(false);
 
@@ -38,6 +38,13 @@ export function ModelUpload() {
         selectedRenderIndex: 0,
         price: 0,
         isPaid: false,
+        uploaderId: "",
+        convertedFileUrl: "",
+        originalFileUrl: "",
+        renderExtraUrls: [],
+        posterUrl: "",
+        renderPrimaryUrl: "",
+        uploaderDisplayName: "",
     });
     // @ts-expect-error FIX later
     const modelViewerRef = useRef();
@@ -172,7 +179,7 @@ export function ModelUpload() {
         }
 
         // Check if user needs seller verification for paid models
-        if (modelData.isPaid && modelData.price > 0) {
+        if (modelData.isPaid && modelData.price && modelData.price > 0) {
             // Check if user has completed seller verification.
             // If they don't have a connect ID in their profile, prompt to create one.
             if (!userData?.stripeConnectId) {
@@ -206,11 +213,11 @@ export function ModelUpload() {
                 file: firstFile,
                 renderFiles: modelData.renderFiles,
                 selectedRenderIndex: modelData.selectedRenderIndex,
-                uploaderId: currentUser?.uid,
-                uploaderDisplayName: currentUser?.displayName,
+                uploaderId: currentUser?.uid ?? "",
+                uploaderDisplayName: currentUser?.displayName ?? "",
                 onProgress: setUploadProgress,
-                posterBlob,
-                preConvertedFile: convertedBlob,
+                posterBlob: posterBlob ?? undefined,
+                preConvertedFile: convertedBlob ?? undefined,
                 price: modelData.price,
                 isPaid: modelData.isPaid,
             });

@@ -1,7 +1,7 @@
-import type { Model } from "./model";
+import type { ModelData } from "./model";
 
 export interface ModelViewerProps {
-  model: Model;
+  model: ModelData;
   selectedRenderIndex: number;
   setSelectedRenderIndex: (idx: number) => void;
 }

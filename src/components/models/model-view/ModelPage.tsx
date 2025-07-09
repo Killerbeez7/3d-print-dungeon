@@ -15,7 +15,7 @@ import { ModelSidebar } from "./ModelSidebar";
 import { CommentsProvider } from "@/providers/commentsProvider";
 import { ModelComments } from "./ModelComments";
 import { Spinner } from "@/components/shared/Spinner";
-import type { Model } from "@/types/model";
+import type { ModelData } from "@/types/model";
 
 export function ModelPage() {
     const { id } = useParams<{ id: string }>();
@@ -25,15 +25,15 @@ export function ModelPage() {
     const [selectedRenderIndex, setSelectedRenderIndex] = useState<number>(-1);
 
     // Use new lightweight view tracking system
-    useViewTracker(id, currentUser);
-    const { count: viewCount, loading: viewCountLoading } = useModelViewCount(id);
+    useViewTracker(id ?? "", currentUser ?? undefined);
+    const { count: viewCount, loading: viewCountLoading } = useModelViewCount(id ?? "");
 
     useEffect(() => {
-        const m = models.find((m: Model) => m.id === id);
+        const m = models.find((m: ModelData) => m.id === id);
         if (m?.uploaderId) fetchUploader(m.uploaderId);
     }, [id, models, fetchUploader]);
 
-    const model: Model | undefined = models.find((m: Model) => m.id === id);
+    const model: ModelData | undefined = models.find((m: ModelData) => m.id === id);
 
     if (loading)
         return (

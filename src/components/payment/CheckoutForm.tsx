@@ -27,7 +27,7 @@ export const CheckoutForm = ({
                 const { clientSecret: secret } = await paymentService.createPaymentIntent(
                     modelId,
                     amount
-                );
+                ) as { clientSecret: string };
                 setClientSecret(secret);
             } catch (error) {
                 console.error("Error creating payment intent:", error);

@@ -5,6 +5,7 @@ import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
+import type { ModelData } from "@/types/model";
 
 interface FeaturedModel {
     id: string;
@@ -41,7 +42,7 @@ export const Featured = () => {
     useEffect(() => {
         if (models.length > 0 && featuredCategories.length > 0) {
             // Filter models that belong to featured categories
-            const featured = models.filter((model: FeaturedModel) =>
+            const featured = models.filter((model: ModelData) =>
                 featuredCategories.includes(model.category)
             );
             setFeaturedModels(featured);

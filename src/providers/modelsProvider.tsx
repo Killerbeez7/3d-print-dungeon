@@ -9,12 +9,12 @@ import {
     doc,
     getDoc,
 } from "firebase/firestore";
-import { ModelsContext } from "../contexts/modelsContext";
-import type { Model } from "@/types/model";
+import { ModelsContext } from "@/contexts/modelsContext";
+import type { ModelData } from "@/types/model";
 
 export function ModelsProvider({ children }: { children: ReactNode }) {
-    const [models, setModels] = useState<Model[]>([]);
-    const [userModels, setUserModels] = useState<Model[]>([]);
+    const [models, setModels] = useState<ModelData[]>([]);
+    const [userModels, setUserModels] = useState<ModelData[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [uploader, setUploader] = useState<Record<string, unknown> | null>(null);
     const [selectedRenderIndex, setSelectedRenderIndex] = useState<number>(-1);
@@ -26,12 +26,12 @@ export function ModelsProvider({ children }: { children: ReactNode }) {
         const unsubscribe = onSnapshot(
             q,
             (snapshot) => {
-                const items: Model[] = snapshot.docs.map(
+                const items: ModelData[] = snapshot.docs.map(
                     (doc) =>
                         ({
                             id: doc.id,
                             ...doc.data(),
-                        } as Model)
+                        } as ModelData)
                 );
                 setModels(items);
                 setLoading(false);
@@ -55,12 +55,12 @@ export function ModelsProvider({ children }: { children: ReactNode }) {
         const unsubscribe = onSnapshot(
             q,
             (snapshot) => {
-                const items: Model[] = snapshot.docs.map(
+                const items: ModelData[] = snapshot.docs.map(
                     (doc) =>
                         ({
                             id: doc.id,
                             ...doc.data(),
-                        } as Model)
+                        } as ModelData)
                 );
                 setUserModels(items);
                 setLoading(false);
@@ -92,7 +92,7 @@ export function ModelsProvider({ children }: { children: ReactNode }) {
                 models,
                 userModels,
                 loading,
-                uploader,
+                uploader: uploader ?? undefined,
                 selectedRenderIndex,
                 setSelectedRenderIndex,
                 fetchUploader,

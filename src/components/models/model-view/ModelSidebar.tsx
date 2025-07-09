@@ -9,19 +9,7 @@ import { PurchaseButton } from "@/components/payment/PurchaseButton";
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 //types
 import type { CurrentUser } from "@/types/auth";
-
-interface Model {
-    id: string;
-    name: string;
-    description?: string;
-    tags?: string[];
-    likes?: number;
-    uploaderId?: string;
-    originalFileUrl?: string;
-    convertedFileUrl?: string;
-    isPaid?: boolean;
-    price?: number;
-}
+import type { ModelData } from "@/types/model";
 
 interface Uploader {
     photoURL?: string;
@@ -29,7 +17,7 @@ interface Uploader {
 }
 
 interface ModelSidebarProps {
-    model: Model;
+    model: ModelData;
     uploader?: Uploader;
     viewCount: number;
     viewCountLoading?: boolean;
@@ -222,7 +210,7 @@ export function ModelSidebar({
                 {/* Purchase/Download Button */}
                 <div className="mb-6">
                     <PurchaseButton
-                        model={model}
+                        model={{ ...model, price: model.price ?? 0 }}
                         className="w-full py-4 text-base font-medium"
                     />
                 </div>

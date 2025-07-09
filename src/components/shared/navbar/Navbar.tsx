@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, RefObject } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 // hooks
 import { useAuth } from "@/hooks/useAuth";
@@ -30,10 +30,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import type { NavSection } from "@/types/navbar";
 
-/**
- * Navbar component for site navigation, authentication, and search.
- * Strictly typed with TypeScript.
- */
 export const Navbar = (): React.ReactNode => {
     const { isAdmin } = useUserRole();
     const { currentUser, handleSignOut } = useAuth();
@@ -84,7 +80,6 @@ export const Navbar = (): React.ReactNode => {
             await handleSignOut();
             navigate("/");
         } catch (error) {
-            // eslint-disable-next-line no-console
             console.error("Failed to log out", error);
         }
     };
@@ -95,15 +90,15 @@ export const Navbar = (): React.ReactNode => {
 
     //outside‑click & route‑change
 
-    useClickOutside(dropdownRef, () => {
+    useClickOutside(dropdownRef as RefObject<HTMLElement>, () => {
         setActiveDropdown(null);
     });
 
-    useClickOutside(mobileDropdownRef, () => {
+    useClickOutside(mobileDropdownRef as RefObject<HTMLElement>, () => {
         setMobileDropdown(null);
     });
 
-    useClickOutside(searchOverlayRef, () => {
+    useClickOutside(searchOverlayRef as RefObject<HTMLElement>, () => {
         setIsSearchVisible(false);
     });
 
