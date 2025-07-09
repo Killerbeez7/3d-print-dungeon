@@ -1,10 +1,11 @@
-import { ModalProvider } from "@/providers/ModalProvider";
+import { ModalProvider } from "@/providers/modalProvider";
 import { AuthProvider } from "./providers/authProvider";
 import { ModelsProvider } from "./providers/modelsProvider";
 import { SearchProvider } from "./providers/searchProvider";
 import { ForumProvider } from "./providers/forumProvider";
-import { StripeProvider } from "./providers/StripeProvider";
-
+import { StripeProvider } from "./providers/stripeProvider";
+import { Suspense } from "react";
+import { Spinner } from "@/components/shared/Spinner";
 import { AppRoutes } from "./AppRoutes";
 
 export const App = () => {
@@ -15,7 +16,9 @@ export const App = () => {
                     <ModelsProvider>
                         <SearchProvider>
                             <ForumProvider>
-                                <AppRoutes />
+                                <Suspense fallback={<Spinner />}>
+                                    <AppRoutes />
+                                </Suspense>
                             </ForumProvider>
                         </SearchProvider>
                     </ModelsProvider>
