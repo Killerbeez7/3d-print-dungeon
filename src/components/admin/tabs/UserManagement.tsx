@@ -2,26 +2,49 @@ import { useState, useEffect } from "react";
 import { collection, query, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { grantRole, revokeRole } from "@/services/adminService";
-import { Spinner } from "@/components/shared/spinner";
-
+import { Spinner } from "@/components/shared/Spinner";
 import { MdEdit, MdCheck, MdClose } from "react-icons/md";
+import type { RawUserData } from "@/types/auth";
 
-const ALL_ROLES = ["admin", "moderator", "contributor", "premium"];
+const ALL_ROLES = ["admin", "moderator", "contributor", "premium"] as const;
+export type Role = (typeof ALL_ROLES)[number];
+
+// Extend RawUserData for admin table rows
+export interface UserRow extends RawUserData {
+    id: string;
+    roles?: Role[];
+}
+
+interface EditingUser {
+    id: string;
+    roles: Role[];
+}
 
 export const UserManagement = () => {
-    /* ─────────────── internal state ─────────────── */
-    const [users, setUsers] = useState([]); // table rows
-    const [loading, setLoading] = useState(true);
-    const [editingUser, setEditingUser] = useState(null); // {id, roles:[]}
-    const [searchQuery, setSearchQuery] = useState("");
+    const [users, setUsers] = useState<UserRow[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [editingUser, setEditingUser] = useState<EditingUser | null>(null);
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
-    /* ─────────────── initial load ─────────────── */
     useEffect(() => {
         (async () => {
             try {
-                const q = query(collection(db, "users")); // TODO: add pagination
+                const q = query(collection(db, "users"));
                 const docs = await getDocs(q);
-                const result = docs.docs.map((d) => ({ id: d.id, ...d.data() }));
+                const result: UserRow[] = docs.docs.map((d) => {
+                    const data = d.data() as RawUserData;
+                    // Map roles to Role[] if present
+                    const roles = Array.isArray(data.roles)
+                        ? data.roles.filter((r): r is Role =>
+                              ALL_ROLES.includes(r as Role)
+                          )
+                        : undefined;
+                    return {
+                        id: d.id,
+                        ...data,
+                        roles,
+                    };
+                });
                 setUsers(result);
             } catch (err) {
                 console.error("Fetch users failed", err);
@@ -31,10 +54,10 @@ export const UserManagement = () => {
         })();
     }, []);
 
-    /* ─────────────── edit helpers ─────────────── */
-    const startEdit = (u) => setEditingUser({ id: u.id, roles: [...(u.roles || [])] });
+    const startEdit = (u: UserRow) =>
+        setEditingUser({ id: u.id, roles: [...(u.roles || [])] });
 
-    const toggleRole = (role) =>
+    const toggleRole = (role: Role) =>
         setEditingUser((prev) => {
             if (!prev) return prev;
             const has = prev.roles.includes(role);
@@ -44,20 +67,15 @@ export const UserManagement = () => {
             };
         });
 
-    /* ─────────────── save / persist ─────────────── */
     const handleSave = async () => {
         if (!editingUser) return;
-
         const original = users.find((u) => u.id === editingUser.id) || { roles: [] };
         const origRoles = original.roles || [];
         const newRoles = editingUser.roles || [];
-
         try {
             setLoading(true);
             const toAdd = newRoles.filter((r) => !origRoles.includes(r));
             const toRemove = origRoles.filter((r) => !newRoles.includes(r));
-
-            // Call cloud function for each change
             for (const role of toAdd) {
                 try {
                     await grantRole(editingUser.id, role);
@@ -67,7 +85,6 @@ export const UserManagement = () => {
                     throw err;
                 }
             }
-
             for (const role of toRemove) {
                 try {
                     await revokeRole(editingUser.id, role);
@@ -77,35 +94,34 @@ export const UserManagement = () => {
                     throw err;
                 }
             }
-
-            // Update local list
             setUsers((prev) =>
                 prev.map((u) =>
                     u.id === editingUser.id ? { ...u, roles: editingUser.roles } : u
                 )
             );
-
-            // Clear edit state
             setEditingUser(null);
         } catch (err) {
             console.error("Failed to save user roles:", err);
-            alert(err.message || "Failed to update roles. Check console for details.");
+            alert(
+                (err as Error).message ||
+                    "Failed to update roles. Check console for details."
+            );
         } finally {
             setLoading(false);
         }
     };
 
-    /* ─────────────── search filter ─────────────── */
     const q = searchQuery.toLowerCase();
     const filtered = users.filter(
         (u) =>
-            u.displayName?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q)
+            u.displayName?.toLowerCase().includes(q) ||
+            "" ||
+            u.email?.toLowerCase().includes(q) ||
+            ""
     );
 
-    /* ─────────────── render ─────────────── */
     return (
         <div className="space-y-6">
-            {/* search */}
             <input
                 type="text"
                 placeholder="Search users…"
@@ -113,8 +129,6 @@ export const UserManagement = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
             />
-
-            {/* table */}
             <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-br-secondary">
                     <thead className="bg-bg-secondary">
@@ -129,15 +143,12 @@ export const UserManagement = () => {
                             ))}
                         </tr>
                     </thead>
-
                     <tbody className="divide-y divide-br-secondary">
                         {filtered.map((u) => {
                             const isEditing = editingUser?.id === u.id;
                             const roles = isEditing ? editingUser.roles : u.roles || [];
-
                             return (
                                 <tr key={u.id}>
-                                    {/* user + avatar */}
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <img
@@ -150,13 +161,9 @@ export const UserManagement = () => {
                                             </span>
                                         </div>
                                     </td>
-
-                                    {/* e-mail */}
                                     <td className="px-6 py-4 text-sm text-txt-secondary">
                                         {u.email}
                                     </td>
-
-                                    {/* roles */}
                                     <td className="px-6 py-4">
                                         {isEditing ? (
                                             <div className="flex flex-wrap gap-2">
@@ -187,8 +194,6 @@ export const UserManagement = () => {
                                             </div>
                                         )}
                                     </td>
-
-                                    {/* actions */}
                                     <td className="px-6 py-4 text-right">
                                         {isEditing ? (
                                             <span className="flex gap-2 justify-end">
