@@ -11,45 +11,39 @@ import {
 } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
 import { STORAGE_PATHS } from '../../../constants/storagePaths';
+import type { AdminModel, AdminUser } from "@/types/adminPanel";
 
-export async function deleteAllModelsAndRelated(onProgress) {
-  // 1. Fetch all models
+
+export async function deleteAllModelsAndRelated(onProgress?: (progress: number) => void): Promise<void> {
   const modelsSnap = await getDocs(collection(db, "models"));
-  const models = modelsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  const models = modelsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as AdminModel[];
   const total = models.length;
   let done = 0;
-
-  // 2. Fetch all users (for favorites/uploads cleanup)
   const usersSnap = await getDocs(collection(db, "users"));
-  const users = usersSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
+  const users = usersSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as AdminUser[];
   for (const model of models) {
-    const modelId = model.id;
-    const fileNames = [];
-    // Try to extract file names from URLs (if present)
-    if (model.originalFileUrl) fileNames.push(model.originalFileUrl.split("/").pop().split("?")[0]);
-    if (model.convertedFileUrl) fileNames.push(model.convertedFileUrl.split("/").pop().split("?")[0]);
-    if (model.renderPrimaryUrl) fileNames.push(model.renderPrimaryUrl.split("/").pop().split("?")[0]);
-    if (model.posterUrl) fileNames.push(model.posterUrl.split("/").pop().split("?")[0]);
+    const modelId = model.id as string;
+    const fileNames: string[] = [];
+    if (model.originalFileUrl) fileNames.push(model.originalFileUrl.split("/").pop()?.split("?")[0] ?? "");
+    if (model.convertedFileUrl) fileNames.push(model.convertedFileUrl.split("/").pop()?.split("?")[0] ?? "");
+    if (model.renderPrimaryUrl) fileNames.push(model.renderPrimaryUrl.split("/").pop()?.split("?")[0] ?? "");
+    if (model.posterUrl) fileNames.push(model.posterUrl.split("/").pop()?.split("?")[0] ?? "");
     if (Array.isArray(model.renderExtraUrls)) {
-      model.renderExtraUrls.forEach((url) => fileNames.push(url.split("/").pop().split("?")[0]));
+      model.renderExtraUrls.forEach((url: string) => fileNames.push(url.split("/").pop()?.split("?")[0] ?? ""));
     }
-
-    // 3. Delete comments
+    // Delete comments
     const commentsQ = query(collection(db, "comments"), where("modelId", "==", modelId));
     const commentsSnap = await getDocs(commentsQ);
     for (const c of commentsSnap.docs) {
       await deleteDoc(c.ref);
     }
-
-    // 4. Delete likes
+    // Delete likes
     const likesQ = query(collection(db, "likes"), where("modelId", "==", modelId));
     const likesSnap = await getDocs(likesQ);
     for (const l of likesSnap.docs) {
       await deleteDoc(l.ref);
     }
-
-    // 5. Delete views (viewTrackers, userViews)
+    // Delete views
     const viewTrackersQ = query(collection(db, "viewTrackers"), where("modelId", "==", modelId));
     const viewTrackersSnap = await getDocs(viewTrackersQ);
     for (const v of viewTrackersSnap.docs) {
@@ -60,8 +54,7 @@ export async function deleteAllModelsAndRelated(onProgress) {
     for (const v of userViewsSnap.docs) {
       await deleteDoc(v.ref);
     }
-
-    // 6. Remove from all users' favorites and uploads
+    // Remove from all users' favorites and uploads
     for (const user of users) {
       const batch = writeBatch(db);
       if (Array.isArray(user.favorites) && user.favorites.includes(modelId)) {
@@ -72,16 +65,15 @@ export async function deleteAllModelsAndRelated(onProgress) {
       }
       await batch.commit();
     }
-
-    // 7. Delete files from storage (try common paths)
-    const storagePaths = [
+    // Delete files from storage
+    const storagePaths: string[] = [
       `${STORAGE_PATHS.ORIGINAL}/${fileNames[0]}`,
       `${STORAGE_PATHS.CONVERTED}/${fileNames[1]}`,
       `${STORAGE_PATHS.RENDER_PRIMARY}/${fileNames[2]}`,
       `${STORAGE_PATHS.POSTERS}/${fileNames[3]}`,
     ];
     if (Array.isArray(model.renderExtraUrls)) {
-      model.renderExtraUrls.forEach((url, i) => {
+      model.renderExtraUrls.forEach((url: string, i: number) => {
         storagePaths.push(`${STORAGE_PATHS.RENDER_EXTRAS}/${fileNames[4 + i]}`);
       });
     }
@@ -94,8 +86,6 @@ export async function deleteAllModelsAndRelated(onProgress) {
         }
       }
     }
-
-    // 8. Delete the model document
     await deleteDoc(doc(db, "models", modelId));
     done++;
     if (onProgress) onProgress(Math.round((done / total) * 100));
@@ -105,35 +95,26 @@ export async function deleteAllModelsAndRelated(onProgress) {
   console.log("All models and related data deleted.");
 }
 
-/**
- * Deletes a single model and all related data (comments, likes, views, favorites, uploads, files).
- * @param {string} modelId - The ID of the model to delete.
- */
-export async function deleteModelAndRelated(modelId) {
-  // 1. Fetch the model document
+
+export async function deleteModelAndRelated(modelId: string): Promise<void> {
   const modelDoc = await getDocs(query(collection(db, "models"), where("__name__", "==", modelId)));
   if (modelDoc.empty) throw new Error("Model not found");
-  const model = { id: modelId, ...modelDoc.docs[0].data() };
-
-  // 2. Fetch all users (for favorites/uploads cleanup)
+  const model = { id: modelId, ...modelDoc.docs[0].data() } as AdminModel;
   const usersSnap = await getDocs(collection(db, "users"));
-  const users = usersSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-
-  // 3. Delete comments
+  const users = usersSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as AdminUser[];
+  // Delete comments
   const commentsQ = query(collection(db, "comments"), where("modelId", "==", modelId));
   const commentsSnap = await getDocs(commentsQ);
   for (const c of commentsSnap.docs) {
     await deleteDoc(c.ref);
   }
-
-  // 4. Delete likes
+  // Delete likes
   const likesQ = query(collection(db, "likes"), where("modelId", "==", modelId));
   const likesSnap = await getDocs(likesQ);
   for (const l of likesSnap.docs) {
     await deleteDoc(l.ref);
   }
-
-  // 5. Delete views (viewTrackers, userViews)
+  // Delete views
   const viewTrackersQ = query(collection(db, "viewTrackers"), where("modelId", "==", modelId));
   const viewTrackersSnap = await getDocs(viewTrackersQ);
   for (const v of viewTrackersSnap.docs) {
@@ -144,8 +125,7 @@ export async function deleteModelAndRelated(modelId) {
   for (const v of userViewsSnap.docs) {
     await deleteDoc(v.ref);
   }
-
-  // 6. Remove from all users' favorites and uploads
+  // Remove from all users' favorites and uploads
   for (const user of users) {
     const batch = writeBatch(db);
     if (Array.isArray(user.favorites) && user.favorites.includes(modelId)) {
@@ -156,24 +136,23 @@ export async function deleteModelAndRelated(modelId) {
     }
     await batch.commit();
   }
-
-  // 7. Delete files from storage (try common paths)
-  const fileNames = [];
-  if (model.originalFileUrl) fileNames.push(model.originalFileUrl.split("/").pop().split("?")[0]);
-  if (model.convertedFileUrl) fileNames.push(model.convertedFileUrl.split("/").pop().split("?")[0]);
-  if (model.renderPrimaryUrl) fileNames.push(model.renderPrimaryUrl.split("/").pop().split("?")[0]);
-  if (model.posterUrl) fileNames.push(model.posterUrl.split("/").pop().split("?")[0]);
+  // Delete files from storage
+  const fileNames: string[] = [];
+  if (model.originalFileUrl) fileNames.push(model.originalFileUrl.split("/").pop()?.split("?")[0] ?? "");
+  if (model.convertedFileUrl) fileNames.push(model.convertedFileUrl.split("/").pop()?.split("?")[0] ?? "");
+  if (model.renderPrimaryUrl) fileNames.push(model.renderPrimaryUrl.split("/").pop()?.split("?")[0] ?? "");
+  if (model.posterUrl) fileNames.push(model.posterUrl.split("/").pop()?.split("?")[0] ?? "");
   if (Array.isArray(model.renderExtraUrls)) {
-    model.renderExtraUrls.forEach((url) => fileNames.push(url.split("/").pop().split("?")[0]));
+    model.renderExtraUrls.forEach((url: string) => fileNames.push(url.split("/").pop()?.split("?")[0] ?? ""));
   }
-  const storagePaths = [
+  const storagePaths: string[] = [
     `${STORAGE_PATHS.ORIGINAL}/${fileNames[0]}`,
     `${STORAGE_PATHS.CONVERTED}/${fileNames[1]}`,
     `${STORAGE_PATHS.RENDER_PRIMARY}/${fileNames[2]}`,
     `${STORAGE_PATHS.POSTERS}/${fileNames[3]}`,
   ];
   if (Array.isArray(model.renderExtraUrls)) {
-    model.renderExtraUrls.forEach((url, i) => {
+    model.renderExtraUrls.forEach((url: string, i: number) => {
       storagePaths.push(`${STORAGE_PATHS.RENDER_EXTRAS}/${fileNames[4 + i]}`);
     });
   }
@@ -186,11 +165,6 @@ export async function deleteModelAndRelated(modelId) {
       }
     }
   }
-
-  // 8. Delete the model document
   await deleteDoc(doc(db, "models", modelId));
   console.log(`Deleted model ${modelId} and all related data.`);
-}
-
-// Optionally, call the function directly for testing
-// deleteAllModelsAndRelated(); 
+} 

@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../../config/firebase";
 import { MdSave } from "react-icons/md";
+import type { SiteSettingsType } from "@/types/adminPanel";
 
 export const SiteSettings = () => {
-    const [settings, setSettings] = useState({
+    const [settings, setSettings] = useState<SiteSettingsType>({
         allowNewRegistrations: true,
         maxUploadSizeMB: 50,
         defaultUserQuotaMB: 500,
@@ -13,7 +14,7 @@ export const SiteSettings = () => {
     });
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
-    const [saveStatus, setSaveStatus] = useState(null);
+    const [saveStatus, setSaveStatus] = useState<{ type: "success" | "error" | null; message: string } | null>(null);
 
     useEffect(() => {
         const fetchSettings = async () => {
@@ -83,7 +84,7 @@ export const SiteSettings = () => {
         }
     };
 
-    const handleRemoveCategory = (category) => {
+    const handleRemoveCategory = (category: string) => {
         console.log("Removing category:", category);
         setSettings(current => ({
             ...current,
@@ -136,7 +137,7 @@ export const SiteSettings = () => {
                                 value={settings.maxUploadSizeMB}
                                 onChange={(e) => setSettings(current => ({
                                     ...current,
-                                    maxUploadSizeMB: e.target.value
+                                    maxUploadSizeMB: Number(e.target.value)
                                 }))}
                                 className="w-full px-4 py-2 rounded-lg bg-bg-surface text-txt-primary"
                             />
@@ -151,7 +152,7 @@ export const SiteSettings = () => {
                                 value={settings.defaultUserQuotaMB}
                                 onChange={(e) => setSettings(current => ({
                                     ...current,
-                                    defaultUserQuotaMB: e.target.value
+                                    defaultUserQuotaMB: Number(e.target.value)
                                 }))}
                                 className="w-full px-4 py-2 rounded-lg bg-bg-surface text-txt-primary"
                             />

@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { collection, query, getDocs, updateDoc, doc, deleteDoc } from "firebase/firestore";
 import { db } from "../../../config/firebase";
 import { MdDelete, MdCheck, MdClose } from "react-icons/md";
+import type { AdminReport } from "@/types/adminPanel";
 
 export const ContentModeration = () => {
-    const [reports, setReports] = useState([]);
+    const [reports, setReports] = useState<AdminReport[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedStatus, setSelectedStatus] = useState("pending");
 
@@ -18,7 +19,7 @@ export const ContentModeration = () => {
                 const reportsData = querySnapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
-                }));
+                })) as AdminReport[];
                 
                 setReports(reportsData);
             } catch (error) {
@@ -31,7 +32,7 @@ export const ContentModeration = () => {
         fetchReports();
     }, []);
 
-    const handleUpdateStatus = async (reportId, status) => {
+    const handleUpdateStatus = async (reportId: string, status: string) => {
         try {
             const reportRef = doc(db, "reports", reportId);
             await updateDoc(reportRef, { status });
@@ -46,7 +47,7 @@ export const ContentModeration = () => {
         }
     };
 
-    const handleDeleteContent = async (reportId, contentId, contentType) => {
+    const handleDeleteContent = async (reportId: string, contentId: string, contentType: string) => {
         if (!window.confirm("Are you sure you want to delete this content? This action cannot be undone.")) {
             return;
         }

@@ -1,20 +1,40 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { collection, query, getDocs, where, orderBy, limit } from "firebase/firestore";
 import { db } from "../../../config/firebase";
-import { MdPeople, MdFileUpload, MdRemoveRedEye, MdThumbUp, MdDelete } from "react-icons/md";
-// import { cleanupViewData } from "@/functions/index";
+import {
+    MdPeople,
+    MdFileUpload,
+    MdRemoveRedEye,
+    MdThumbUp,
+    MdDelete,
+} from "react-icons/md";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "../../../utils/imageUtils";
+import type { AdminModel, AdminUser } from "@/types/adminPanel";
 
 // Cache duration in milliseconds (5 minutes)
 const CACHE_DURATION = 5 * 60 * 1000;
-let statsCache = {
+let statsCache: {
+    data: AnalyticsStats | null;
+    timestamp: number;
+    timeRange: string | null;
+} = {
     data: null,
     timestamp: 0,
-    timeRange: null
+    timeRange: null,
 };
 
+interface AnalyticsStats {
+    totalUsers: number;
+    totalModels: number;
+    totalViews: number;
+    totalLikes: number;
+    recentUploads: AdminModel[];
+    popularModels: AdminModel[];
+    activeUsers: (AdminUser & { uploadCount: number })[];
+}
+
 export const Analytics = () => {
-    const [stats, setStats] = useState({
+    const [stats, setStats] = useState<AnalyticsStats>({
         totalUsers: 0,
         totalModels: 0,
         totalViews: 0,
@@ -68,15 +88,15 @@ export const Analytics = () => {
             const modelsRef = collection(db, "models");
             const modelsQuery = query(modelsRef, where("createdAt", ">=", startDate));
             const modelsSnapshot = await getDocs(modelsQuery);
-            
+
             let totalModels = 0;
             let totalViews = 0;
-            const models = [];
+            const models: AdminModel[] = [];
 
-            modelsSnapshot.forEach(doc => {
-                const model = { id: doc.id, ...doc.data() };
+            modelsSnapshot.forEach((doc) => {
+                const model = { id: doc.id, ...doc.data() } as AdminModel;
                 totalModels++;
-                totalViews += model.views || 0;
+                totalViews += (model.views as number) || 0;
                 models.push(model);
             });
 
@@ -92,31 +112,33 @@ export const Analytics = () => {
                 limit(5)
             );
             const recentUploadsSnapshot = await getDocs(recentUploadsQuery);
-            const recentUploads = recentUploadsSnapshot.docs.map(doc => ({
+            const recentUploads = recentUploadsSnapshot.docs.map((doc) => ({
                 id: doc.id,
                 ...doc.data(),
-                thumbnail: getThumbnailUrl(doc.data().renderPrimaryUrl, THUMBNAIL_SIZES.SMALL) || doc.data().posterUrl || "/placeholder.png"
-            }));
+                thumbnail:
+                    getThumbnailUrl(doc.data().renderPrimaryUrl, THUMBNAIL_SIZES.SMALL) ||
+                    doc.data().posterUrl ||
+                    "/placeholder.png",
+            })) as AdminModel[];
 
             // Get popular models with thumbnails
             const popularModels = [...models]
-                .sort((a, b) => (b.views || 0) - (a.views || 0))
+                .sort((a, b) => ((b.views as number) || 0) - ((a.views as number) || 0))
                 .slice(0, 5)
-                .map(model => ({
+                .map((model) => ({
                     ...model,
-                    thumbnail: getThumbnailUrl(model.renderPrimaryUrl, THUMBNAIL_SIZES.SMALL) || model.posterUrl || "/placeholder.png"
-                }));
+                    thumbnail:
+                        getThumbnailUrl(model.renderPrimaryUrl as string, THUMBNAIL_SIZES.SMALL) ||
+                        model.posterUrl ||
+                        "/placeholder.png",
+                })) as AdminModel[];
 
             // Get most active users based on uploads array length
-            const activeUsers = [...usersSnapshot.docs]
-                .map(doc => ({ 
-                    id: doc.id, 
-                    ...doc.data(),
-                    uploadCount: doc.data().uploads?.length || 0
-                }))
-                .filter(user => user.uploads && user.uploads.length > 0)
-                .sort((a, b) => b.uploadCount - a.uploadCount)
-                .slice(0, 5);
+            const activeUsers = [...usersSnapshot.docs].map((doc) => ({
+                id: doc.id,
+                ...doc.data(),
+                uploadCount: doc.data().uploads?.length || 0,
+            })) as (AdminUser & { uploadCount: number })[];
 
             const newStats = {
                 totalUsers,
@@ -132,7 +154,7 @@ export const Analytics = () => {
             statsCache = {
                 data: newStats,
                 timestamp: now,
-                timeRange
+                timeRange,
             };
 
             setStats(newStats);
@@ -148,7 +170,11 @@ export const Analytics = () => {
     }, [fetchAnalytics]);
 
     const handleCleanupViews = async () => {
-        if (!window.confirm('Are you sure you want to reset all view counts? This action cannot be undone.')) {
+        if (
+            !window.confirm(
+                "Are you sure you want to reset all view counts? This action cannot be undone."
+            )
+        ) {
             return;
         }
 
@@ -157,10 +183,10 @@ export const Analytics = () => {
             // await cleanupViewData();
             // Refresh stats after cleanup
             await fetchAnalytics();
-            alert('Successfully reset all view counts!');
+            alert("Successfully reset all view counts!");
         } catch (error) {
-            console.error('Error cleaning up views:', error);
-            alert('Failed to reset view counts. Check console for details.');
+            console.error("Error cleaning up views:", error);
+            alert("Failed to reset view counts. Check console for details.");
         } finally {
             setIsCleaningViews(false);
         }
@@ -195,7 +221,7 @@ export const Analytics = () => {
                     className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <MdDelete className="w-5 h-5" />
-                    {isCleaningViews ? 'Cleaning...' : 'Reset All Views'}
+                    {isCleaningViews ? "Cleaning..." : "Reset All Views"}
                 </button>
             </div>
 
@@ -205,7 +231,9 @@ export const Analytics = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-txt-secondary">Total Users</p>
-                            <p className="text-2xl font-bold text-txt-primary">{stats.totalUsers}</p>
+                            <p className="text-2xl font-bold text-txt-primary">
+                                {stats.totalUsers}
+                            </p>
                         </div>
                         <MdPeople className="text-accent" size={24} />
                     </div>
@@ -215,7 +243,9 @@ export const Analytics = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-txt-secondary">Total Models</p>
-                            <p className="text-2xl font-bold text-txt-primary">{stats.totalModels}</p>
+                            <p className="text-2xl font-bold text-txt-primary">
+                                {stats.totalModels}
+                            </p>
                         </div>
                         <MdFileUpload className="text-accent" size={24} />
                     </div>
@@ -225,7 +255,9 @@ export const Analytics = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-txt-secondary">Total Views</p>
-                            <p className="text-2xl font-bold text-txt-primary">{stats.totalViews}</p>
+                            <p className="text-2xl font-bold text-txt-primary">
+                                {stats.totalViews}
+                            </p>
                         </div>
                         <MdRemoveRedEye className="text-accent" size={24} />
                     </div>
@@ -235,7 +267,9 @@ export const Analytics = () => {
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-txt-secondary">Total Likes</p>
-                            <p className="text-2xl font-bold text-txt-primary">{stats.totalLikes}</p>
+                            <p className="text-2xl font-bold text-txt-primary">
+                                {stats.totalLikes}
+                            </p>
                         </div>
                         <MdThumbUp className="text-accent" size={24} />
                     </div>
@@ -251,17 +285,21 @@ export const Analytics = () => {
                         {stats.recentUploads.map((model) => (
                             <div key={model.id} className="flex items-center space-x-3">
                                 <img
-                                    src={model.thumbnail}
-                                    alt={model.name}
+                                    src={model.thumbnail as string}
+                                    alt={model.name as string}
                                     className="w-16 h-16 rounded object-cover bg-bg-surface"
                                 />
                                 <div>
-                                    <p className="text-txt-primary font-medium">{model.name}</p>
+                                    <p className="text-txt-primary font-medium">
+                                        {model.name as string}
+                                    </p>
                                     <p className="text-sm text-txt-secondary">
-                                        {new Date(model.createdAt?.seconds * 1000).toLocaleDateString()}
+                                        {new Date(
+                                            (model.createdAt as { seconds: number })?.seconds * 1000
+                                        ).toLocaleDateString()}
                                     </p>
                                     <p className="text-xs text-txt-secondary">
-                                        {model.views || 0} views
+                                        {(model.views as number) || 0} views
                                     </p>
                                 </div>
                             </div>
@@ -274,21 +312,26 @@ export const Analytics = () => {
                     <h3 className="text-lg font-medium mb-4">Popular Models</h3>
                     <div className="space-y-4">
                         {stats.popularModels.map((model) => (
-                            <div key={model.id} className="flex items-center justify-between">
+                            <div
+                                key={model.id}
+                                className="flex items-center justify-between"
+                            >
                                 <div className="flex items-center space-x-3">
                                     <img
-                                        src={model.thumbnail}
-                                        alt={model.name}
+                                        src={model.thumbnail as string}
+                                        alt={model.name as string}
                                         className="w-16 h-16 rounded object-cover bg-bg-surface"
                                     />
                                     <div>
-                                        <p className="text-txt-primary font-medium">{model.name}</p>
+                                        <p className="text-txt-primary font-medium">
+                                            {model.name as string}
+                                        </p>
                                         <p className="text-sm text-txt-secondary">
-                                            By {model.uploaderDisplayName || "Anonymous"}
+                                            By {model.uploaderDisplayName as string || "Anonymous"}
                                         </p>
                                         <div className="flex items-center space-x-2 text-txt-secondary text-sm">
                                             <MdRemoveRedEye className="w-4 h-4" />
-                                            <span>{model.views || 0}</span>
+                                            <span>{(model.views as number) || 0}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -302,16 +345,19 @@ export const Analytics = () => {
                     <h3 className="text-lg font-medium mb-4">Most Active Users</h3>
                     <div className="space-y-4">
                         {stats.activeUsers.map((user) => (
-                            <div key={user.id} className="flex items-center justify-between">
+                            <div
+                                key={user.id}
+                                className="flex items-center justify-between"
+                            >
                                 <div className="flex items-center space-x-3">
                                     <img
-                                        src={user.photoURL || "/default-avatar.png"}
-                                        alt={user.displayName}
+                                        src={user.photoURL as string || "/default-avatar.png"}
+                                        alt={user.displayName as string}
                                         className="w-10 h-10 rounded-full bg-bg-surface"
                                     />
                                     <div>
                                         <p className="text-txt-primary font-medium">
-                                            {user.displayName || "Anonymous"}
+                                            {user.displayName as string || "Anonymous"}
                                         </p>
                                         <p className="text-sm text-txt-secondary">
                                             {user.uploadCount || 0} uploads

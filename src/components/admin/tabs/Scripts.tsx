@@ -3,8 +3,14 @@ import { duplicateModels } from "../scripts/duplicateModels";
 import { deleteAllModelsAndRelated } from "../scripts/deleteAllModels";
 import { refreshIdToken } from "@/utils/auth/refreshIdToken";
 
+interface ScriptDef {
+    name: string;
+    description: string;
+    run: (onProgress: (progress: number) => void) => Promise<void>;
+}
+
 export const Scripts = () => {
-    const scripts = [
+    const scripts: ScriptDef[] = [
         {
             name: "Duplicate Models",
             description: "Duplicate all models in the database for testing.",
@@ -18,13 +24,15 @@ export const Scripts = () => {
         },
     ];
 
-    const [progress, setProgress] = useState(Array(scripts.length).fill(0));
-    const [running, setRunning] = useState(Array(scripts.length).fill(false));
-    const [complete, setComplete] = useState(Array(scripts.length).fill(false));
-    const [claims, setClaims] = useState(null);
+    const [progress, setProgress] = useState<number[]>(Array(scripts.length).fill(0));
+    const [running, setRunning] = useState<boolean[]>(Array(scripts.length).fill(false));
+    const [complete, setComplete] = useState<boolean[]>(
+        Array(scripts.length).fill(false)
+    );
+    const [claims, setClaims] = useState<unknown>(null);
     const [loading, setLoading] = useState(false);
 
-    const handleRun = async (idx) => {
+    const handleRun = async (idx: number) => {
         setRunning((r) => r.map((v, i) => (i === idx ? true : v)));
         setProgress((p) => p.map((v, i) => (i === idx ? 0 : v)));
         setComplete((c) => c.map((v, i) => (i === idx ? false : v)));
@@ -37,7 +45,7 @@ export const Scripts = () => {
                 setComplete((c) => c.map((v, i) => (i === idx ? false : v)));
             }, 3000);
         } catch (e) {
-            alert("Script failed: " + e.message);
+            alert("Script failed: " + (e instanceof Error ? e.message : String(e)));
         }
         setRunning((r) => r.map((v, i) => (i === idx ? false : v)));
     };
@@ -103,9 +111,11 @@ export const Scripts = () => {
                 </button>
             </div>
 
-            {claims && (
+            {claims != null && (
                 <pre className="p-4 bg-bg-secondary rounded-lg overflow-auto">
-                    {JSON.stringify(claims, null, 2)}
+                    {typeof claims === "string"
+                        ? claims
+                        : JSON.stringify(claims, null, 2)}
                 </pre>
             )}
         </div>
