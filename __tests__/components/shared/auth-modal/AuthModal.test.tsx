@@ -1,9 +1,6 @@
-/**
- * Integration test for the AuthModal component + focus / esc behaviour.
- * Path: <repo-root>/__tests__/components/auth-modal/AuthModal.test.tsx
- */
+import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { ModalProvider } from "@/providers/ModalProvider";
+import { ModalProvider } from "@/providers/modalProvider";
 import { AuthModal } from "@/components/shared/auth-modal/AuthModal";
 import { useModal } from "@/hooks/useModal";
 

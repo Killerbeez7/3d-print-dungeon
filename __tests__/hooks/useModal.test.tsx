@@ -1,9 +1,6 @@
-/**
- * Unit-tests for the modal manager hook.
- * Path:  <repo-root>/__tests__/hooks/useModal.test.tsx
- */
+import { describe, it, expect } from "vitest";
 import { renderHook, act } from "@testing-library/react";
-import { ModalProvider } from "@/providers/ModalProvider";
+import { ModalProvider } from "@/providers/modalProvider";
 import { useModal } from "@/hooks/useModal";
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (

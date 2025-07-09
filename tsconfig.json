@@ -9,7 +9,6 @@
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "noEmit": true,
-        // "types": ["vitest/globals"],
 
         /* paths / aliases -------------------------------------------------- */
         "baseUrl": ".",

@@ -1,7 +1,9 @@
+import { it, expect, vi } from "vitest";
+
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Layout from "@/components/shared/Layout";
-import { ModalProvider } from "@/providers/ModalProvider";
+import { ModalProvider } from "@/providers/modalProvider";
 
 vi.mock("@/components/search/GlobalSearch", () => ({
     default: () => <div data-testid="search">search</div>,

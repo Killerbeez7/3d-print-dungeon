@@ -1,6 +1,8 @@
+import { describe, it, expect } from "vitest";
+
 import { vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { ModalProvider } from "@/providers/ModalProvider";
+import { ModalProvider } from "@/providers/modalProvider";
 import { AuthModal } from "@/components/shared/auth-modal/AuthModal";
 import { useModal } from "@/hooks/useModal";
 

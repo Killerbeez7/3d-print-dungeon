@@ -2,7 +2,7 @@ import { vi } from "vitest";
 
 /** firebase/app ----------------------------------------------------- */
 vi.mock("firebase/app", () => {
-    let apps: any[] = [];
+    let apps: unknown[] = [];
 
     return {
         initializeApp: (cfg: unknown) => {

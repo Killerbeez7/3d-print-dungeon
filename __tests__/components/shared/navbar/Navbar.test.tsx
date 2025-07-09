@@ -97,7 +97,7 @@ describe("Navbar", () => {
         it("render user profile button", () => {
             render(
                 <BrowserRouter>
-                    <Navbar onLoginClick={() => {}} onSignUpClick={() => {}} />
+                    <Navbar />
                 </BrowserRouter>
             );
 
@@ -123,7 +123,7 @@ describe("Navbar", () => {
         it("render upload model button", () => {
             render(
                 <BrowserRouter>
-                    <Navbar onLoginClick={() => {}} onSignUpClick={() => {}} />
+                    <Navbar />
                 </BrowserRouter>
             );
 
@@ -137,7 +137,7 @@ describe("Navbar", () => {
         it("render user's display name", () => {
             render(
                 <BrowserRouter>
-                    <Navbar onLoginClick={() => {}} onSignUpClick={() => {}} />
+                    <Navbar />
                 </BrowserRouter>
             );
 
@@ -149,7 +149,7 @@ describe("Navbar", () => {
         it("DO NOT render Sign In/ Sign Up buttons", () => {
             render(
                 <BrowserRouter>
-                    <Navbar onLoginClick={() => {}} onSignUpClick={() => {}} />
+                    <Navbar />
                 </BrowserRouter>
             );
 
@@ -172,7 +172,7 @@ describe("Navbar", () => {
         it("render Sign In/ Sign Up buttons", () => {
             render(
                 <BrowserRouter>
-                    <Navbar onLoginClick={() => {}} onSignUpClick={() => {}} />
+                    <Navbar />
                 </BrowserRouter>
             );
 
@@ -186,7 +186,7 @@ describe("Navbar", () => {
         it("DO NOT render user profile button", () => {
             render(
                 <BrowserRouter>
-                    <Navbar onLoginClick={() => {}} onSignUpClick={() => {}} />
+                    <Navbar />
                 </BrowserRouter>
             );
 
@@ -197,7 +197,7 @@ describe("Navbar", () => {
         it("DO NOT render upload model button", () => {
             render(
                 <BrowserRouter>
-                    <Navbar onLoginClick={() => {}} onSignUpClick={() => {}} />
+                    <Navbar />
                 </BrowserRouter>
             );
 

@@ -1,5 +1,6 @@
+import { describe, it, expect } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { ModalProvider } from "@/providers/ModalProvider";
+import { ModalProvider } from "@/providers/modalProvider";
 import { Navbar } from "@/components/shared/navbar/Navbar";
 import { AuthModal } from "@/components/shared/auth-modal/AuthModal";
 import { MemoryRouter } from "react-router-dom";
