@@ -4,7 +4,7 @@ import type { Timestamp } from "firebase/firestore";
 export interface RawUserData {
     uid: string;
     stripeConnectId?: string;
-    email: string | null;
+    email: string | null | undefined;
     displayName: string | null;
     photoURL: string | null;
     roles?: string[];

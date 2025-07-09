@@ -12,7 +12,7 @@ import {
     signOutUser as signOut,
     changePassword as changeUserPassword,
     getUserFromDatabase,
-} from "../services/authService";
+} from "../services/authService.ts";
 import {
     checkMaintenanceStatus,
     subscribeToMaintenanceStatus,
