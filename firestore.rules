@@ -17,21 +17,27 @@ service cloud.firestore {
 
     // -------------- Users --------------
     match /users/{userId} {
-      allow read: if true;
-      allow create: if request.auth.uid == userId;
-      // Allow user to update their own profile fields, but NOT 'roles'
-      allow update: if request.auth.uid == userId
-        && !('roles' in request.resource.data.diff(resource.data).affectedKeys())
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          'displayName', 'photoURL', 'bio', 'city', 'country',
-          'coverURL',  'email', 'searchableName', 'socials',
-          'uploads', 'upscalePhotoURL', 'createdAt', 'artist',
-          'stripeCustomerId', 'stripeAccountId', 'sellerEnabled',
-          'purchasedModels', 'totalSales', 'salesCount'
-        ]);
-      // Only admin or super admin can update roles field
-      allow update: if (isAdmin() || isSuperAdmin())
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['roles']);
+      // Allow admins to read all users
+      allow read: if isAdmin();
+
+      // Allow anyone to read user documents where artist == true (public artist profiles)
+      allow read: if resource.data.artist == true;
+
+      // Allow users to read their own profile (even if not an artist)
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Allow users to update their own profile, but NOT the 'roles' field
+      allow update: if request.auth != null
+        && request.auth.uid == userId
+        && !(("roles" in request.resource.data) && (resource.data.roles != request.resource.data.roles));
+
+      // Allow users to create their own profile
+      allow create: if request.auth != null && request.auth.uid == userId;
+
+      // Allow admins to update any field, including 'roles'
+      allow update: if isAdmin();
+
+      // No one can delete user documents
       allow delete: if false;
     }
 
@@ -157,6 +163,12 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isSignedIn() && 
         (request.auth.uid == userId || isAdmin());
+    }
+
+    // -------------- Artists --------------
+    match /artists/{artistId} {
+      allow read: if true; // Public read access
+      // Write rules as needed
     }
   }
 }
