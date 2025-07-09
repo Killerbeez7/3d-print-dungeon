@@ -3,14 +3,20 @@ import { useAuth } from "@/hooks/useAuth";
 import { AccountSettings } from "./AccountSettings";
 import { SecuritySettings } from "./SecuritySettings";
 import { ProfileSettings } from "./ProfileSettings";
-// import { NotificationSettings } from "./NotificationSettings";
-// import { BioSettings } from "./BioSettings";
+
+/**
+ * SettingsPage component for managing user settings tabs.
+ */
+type Tab = {
+    id: string;
+    label: string;
+};
 
 export const SettingsPage = () => {
     const { currentUser } = useAuth();
-    const [activeTab, setActiveTab] = useState("profile");
+    const [activeTab, setActiveTab] = useState<string>("profile");
 
-    const tabs = [
+    const tabs: Tab[] = [
         { id: "profile", label: "Profile" },
         { id: "account", label: "Account" },
         { id: "notifications", label: "Notifications" },
@@ -31,7 +37,6 @@ export const SettingsPage = () => {
                         {currentUser?.displayName || "Anonymous"}
                     </h2>
                 </div>
-
                 <nav className="mt-6">
                     <ul className="space-y-2">
                         {tabs.map((tab) => (
@@ -42,6 +47,7 @@ export const SettingsPage = () => {
                                             ? "bg-accent text-white"
                                             : "text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
                                         }`}
+                                    type="button"
                                 >
                                     {tab.label}
                                 </button>
@@ -50,7 +56,6 @@ export const SettingsPage = () => {
                     </ul>
                 </nav>
             </aside>
-
             {/* Main Content */}
             <section className="md:w-3/4 p-6 bg-bg-surface shadow-md rounded-lg flex-grow">
                 {activeTab === "profile" && <ProfileSettings />}
@@ -60,4 +65,4 @@ export const SettingsPage = () => {
             </section>
         </div>
     );
-};
+}; 

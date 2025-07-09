@@ -1,44 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { profileService } from "@/services/profileService";
 import { countries } from "@/data/countries";
 import AlertModal from "@/components/shared/alert-modal/AlertModal";
 
+/**
+ * ProfileSettings component for managing user profile information.
+ */
 export const ProfileSettings = () => {
     const { currentUser } = useAuth();
-    const [displayName, setDisplayName] = useState(
-        currentUser?.displayName || ""
-    );
-    const [email, setEmail] = useState(currentUser?.email || "");
-    const [isEmailPublic, setIsEmailPublic] = useState(false);
-    const [city, setCity] = useState("");
-    const [country, setCountry] = useState("");
-    const [bio, setBio] = useState("");
-    const [profilePicture, setProfilePicture] = useState(null);
-    const [coverPhoto, setCoverPhoto] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [displayName, setDisplayName] = useState<string>(currentUser?.displayName || "");
+    const [email, setEmail] = useState<string>(currentUser?.email || "");
+    const [isEmailPublic, setIsEmailPublic] = useState<boolean>(false);
+    const [city, setCity] = useState<string>("");
+    const [country, setCountry] = useState<string>("");
+    const [bio, setBio] = useState<string>("");
+    const [profilePicture, setProfilePicture] = useState<File | null>(null);
+    const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
 
     // Social media states
-    const [facebook, setFacebook] = useState("");
-    const [twitter, setTwitter] = useState("");
-    const [instagram, setInstagram] = useState("");
-    const [linkedin, setLinkedin] = useState("");
+    const [facebook, setFacebook] = useState<string>("");
+    const [twitter, setTwitter] = useState<string>("");
+    const [instagram, setInstagram] = useState<string>("");
+    const [linkedin, setLinkedin] = useState<string>("");
 
     useEffect(() => {
         const loadProfileData = async () => {
             if (!currentUser?.uid) return;
 
             try {
-                const profileData = await profileService.getProfileData(
-                    currentUser.uid
-                );
+                const profileData = await profileService.getProfileData(currentUser.uid);
                 if (profileData) {
                     setCity(profileData.city || "");
                     setCountry(profileData.country || "");
                     setBio(profileData.bio || "");
-                    setIsEmailPublic(profileData.isEmailPublic || false);
+                    setIsEmailPublic(Boolean(profileData.isEmailPublic));
 
                     // Load social media data
                     if (profileData.socials) {
@@ -48,8 +47,8 @@ export const ProfileSettings = () => {
                         setLinkedin(profileData.socials.linkedin || "");
                     }
                 }
-            } catch (error) {
-                console.error("Error loading profile data:", error);
+            } catch (err) {
+                console.error("Error loading profile data:", err);
                 setError("Failed to load profile data. Please try again.");
             }
         };
@@ -57,24 +56,29 @@ export const ProfileSettings = () => {
         loadProfileData();
     }, [currentUser]);
 
-    const handleProfilePictureChange = (e) => {
-        if (e.target.files[0]) {
+    const handleProfilePictureChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
             setProfilePicture(e.target.files[0]);
         }
     };
 
-    const handleCoverPhotoChange = (e) => {
-        if (e.target.files[0]) {
+    const handleCoverPhotoChange = (e: ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
             setCoverPhoto(e.target.files[0]);
         }
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
 
         try {
+            if (!currentUser) {
+                setError("User not authenticated.");
+                setLoading(false);
+                return;
+            }
             const profileData = {
                 displayName,
                 email,
@@ -97,25 +101,29 @@ export const ProfileSettings = () => {
                 coverPhoto
             );
 
-            // Reset file inputs after successful update
             setProfilePicture(null);
             setCoverPhoto(null);
-
-            // Show success modal instead of alert
             setShowSuccessModal(true);
-        } catch (error) {
-            console.error("Error updating profile:", error);
+        } catch (err) {
+            console.error("Error updating profile:", err);
             setError("Failed to update profile. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
+    // Helper to get coverURL if present
+    const getCoverUrl = (): string => {
+        if (currentUser && typeof currentUser === "object" && "coverURL" in currentUser) {
+            const cover = (currentUser as { coverURL?: string }).coverURL;
+            return typeof cover === "string" ? cover : "";
+        }
+        return "";
+    };
+
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-txt-primary">
-                Profile Settings
-            </h2>
+            <h2 className="text-2xl font-bold text-txt-primary">Profile Settings</h2>
 
             {error && (
                 <div className="p-4 bg-bg-reverse border border-error text-error rounded-md">
@@ -123,21 +131,13 @@ export const ProfileSettings = () => {
                 </div>
             )}
 
-            <form
-                onSubmit={handleSubmit}
-                className="space-y-6 divider-top-left pt-4">
+            <form onSubmit={handleSubmit} className="space-y-6 divider-top-left pt-4">
                 {/* User's Info Section */}
                 <div>
-                    <h4 className="mb-6 font-semibold text-txt-primary">
-                        User
-                    </h4>
+                    <h4 className="mb-6 font-semibold text-txt-primary">User</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label
-                                htmlFor="displayName"
-                                className="block text-sm font-medium text-txt-secondary">
-                                Display Name
-                            </label>
+                            <label htmlFor="displayName" className="block text-sm font-medium text-txt-secondary">Display Name</label>
                             <input
                                 type="text"
                                 id="displayName"
@@ -147,13 +147,8 @@ export const ProfileSettings = () => {
                                 required
                             />
                         </div>
-
                         <div>
-                            <label
-                                htmlFor="email"
-                                className="block text-sm font-medium text-txt-secondary">
-                                Email
-                            </label>
+                            <label htmlFor="email" className="block text-sm font-medium text-txt-secondary">Email</label>
                             <input
                                 type="text"
                                 id="email"
@@ -167,25 +162,15 @@ export const ProfileSettings = () => {
                                     type="checkbox"
                                     id="isEmailPublic"
                                     checked={isEmailPublic}
-                                    onChange={(e) =>
-                                        setIsEmailPublic(e.target.checked)
-                                    }
+                                    onChange={(e) => setIsEmailPublic(e.target.checked)}
                                     className="h-4 w-4 rounded border-br-primary text-accent focus:ring-accent"
                                 />
-                                <label
-                                    htmlFor="isEmailPublic"
-                                    className="ml-2 block text-sm text-txt-secondary">
-                                    Public Email
-                                </label>
+                                <label htmlFor="isEmailPublic" className="ml-2 block text-sm text-txt-secondary">Public Email</label>
                             </div>
                         </div>
                     </div>
                     <div className="md:mt-0 mt-6">
-                        <label
-                            htmlFor="bio"
-                            className="block text-sm font-medium text-txt-secondary">
-                            Short Bio
-                        </label>
+                        <label htmlFor="bio" className="block text-sm font-medium text-txt-secondary">Short Bio</label>
                         <textarea
                             id="bio"
                             value={bio}
@@ -196,19 +181,12 @@ export const ProfileSettings = () => {
                         />
                     </div>
                 </div>
-
                 {/* Social Section */}
                 <div className="mt-16">
-                    <h4 className="mb-6 font-semibold text-txt-primary">
-                        Social
-                    </h4>
+                    <h4 className="mb-6 font-semibold text-txt-primary">Social</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label
-                                htmlFor="facebook"
-                                className="block text-sm font-medium text-txt-secondary">
-                                Facebook
-                            </label>
+                            <label htmlFor="facebook" className="block text-sm font-medium text-txt-secondary">Facebook</label>
                             <input
                                 type="text"
                                 id="facebook"
@@ -217,13 +195,8 @@ export const ProfileSettings = () => {
                                 className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             />
                         </div>
-
                         <div>
-                            <label
-                                htmlFor="twitter"
-                                className="block text-sm font-medium text-txt-secondary">
-                                Twitter
-                            </label>
+                            <label htmlFor="twitter" className="block text-sm font-medium text-txt-secondary">Twitter</label>
                             <input
                                 type="text"
                                 id="twitter"
@@ -232,13 +205,8 @@ export const ProfileSettings = () => {
                                 className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             />
                         </div>
-
                         <div>
-                            <label
-                                htmlFor="instagram"
-                                className="block text-sm font-medium text-txt-secondary">
-                                Instagram
-                            </label>
+                            <label htmlFor="instagram" className="block text-sm font-medium text-txt-secondary">Instagram</label>
                             <input
                                 type="text"
                                 id="instagram"
@@ -247,13 +215,8 @@ export const ProfileSettings = () => {
                                 className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             />
                         </div>
-
                         <div>
-                            <label
-                                htmlFor="linkedin"
-                                className="block text-sm font-medium text-txt-secondary">
-                                LinkedIn
-                            </label>
+                            <label htmlFor="linkedin" className="block text-sm font-medium text-txt-secondary">LinkedIn</label>
                             <input
                                 type="text"
                                 id="linkedin"
@@ -264,19 +227,12 @@ export const ProfileSettings = () => {
                         </div>
                     </div>
                 </div>
-
                 {/* Location Section */}
                 <div className="mt-16">
-                    <h4 className="mb-6 font-semibold text-txt-primary">
-                        Location
-                    </h4>
+                    <h4 className="mb-6 font-semibold text-txt-primary">Location</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label
-                                htmlFor="city"
-                                className="block text-sm font-medium text-txt-secondary">
-                                City
-                            </label>
+                            <label htmlFor="city" className="block text-sm font-medium text-txt-secondary">City</label>
                             <input
                                 type="text"
                                 id="city"
@@ -285,23 +241,17 @@ export const ProfileSettings = () => {
                                 className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             />
                         </div>
-
                         <div>
-                            <label
-                                htmlFor="country"
-                                className="block text-sm font-medium text-txt-secondary">
-                                Country
-                            </label>
+                            <label htmlFor="country" className="block text-sm font-medium text-txt-secondary">Country</label>
                             <select
                                 id="country"
                                 value={country}
                                 onChange={(e) => setCountry(e.target.value)}
-                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent">
+                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                            >
                                 <option value="">Select a country</option>
                                 {countries.map((countryName) => (
-                                    <option
-                                        key={countryName}
-                                        value={countryName}>
+                                    <option key={countryName} value={countryName}>
                                         {countryName}
                                     </option>
                                 ))}
@@ -309,24 +259,17 @@ export const ProfileSettings = () => {
                         </div>
                     </div>
                 </div>
-
                 {/* Appearance Section */}
                 <div className="mt-16">
-                    <h4 className="mb-6 font-semibold text-txt-primary">
-                        Appearance
-                    </h4>
+                    <h4 className="mb-6 font-semibold text-txt-primary">Appearance</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Profile Picture */}
                         <div className="space-y-4">
-                            <label className="block text-sm font-medium text-txt-secondary">
-                                Profile Picture
-                            </label>
+                            <label className="block text-sm font-medium text-txt-secondary">Profile Picture</label>
                             <div className="flex flex-col space-y-4">
                                 <div className="h-32 w-32 rounded-full overflow-hidden bg-bg-secondary">
                                     <img
-                                        src={
-                                            currentUser?.photoURL || "/user.png"
-                                        }
+                                        src={currentUser?.photoURL || "/user.png"}
                                         alt="Profile"
                                         className="h-full w-full object-cover"
                                     />
@@ -339,17 +282,14 @@ export const ProfileSettings = () => {
                                 />
                             </div>
                         </div>
-
                         {/* Cover Photo */}
                         <div className="space-y-4">
-                            <label className="block text-sm font-medium text-txt-secondary">
-                                Cover Photo
-                            </label>
+                            <label className="block text-sm font-medium text-txt-secondary">Cover Photo</label>
                             <div className="flex flex-col space-y-4">
                                 <div className="h-48 w-full overflow-hidden rounded-lg bg-bg-secondary">
-                                    {currentUser?.coverURL ? (
+                                    {getCoverUrl() ? (
                                         <img
-                                            src={currentUser.coverURL}
+                                            src={getCoverUrl()}
                                             alt="Cover"
                                             className="h-full w-full object-cover"
                                         />
@@ -369,18 +309,17 @@ export const ProfileSettings = () => {
                         </div>
                     </div>
                 </div>
-
                 {/* Submit Button */}
                 <div className="flex justify-start pt-4">
                     <button
                         type="submit"
                         disabled={loading}
-                        className="px-6 py-2 cta-button disabled:opacity-50 disabled:cursor-not-allowed">
+                        className="px-6 py-2 cta-button disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                         {loading ? "Saving..." : "Save Changes"}
                     </button>
                 </div>
             </form>
-
             <AlertModal
                 isOpen={showSuccessModal}
                 onClose={() => setShowSuccessModal(false)}
@@ -389,4 +328,4 @@ export const ProfileSettings = () => {
             />
         </div>
     );
-};
+}; 

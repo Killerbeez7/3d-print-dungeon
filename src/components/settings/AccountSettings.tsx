@@ -1,15 +1,34 @@
-import { useState } from "react";
+import { useState, KeyboardEvent, Dispatch, SetStateAction } from "react";
 import { useTheme } from "../../utils/theme";
 
-const themes = [
-    { id: "system", label: "OS Default" },
-    { id: "light", label: "Light" },
-    { id: "dark", label: "Dark" },
-];
+export interface ThemeOption {
+    id: string;
+    label: string;
+}
 
 export const AccountSettings = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [theme, setTheme] = useTheme();
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [themeRaw, setThemeRaw] = useTheme();
+    const theme: string = typeof themeRaw === "string" ? themeRaw : "system";
+    const setTheme: (theme: string) => void =
+        typeof setThemeRaw === "function"
+            ? (t: string) => (setThemeRaw as Dispatch<SetStateAction<string>>)(t)
+            : () => {};
+
+    const themes: ThemeOption[] = [
+        { id: "system", label: "OS Default" },
+        { id: "light", label: "Light" },
+        { id: "dark", label: "Dark" },
+    ];
+
+    const handleThemeSelect = (t: ThemeOption): void => {
+        setTheme(t.id);
+        setIsOpen(false);
+    };
+
+    const handleDropdownKeyDown = (e: KeyboardEvent<HTMLDivElement>): void => {
+        if (e.key === "Enter" || e.key === " ") setIsOpen(!isOpen);
+    };
 
     return (
         <div>
@@ -25,10 +44,14 @@ export const AccountSettings = () => {
                 <div className="relative w-2/3">
                     <div
                         className="relative cursor-pointer border border-br-secondary pl-3 py-2 rounded-md text-txt-primary bg-bg-secondary"
-                        onClick={() => setIsOpen(!isOpen)}>
+                        onClick={() => setIsOpen(!isOpen)}
+                        role="button"
+                        tabIndex={0}
+                        aria-label="Select theme"
+                        onKeyDown={handleDropdownKeyDown}
+                    >
                         <span>
-                            {themes.find((t) => t.id === theme)?.label ||
-                                "Select Theme"}
+                            {themes.find((t) => t.id === theme)?.label || "Select Theme"}
                         </span>
                     </div>
 
@@ -38,10 +61,9 @@ export const AccountSettings = () => {
                                 <button
                                     key={t.id}
                                     className="block w-full text-left px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:shadow-sm hover:font-semibold"
-                                    onClick={() => {
-                                        setTheme(t.id);
-                                        setIsOpen(false);
-                                    }}>
+                                    type="button"
+                                    onClick={() => handleThemeSelect(t)}
+                                >
                                     {t.label}
                                 </button>
                             ))}
