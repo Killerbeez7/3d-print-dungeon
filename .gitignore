@@ -130,8 +130,6 @@ dist
 .pnp.*
 
 # Firebase/Google Cloud credentials and keys - NEVER COMMIT THESE!
-src/keys/
-src/keys/**/*
 *.service-account.json
 *firebase-adminsdk*.json
 *service-account-key*.json
@@ -142,3 +140,8 @@ src/keys/**/*
 # Build files
 dist/
 build/
+
+# Ignore all files in src/keys/
+src/keys/*
+# But do NOT ignore example files
+!src/keys/*.example.json
