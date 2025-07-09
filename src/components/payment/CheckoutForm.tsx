@@ -1,26 +1,23 @@
-import { useState, useEffect } from "react";
-import {
-    PaymentElement,
-    useStripe,
-    useElements,
-} from "@stripe/react-stripe-js";
+import { useState, useEffect, FormEvent } from "react";
+import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { paymentService } from "@/services/paymentService";
-import PropTypes from "prop-types";
+import type { CheckoutFormProps } from "@/types/payment";
+import type { Stripe, StripeElements } from "@stripe/stripe-js";
 
-export const CheckoutForm = ({ 
-    modelId, 
-    amount, 
-    modelName, 
-    onSuccess, 
+export const CheckoutForm = ({
+    modelId,
+    amount,
+    modelName,
+    onSuccess,
     onError,
-    onCancel 
-}) => {
-    const stripe = useStripe();
-    const elements = useElements();
-    
-    const [isLoading, setIsLoading] = useState(false);
-    const [message, setMessage] = useState(null);
-    const [clientSecret, setClientSecret] = useState("");
+    onCancel,
+}: CheckoutFormProps) => {
+    const stripe = useStripe() as Stripe | null;
+    const elements = useElements() as StripeElements | null;
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [message, setMessage] = useState<string | null>(null);
+    const [clientSecret, setClientSecret] = useState<string>("");
 
     useEffect(() => {
         if (!modelId || !amount) return;
@@ -42,7 +39,7 @@ export const CheckoutForm = ({
         createPaymentIntent();
     }, [modelId, amount, onError]);
 
-    const handleSubmit = async (event) => {
+    const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         if (!stripe || !elements) {
@@ -62,20 +59,21 @@ export const CheckoutForm = ({
 
         if (error) {
             if (error.type === "card_error" || error.type === "validation_error") {
-                setMessage(error.message);
+                setMessage(error.message ?? "");
             } else {
                 setMessage("An unexpected error occurred.");
             }
             onError?.(error);
         } else if (paymentIntent && paymentIntent.status === "succeeded") {
             try {
-                // Handle successful payment on the backend
                 await paymentService.handlePaymentSuccess(paymentIntent.id);
                 setMessage("Payment succeeded!");
                 onSuccess?.(paymentIntent);
             } catch (backendError) {
                 console.error("Backend error:", backendError);
-                setMessage("Payment succeeded but there was an issue processing your purchase. Please contact support.");
+                setMessage(
+                    "Payment succeeded but there was an issue processing your purchase. Please contact support."
+                );
                 onError?.(backendError);
             }
         }
@@ -84,7 +82,7 @@ export const CheckoutForm = ({
     };
 
     const paymentElementOptions = {
-        layout: "tabs",
+        layout: "tabs" as const,
     };
 
     if (!clientSecret) {
@@ -111,11 +109,8 @@ export const CheckoutForm = ({
             </div>
 
             <form id="payment-form" onSubmit={handleSubmit}>
-                <PaymentElement 
-                    id="payment-element" 
-                    options={paymentElementOptions}
-                />
-                
+                <PaymentElement id="payment-element" options={paymentElementOptions} />
+
                 <div className="flex gap-3 mt-6">
                     <button
                         type="button"
@@ -144,11 +139,13 @@ export const CheckoutForm = ({
                 </div>
 
                 {message && (
-                    <div className={`mt-4 p-3 rounded-md text-sm ${
-                        message.includes("succeeded") 
-                            ? "bg-green-50 text-green-800 border border-green-200" 
-                            : "bg-red-50 text-red-800 border border-red-200"
-                    }`}>
+                    <div
+                        className={`mt-4 p-3 rounded-md text-sm ${
+                            message.includes("succeeded")
+                                ? "bg-green-50 text-green-800 border border-green-200"
+                                : "bg-red-50 text-red-800 border border-red-200"
+                        }`}
+                    >
                         {message}
                     </div>
                 )}
@@ -156,12 +153,3 @@ export const CheckoutForm = ({
         </div>
     );
 };
-
-CheckoutForm.propTypes = {
-    modelId: PropTypes.string.isRequired,
-    amount: PropTypes.number.isRequired,
-    modelName: PropTypes.string.isRequired,
-    onSuccess: PropTypes.func,
-    onError: PropTypes.func,
-    onCancel: PropTypes.func,
-}; 

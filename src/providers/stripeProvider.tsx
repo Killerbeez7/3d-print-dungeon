@@ -1,14 +1,17 @@
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
-import PropTypes from "prop-types";
+import type { ReactNode } from "react";
 
 // Initialize Stripe with your publishable key
-console.log("Stripe Key:", import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ? "✅ Found" : "❌ Missing");
+console.log(
+    "Stripe Key:",
+    import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ? "✅ Found" : "❌ Missing"
+);
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const stripeOptions = {
     appearance: {
-        theme: "stripe",
+        theme: "stripe" as const,
         variables: {
             colorPrimary: "#0570de",
             colorBackground: "#ffffff",
@@ -21,14 +24,14 @@ const stripeOptions = {
     },
 };
 
-export const StripeProvider = ({ children }) => {
+export interface StripeProviderProps {
+    children: ReactNode;
+}
+
+export function StripeProvider({ children }: StripeProviderProps) {
     return (
         <Elements stripe={stripePromise} options={stripeOptions}>
             {children}
         </Elements>
     );
-};
-
-StripeProvider.propTypes = {
-    children: PropTypes.node.isRequired,
-}; 
+}

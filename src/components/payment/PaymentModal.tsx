@@ -1,23 +1,34 @@
 import { useState } from "react";
 import { CheckoutForm } from "./CheckoutForm";
 import { useModal } from "@/hooks/useModal";
-import PropTypes from "prop-types";
+import type { PaymentModalProps } from "@/types/payment";
 
-export const PaymentModal = ({ model, isOpen, onClose }) => {
-    const [paymentStatus, setPaymentStatus] = useState("idle"); // idle, processing, success, error
-    const { closeModal } = useModal();
+export interface PaymentModalWithSuccessProps extends PaymentModalProps {
+    onSuccess?: () => void;
+}
+
+export const PaymentModal = ({
+    model,
+    isOpen,
+    onClose,
+    onSuccess,
+}: PaymentModalWithSuccessProps): React.ReactElement | null => {
+    const [paymentStatus, setPaymentStatus] = useState<
+        "idle" | "processing" | "success" | "error"
+    >("idle");
+    const { close } = useModal("payment");
 
     const handlePaymentSuccess = () => {
         setPaymentStatus("success");
         setTimeout(() => {
             onClose();
-            closeModal();
-            // Optionally redirect to purchased models or show success message
-            window.location.reload(); // Refresh to update user's purchased models
+            close();
+            if (onSuccess) onSuccess();
+            window.location.reload();
         }, 2000);
     };
 
-    const handlePaymentError = (error) => {
+    const handlePaymentError = (error: unknown) => {
         setPaymentStatus("error");
         console.error("Payment error:", error);
     };
@@ -25,7 +36,7 @@ export const PaymentModal = ({ model, isOpen, onClose }) => {
     const handleCancel = () => {
         setPaymentStatus("idle");
         onClose();
-        closeModal();
+        close();
     };
 
     if (!isOpen || !model) return null;
@@ -37,8 +48,18 @@ export const PaymentModal = ({ model, isOpen, onClose }) => {
                     {paymentStatus === "success" ? (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                <svg
+                                    className="w-8 h-8 text-green-600"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M5 13l4 4L19 7"
+                                    />
                                 </svg>
                             </div>
                             <h3 className="text-xl font-semibold text-txt-primary mb-2">
@@ -54,15 +75,26 @@ export const PaymentModal = ({ model, isOpen, onClose }) => {
                     ) : paymentStatus === "error" ? (
                         <div className="text-center py-8">
                             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                <svg
+                                    className="w-8 h-8 text-red-600"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
                                 </svg>
                             </div>
                             <h3 className="text-xl font-semibold text-txt-primary mb-2">
                                 Payment Failed
                             </h3>
                             <p className="text-txt-secondary mb-4">
-                                There was an issue processing your payment. Please try again.
+                                There was an issue processing your payment. Please try
+                                again.
                             </p>
                             <div className="flex gap-3 justify-center">
                                 <button
@@ -89,8 +121,18 @@ export const PaymentModal = ({ model, isOpen, onClose }) => {
                                     onClick={handleCancel}
                                     className="text-txt-secondary hover:text-txt-primary transition-colors"
                                 >
-                                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    <svg
+                                        className="w-6 h-6"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            strokeWidth={2}
+                                            d="M6 18L18 6M6 6l12 12"
+                                        />
                                     </svg>
                                 </button>
                             </div>
@@ -105,7 +147,9 @@ export const PaymentModal = ({ model, isOpen, onClose }) => {
                                         />
                                     )}
                                     <div className="flex-1">
-                                        <h3 className="font-semibold text-txt-primary">{model.name}</h3>
+                                        <h3 className="font-semibold text-txt-primary">
+                                            {model.name}
+                                        </h3>
                                         <p className="text-sm text-txt-secondary">
                                             by {model.uploaderDisplayName}
                                         </p>
@@ -131,15 +175,3 @@ export const PaymentModal = ({ model, isOpen, onClose }) => {
         </div>
     );
 };
-
-PaymentModal.propTypes = {
-    model: PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        price: PropTypes.number.isRequired,
-        uploaderDisplayName: PropTypes.string,
-        renderPrimaryUrl: PropTypes.string,
-    }),
-    isOpen: PropTypes.bool.isRequired,
-    onClose: PropTypes.func.isRequired,
-}; 
