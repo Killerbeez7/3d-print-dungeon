@@ -9,6 +9,8 @@ import {
     signInWithPopup,
     updateProfile,
     signOut,
+    User as FirebaseUser,
+    UserCredential,
 } from "firebase/auth";
 import {
     updatePassword,
@@ -16,21 +18,22 @@ import {
     EmailAuthProvider,
 } from "firebase/auth";
 import { STATIC_ASSETS } from "../config/assetsConfig";
-// upscale profile picture
-export const getHighResPhotoURL = (photoURL) => {
+import type { RawUserData } from "../types/auth";
+
+export const getHighResPhotoURL = (photoURL?: string | null): string => {
     if (photoURL && photoURL.includes("googleusercontent.com")) {
         return photoURL.replace(/=s\d+-c/, "=s512-c");
     }
     return photoURL || "/user.png";
 };
 
-// Add user to Firestore
+
 export const addUserToDatabase = async (
-    uid,
-    email,
-    displayName = "Anonymous",
-    photoURL = STATIC_ASSETS.DEFAULT_AVATAR
-) => {
+    uid: string,
+    email: string | null | undefined,
+    displayName: string = "Anonymous",
+    photoURL: string = STATIC_ASSETS.DEFAULT_AVATAR
+): Promise<void> => {
     const userDocRef = doc(db, "users", uid);
     try {
         await setDoc(
@@ -51,20 +54,22 @@ export const addUserToDatabase = async (
     }
 };
 
-// Get user from Firestore
-export const getUserFromDatabase = (uid, callback) => {
+
+export const getUserFromDatabase = (
+    uid: string,
+    callback: (user: RawUserData | null) => void
+): (() => void) => {
     if (!uid) {
         console.error("No uid provided to getUserFromDatabase");
         callback(null);
-        return () => {}; // Return empty cleanup function
+        return () => { };
     }
-
     const userDocRef = doc(db, "users", uid);
     const unsubscribe = onSnapshot(
         userDocRef,
         (snapshot) => {
             if (snapshot.exists()) {
-                callback(snapshot.data());
+                callback(snapshot.data() as RawUserData);
             } else {
                 console.log(`No user document found for uid: ${uid}`);
                 callback(null);
@@ -75,72 +80,75 @@ export const getUserFromDatabase = (uid, callback) => {
             callback(null);
         }
     );
-
     return unsubscribe;
 };
 
-// Email Sign Up
-export const signUpWithEmail = async (email, password) => {
+
+export const signUpWithEmail = async (
+    email: string,
+    password: string
+): Promise<FirebaseUser> => {
     try {
-        const userCredential = await createUserWithEmailAndPassword(
+        const userCredential: UserCredential = await createUserWithEmailAndPassword(
             auth,
             email,
             password
         );
         const user = userCredential.user;
-
         await updateProfile(user, {
             displayName: "Anonymous",
         });
-
-        await addUserToDatabase(user.uid, email, user.displayName);
+        await addUserToDatabase(user.uid, email ?? undefined, user.displayName ?? undefined);
         return user;
-    } catch (error) {
+    } catch (error: unknown) {
+        const errMsg = error instanceof Error ? error.message : String(error);
         console.error("Error signing up with email:", error);
-        throw new Error(error.message);
+        throw new Error(errMsg);
     }
 };
 
-// Email Sign In
-export const signInWithEmail = async (email, password) => {
+
+export const signInWithEmail = async (
+    email: string,
+    password: string
+): Promise<FirebaseUser> => {
     try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
         return userCredential.user;
-    } catch (error) {
+    } catch (error: unknown) {
+        const errMsg = error instanceof Error ? error.message : String(error);
         console.error("Error signing in with email:", error);
-        throw new Error(error.message);
+        throw new Error(errMsg);
     }
 };
 
-// Google Sign In
-export const signInWithGoogle = async () => {
+
+export const signInWithGoogle = async (): Promise<FirebaseUser> => {
     try {
         const provider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
         const upscalePhotoURL = getHighResPhotoURL(user.photoURL);
-
         await addUserToDatabase(
             user.uid,
             user.email,
             user.displayName || "Anonymous",
             upscalePhotoURL || "/user.png"
         );
-
         return user;
-    } catch (error) {
+    } catch (error: unknown) {
+        const errMsg = error instanceof Error ? error.message : String(error);
         console.error("Error with Google Sign-In:", error);
-        throw new Error(error.message);
+        throw new Error(errMsg);
     }
 };
 
-// Facebook Sign In
-export const signInWithFacebook = async () => {
+
+export const signInWithFacebook = async (): Promise<FirebaseUser> => {
     try {
         const provider = new FacebookAuthProvider();
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-
         const upscalePhotoURL = getHighResPhotoURL(user.photoURL);
         await addUserToDatabase(
             user.uid,
@@ -148,21 +156,20 @@ export const signInWithFacebook = async () => {
             user.displayName || "Facebook User",
             upscalePhotoURL || "/user.png"
         );
-
         return user;
-    } catch (error) {
+    } catch (error: unknown) {
+        const errMsg = error instanceof Error ? error.message : String(error);
         console.error("Error with Facebook Sign-In:", error);
-        throw new Error(error.message);
+        throw new Error(errMsg);
     }
 };
 
-// Twitter Sign In
-export const signInWithTwitter = async () => {
+
+export const signInWithTwitter = async (): Promise<FirebaseUser> => {
     try {
         const provider = new TwitterAuthProvider();
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-
         const upscalePhotoURL = getHighResPhotoURL(user.photoURL);
         await addUserToDatabase(
             user.uid,
@@ -170,38 +177,41 @@ export const signInWithTwitter = async () => {
             user.displayName || "Twitter User",
             upscalePhotoURL || "/user.png"
         );
-
         return user;
-    } catch (error) {
+    } catch (error: unknown) {
+        const errMsg = error instanceof Error ? error.message : String(error);
         console.error("Error with Twitter Sign-In:", error);
-        throw new Error(error.message);
+        throw new Error(errMsg);
     }
 };
 
-// Function to change password
-export const changePassword = async (currentUser, currentPassword, newPassword) => {
+
+export const changePassword = async (
+    currentUser: FirebaseUser,
+    currentPassword: string,
+    newPassword: string
+): Promise<void> => {
     try {
-        // Reauthenticate the user with their current password
         const credential = EmailAuthProvider.credential(
-            currentUser.email,
+            currentUser.email!,
             currentPassword
         );
         await reauthenticateWithCredential(currentUser, credential);
-
-        // Update the password
         await updatePassword(currentUser, newPassword);
-    } catch (error) {
+    } catch (error: unknown) {
+        const errMsg = error instanceof Error ? error.message : String(error);
         console.error("Error updating password:", error);
-        throw new Error(error.message);
+        throw new Error(errMsg);
     }
 };
 
-// Sign Out
-export const signOutUser = async () => {
+
+export const signOutUser = async (): Promise<void> => {
     try {
         await signOut(auth);
-    } catch (error) {
+    } catch (error: unknown) {
+        const errMsg = error instanceof Error ? error.message : String(error);
         console.error("Error signing out:", error);
-        throw new Error(error.message);
+        throw new Error(errMsg);
     }
 };

@@ -20,14 +20,9 @@ import {
 } from "firebase/firestore";
 import type { ForumThread, ForumReply } from "@/types/forum";
 
-/**
- * Forum Service
- * Contains methods for interacting with forum data in Firestore
- */
+
 export const forumService = {
-    /**
-     * Get threads by category with pagination
-     */
+
     async getThreadsByCategory(categoryId: string, sortBy: string = "lastActivity", pageSize: number = 20): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const threadsRef = collection(db, "forumThreads");
@@ -51,9 +46,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Get more threads by category (pagination)
-     */
+
     async getMoreThreadsByCategory(categoryId: string, sortBy: string = "lastActivity", lastVisible: unknown, pageSize: number = 20): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const threadsRef = collection(db, "forumThreads");
@@ -78,9 +71,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Get recent threads
-     */
+
     async getRecentThreads(limitCount: number = 10): Promise<ForumThread[]> {
         try {
             const threadsRef = collection(db, "forumThreads");
@@ -99,9 +90,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Get popular threads
-     */
+
     async getPopularThreads(limitCount: number = 10): Promise<ForumThread[]> {
         try {
             const threadsRef = collection(db, "forumThreads");
@@ -120,9 +109,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Get unanswered threads
-     */
+
     async getUnansweredThreads(limitCount: number = 10): Promise<ForumThread[]> {
         try {
             const threadsRef = collection(db, "forumThreads");
@@ -142,9 +129,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Get thread by ID
-     */
+
     async getThreadById(threadId: string): Promise<ForumThread> {
         try {
             const threadRef = doc(db, "forumThreads", threadId);
@@ -161,9 +146,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Create new thread
-     */
+
     async createThread(threadData: Partial<ForumThread>): Promise<string> {
         try {
             const threadsRef = collection(db, "forumThreads");
@@ -185,9 +168,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Update thread
-     */
+
     async updateThread(threadId: string, threadData: Partial<ForumThread>): Promise<string> {
         try {
             const threadRef = doc(db, "forumThreads", threadId);
@@ -202,9 +183,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Delete thread
-     */
+
     async deleteThread(threadId: string): Promise<string> {
         try {
             // Delete all replies first
@@ -229,9 +208,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Add reply to thread
-     */
+
     async addReply(threadId: string, replyData: Record<string, unknown>): Promise<string> {
         try {
             const threadRef = doc(db, "forumThreads", threadId);
@@ -260,9 +237,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Update reply
-     */
+
     async updateReply(replyId: string, replyData: Record<string, unknown>): Promise<string> {
         try {
             const replyRef = doc(db, "forumReplies", replyId);
@@ -278,9 +253,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Delete reply
-     */
+
     async deleteReply(replyId: string, threadId: string): Promise<string> {
         try {
             const replyRef = doc(db, "forumReplies", replyId);
@@ -299,9 +272,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Get thread replies with pagination
-     */
+
     async getThreadReplies(threadId: string, pageSize: number = 20): Promise<{ replies: ForumReply[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const repliesRef = collection(db, "forumReplies");
@@ -325,9 +296,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Get more thread replies (pagination)
-     */
+
     async getMoreThreadReplies(threadId: string, lastVisible: unknown, pageSize: number = 20): Promise<{ replies: ForumReply[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const repliesRef = collection(db, "forumReplies");
@@ -352,9 +321,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Increment thread views
-     */
+
     async incrementThreadViews(threadId: string): Promise<void> {
         try {
             const threadRef = doc(db, "forumThreads", threadId);
@@ -367,9 +334,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Search threads
-     */
+
     async searchThreads(queryStr: string, pageSize: number = 20): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             // Due to Firestore limitations, we can't do full-text search
@@ -396,9 +361,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Get user's threads
-     */
+
     async getUserThreads(userId: string, pageSize: number = 20): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const threadsRef = collection(db, "forumThreads");
@@ -422,9 +385,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Get user's replies
-     */
+
     async getUserReplies(userId: string, pageSize: number = 20): Promise<{ replies: ForumReply[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const repliesRef = collection(db, "forumReplies");
@@ -448,9 +409,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Get newest threads (by creation date, descending)
-     */
+
     async getNewestThreads(limitCount: number = 10): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const threadsRef = collection(db, "forumThreads");
@@ -473,9 +432,7 @@ export const forumService = {
         }
     },
 
-    /**
-     * Get more newest threads (pagination)
-     */
+
     async getMoreNewestThreads(lastVisible: unknown, limitCount: number = 5): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             if (!lastVisible) {
