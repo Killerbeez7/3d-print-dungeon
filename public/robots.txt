@@ -1,0 +1,53 @@
+# 3D Print Dungeon robots.txt
+
+# 1) Allow all crawlers by default
+User-agent: *
+Allow: /
+
+# 2) Disallow sensitive/admin/private endpoints
+Disallow: /admin/
+Disallow: /admin-panel
+Disallow: /private/
+Disallow: /api/
+Disallow: /settings
+Disallow: /model/upload
+Disallow: /model/:id/edit
+Disallow: /forum/new-thread
+Disallow: /forum/thread/:threadId/edit
+Disallow: /forum/reply/:replyId/edit
+
+# 3) Allow public-facing pages and directories
+Allow: /artists
+Allow: /artists/:id
+Allow: /collections
+Allow: /events
+Allow: /blog
+Allow: /forum
+Allow: /forum/category/:categoryId
+Allow: /forum/thread/:threadId
+Allow: /forum/dashboard
+Allow: /forum/my-threads
+Allow: /forum/rules
+Allow: /forum/help
+Allow: /marketplace/featured
+Allow: /marketplace/new-arrivals
+Allow: /marketplace/best-sellers
+Allow: /business/bulk-orders
+Allow: /business/custom-solutions
+Allow: /business/enterprise-suite
+Allow: /competitions
+Allow: /model/:id
+Allow: /search
+
+# 4) Allow static assets
+Allow: /assets/
+Allow: /images/
+Allow: /static/
+Allow: /fonts/
+Allow: /favicon.svg
+
+# 5) Sitemap location
+Sitemap: https://print-dungeon-3d.firebaseapp.com/sitemap.xml
+
+# 6) Gentle crawl delay for bots
+Crawl-delay: 10 
