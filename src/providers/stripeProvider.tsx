@@ -2,12 +2,10 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import type { ReactNode } from "react";
 
-// Initialize Stripe with your publishable key
-console.log(
-    "Stripe Key:",
-    import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ? "✅ Found" : "❌ Missing"
-);
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+const stripeKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+console.log("Stripe Key:", stripeKey ? "✅ Found" : "❌ Missing");
+
+const stripePromise = loadStripe(stripeKey);
 
 const stripeOptions = {
     appearance: {
