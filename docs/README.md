@@ -98,6 +98,16 @@ npm run build
 npm run deploy
 ``` 
 
+## TypeScript Type Checking
+
+To check for TypeScript errors across the entire project (without emitting output files), run:
+
+```bash
+npx tsc --noEmit
+```
+
+This will enforce strict type safety and help catch type errors before build or deployment.
+
 ## Testing
 
 ### Setup
