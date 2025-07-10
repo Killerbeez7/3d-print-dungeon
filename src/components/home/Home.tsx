@@ -73,7 +73,6 @@ function applyCategoryFilter(items: Artwork[], category: string): Artwork[] {
 }
 
 export const Home = (): React.ReactNode => {
-    // UI state
     const [sortBy, setSortBy] = useState<SortBy>("community");
     const [categoryFilter, setCategoryFilter] = useState<string>("all");
     const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
@@ -207,7 +206,9 @@ export const Home = (): React.ReactNode => {
 
             {/* grid */}
             <div ref={mainRef} className="mx-auto p-4">
-                <h1 className="mb-4 font-bold">Models</h1>
+                <h1 className="mb-4 font-bold text-[0.3rem] md:text-[0.75rem] lg:text-[1rem]">
+                    Models
+                </h1>
 
                 <InfiniteScrollList
                     items={filtered}
@@ -234,9 +235,9 @@ export const Home = (): React.ReactNode => {
                                             height={400}
                                         />
                                     </div>
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end opacity-0 hover:opacity-100 transition-opacity rounded-md">
+                                    <div className="absolute inset-0 bg-gradient-to-t from-[#000000dc] to-transparent flex items-end opacity-0 hover:opacity-100 transition-opacity rounded-md">
                                         <div className="text-white m-2">
-                                            <h4 className="font-semibold">{art.title}</h4>
+                                            <h2 className="font-semibold" style={{ fontSize: "1rem" }}>{art.title}</h2>
                                             <p className="text-sm">{art.artist}</p>
                                         </div>
                                     </div>

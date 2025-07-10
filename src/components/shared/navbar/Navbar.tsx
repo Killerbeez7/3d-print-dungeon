@@ -243,8 +243,10 @@ export const Navbar = (): React.ReactNode => {
                                     {/* Profile Dropdown */}
                                     <div className="relative" ref={dropdownRef}>
                                         <button
+                                            id="profile-button"
                                             onClick={() => toggleDropdown("profile")}
                                             className="flex items-center text-txt-secondary hover:text-txt-primary cursor-pointer"
+                                            aria-label="Profile menu"
                                         >
                                             <MdAccountCircle className="h-7 w-7" />
                                         </button>

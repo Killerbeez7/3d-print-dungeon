@@ -38,40 +38,32 @@ export const Footer = () => {
                         <h3 className="text-lg font-semibold text-txt-primary">
                             Useful Links
                         </h3>
-                        <ul className="mt-2 text-sm">
-                            <li>
-                                <a
-                                    href="#"
-                                    className="block hover:text-accent-hover transition-colors duration-300"
-                                >
-                                    About Us
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="block hover:text-accent-hover transition-colors duration-300"
-                                >
-                                    Contact
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="block hover:text-accent-hover transition-colors duration-300"
-                                >
-                                    Privacy Policy
-                                </a>
-                            </li>
-                            <li>
-                                <a
-                                    href="#"
-                                    className="block hover:text-accent-hover transition-colors duration-300"
-                                >
-                                    Terms & Conditions
-                                </a>
-                            </li>
-                        </ul>
+                        <div className="flex flex-col gap-2">
+                            <a
+                                href="#"
+                                className="block px-4 py-3 rounded hover:text-accent-hover transition-colors duration-300"
+                            >
+                                About Us
+                            </a>
+                            <a
+                                href="#"
+                                className="block px-4 py-3 rounded hover:text-accent-hover transition-colors duration-300"
+                            >
+                                Contact
+                            </a>
+                            <a
+                                href="#"
+                                className="block px-4 py-3 rounded hover:text-accent-hover transition-colors duration-300"
+                            >
+                                Privacy Policy
+                            </a>
+                            <a
+                                href="#"
+                                className="block px-4 py-3 rounded hover:text-accent-hover transition-colors duration-300"
+                            >
+                                Terms & Conditions
+                            </a>
+                        </div>
                     </div>
 
                     {/* Contact Information */}

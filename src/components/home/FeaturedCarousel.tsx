@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ReusableCarousel } from "../shared/carousel/ReusableCarousel";
 import type { FC } from "react";
+import { useRef, useEffect, useState } from "react";
 
 export interface FeaturedCarouselItem {
     id: string;
@@ -17,13 +18,33 @@ export interface FeaturedCarouselProps {
     slidesToShow?: number;
 }
 
-export const FeaturedCarousel: FC<FeaturedCarouselProps> = ({
-    items,
-    itemHeight = 250,
-    slidesToShow = 4,
-}) => {
-    const renderItem = (item: FeaturedCarouselItem) => (
-        <Link to={item.link} target="_blank" rel="noopener noreferrer">
+interface FeaturedCarouselSlideProps {
+    item: FeaturedCarouselItem;
+    itemHeight: number;
+}
+
+const FeaturedCarouselSlide: FC<FeaturedCarouselSlideProps> = ({ item, itemHeight }) => {
+    const linkRef = useRef<HTMLAnchorElement>(null);
+    const [isHidden, setIsHidden] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (linkRef.current) {
+            const slide = linkRef.current.closest("[aria-hidden]");
+            if (slide) {
+                setIsHidden(slide.getAttribute("aria-hidden") === "true");
+            }
+        }
+    }, [linkRef]);
+
+    return (
+        <Link
+            to={item.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            ref={linkRef}
+            tabIndex={isHidden ? -1 : undefined}
+            aria-hidden={isHidden ? "true" : undefined}
+        >
             <div className="relative overflow-hidden rounded-xl group">
                 <img
                     src={item.image}
@@ -49,11 +70,19 @@ export const FeaturedCarousel: FC<FeaturedCarouselProps> = ({
             </div>
         </Link>
     );
+};
 
+export const FeaturedCarousel: FC<FeaturedCarouselProps> = ({
+    items,
+    itemHeight = 250,
+    slidesToShow = 4,
+}) => {
     return (
         <ReusableCarousel<FeaturedCarouselItem>
             items={items}
-            renderItem={renderItem}
+            renderItem={(item) => (
+                <FeaturedCarouselSlide item={item} itemHeight={itemHeight} />
+            )}
             slidesToShow={slidesToShow}
             slidesToScroll={slidesToShow}
             infinite={false}
