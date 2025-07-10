@@ -32,7 +32,7 @@ export default defineConfig({
         },
         assetsDir: "assets",
         copyPublicDir: true,
-        sourcemap: false,
+        sourcemap: true,
         minify: 'terser',
     }
 });
