@@ -10,20 +10,20 @@ import { AppRoutes } from "./AppRoutes";
 
 export const App = () => {
     return (
-        <StripeProvider>
-            <ModalProvider>
-                <AuthProvider>
-                    <ModelsProvider>
-                        <SearchProvider>
-                            <ForumProvider>
+        <AuthProvider>
+            <ModelsProvider>
+                <SearchProvider>
+                    <ForumProvider>
+                        <StripeProvider>
+                            <ModalProvider>
                                 <Suspense fallback={<Spinner />}>
                                     <AppRoutes />
                                 </Suspense>
-                            </ForumProvider>
-                        </SearchProvider>
-                    </ModelsProvider>
-                </AuthProvider>
-            </ModalProvider>
-        </StripeProvider>
+                            </ModalProvider>
+                        </StripeProvider>
+                    </ForumProvider>
+                </SearchProvider>
+            </ModelsProvider>
+        </AuthProvider>
     );
 };
