@@ -20,7 +20,10 @@ export function useTheme(): [Theme, Dispatch<SetStateAction<Theme>>] {
     useEffect(() => {
         const applyTheme = (theme: Theme) => {
             if (theme === SYSTEM) {
-                const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                const prefersDark =
+                    typeof window !== "undefined" &&
+                    typeof window.matchMedia === "function" &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches;
                 document.documentElement.setAttribute("data-theme", prefersDark ? DARK : LIGHT);
             } else {
                 document.documentElement.setAttribute("data-theme", theme);
