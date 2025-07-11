@@ -12,7 +12,8 @@
         "lint:fix": "eslint src --ext .js,.jsx,.ts,.tsx --fix",
         "test": "vitest",
         "test:ui": "vitest --ui",
-        "hosting": "npm run build && firebase deploy --only hosting"
+        "hosting": "npm run generate-sitemap && npm run build && firebase deploy --only hosting",
+        "generate-sitemap": "node src/scripts/sitemap.cjs"
     },
     "dependencies": {
         "@fingerprintjs/fingerprintjs": "^4.6.2",
