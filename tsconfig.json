@@ -11,8 +11,10 @@
         "noEmit": true,
 
         /* paths / aliases -------------------------------------------------- */
-        "baseUrl": ".",
-        "paths": { "@/*": ["src/*"] },
+        "baseUrl": "./src",
+        "paths": {
+            "@/*": ["./*"]
+        },
 
         /* type-safety & ergonomics ---------------------------------------- */
         "strict": true,
