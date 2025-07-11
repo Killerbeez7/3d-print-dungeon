@@ -9,7 +9,7 @@ interface UserData {
     };
 }
 
-export const AboutSection = ({ userData }: { userData: UserData }) => {
+export const AboutTab = ({ userData }: { userData: UserData }) => {
     return (
         <div className="bg-bg-surface p-8 rounded-lg shadow-md mt-8 max-w-6xl mx-auto">
             {/* Bio Section */}

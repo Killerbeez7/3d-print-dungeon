@@ -10,7 +10,7 @@ import {
 } from "firebase/firestore";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
 
-interface LikesSectionProps {
+interface LikesTabProps {
     userId: string;
 }
 
@@ -25,7 +25,7 @@ interface LikedArtwork {
 
 const db = getFirestore();
 
-export const LikesSection = ({ userId }: LikesSectionProps) => {
+export const LikesTab = ({ userId }: LikesTabProps) => {
     const [likedArtworks, setLikedArtworks] = useState<LikedArtwork[]>([]);
     const [loading, setLoading] = useState(true);
 

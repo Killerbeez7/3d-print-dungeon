@@ -1,8 +1,8 @@
-import { Featured } from "../components/store/Featured";
-import { NewArrivals } from "../components/store/NewArrivals";
-import { BestSellers } from "../components/store/BestSellers";
-import { withMaintenance } from "../helpers/routeHelpers";
-import { ROUTES } from "../constants/routeConstants";
+import { Featured } from "@/features/store/pages/Featured";
+import { NewArrivals } from "@/features/store/pages/NewArrivals";
+import { BestSellers } from "@/features/store/pages/BestSellers";
+import { withMaintenance } from "@/helpers/routeHelpers";
+import { ROUTES } from "@/constants/routeConstants";
 import type { RouteObject } from "react-router-dom";
 
 export const storeRoutes: RouteObject[] = [

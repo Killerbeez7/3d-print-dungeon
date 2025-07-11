@@ -17,7 +17,7 @@ export const NAV_SECTIONS: NavSection[] = [
         to: ROUTES.HOME,
         items: [
             { label: "Models", to: ROUTES.HOME },
-            { label: "Artists", to: ROUTES.ARTISTS },
+            { label: "Artists", to: ROUTES.ARTISTS_LIST },
             { label: "Collections", to: ROUTES.COLLECTIONS },
         ],
     },

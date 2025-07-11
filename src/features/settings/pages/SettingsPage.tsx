@@ -1,12 +1,9 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { AccountSettings } from "./AccountSettings";
-import { SecuritySettings } from "./SecuritySettings";
-import { ProfileSettings } from "./ProfileSettings";
+import { AccountSettings } from "@/features/settings/components/AccountSettings";
+import { SecuritySettings } from "@/features/settings/components/SecuritySettings";
+import { ProfileSettings } from "@/features/settings/components/ProfileSettings";
 
-/**
- * SettingsPage component for managing user settings tabs.
- */
 type Tab = {
     id: string;
     label: string;
@@ -43,10 +40,11 @@ export const SettingsPage = () => {
                             <li key={tab.id}>
                                 <button
                                     onClick={() => setActiveTab(tab.id)}
-                                    className={`w-full text-left px-4 py-2 rounded-md font-medium ${activeTab === tab.id
+                                    className={`w-full text-left px-4 py-2 rounded-md font-medium ${
+                                        activeTab === tab.id
                                             ? "bg-accent text-white"
                                             : "text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
-                                        }`}
+                                    }`}
                                     type="button"
                                 >
                                     {tab.label}
@@ -65,4 +63,4 @@ export const SettingsPage = () => {
             </section>
         </div>
     );
-}; 
+};

@@ -1,5 +1,5 @@
 import { useState, KeyboardEvent, Dispatch, SetStateAction } from "react";
-import { useTheme } from "../../utils/theme";
+import { useTheme } from "@/features/shared/theme";
 
 export interface ThemeOption {
     id: string;

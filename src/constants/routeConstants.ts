@@ -4,9 +4,11 @@ export const ROUTES = {
     SEARCH: "/search",
     MAINTENANCE: "/maintenance",
 
-    /* Explore */
-    ARTISTS: "/artists",
-    ARTIST_PROFILE: "/artists/:id",
+    /* Artists */
+    ARTISTS_LIST: "/artists",
+    ARTIST_PROFILE: "/artists/:artistId",
+
+    /* Collections */
     COLLECTIONS: "/collections",
 
     /* Community */
@@ -33,12 +35,11 @@ export const ROUTES = {
 
     /* Models */
     MODEL_UPLOAD: "/model/upload",
-    MODEL_VIEW: "/model/:id",
-    MODEL_EDIT: "/model/:id/edit",
+    MODEL_VIEW: "/model/:modelId",
+    MODEL_EDIT: "/model/:modelId/edit",
 
     /* User */
     SETTINGS: "/settings",
-
 
     /* Admin */
     ADMIN_PANEL: "/admin-panel",

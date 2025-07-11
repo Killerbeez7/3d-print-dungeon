@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../../config/firebase";
+import { db } from "../../../config/firebase";
 import type { RawUserData } from "@/types/auth";
+import { ArtistListGrid } from "../components/ArtistListGrid";
 
 interface Artist extends RawUserData {
     id: string;
@@ -11,7 +12,7 @@ interface Artist extends RawUserData {
     displayName: string | null;
 }
 
-export const ArtistsList = () => {
+export const ArtistsListPage = () => {
     const [artists, setArtists] = useState<Artist[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -81,40 +82,20 @@ export const ArtistsList = () => {
         );
     }
 
+    // Prepare data for ArtistListGrid (no getArtistPath in the object)
+    const artistCardData = artists.map((artist) => ({
+        id: artist.id,
+        displayName: artist.displayName,
+        photoURL: artist.photoURL,
+        bio: artist.bio,
+    }));
+
     return (
         <section className="text-txt-primary min-h-screen">
             <div className="p-4">
                 <h1 className="font-bold mb-4">Artists</h1>
                 <article>
-                    {artists.length === 0 ? (
-                        <p className="text-lg text-txt-secondary">No artists found.</p>
-                    ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-2">
-                            {artists.map((artist) => (
-                                <Link
-                                    key={artist.id}
-                                    to={getArtistPath(artist.id)}
-                                    className="block transform hover:scale-[1.02] transition-transform duration-200"
-                                >
-                                    <article className="relative bg-bg-surface border border-br-primary rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                                        <img
-                                            src={artist.photoURL || "/user.png"}
-                                            alt={artist.displayName || "Artist"}
-                                            className="w-full h-48 object-cover"
-                                        />
-                                        <section className="p-3">
-                                            <h4 className="text-lg font-semibold mb-1">
-                                                {artist.displayName || "Anonymous"}
-                                            </h4>
-                                            <p className="text-txt-secondary text-sm mb-2 line-clamp-2">
-                                                {artist.bio || "No bio available"}
-                                            </p>
-                                        </section>
-                                    </article>
-                                </Link>
-                            ))}
-                        </div>
-                    )}
+                    <ArtistListGrid artists={artistCardData} getArtistPath={getArtistPath} />
                 </article>
             </div>
         </section>

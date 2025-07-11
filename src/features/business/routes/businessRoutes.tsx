@@ -1,8 +1,8 @@
-import { BulkOrders } from "../components/business/BulkOrders";
-import { CustomSolutions } from "../components/business/CustomSolutions";
-import { Enterprise } from "../components/business/Enterprise";
-import { withMaintenance } from "../helpers/routeHelpers";
-import { ROUTES } from "../constants/routeConstants";
+import { BulkOrders } from "../components/BulkOrders";
+import { CustomSolutions } from "../components/CustomSolutions";
+import { Enterprise } from "../components/Enterprise";
+import { withMaintenance } from "@/helpers/routeHelpers";
+import { ROUTES } from "@/constants/routeConstants";
 import type { RouteObject } from "react-router-dom";
 
 export const businessRoutes: RouteObject[] = [

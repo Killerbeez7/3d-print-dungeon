@@ -4,7 +4,7 @@ import { db } from "../../../config/firebase";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
 import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 
-interface UploadsSectionProps {
+interface UploadsTabProps {
     userId: string;
 }
 
@@ -16,7 +16,7 @@ interface UploadedArtwork {
     views?: number;
 }
 
-export const UploadsSection = ({ userId }: UploadsSectionProps) => {
+export const UploadsTab = ({ userId }: UploadsTabProps) => {
     const [artworks, setArtworks] = useState<UploadedArtwork[]>([]);
     const [loading, setLoading] = useState(true);
 

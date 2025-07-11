@@ -3,14 +3,17 @@ import { useRoutes, Navigate, RouteObject } from "react-router-dom";
 import { ROUTES } from "./constants/routeConstants";
 
 import { publicRoutes } from "./routes/publicRoutes";
-import { exploreRoutes } from "./routes/exploreRoutes";
+import { collectionsRoutes } from "./features/collections/routes/collectionsRouter";
+import { artistsRoutes } from "./features/artists/routes/artistsRoutes";
+
+
 import { communityRoutes } from "./routes/communityRoutes";
-import { storeRoutes } from "./routes/storeRoutes";
-import { businessRoutes } from "./routes/businessRoutes";
+import { storeRoutes } from "./features/store/routes/storeRoutes";
+import { businessRoutes } from "./features/business/routes/businessRoutes";
 import { forumRoutes } from "./routes/forumRoutes";
 import { eventsRoutes } from "./routes/eventsRoutes";
 import { modelsRoutes } from "./routes/modelsRoutes";
-import { userRoutes } from "./routes/userRoutes";
+import { settingsRoutes } from "./features/settings/routes/settingsRoutes";
 import { adminRoutes } from "./routes/adminRoutes";
 
 import Layout from "./components/shared/Layout";
@@ -19,14 +22,16 @@ export const AppRoutes: React.FC = () => {
     // Aggregate all child routes into a single RouteObject array
     const childRoutes: RouteObject[] = [
         ...publicRoutes,
-        ...exploreRoutes,
-        ...communityRoutes,
-        ...storeRoutes,
+        ...collectionsRoutes,
+        ...artistsRoutes,
+
+        ...communityRoutes, // del when done with separating routes
+        ...storeRoutes, // del when done with separating routes
         ...businessRoutes,
         ...forumRoutes,
         ...eventsRoutes,
         ...modelsRoutes,
-        ...userRoutes,
+        ...settingsRoutes,
         ...adminRoutes,
         // fallback for unknown routes
         {

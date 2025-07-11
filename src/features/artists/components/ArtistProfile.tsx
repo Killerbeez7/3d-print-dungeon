@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getUserFromDatabase } from "@/services/authService";
-import { UploadsSection } from "./UploadsSection";
-import { LikesSection } from "./LikesSection";
-import { AboutSection } from "./AboutSection";
+import { UploadsTab } from "./UploadsTab";
+import { LikesTab } from "./LikesTab";
+import { AboutTab } from "./AboutTab";
 import type { RawUserData } from "@/types/auth";
+
+export interface ArtistProfileProps {
+    artistId: string;
+}
 
 interface Tab {
     id: "uploads" | "likes" | "about";
@@ -22,8 +26,7 @@ interface ProfileUserData extends RawUserData {
     };
 }
 
-export const ArtistProfile = () => {
-    const { id } = useParams<{ id: string }>();
+export function ArtistProfile({ artistId }: ArtistProfileProps) {
     const navigate = useNavigate();
     const [userData, setUserData] = useState<ProfileUserData | null>(null);
     const [activeTab, setActiveTab] = useState<Tab["id"]>("uploads");
@@ -35,14 +38,14 @@ export const ArtistProfile = () => {
         { id: "about", label: "About" },
     ];
 
-    // Fetch user data based on ID
+    // Fetch user data based on artistId
     useEffect(() => {
-        if (!id) {
+        if (!artistId) {
             setError("No user ID provided");
             return;
         }
 
-        const unsubscribe = getUserFromDatabase(id, (data: ProfileUserData | null) => {
+        const unsubscribe = getUserFromDatabase(artistId, (data: ProfileUserData | null) => {
             if (data) {
                 setUserData(data);
                 setError(null);
@@ -57,7 +60,7 @@ export const ArtistProfile = () => {
                 unsubscribe();
             }
         };
-    }, [id]);
+    }, [artistId]);
 
     if (error) {
         return (
@@ -115,12 +118,12 @@ export const ArtistProfile = () => {
 
             {/* Content Section */}
             <div className="mt-4 sm:mt-6">
-                {activeTab === "uploads" && id && <UploadsSection userId={id} />}
-                {activeTab === "likes" && id && <LikesSection userId={id} />}
+                {activeTab === "uploads" && artistId && <UploadsTab userId={artistId} />}
+                {activeTab === "likes" && artistId && <LikesTab userId={artistId} />}
                 {activeTab === "about" && userData && (
-                    <AboutSection userData={userData} />
+                    <AboutTab userData={userData} />
                 )}
             </div>
         </div>
     );
-};
+}

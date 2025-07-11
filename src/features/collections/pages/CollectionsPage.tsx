@@ -1,4 +1,4 @@
-export const Collections = () => (
+export const CollectionsPage = () => (
     <section className="text-txt-primary min-h-screen">
         <div className="p-4">
             <h1 className="font-bold mb-4">Collections</h1>
