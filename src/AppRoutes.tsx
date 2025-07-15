@@ -7,9 +7,7 @@ import { collectionsRoutes } from "./features/collections/routes/collectionsRout
 import { artistsRoutes } from "./features/artists/routes/artistsRoutes";
 import { eventsRoutes } from "./features/events/routes/eventRoutes";
 import { adminRoutes } from "./features/admin/routes/adminRoutes";
-
-
-
+import { blogRoutes } from "./features/blog/routes/blogRoutes";
 
 import { storeRoutes } from "./features/store/routes/storeRoutes";
 import { businessRoutes } from "./features/business/routes/businessRoutes";
@@ -26,8 +24,8 @@ export const AppRoutes: React.FC = () => {
         ...collectionsRoutes,
         ...artistsRoutes,
         ...eventsRoutes,
+        ...blogRoutes,
 
-        
         ...storeRoutes, // del when done with separating routes
         ...businessRoutes,
         ...forumRoutes,

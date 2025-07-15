@@ -7,7 +7,7 @@ export interface NavItem {
 
 export interface NavSection {
     label: string;
-    to: string;
+    to: string | null; // null or "#" if just a dropdown
     items: NavItem[];
 }
 
@@ -23,7 +23,7 @@ export const NAV_SECTIONS: NavSection[] = [
     },
     {
         label: "Community",
-        to: "/community",
+        to: null,
         items: [
             { label: "Events", to: ROUTES.EVENTS },
             { label: "Forum", to: ROUTES.FORUM },
