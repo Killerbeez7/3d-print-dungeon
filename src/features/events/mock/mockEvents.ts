@@ -1,4 +1,6 @@
-export const mockEvents = [
+import type { Event } from "@/types/event";
+
+export const mockEvents: Event[] = [
   {
     id: "spring2024",
     type: "competition",
@@ -10,6 +12,26 @@ export const mockEvents = [
     status: "ongoing",
     prizes: "1st: $100 Filament Voucher, 2nd: $50, 3rd: $25",
     rules: "1. Must be your own design. 2. One entry per user. 3. Spring theme required.",
+    entries: [
+      {
+        id: "entry1",
+        userName: "Alice",
+        imageUrl: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
+        description: "My spring flower vase!",
+      },
+      {
+        id: "entry2",
+        userName: "Bob",
+        imageUrl: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80",
+        description: "A bunny planter for the garden.",
+      },
+      {
+        id: "entry3",
+        userName: "Charlie",
+        imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+        description: "Spring-themed phone stand.",
+      },
+    ],
   },
   {
     id: "summer2024",
@@ -22,6 +44,7 @@ export const mockEvents = [
     status: "upcoming",
     prizes: "1st: 3D Printer, 2nd: $100, 3rd: $50",
     rules: "1. Must be functional. 2. One entry per user. 3. Summer theme required.",
+    entries: [],
   },
   {
     id: "retro2023",
@@ -34,6 +57,7 @@ export const mockEvents = [
     status: "ended",
     prizes: "1st: $200, 2nd: $100, 3rd: $50",
     rules: "1. Must be retro-inspired. 2. One entry per user.",
+    entries: [],
   },
   {
     id: "meetup1",

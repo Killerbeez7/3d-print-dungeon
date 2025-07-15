@@ -11,8 +11,11 @@ export const ROUTES = {
     /* Collections */
     COLLECTIONS: "/collections",
 
-    /* Community */
+    /* Events */
     EVENTS: "/events",
+    EVENTS_DETAILS: "/events/:eventId",
+
+    /* Blog */
     BLOG: "/blog",
 
     /* Forum */
@@ -45,5 +48,5 @@ export const ROUTES = {
     ADMIN_PANEL: "/admin-panel",
 
     /* Competitions */
-    COMPETITIONS: "/competitions",
+    // COMPETITIONS: "/competitions",
 }; 

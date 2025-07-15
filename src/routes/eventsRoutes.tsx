@@ -1,6 +1,6 @@
-import { EventsHome } from "@/components/community/events/EventsHome";
-import { EventDetails } from "@/components/community/events/EventDetails";
-import { EventEntryForm } from "@/components/community/events/EventEntryForm";
+import { EventsHome } from "@/features/events/pages/EventsHome";
+import { EventDetails } from "@/features/events/components/EventDetails";
+import { EventEntryForm } from "@/features/events/components/EventEntryForm";
 import { withMaintenance } from "@/helpers/routeHelpers";
 import type { RouteObject } from "react-router-dom";
 

@@ -1,34 +1,14 @@
 import { useParams, Link } from "react-router-dom";
-import { mockEvents } from "./mockEvents";
-import { EventEntryCard } from "./EventEntryCard";
+import { useState } from "react";
+import { mockEvents } from "../mock/mockEvents";
+import { EventEntryCard } from "../components/EventEntryCard";
+import { EventEntryForm } from "../components/EventEntryForm";
+import type { Event, EventEntry } from "@/types/event";
 
-const mockEntries = [
-    {
-        id: "entry1",
-        userName: "Alice",
-        imageUrl:
-            "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
-        description: "My spring flower vase!",
-    },
-    {
-        id: "entry2",
-        userName: "Bob",
-        imageUrl:
-            "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80",
-        description: "A bunny planter for the garden.",
-    },
-    {
-        id: "entry3",
-        userName: "Charlie",
-        imageUrl:
-            "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
-        description: "Spring-themed phone stand.",
-    },
-];
-
-export const EventDetails = () => {
+export const EventDetailsPage = () => {
     const { eventId } = useParams();
-    const event = mockEvents.find((e) => e.id === eventId);
+    const [events, setEvents] = useState<Event[]>(mockEvents);
+    const event = events.find((e) => e.id === eventId);
 
     if (!event) {
         return (
@@ -41,70 +21,84 @@ export const EventDetails = () => {
         );
     }
 
+    const handleEntry = (entry: Omit<EventEntry, "id">) => {
+        setEvents((prevEvents) =>
+            prevEvents.map((e) =>
+                e.id === event.id
+                    ? {
+                          ...e,
+                          entries: [
+                              ...(e.entries || []),
+                              { ...entry, id: `entry${(e.entries?.length || 0) + 1}` },
+                          ],
+                      }
+                    : e
+            )
+        );
+    };
+
+    // Find the updated event after state change
+    const currentEvent = events.find((e) => e.id === eventId) || event;
+
     return (
         <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
             <div className="mb-6 rounded-lg overflow-hidden shadow">
                 <div className="relative w-full aspect-[16/7] bg-gray-200">
                     <img
-                        src={event.bannerUrl}
-                        alt={event.title}
+                        src={currentEvent.bannerUrl}
+                        alt={currentEvent.title}
                         className="absolute inset-0 w-full h-full object-cover"
                     />
                 </div>
             </div>
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-[var(--txt-primary)] text-center break-words">
-                {event.title}
+                {currentEvent.title}
             </h1>
             <div className="mb-2 text-sm sm:text-base text-[var(--txt-secondary)] text-center">
-                {event.startDate} - {event.endDate}
+                {currentEvent.startDate} - {currentEvent.endDate}
             </div>
             <div className="mb-4 text-xs sm:text-sm text-[var(--txt-muted)] text-center">
-                Status: <span className="font-semibold">{event.status}</span>
+                Status: <span className="font-semibold">{currentEvent.status}</span>
             </div>
             <div className="mb-4 text-base sm:text-lg text-[var(--txt-primary)] text-center">
-                {event.description}
+                {currentEvent.description}
             </div>
-            {event.type === "competition" && event.prizes && (
+            {currentEvent.type === "competition" && currentEvent.prizes && (
                 <div className="mb-4">
                     <h2 className="font-semibold mb-1 text-sm sm:text-base">Prizes</h2>
                     <div className="text-[var(--txt-highlight)] text-xs sm:text-sm">
-                        {event.prizes}
+                        {currentEvent.prizes}
                     </div>
                 </div>
             )}
-            {event.rules && (
+            {currentEvent.rules && (
                 <div className="mb-4">
                     <h2 className="font-semibold mb-1 text-sm sm:text-base">Rules</h2>
                     <div className="text-[var(--txt-secondary)] whitespace-pre-line text-xs sm:text-sm">
-                        {event.rules}
+                        {currentEvent.rules}
                     </div>
                 </div>
             )}
-            {event.type === "competition" && event.status === "ongoing" && (
+            {currentEvent.type === "competition" && currentEvent.status === "ongoing" && (
                 <div className="mb-8 text-center">
-                    <Link
-                        to={`/events/${event.id}/enter`}
-                        className="inline-block px-6 py-2 rounded bg-[var(--accent)] text-[var(--txt-highlight)] font-semibold hover:bg-[var(--accent-hover)] transition-colors"
-                    >
-                        Enter Now
-                    </Link>
+                    <EventEntryForm onSubmit={handleEntry} />
                 </div>
             )}
-            {(event.type === "meetup" || event.type === "webinar") &&
-                event.status === "upcoming" && (
+            {(currentEvent.type === "meetup" || currentEvent.type === "webinar") &&
+                currentEvent.status === "upcoming" && (
                     <div className="mb-8 text-center">
                         <button className="inline-block px-6 py-2 rounded bg-[var(--accent)] text-[var(--txt-highlight)] font-semibold hover:bg-[var(--accent-hover)] transition-colors">
                             RSVP
                         </button>
                     </div>
                 )}
-            {event.type === "competition" && (
+            {currentEvent.type === "competition" && (
                 <div className="mb-4">
                     <h2 className="font-semibold mb-3 text-center text-base sm:text-lg">
                         Entries Gallery
                     </h2>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-                        {mockEntries.map((entry) => (
+                        {(currentEvent.entries || []).map((entry) => (
                             <EventEntryCard key={entry.id} entry={entry} />
                         ))}
                     </div>

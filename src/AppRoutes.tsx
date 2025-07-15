@@ -6,12 +6,13 @@ import { publicRoutes } from "./routes/publicRoutes";
 import { collectionsRoutes } from "./features/collections/routes/collectionsRouter";
 import { artistsRoutes } from "./features/artists/routes/artistsRoutes";
 
+import { eventsRoutes } from "./features/events/routes/eventRoutes";
+
 
 import { communityRoutes } from "./routes/communityRoutes";
 import { storeRoutes } from "./features/store/routes/storeRoutes";
 import { businessRoutes } from "./features/business/routes/businessRoutes";
 import { forumRoutes } from "./routes/forumRoutes";
-import { eventsRoutes } from "./routes/eventsRoutes";
 import { modelsRoutes } from "./routes/modelsRoutes";
 import { settingsRoutes } from "./features/settings/routes/settingsRoutes";
 import { adminRoutes } from "./routes/adminRoutes";
@@ -24,8 +25,9 @@ export const AppRoutes: React.FC = () => {
         ...publicRoutes,
         ...collectionsRoutes,
         ...artistsRoutes,
+        ...eventsRoutes,
 
-        ...communityRoutes, // del when done with separating routes
+        
         ...storeRoutes, // del when done with separating routes
         ...businessRoutes,
         ...forumRoutes,
