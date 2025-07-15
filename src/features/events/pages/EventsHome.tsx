@@ -31,26 +31,29 @@ export const EventsHome = () => {
             </h1>
 
             {/* filter chips – responsive grid for all devices */}
-            <div className="mb-8">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 justify-center w-full max-w-md mx-auto">
+            <div className="mb-8 w-full max-w-md mx-auto">
+                {/* Tabs row */}
+                <div className="flex flex-row gap-2">
                     {Object.entries(typeLabels).map(([key, label]) => (
                         <button
                             key={key}
                             onClick={() => setType(key as EventType | "all")}
-                            className={`whitespace-nowrap px-4 py-2 rounded font-semibold transition
-                ${
-                    type === key
-                        ? "bg-[var(--accent)] text-[var(--txt-highlight)]"
-                        : "bg-[var(--bg-surface)] text-[var(--txt-primary)] hover:bg-[var(--bg-tertiary)]"
-                }`}
+                            className={`flex-1 px-4 py-2 rounded font-semibold transition text-center
+                    ${
+                        type === key
+                            ? "bg-[var(--accent)] text-[var(--txt-highlight)]"
+                            : "bg-[var(--bg-surface)] text-[var(--txt-primary)] hover:bg-[var(--bg-tertiary)]"
+                    }`}
                         >
                             {label}
                         </button>
                     ))}
-                    {/* Show create button for admins only; for demo, always visible */}
+                </div>
+                {/* Create Event button below, same width as a tab */}
+                <div className="flex mt-2">
                     <button
                         onClick={() => setShowCreate(true)}
-                        className="col-span-2 sm:col-span-4 mt-2 sm:mt-0 bg-green-600 text-white px-4 py-2 rounded font-semibold"
+                        className="flex-1 bg-green-600 text-white px-4 py-2 rounded font-semibold text-center"
                     >
                         + Create Event
                     </button>
