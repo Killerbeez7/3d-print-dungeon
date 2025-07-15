@@ -49,4 +49,8 @@ export const ROUTES = {
 
     /* Competitions */
     // COMPETITIONS: "/competitions",
+
+    /* Printed Figures */
+    PRINTED_FIGURES: "/printed-figures",
 }; 
+

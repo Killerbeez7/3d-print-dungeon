@@ -6,6 +6,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
 import type { ModelData } from "@/types/model";
+import type { FC } from "react";
+interface FeaturedProps { previewCount?: number; }
 
 interface FeaturedModel {
     id: string;
@@ -16,7 +18,7 @@ interface FeaturedModel {
     [key: string]: unknown;
 }
 
-export const Featured = () => {
+export const Featured: FC<FeaturedProps> = ({ previewCount }) => {
     const { models, loading } = useModels();
     const [featuredModels, setFeaturedModels] = useState<FeaturedModel[]>([]);
     const [featuredCategories, setFeaturedCategories] = useState<string[]>([]);
@@ -57,14 +59,16 @@ export const Featured = () => {
         );
     }
 
+    const modelsToShow = previewCount ? featuredModels.slice(0, previewCount) : featuredModels;
+
     return (
         <section className="max-w-6xl mx-auto py-12 px-4">
-            <h1 className="text-3xl font-semibold mb-6">Featured Models</h1>
-            <p className="text-lg text-txt-secondary mb-8">
-                Hand-picked models selected by our team.
+            <h1 className="text-3xl font-bold mb-6 text-[var(--accent)]">Featured 3D Models</h1>
+            <p className="text-lg text-[var(--txt-secondary)] mb-8">
+                Hand-picked STL files and 3D models selected by our team.
             </p>
 
-            {featuredModels.length === 0 ? (
+            {modelsToShow.length === 0 ? (
                 <div>
                     <p className="text-txt-secondary">
                         No featured models available at the moment.
@@ -75,7 +79,7 @@ export const Featured = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {featuredModels.map((model) => (
+                    {modelsToShow.map((model) => (
                         <Link key={model.id} to={`/model/${model.id}`}>
                             <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                                 <div className="relative w-full aspect-square">
@@ -99,6 +103,12 @@ export const Featured = () => {
                                             </p>
                                         </div>
                                     </div>
+                                </div>
+                                <div className="p-2">
+                                    <h4 className="font-semibold text-base truncate">{model.name}</h4>
+                                    <p className="text-xs text-txt-secondary truncate">{model.uploaderDisplayName}</p>
+                                    {/* Add price, rating, etc. here if available */}
+                                    <Link to={`/model/${model.id}`} className="text-accent hover:underline text-sm">View Details</Link>
                                 </div>
                             </article>
                         </Link>

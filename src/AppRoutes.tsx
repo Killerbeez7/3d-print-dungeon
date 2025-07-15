@@ -8,8 +8,9 @@ import { artistsRoutes } from "./features/artists/routes/artistsRoutes";
 import { eventsRoutes } from "./features/events/routes/eventRoutes";
 import { adminRoutes } from "./features/admin/routes/adminRoutes";
 import { blogRoutes } from "./features/blog/routes/blogRoutes";
+import { marketplaceRoutes } from "./features/marketplace/routes/marketplaceRoutes";
+import { printedFiguresRoutes } from "./features/printed-figures/routes/printedFiguresRoutes";
 
-import { storeRoutes } from "./features/store/routes/storeRoutes";
 import { businessRoutes } from "./features/business/routes/businessRoutes";
 import { forumRoutes } from "./routes/forumRoutes";
 import { modelsRoutes } from "./routes/modelsRoutes";
@@ -25,8 +26,9 @@ export const AppRoutes: React.FC = () => {
         ...artistsRoutes,
         ...eventsRoutes,
         ...blogRoutes,
+        ...marketplaceRoutes,
+        ...printedFiguresRoutes,
 
-        ...storeRoutes, // del when done with separating routes
         ...businessRoutes,
         ...forumRoutes,
         ...eventsRoutes,

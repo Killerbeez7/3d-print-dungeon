@@ -7,14 +7,14 @@ export interface NavItem {
 
 export interface NavSection {
     label: string;
-    to: string | null; // null or "#" if just a dropdown
+    to: string | null;
     items: NavItem[];
 }
 
 export const NAV_SECTIONS: NavSection[] = [
     {
         label: "Explore",
-        to: ROUTES.HOME,
+        to: null,
         items: [
             { label: "Models", to: ROUTES.HOME },
             { label: "Artists", to: ROUTES.ARTISTS_LIST },
@@ -31,17 +31,16 @@ export const NAV_SECTIONS: NavSection[] = [
         ],
     },
     {
-        label: "Marketplace",
-        to: "/marketplace",
+        label: "Shop",
+        to: null,
         items: [
-            { label: "Featured", to: ROUTES.MARKETPLACE_FEATURED },
-            { label: "New Arrivals", to: ROUTES.MARKETPLACE_NEW_ARRIVALS },
-            { label: "Best Sellers", to: ROUTES.MARKETPLACE_BEST_SELLERS },
+            { label: "Marketplace", to: "/marketplace" },
+            { label: "Printed Figures", to: "/printed-figures" },
         ],
     },
     {
         label: "Business",
-        to: "/business",
+        to: null,
         items: [
             { label: "Bulk Orders", to: ROUTES.BUSINESS_BULK_ORDERS },
             { label: "Custom Solutions", to: ROUTES.BUSINESS_CUSTOM_SOLUTIONS },
