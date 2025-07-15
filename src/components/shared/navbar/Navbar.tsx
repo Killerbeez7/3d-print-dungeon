@@ -264,7 +264,7 @@ export const Navbar = (): React.ReactNode => {
                                             </h6>
                                             {isAdmin && (
                                                 <Link
-                                                    to={`/admin-panel`}
+                                                    to={`/admin-dashboard`}
                                                     className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary divider-top hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)

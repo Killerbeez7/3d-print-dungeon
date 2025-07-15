@@ -9,7 +9,7 @@ import {
     MdDelete,
 } from "react-icons/md";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "../../../utils/imageUtils";
-import type { AdminModel, AdminUser } from "@/types/adminPanel";
+import type { AdminModel, AdminUser } from "@/types/admin";
 
 // Cache duration in milliseconds (5 minutes)
 const CACHE_DURATION = 5 * 60 * 1000;

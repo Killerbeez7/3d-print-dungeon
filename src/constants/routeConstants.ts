@@ -45,7 +45,7 @@ export const ROUTES = {
     SETTINGS: "/settings",
 
     /* Admin */
-    ADMIN_PANEL: "/admin-panel",
+    ADMIN_DASHBOARD: "/admin-dashboard",
 
     /* Competitions */
     // COMPETITIONS: "/competitions",

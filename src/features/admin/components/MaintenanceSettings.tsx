@@ -9,7 +9,7 @@ import {
     MdExpandLess,
 } from "react-icons/md";
 import { cleanupOldMaintenanceSettings } from "@/services/maintenanceService";
-import type { MaintenanceSettingsType } from "@/types/adminPanel";
+import type { MaintenanceSettingsType } from "@/types/admin";
 
 export const MaintenanceSettings = () => {
     const [settings, setSettings] = useState<MaintenanceSettingsType>({

@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Tab } from "@headlessui/react";
-import { UserManagement } from "./tabs/UserManagement";
-import { ContentModeration } from "./tabs/ContentModeration";
-import { SiteSettings } from "./tabs/SiteSettings";
-import { Analytics } from "./tabs/Analytics";
-import { MaintenanceSettings } from "./tabs/MaintenanceSettings";
-import { Scripts } from "./tabs/Scripts";
+import { UserManagement } from "../components/UserManagement";
+import { ContentModeration } from "../components/ContentModeration";
+import { SiteSettings } from "../components/SiteSettings";
+import { Analytics } from "../components/Analytics";
+import { MaintenanceSettings } from "../components/MaintenanceSettings";
+import { Scripts } from "../components/Scripts";
 import { useAuth } from "@/hooks/useAuth";
 import { Navigate } from "react-router-dom";
 import { Spinner } from "@/components/shared/Spinner";
@@ -19,7 +19,7 @@ interface TabConfig {
     component: React.ComponentType;
 }
 
-export const AdminPanel = () => {
+export const AdminPage = () => {
     const { currentUser, isAdmin, loading } = useAuth();
     const [selectedTab, setSelectedTab] = useState<number>(0);
 
