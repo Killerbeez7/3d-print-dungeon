@@ -45,9 +45,9 @@ export const Featured: FC<FeaturedProps> = ({ previewCount }) => {
         if (models.length > 0 && featuredCategories.length > 0) {
             // Filter models that belong to featured categories
             const featured = models.filter((model: ModelData) =>
-                featuredCategories.includes(model.category)
+                featuredCategories.includes(model.category ?? "")
             );
-            setFeaturedModels(featured);
+            setFeaturedModels(featured as FeaturedModel[]);
         }
     }, [models, featuredCategories]);
 

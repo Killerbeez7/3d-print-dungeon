@@ -210,7 +210,7 @@ export function ModelSidebar({
                 {/* Purchase/Download Button */}
                 <div className="mb-6">
                     <PurchaseButton
-                        model={{ ...model, price: model.price ?? 0 }}
+                        model={{ ...model, price: model.price ?? 0, uploaderId: model.uploaderId ?? "" }}
                         className="w-full py-4 text-base font-medium"
                     />
                 </div>

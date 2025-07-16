@@ -198,7 +198,7 @@ export const ArtworksTab = ({ searchTerm, models }: ArtworksTabProps) => {
                                 <div className="relative w-full aspect-square">
                                     <LazyImage
                                         src={
-                                            getThumbnailUrl(m.renderPrimaryUrl, THUMBNAIL_SIZES.MEDIUM) || undefined
+                                            getThumbnailUrl(m.renderPrimaryUrl ?? null, THUMBNAIL_SIZES.MEDIUM) ?? undefined
                                         }
                                         alt={m.name}
                                         className="absolute inset-0 w-full h-full object-cover rounded-lg"
