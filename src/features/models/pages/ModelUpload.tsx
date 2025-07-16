@@ -4,13 +4,13 @@ import { createAdvancedModel } from "@/services/modelsService";
 import { finalConvertFileToGLB } from "@/utils/models/converter";
 
 // components
-import { FilesUpload } from "./sections/FilesUpload";
-import { InfoForm } from "./sections/InfoForm";
-import { PricingForm } from "./sections/PricingForm";
+import { FilesUpload } from "../components/model-upload/FilesUpload";
+import { InfoForm } from "../components/model-upload/InfoForm";
+import { PricingForm } from "../components/model-upload/PricingForm";
 import AlertModal from "@/components/shared/alert-modal/AlertModal";
 import { SellerVerification } from "@/components/payment/SellerVerification";
 
-import type { ModelData } from "@/types/model";
+import type { ModelData } from "@/features/models/types/model";
 
 const UPLOAD_STATE_KEY = "pendingUploadState";
 

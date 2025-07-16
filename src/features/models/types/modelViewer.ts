@@ -1,4 +1,4 @@
-import type { ModelData } from "./model";
+import type { ModelData } from "@/features/models/types/model";
 
 export interface ModelViewerProps {
   model: ModelData;

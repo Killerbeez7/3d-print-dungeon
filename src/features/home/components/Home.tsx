@@ -10,7 +10,7 @@ import { FilterPanel } from "./FilterPanel";
 import { Spinner } from "@/components/shared/Spinner";
 import { FeaturedCarousel } from "./FeaturedCarousel";
 import { featuredMockData } from "./featuredMockData";
-import { ModelCardSkeleton } from "@/components/models/parts/ModelCardSkeleton";
+import { ModelCardSkeleton } from "@/features/models/components/ModelCardSkeleton";
 import { InfiniteScrollList } from "@/components/shared/InfiniteScrollList";
 import { SequentialImage } from "@/components/shared/SequentialImage";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";

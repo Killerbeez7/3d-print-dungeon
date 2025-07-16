@@ -2,14 +2,14 @@ import { useEffect, useState, ChangeEvent } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 //components
-import { LikeButton } from "../action-buttons/likeButton";
-import { FavoritesButton } from "../action-buttons/favoritesButton";
+import { LikeButton } from "../likeButton";
+import { FavoritesButton } from "../favoritesButton";
 import { PurchaseButton } from "@/components/payment/PurchaseButton";
 //contexts
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 //types
 import type { CurrentUser } from "@/types/auth";
-import type { ModelData } from "@/types/model";
+import type { ModelData } from "@/features/models/types/model";
 
 interface Uploader {
     photoURL?: string;

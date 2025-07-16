@@ -1,7 +1,7 @@
 import { useState, ChangeEvent, KeyboardEvent, FC } from "react";
 import { TiDelete } from "react-icons/ti";
 import { ImagesUpload } from "./ImagesUpload";
-import type { ModelData } from "@/types/model";
+import type { ModelData } from "@/features/models/types/model";
 
 interface InfoFormProps {
     modelData: ModelData;

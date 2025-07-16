@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, ReactNode } from "react";
-import { db } from "../config/firebase";
+import { db } from "@/config/firebase";
 import {
     collection,
     query,
@@ -9,8 +9,8 @@ import {
     doc,
     getDoc,
 } from "firebase/firestore";
-import { ModelsContext } from "@/contexts/modelsContext";
-import type { ModelData } from "@/types/model";
+import { ModelsContext } from "@/features/models/context/modelsContext";
+import type { ModelData } from "@/features/models/types/model";
 
 export function ModelsProvider({ children }: { children: ReactNode }) {
     const [models, setModels] = useState<ModelData[]>([]);

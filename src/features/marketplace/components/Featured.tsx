@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { useModels } from "@/hooks/useModels";
+import { useModels } from "../../models/hooks/useModels";
 import { Link } from "react-router-dom";
 import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
-import type { ModelData } from "@/types/model";
+import type { ModelData } from "@/features/models/types/model";
 import type { FC } from "react";
 interface FeaturedProps { previewCount?: number; }
 

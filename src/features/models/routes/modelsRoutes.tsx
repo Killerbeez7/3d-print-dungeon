@@ -1,8 +1,8 @@
-import { ModelUpload } from "../components/models/model-upload/ModelUpload";
-import { ModelPage } from "../components/models/model-view/ModelPage";
-import { ModelEdit } from "../components/models/model-edit/ModelEdit";
-import { withMaintenance, withProtectedMaintenance } from "../helpers/routeHelpers";
-import { ROUTES } from "../constants/routeConstants";
+import { ModelUpload } from "../pages/ModelUpload";
+import { ModelPage } from "../pages/ModelPage";
+import { ModelEdit } from "../pages/ModelEdit";
+import { withMaintenance, withProtectedMaintenance } from "../../../helpers/routeHelpers";
+import { ROUTES } from "../../../constants/routeConstants";
 import type { RouteObject } from "react-router-dom";
 
 export const modelsRoutes: RouteObject[] = [

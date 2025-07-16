@@ -2,8 +2,8 @@ import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/firebase";
-import { useModels } from "@/hooks/useModels";
-import type { ModelData } from "@/types/model";
+import { useModels } from "../hooks/useModels";
+import type { ModelData } from "@/features/models/types/model";
 
 export function ModelEdit() {
     const { id } = useParams<{ id: string }>();

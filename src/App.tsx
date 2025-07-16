@@ -1,6 +1,6 @@
 import { ModalProvider } from "@/providers/modalProvider";
 import { AuthProvider } from "./providers/authProvider";
-import { ModelsProvider } from "./providers/modelsProvider";
+import { ModelsProvider } from "./features/models/providers/modelsProvider";
 import { SearchProvider } from "./features/search/provider/searchProvider";
 import { ForumProvider } from "./providers/forumProvider";
 import { StripeProvider } from "./providers/stripeProvider";

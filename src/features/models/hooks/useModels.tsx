@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { ModelsContext, ModelsContextType } from "../contexts/modelsContext";
+import { ModelsContext, ModelsContextType } from "../context/modelsContext";
 
 export const useModels = (): ModelsContextType => {
     const context = useContext(ModelsContext);

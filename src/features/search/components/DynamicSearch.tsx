@@ -4,10 +4,10 @@ import { useState, useEffect, type ChangeEvent } from "react";
 import { useSearchParams } from "react-router-dom";
 import { ArtworksTab } from "./ArtworksTab";
 import { ArtistsTab } from "./ArtistsTab";
-import { useModels } from "@/hooks/useModels";
+import { useModels } from "../../models/hooks/useModels";
 import { useSearch } from "@/features/search/hooks/useSearch";
 import { Spinner } from "@/components/shared/Spinner";
-import type { ModelData } from "@/types/model";
+import type { ModelData } from "@/features/models/types/model";
 
 export function DynamicSearch() {
     const { activeTab, setActiveTab } = useSearch();

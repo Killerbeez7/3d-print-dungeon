@@ -15,7 +15,7 @@ import { homeRoutes } from "./features/home/routes/homeRoutes";
 
 import { businessRoutes } from "./features/business/routes/businessRoutes";
 import { forumRoutes } from "./routes/forumRoutes";
-import { modelsRoutes } from "./routes/modelsRoutes";
+import { modelsRoutes } from "./features/models/routes/modelsRoutes";
 import { settingsRoutes } from "./features/settings/routes/settingsRoutes";
 
 import Layout from "./components/shared/Layout";

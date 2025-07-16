@@ -1,6 +1,6 @@
 import { TiDelete } from "react-icons/ti";
 import type { FC, ChangeEvent } from "react";
-import type { ModelData } from "@/types/model";
+import type { ModelData } from "@/features/models/types/model";
 
 /**
  * Props for ImagesUpload component

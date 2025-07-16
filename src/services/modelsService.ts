@@ -18,7 +18,7 @@ import {
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { finalConvertFileToGLB } from "../utils/models/converter";
 import { STORAGE_PATHS } from '../constants/storagePaths';
-import type { ModelData } from "../types/model";
+import type { ModelData } from "../features/models/types/model";
 
 export interface CreateModelParams {
     name: string;

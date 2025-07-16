@@ -10,7 +10,7 @@ import type {
     ModelViewerProps,
     NavigationArrowProps,
     NavigationDotsProps,
-} from "@/types/modelViewer";
+} from "@/features/models/types/modelViewer";
 
 const NavigationArrow = ({ direction, onClick }: NavigationArrowProps) => (
     <button

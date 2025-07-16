@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import type { ModelData } from "@/types/model";
+import type { ModelData } from "@/features/models/types/model";
 
 export interface ModelsContextType {
     models: ModelData[];

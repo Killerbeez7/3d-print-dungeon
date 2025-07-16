@@ -1,21 +1,21 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams } from "react-router-dom";
 //hooks
-import { useModels } from "@/hooks/useModels";
+import { useModels } from "../hooks/useModels";
 import { useAuth } from "@/hooks/useAuth";
 import { useModal } from "@/hooks/useModal";
 import { useViewTracker, useModelViewCount } from "@/services/viewService";
 
 const ModelViewer = lazy(() =>
-    import("./ModelViewer").then((module) => ({ default: module.ModelViewer }))
+    import("../components/model-view/ModelViewer").then((module) => ({ default: module.ModelViewer }))
 );
 
 //components
-import { ModelSidebar } from "./ModelSidebar";
+import { ModelSidebar } from "../components/model-view/ModelSidebar";
 import { CommentsProvider } from "@/providers/commentsProvider";
-import { ModelComments } from "./ModelComments";
+import { ModelComments } from "../components/model-view/ModelComments";
 import { Spinner } from "@/components/shared/Spinner";
-import type { ModelData } from "@/types/model";
+import type { ModelData } from "@/features/models/types/model";
 
 export function ModelPage() {
     const { modelId } = useParams<{ modelId: string }>();
