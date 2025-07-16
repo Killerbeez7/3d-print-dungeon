@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../../../config/firebase";
+import { db } from "../../../config/firebaseConfig";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
-import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
+import { LazyImage } from "@/features/shared/reusable/LazyImage";
 
 interface UploadsTabProps {
     userId: string;

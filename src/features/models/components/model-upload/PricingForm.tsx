@@ -1,6 +1,6 @@
 import { useState, ChangeEvent, FC } from "react";
-import { paymentService } from "@/services/paymentService";
-import { useAuth } from "@/hooks/useAuth";
+import { paymentService } from "@/features/payment/services/paymentService";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import type { ModelData } from "@/features/models/types/model";
 
 export interface PricingFormProps {

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
+import { LazyImage } from "@/features/shared/reusable/LazyImage";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
-import type { SortBy, Medium, Subject } from "@/types/search";
+import type { SortBy, Medium, Subject } from "@/features/search/types/search";
 import type { ModelData } from "@/features/models/types/model";
 
 interface ArtworksTabProps {

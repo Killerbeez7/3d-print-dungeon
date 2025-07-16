@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { AccountSettings } from "@/features/settings/components/AccountSettings";
 import { SecuritySettings } from "@/features/settings/components/SecuritySettings";
 import { ProfileSettings } from "@/features/settings/components/ProfileSettings";

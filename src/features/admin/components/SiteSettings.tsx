@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { db } from "../../../config/firebase";
+import { db } from "../../../config/firebaseConfig";
 import { MdSave } from "react-icons/md";
-import type { SiteSettingsType } from "@/types/admin";
+import type { SiteSettingsType } from "@/features/admin/types/admin";
 
 export const SiteSettings = () => {
     const [settings, setSettings] = useState<SiteSettingsType>({

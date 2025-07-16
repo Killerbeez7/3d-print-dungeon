@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../../../config/firebase";
-import type { RawUserData } from "@/types/auth";
+import { db } from "../../../config/firebaseConfig";
+import type { RawUserData } from "@/features/auth/types/auth";
 import { ArtistListGrid } from "../components/ArtistListGrid";
 
 interface Artist extends RawUserData {

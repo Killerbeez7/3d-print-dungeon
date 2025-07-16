@@ -1,7 +1,7 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "@/config/firebase";
+import { db } from "@/config/firebaseConfig";
 import { useModels } from "../hooks/useModels";
 import type { ModelData } from "@/features/models/types/model";
 

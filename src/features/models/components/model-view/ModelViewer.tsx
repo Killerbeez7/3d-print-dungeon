@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import { fullscreenConfig } from "@/config/fullscreenConfig";
-import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
-import { Model3DIcon } from "@/components/shared/icons/Model3DIcon";
+import { LazyImage } from "@/features/shared/reusable/LazyImage";
+import { Model3DIcon } from "@/features/shared/Model3DIcon";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
 import type { ModelViewerElement } from "@google/model-viewer";
 

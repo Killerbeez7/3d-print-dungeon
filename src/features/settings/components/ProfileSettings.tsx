@@ -1,8 +1,8 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { profileService } from "@/services/profileService";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { profileService } from "@/features/settings/services/profileService";
 import { countries } from "@/data/countries";
-import AlertModal from "@/components/shared/alert-modal/AlertModal";
+import { AlertModal } from "@/features/shared/AlertModal";
 
 /**
  * ProfileSettings component for managing user profile information.

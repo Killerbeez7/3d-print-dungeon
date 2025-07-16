@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { collection, query, getDocs } from "firebase/firestore";
-import { db } from "@/config/firebase";
-import { grantRole, revokeRole } from "@/services/adminService";
-import { Spinner } from "@/components/shared/Spinner";
+import { db } from "@/config/firebaseConfig";
+import { grantRole, revokeRole } from "@/features/admin/services/adminService";
+import { Spinner } from "@/features/shared/reusable/Spinner";
 import { MdEdit, MdCheck, MdClose } from "react-icons/md";
-import type { RawUserData } from "@/types/auth";
+import type { RawUserData } from "@/features/auth/types/auth";
 
 const ALL_ROLES = ["admin", "moderator", "contributor", "premium"] as const;
 export type Role = (typeof ALL_ROLES)[number];

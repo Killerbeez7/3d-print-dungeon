@@ -11,7 +11,7 @@ import {
     limit,
     getDocs,
 } from "firebase/firestore";
-import type { Artist } from "@/types/search";
+import type { Artist } from "@/features/search/types/search";
 
 export function GlobalSearch() {
     const {

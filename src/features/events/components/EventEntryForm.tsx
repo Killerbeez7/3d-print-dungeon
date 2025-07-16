@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { EventEntry } from "@/types/event";
+import type { EventEntry } from "@/features/events/types/event";
 
 export const EventEntryForm = ({
     onSubmit,

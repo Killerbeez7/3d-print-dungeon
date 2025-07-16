@@ -6,9 +6,9 @@ import { SiteSettings } from "../components/SiteSettings";
 import { Analytics } from "../components/Analytics";
 import { MaintenanceSettings } from "../components/MaintenanceSettings";
 import { Scripts } from "../components/Scripts";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Navigate } from "react-router-dom";
-import { Spinner } from "@/components/shared/Spinner";
+import { Spinner } from "@/features/shared/reusable/Spinner";
 
 function classNames(...classes: (string | undefined | null | false)[]): string {
     return classes.filter(Boolean).join(" ");

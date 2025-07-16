@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { collection, query, getDocs, updateDoc, doc, deleteDoc } from "firebase/firestore";
-import { db } from "../../../config/firebase";
+import { db } from "../../../config/firebaseConfig";
 import { MdDelete, MdCheck, MdClose } from "react-icons/md";
-import type { AdminReport } from "@/types/admin";
+import type { AdminReport } from "@/features/admin/types/admin";
 
 export const ContentModeration = () => {
     const [reports, setReports] = useState<AdminReport[]>([]);

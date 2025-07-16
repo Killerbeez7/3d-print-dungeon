@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/config/firebase";
+import { db } from "@/config/firebaseConfig";
 import {
     MdSave,
     MdSchedule,
@@ -8,8 +8,8 @@ import {
     MdExpandMore,
     MdExpandLess,
 } from "react-icons/md";
-import { cleanupOldMaintenanceSettings } from "@/services/maintenanceService";
-import type { MaintenanceSettingsType } from "@/types/admin";
+import { cleanupOldMaintenanceSettings } from "@/features/maintenance/services/maintenanceService";
+import type { MaintenanceSettingsType } from "@/features/admin/types/admin";
 
 export const MaintenanceSettings = () => {
     const [settings, setSettings] = useState<MaintenanceSettingsType>({

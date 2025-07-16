@@ -1,7 +1,7 @@
 import { useState, FormEvent, ChangeEvent } from "react";
-import { changePassword } from "@/services/authService";
-import { useAuth } from "@/hooks/useAuth";
-import AlertModal from "@/components/shared/alert-modal/AlertModal";
+import { changePassword } from "@/features/auth/services/authService";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { AlertModal } from "@/features/shared/AlertModal";
 
 export const SecuritySettings = () => {
     const { currentUser } = useAuth();

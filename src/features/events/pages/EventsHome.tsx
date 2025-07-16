@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { mockEvents } from "../mock/mockEvents";
 import { EventCreateForm } from "../components/EventCreateForm";
-import type { Event, EventType } from "@/types/event";
+import type { Event, EventType } from "@/features/events/types/event";
 
 const typeLabels: Record<EventType | "all", string> = {
     all: "All",

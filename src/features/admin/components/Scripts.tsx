@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { duplicateModels } from "../scripts/duplicateModels";
 import { deleteAllModelsAndRelated } from "../scripts/deleteAllModels";
-import { refreshIdToken } from "@/utils/auth/refreshIdToken";
+import { refreshIdToken } from "@/features/auth/utils/refreshIdToken";
 
 interface ScriptDef {
     name: string;

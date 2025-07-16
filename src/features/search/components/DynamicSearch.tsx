@@ -6,7 +6,7 @@ import { ArtworksTab } from "./ArtworksTab";
 import { ArtistsTab } from "./ArtistsTab";
 import { useModels } from "../../models/hooks/useModels";
 import { useSearch } from "@/features/search/hooks/useSearch";
-import { Spinner } from "@/components/shared/Spinner";
+import { Spinner } from "@/features/shared/reusable/Spinner";
 import type { ModelData } from "@/features/models/types/model";
 
 export function DynamicSearch() {

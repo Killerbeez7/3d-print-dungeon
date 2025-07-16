@@ -10,7 +10,7 @@ import {
     endAt,
     limit,
 } from "firebase/firestore";
-import type { Artist } from "@/types/search";
+import type { Artist } from "@/features/search/types/search";
 
 interface ArtistsTabProps {
     searchTerm: string;

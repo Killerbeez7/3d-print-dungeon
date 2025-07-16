@@ -2,9 +2,9 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams } from "react-router-dom";
 //hooks
 import { useModels } from "../hooks/useModels";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useModal } from "@/hooks/useModal";
-import { useViewTracker, useModelViewCount } from "@/services/viewService";
+import { useViewTracker, useModelViewCount } from "@/features/models/services/viewService";
 
 const ModelViewer = lazy(() =>
     import("../components/model-view/ModelViewer").then((module) => ({ default: module.ModelViewer }))
@@ -12,9 +12,9 @@ const ModelViewer = lazy(() =>
 
 //components
 import { ModelSidebar } from "../components/model-view/ModelSidebar";
-import { CommentsProvider } from "@/providers/commentsProvider";
+import { CommentsProvider } from "@/features/models/providers/commentsProvider";
 import { ModelComments } from "../components/model-view/ModelComments";
-import { Spinner } from "@/components/shared/Spinner";
+import { Spinner } from "@/features/shared/reusable/Spinner";
 import type { ModelData } from "@/features/models/types/model";
 
 export function ModelPage() {

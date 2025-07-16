@@ -1,8 +1,8 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useState, useEffect, ReactNode } from "react";
-import { subscribeToMaintenanceStatus } from "@/services/maintenanceService";
-import { MaintenanceStatus } from "@/types/maintenance";
+import { subscribeToMaintenanceStatus } from "@/features/maintenance/services/maintenanceService";
+import { MaintenanceStatus } from "@/features/maintenance/types/maintenance";
 
 interface MaintenanceRouteProps {
     children: ReactNode;

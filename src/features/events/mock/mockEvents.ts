@@ -1,4 +1,4 @@
-import type { Event } from "@/types/event";
+import type { Event } from "@/features/events/types/event";
 
 export const mockEvents: Event[] = [
   {

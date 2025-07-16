@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { collection, query, getDocs, where, orderBy, limit } from "firebase/firestore";
-import { db } from "../../../config/firebase";
+import { db } from "../../../config/firebaseConfig";
 import {
     MdPeople,
     MdFileUpload,
@@ -9,7 +9,7 @@ import {
     MdDelete,
 } from "react-icons/md";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "../../../utils/imageUtils";
-import type { AdminModel, AdminUser } from "@/types/admin";
+import type { AdminModel, AdminUser } from "@/features/admin/types/admin";
 
 // Cache duration in milliseconds (5 minutes)
 const CACHE_DURATION = 5 * 60 * 1000;

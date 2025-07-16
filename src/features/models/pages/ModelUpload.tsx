@@ -1,14 +1,14 @@
 import { useRef, useState, useEffect } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import { createAdvancedModel } from "@/services/modelsService";
-import { finalConvertFileToGLB } from "@/utils/models/converter";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { createAdvancedModel } from "@/features/models/services/modelsService";
+import { finalConvertFileToGLB } from "@/features/models/utils/converter";
 
 // components
 import { FilesUpload } from "../components/model-upload/FilesUpload";
 import { InfoForm } from "../components/model-upload/InfoForm";
 import { PricingForm } from "../components/model-upload/PricingForm";
-import AlertModal from "@/components/shared/alert-modal/AlertModal";
-import { SellerVerification } from "@/components/payment/SellerVerification";
+import { AlertModal } from "@/features/shared/AlertModal";
+import { SellerVerification } from "@/features/payment/components/SellerVerification";
 
 import type { ModelData } from "@/features/models/types/model";
 
@@ -159,15 +159,15 @@ export function ModelUpload() {
             setError("Please enter a model name.");
             return;
         }
-        if (!modelData.category.trim()) {
+        if (!modelData.category?.trim()) {
             setError("Please enter a category.");
             return;
         }
-        if (!modelData.description.trim()) {
+        if (!modelData.description?.trim()) {
             setError("Please enter a model description.");
             return;
         }
-        if (modelData.renderFiles.length === 0) {
+        if (modelData.renderFiles?.length === 0) {
             setError("Please upload at least one render of your model.");
             return;
         }
@@ -209,10 +209,10 @@ export function ModelUpload() {
                 name: modelData.name,
                 description: modelData.description,
                 category: modelData.category,
-                tags: modelData.tags,
+                tags: modelData.tags ?? [],
                 file: firstFile,
-                renderFiles: modelData.renderFiles,
-                selectedRenderIndex: modelData.selectedRenderIndex,
+                renderFiles: modelData.renderFiles ?? [],
+                selectedRenderIndex: modelData.selectedRenderIndex ?? 0,
                 uploaderId: currentUser?.uid ?? "",
                 uploaderDisplayName: currentUser?.displayName ?? "",
                 onProgress: setUploadProgress,
@@ -242,8 +242,9 @@ export function ModelUpload() {
     const canProceedToStep2 = files.length > 0;
     const canProceedToStep3 =
         modelData.name.trim() &&
-        modelData.category.trim() &&
-        modelData.description.trim() &&
+        modelData.category?.trim() &&
+        modelData.description?.trim() &&
+        modelData.renderFiles?.length &&
         modelData.renderFiles.length > 0;
 
     const handleSellerVerificationClose = () => {

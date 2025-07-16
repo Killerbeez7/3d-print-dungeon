@@ -1,4 +1,4 @@
-import { db, storage } from "../../../config/firebase";
+import { db, storage } from "../../../config/firebaseConfig";
 import {
   collection,
   getDocs,
@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { ref, deleteObject } from "firebase/storage";
 import { STORAGE_PATHS } from '../../../constants/storagePaths';
-import type { AdminModel, AdminUser } from "@/types/admin";
+import type { AdminModel, AdminUser } from "@/features/admin/types/admin";
 
 
 export async function deleteAllModelsAndRelated(onProgress?: (progress: number) => void): Promise<void> {

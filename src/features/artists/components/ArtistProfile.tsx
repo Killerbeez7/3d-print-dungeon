@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserFromDatabase } from "@/services/authService";
+import { getUserFromDatabase } from "@/features/auth/services/authService";
 import { UploadsTab } from "./UploadsTab";
 import { LikesTab } from "./LikesTab";
 import { AboutTab } from "./AboutTab";
-import type { RawUserData } from "@/types/auth";
+import type { RawUserData } from "@/features/auth/types/auth";
 
 export interface ArtistProfileProps {
     artistId: string;

@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { toggleFavorite, getFavoritesForUser } from "@/services/favoritesService";
+import { toggleFavorite, getFavoritesForUser } from "../services/favoritesService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
-import type { CurrentUser } from "@/types/auth";
+import type { CurrentUser } from "@/features/auth/types/auth";
 
 export interface FavoritesButtonUser {
     uid: string;

@@ -1,6 +1,6 @@
-import { db } from "@/config/firebase";
+import { db } from "@/config/firebaseConfig";
 import { collection, getDocs, addDoc, serverTimestamp, DocumentData, CollectionReference } from "firebase/firestore";
-import type { AdminModel } from "@/types/admin";
+import type { AdminModel } from "@/features/admin/types/admin";
 
 
 export async function duplicateModels(

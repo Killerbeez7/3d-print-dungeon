@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import { AuthProvider } from "@/providers/authProvider";
-import { AuthContext } from "@/contexts/authContext";
+import { AuthProvider } from "@/features/auth/providers/authProvider";
+import { AuthContext } from "@/features/auth/context/authContext";
 import { setAuthUser, clearAuthUser, mockUser } from "../mocks/firebase";
 import type { ReactNode } from "react";
 import { afterEach, describe, it, expect } from "vitest";

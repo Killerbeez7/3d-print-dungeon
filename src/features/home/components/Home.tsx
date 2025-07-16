@@ -4,17 +4,17 @@ import { useState, useCallback, useRef, useEffect } from "react";
 // config
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 // service
-import { fetchModels, PAGE_SIZE } from "@/services/modelsService";
+import { fetchModels, PAGE_SIZE } from "@/features/models/services/modelsService";
 // components
 import { FilterPanel } from "./FilterPanel";
-import { Spinner } from "@/components/shared/Spinner";
+import { Spinner } from "@/features/shared/reusable/Spinner";
 import { FeaturedCarousel } from "./FeaturedCarousel";
 import { featuredMockData } from "./featuredMockData";
 import { ModelCardSkeleton } from "@/features/models/components/ModelCardSkeleton";
-import { InfiniteScrollList } from "@/components/shared/InfiniteScrollList";
-import { SequentialImage } from "@/components/shared/SequentialImage";
+import { InfiniteScrollList } from "@/features/shared/InfiniteScrollList";
+import { SequentialImage } from "@/features/shared/reusable/SequentialImage";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
-import { Artwork, SortBy } from "@/types/home";
+import { Artwork, SortBy } from "@/features/home/types/home";
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { InfiniteData } from "@tanstack/react-query";
 

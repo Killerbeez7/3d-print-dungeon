@@ -1,4 +1,4 @@
-import type { Event } from "@/types/event";
+import type { Event } from "@/features/events/types/event";
 import { Link } from "react-router-dom";
 
 export const EventCard = ({ event }: { event: Event }) => (

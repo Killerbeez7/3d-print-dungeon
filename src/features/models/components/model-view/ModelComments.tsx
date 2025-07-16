@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { formatDistanceToNow } from "date-fns";
-import { useAuth } from "@/hooks/useAuth";
-import { useComments } from "@/hooks/useComments";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useComments } from "@/features/models/hooks/useComments";
 
 interface ModelCommentsProps {
     openAuthModal: () => void;

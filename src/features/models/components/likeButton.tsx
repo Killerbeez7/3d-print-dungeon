@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import { toggleLike, isLiked } from "@/services/likesService";
+import { toggleLike, isLiked } from "../services/likesService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as solidHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons";
-import type { CurrentUser } from "@/types/auth";
+import type { CurrentUser } from "@/features/auth/types/auth";
 
 export interface LikeButtonUser {
     uid: string;

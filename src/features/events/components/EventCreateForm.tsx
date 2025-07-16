@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { EventType, Event } from "@/types/event";
+import type { EventType, Event } from "@/features/events/types/event";
 
 export const EventCreateForm = ({
     onCreate,

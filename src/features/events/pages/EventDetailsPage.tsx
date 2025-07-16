@@ -3,7 +3,7 @@ import { useState } from "react";
 import { mockEvents } from "../mock/mockEvents";
 import { EventEntryCard } from "../components/EventEntryCard";
 import { EventEntryForm } from "../components/EventEntryForm";
-import type { Event, EventEntry } from "@/types/event";
+import type { Event, EventEntry } from "@/features/events/types/event";
 
 export const EventDetailsPage = () => {
     const { eventId } = useParams();

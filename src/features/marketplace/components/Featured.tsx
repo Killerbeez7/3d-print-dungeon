@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useModels } from "../../models/hooks/useModels";
 import { Link } from "react-router-dom";
-import { LazyImage } from "@/components/shared/lazy-image/LazyImage";
+import { LazyImage } from "@/features/shared/reusable/LazyImage";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "@/config/firebase";
+import { db } from "@/config/firebaseConfig";
 import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
 import type { ModelData } from "@/features/models/types/model";
 import type { FC } from "react";

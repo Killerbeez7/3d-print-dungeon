@@ -4,7 +4,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { App } from "./App";
 import { ScrollToTop } from "./utils/ScrollToTop";
-import { ErrorBoundary } from "@/components/shared/ErrorBoundary";
+import { ErrorBoundary } from "@/features/shared/ErrorBoundary";
 
 // React-Query
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
