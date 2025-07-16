@@ -5,7 +5,7 @@ import { useSearchParams } from "react-router-dom";
 import { ArtworksTab } from "./ArtworksTab";
 import { ArtistsTab } from "./ArtistsTab";
 import { useModels } from "@/hooks/useModels";
-import { useSearch } from "@/hooks/useSearch";
+import { useSearch } from "@/features/search/hooks/useSearch";
 import { Spinner } from "@/components/shared/Spinner";
 import type { ModelData } from "@/types/model";
 

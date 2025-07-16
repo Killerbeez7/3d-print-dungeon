@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 // hooks
 import { useAuth } from "@/hooks/useAuth";
 import { useUserRole } from "@/hooks/useUserRole";
-import { useSearch } from "@/hooks/useSearch";
+import { useSearch } from "@/features/search/hooks/useSearch";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { useModal } from "@/hooks/useModal"; // NEW
 // configs
@@ -11,7 +11,7 @@ import { NAV_SECTIONS } from "@/config/navConfig";
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 // components
 import { AuthButtons } from "./AuthButtons";
-import { GlobalSearch } from "@/components/search/GlobalSearch";
+import { GlobalSearch } from "@/features/search/components/GlobalSearch";
 // icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {

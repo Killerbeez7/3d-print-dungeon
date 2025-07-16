@@ -10,6 +10,8 @@ import { adminRoutes } from "./features/admin/routes/adminRoutes";
 import { blogRoutes } from "./features/blog/routes/blogRoutes";
 import { marketplaceRoutes } from "./features/marketplace/routes/marketplaceRoutes";
 import { printedFiguresRoutes } from "./features/printed-figures/routes/printedFiguresRoutes";
+import { searchRoutes } from "./features/search/routes/searchRoutes";
+import { homeRoutes } from "./features/home/routes/homeRoutes";
 
 import { businessRoutes } from "./features/business/routes/businessRoutes";
 import { forumRoutes } from "./routes/forumRoutes";
@@ -28,6 +30,8 @@ export const AppRoutes: React.FC = () => {
         ...blogRoutes,
         ...marketplaceRoutes,
         ...printedFiguresRoutes,
+        ...searchRoutes,
+        ...homeRoutes,
 
         ...businessRoutes,
         ...forumRoutes,

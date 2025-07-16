@@ -1,4 +1,4 @@
-import { STATIC_ASSETS } from "../../config/assetsConfig";
+import { STATIC_ASSETS } from "@/config/assetsConfig";
 
 export const featuredMockData = [
     {

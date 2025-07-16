@@ -1,7 +1,7 @@
 import { ModalProvider } from "@/providers/modalProvider";
 import { AuthProvider } from "./providers/authProvider";
 import { ModelsProvider } from "./providers/modelsProvider";
-import { SearchProvider } from "./providers/searchProvider";
+import { SearchProvider } from "./features/search/provider/searchProvider";
 import { ForumProvider } from "./providers/forumProvider";
 import { StripeProvider } from "./providers/stripeProvider";
 import { Suspense } from "react";

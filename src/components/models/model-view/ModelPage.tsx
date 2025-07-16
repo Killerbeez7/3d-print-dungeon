@@ -18,22 +18,22 @@ import { Spinner } from "@/components/shared/Spinner";
 import type { ModelData } from "@/types/model";
 
 export function ModelPage() {
-    const { id } = useParams<{ id: string }>();
+    const { modelId } = useParams<{ modelId: string }>();
     const { models, loading, uploader, fetchUploader } = useModels();
     const { currentUser } = useAuth();
     const { open } = useModal("auth");
     const [selectedRenderIndex, setSelectedRenderIndex] = useState<number>(-1);
 
     // Use new lightweight view tracking system
-    useViewTracker(id ?? "", currentUser ?? undefined);
-    const { count: viewCount, loading: viewCountLoading } = useModelViewCount(id ?? "");
+    useViewTracker(modelId ?? "", currentUser ?? undefined);
+    const { count: viewCount, loading: viewCountLoading } = useModelViewCount(modelId ?? "");
 
     useEffect(() => {
-        const m = models.find((m: ModelData) => m.id === id);
+        const m = models.find((m: ModelData) => m.id === modelId);
         if (m?.uploaderId) fetchUploader(m.uploaderId);
-    }, [id, models, fetchUploader]);
+    }, [modelId, models, fetchUploader]);
 
-    const model: ModelData | undefined = models.find((m: ModelData) => m.id === id);
+    const model: ModelData | undefined = models.find((m: ModelData) => m.id === modelId);
 
     if (loading)
         return (

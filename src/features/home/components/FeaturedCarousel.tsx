@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ReusableCarousel } from "../shared/carousel/ReusableCarousel";
+import { ReusableCarousel } from "@/components/shared/carousel/ReusableCarousel";
 import type { FC } from "react";
 import { useRef, useEffect, useState } from "react";
 
