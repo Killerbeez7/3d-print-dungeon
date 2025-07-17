@@ -71,7 +71,10 @@ export async function createAdvancedModel({
 
     // original 3D file
     const origRef = ref(storage, `${STORAGE_PATHS.ORIGINAL}/${file.name}`);
-    const origTask = uploadBytesResumable(origRef, file);
+    const origTask = uploadBytesResumable(origRef, file, {
+        contentType: file.type,
+        cacheControl: "public,max-age=31536000,immutable"
+    });
     const originalFileUrl: string = await new Promise((res, rej) => {
         origTask.on(
             "state_changed",
@@ -93,7 +96,10 @@ export async function createAdvancedModel({
             : (await finalConvertFileToGLB(file)).blob;
         const base = file.name.replace(/\.[^.]+$/, "");
         const convRef = ref(storage, `${STORAGE_PATHS.CONVERTED}/${base}.glb`);
-        const convTask = uploadBytesResumable(convRef, blob);
+        const convTask = uploadBytesResumable(convRef, blob, {
+            contentType: "model/gltf-binary",
+            cacheControl: "public,max-age=31536000,immutable"
+        });
         convertedFileUrl = await new Promise((res, rej) => {
             convTask.on(
                 "state_changed",
@@ -118,7 +124,10 @@ export async function createAdvancedModel({
         const primary = renderFiles[selectedRenderIndex];
         if (primary) {
             const pRef = ref(storage, `${STORAGE_PATHS.RENDER_PRIMARY}/${primary.name}`);
-            const pTask = uploadBytesResumable(pRef, primary);
+            const pTask = uploadBytesResumable(pRef, primary, {
+                contentType: primary.type,
+                cacheControl: "public,max-age=31536000,immutable"
+            });
             renderPrimaryUrl = await new Promise((res, rej) => {
                 pTask.on(
                     "state_changed",
@@ -140,7 +149,10 @@ export async function createAdvancedModel({
                         storage,
                         `${STORAGE_PATHS.RENDER_EXTRAS}/${extra.name}`
                     );
-                    const xTask = uploadBytesResumable(xRef, extra);
+                    const xTask = uploadBytesResumable(xRef, extra, {
+                        contentType: extra.type,
+                        cacheControl: "public,max-age=31536000,immutable"
+                    });
                     return await new Promise<string>((res, rej) => {
                         xTask.on(
                             "state_changed",
@@ -160,7 +172,10 @@ export async function createAdvancedModel({
     let posterUrl: string | null = null;
     if (posterBlob) {
         const postRef = ref(storage, `${STORAGE_PATHS.POSTERS}/${file.name}.webp`);
-        const postTask = uploadBytesResumable(postRef, posterBlob);
+        const postTask = uploadBytesResumable(postRef, posterBlob, {
+            contentType: "image/webp",
+            cacheControl: "public,max-age=31536000,immutable"
+        });
         posterUrl = await new Promise((res, rej) => {
             postTask.on(
                 "state_changed",
