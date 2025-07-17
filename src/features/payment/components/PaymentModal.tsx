@@ -1,7 +1,9 @@
-import { useState } from "react";
-import { CheckoutForm } from "./CheckoutForm";
+import { useState, useEffect } from "react";
 import { useModal } from "@/hooks/useModal";
+import { CheckoutForm } from "./CheckoutForm";
+import { LazyStripeProvider } from "../provider/LazyStripeProvider";
 import type { PaymentModalProps } from "@/features/payment/types/payment";
+import { paymentService } from "@/features/payment/services/paymentService";
 
 export interface PaymentModalWithSuccessProps extends PaymentModalProps {
     onSuccess?: () => void;
@@ -16,6 +18,30 @@ export const PaymentModal = ({
     const [paymentStatus, setPaymentStatus] = useState<
         "idle" | "processing" | "success" | "error"
     >("idle");
+
+    const [clientSecret, setClientSecret] = useState<string>("");
+
+    // Create payment intent when the modal is opened
+    useEffect(() => {
+        const initPayment = async () => {
+            if (!isOpen) return;
+            try {
+                setPaymentStatus("processing");
+                const { clientSecret: secret } =
+                    (await paymentService.createPaymentIntent(model.id, model.price)) as {
+                        clientSecret: string;
+                    };
+                setClientSecret(secret);
+                setPaymentStatus("idle");
+            } catch (error) {
+                console.error("Error initializing payment:", error);
+                setPaymentStatus("error");
+            }
+        };
+
+        initPayment();
+    }, [isOpen, model.id, model.price]);
+
     const { close } = useModal("payment");
 
     const handlePaymentSuccess = () => {
@@ -160,14 +186,16 @@ export const PaymentModal = ({
                                 </div>
                             </div>
 
-                            <CheckoutForm
-                                modelId={model.id}
-                                amount={model.price}
-                                modelName={model.name}
-                                onSuccess={handlePaymentSuccess}
-                                onError={handlePaymentError}
-                                onCancel={handleCancel}
-                            />
+                            <LazyStripeProvider clientSecret={clientSecret}>
+                                <CheckoutForm
+                                    modelId={model.id}
+                                    amount={model.price}
+                                    modelName={model.name}
+                                    onSuccess={handlePaymentSuccess}
+                                    onError={handlePaymentError}
+                                    onCancel={handleCancel}
+                                />
+                            </LazyStripeProvider>
                         </>
                     )}
                 </div>

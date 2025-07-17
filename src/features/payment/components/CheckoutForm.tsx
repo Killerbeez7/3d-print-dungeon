@@ -1,11 +1,12 @@
-import { useState, useEffect, FormEvent } from "react";
+import { useState, FormEvent } from "react";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { paymentService } from "@/features/payment/services/paymentService";
+// Types
 import type { CheckoutFormProps } from "@/features/payment/types/payment";
+import type { StripePaymentElementChangeEvent } from "@stripe/stripe-js";
 import type { Stripe, StripeElements } from "@stripe/stripe-js";
 
 export const CheckoutForm = ({
-    modelId,
     amount,
     modelName,
     onSuccess,
@@ -17,27 +18,7 @@ export const CheckoutForm = ({
 
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string | null>(null);
-    const [clientSecret, setClientSecret] = useState<string>("");
-
-    useEffect(() => {
-        if (!modelId || !amount) return;
-
-        const createPaymentIntent = async () => {
-            try {
-                const { clientSecret: secret } = await paymentService.createPaymentIntent(
-                    modelId,
-                    amount
-                ) as { clientSecret: string };
-                setClientSecret(secret);
-            } catch (error) {
-                console.error("Error creating payment intent:", error);
-                setMessage("Failed to initialize payment. Please try again.");
-                onError?.(error);
-            }
-        };
-
-        createPaymentIntent();
-    }, [modelId, amount, onError]);
+    const [isDetailsComplete, setIsDetailsComplete] = useState<boolean>(false);
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -85,14 +66,9 @@ export const CheckoutForm = ({
         layout: "tabs" as const,
     };
 
-    if (!clientSecret) {
-        return (
-            <div className="flex items-center justify-center p-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
-                <span className="ml-3 text-txt-secondary">Initializing payment...</span>
-            </div>
-        );
-    }
+    const handleElementChange = (event: StripePaymentElementChangeEvent) => {
+        setIsDetailsComplete(event.complete);
+    };
 
     return (
         <div className="max-w-md mx-auto bg-bg-surface rounded-lg p-6 shadow-lg">
@@ -109,7 +85,11 @@ export const CheckoutForm = ({
             </div>
 
             <form id="payment-form" onSubmit={handleSubmit}>
-                <PaymentElement id="payment-element" options={paymentElementOptions} />
+                <PaymentElement
+                    id="payment-element"
+                    options={paymentElementOptions}
+                    onChange={handleElementChange}
+                />
 
                 <div className="flex gap-3 mt-6">
                     <button
@@ -121,7 +101,7 @@ export const CheckoutForm = ({
                         Cancel
                     </button>
                     <button
-                        disabled={isLoading || !stripe || !elements}
+                        disabled={isLoading || !stripe || !elements || !isDetailsComplete}
                         id="submit"
                         className="flex-1 px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
