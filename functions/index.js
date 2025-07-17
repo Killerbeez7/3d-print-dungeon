@@ -41,9 +41,36 @@ export const testStripeConnection = onCall(
     }
 );
 
+// Helper -> fetch (or create) Stripe customer for a Firebase UID
+const getOrCreateStripeCustomerId = async (uid, token) => {
+    const userRef = db.collection("users").doc(uid);
+    const userDoc = await userRef.get();
+    const userData = userDoc.data() || {};
+
+    if (userData.stripeCustomerId) {
+        return userData.stripeCustomerId;
+    }
+
+    const stripe = getStripe();
+    const customer = await stripe.customers.create({
+        email: token?.email ?? undefined,
+        name: userData.displayName || token?.name || undefined,
+        metadata: { firebaseUID: uid },
+    });
+
+    await userRef.set(
+        {
+            stripeCustomerId: customer.id,
+            updatedAt: FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+    );
+
+    return customer.id;
+};
+
 // =========================================== STRIPE PAYMENT FUNCTIONS ===========================================
 
-// create stripe customer
 export const createStripeCustomer = onCall(
     { secrets: [stripeSecretKey], cors: true, invoker: "public" },
     async (request) => {
@@ -51,28 +78,10 @@ export const createStripeCustomer = onCall(
             if (!request.auth) {
                 throw new HttpsError("unauthenticated", "User must be authenticated.");
             }
+
             const { uid, token } = request.auth;
-
-            const userDoc = await db.collection("users").doc(uid).get();
-            const userData = userDoc.data();
-
-            if (userData?.stripeCustomerId) {
-                return { customerId: userData.stripeCustomerId };
-            }
-
-            const stripe = getStripe();
-            const customer = await stripe.customers.create({
-                email: token.email,
-                name: userData?.displayName || token.name,
-                metadata: { firebaseUID: uid },
-            });
-
-            await db.collection("users").doc(uid).update({
-                stripeCustomerId: customer.id,
-                updatedAt: FieldValue.serverTimestamp(),
-            });
-
-            return { customerId: customer.id };
+            const customerId = await getOrCreateStripeCustomerId(uid, token);
+            return { customerId };
         } catch (error) {
             console.error("❌ Error in createStripeCustomer:", error);
             throw new HttpsError("internal", "Failed to create Stripe customer.");
@@ -80,7 +89,6 @@ export const createStripeCustomer = onCall(
     }
 );
 
-// create payment intent for model purchase
 export const createPaymentIntent = onCall(
     { secrets: [stripeSecretKey], cors: true, invoker: "public" },
     async (request) => {
@@ -89,7 +97,7 @@ export const createPaymentIntent = onCall(
                 throw new HttpsError("unauthenticated", "User must be authenticated.");
             }
             const { modelId, amount, currency = "usd" } = request.data;
-            const { uid } = request.auth;
+            const { uid, token } = request.auth;
 
             if (!modelId || !amount) {
                 throw new HttpsError(
@@ -104,7 +112,7 @@ export const createPaymentIntent = onCall(
             }
             const modelData = modelDoc.data();
 
-            const { customerId } = await createStripeCustomer(request);
+            const customerId = await getOrCreateStripeCustomerId(uid, token);
 
             const stripe = getStripe();
             const paymentIntent = await stripe.paymentIntents.create({
@@ -142,7 +150,6 @@ export const createPaymentIntent = onCall(
     }
 );
 
-// create subscription for premium features
 export const createSubscription = onCall(
     { secrets: [stripeSecretKey], invoker: "public" },
     async (request) => {
@@ -204,7 +211,6 @@ export const createSubscription = onCall(
     }
 );
 
-// handle payment success
 export const handlePaymentSuccess = onCall(
     { secrets: [stripeSecretKey], invoker: "public" },
     async (request) => {
@@ -280,7 +286,6 @@ export const handlePaymentSuccess = onCall(
     }
 );
 
-// get user's purchases
 export const getUserPurchases = onCall(
     { secrets: [stripeSecretKey], cors: true, invoker: "public" },
     async (request) => {
@@ -316,7 +321,6 @@ export const getUserPurchases = onCall(
     }
 );
 
-// get seller's sales
 export const getSellerSales = onCall(
     { secrets: [stripeSecretKey], invoker: "public" },
     async (request) => {
@@ -359,7 +363,6 @@ export const getSellerSales = onCall(
     }
 );
 
-// Create Stripe Connect account for a seller
 export const createConnectAccount = onCall(
     { secrets: [stripeSecretKey], invoker: "public" },
     async (request) => {
@@ -381,7 +384,10 @@ export const createConnectAccount = onCall(
             const stripe = getStripe();
             console.log("Stripe initialized successfully.");
 
-            console.log("Attempting to create Stripe Express account for email:", auth.token.email);
+            console.log(
+                "Attempting to create Stripe Express account for email:",
+                auth.token.email
+            );
             const account = await stripe.accounts.create({
                 type: "express",
                 email: auth.token.email,
@@ -418,7 +424,6 @@ export const createConnectAccount = onCall(
     }
 );
 
-// Generate onboarding link for a Stripe Connect account
 export const createAccountLink = onCall(
     { secrets: [stripeSecretKey], invoker: "public" },
     async (request) => {
