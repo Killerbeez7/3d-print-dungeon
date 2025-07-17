@@ -12,7 +12,14 @@
             rel="stylesheet"
         />
 
-        <link href="/src/styles.css" rel="stylesheet" />
+        <link
+            rel="preload"
+            href="/src/styles.css"
+            as="style"
+            onload="this.onload=null;this.rel='stylesheet'"
+        />
+
+        <noscript><link rel="stylesheet" href="/src/styles.css" /></noscript>
         <script>
             (function () {
                 // Check the localStorage for a saved theme, or fall back to the system preference.

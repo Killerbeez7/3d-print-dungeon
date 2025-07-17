@@ -4,11 +4,17 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { fileURLToPath } from "url";
 import compression from "vite-plugin-compression"; // gzip+br
+import webFontDownload from "vite-plugin-webfont-dl";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-    plugins: [react(), tailwindcss(), compression({ algorithm: "brotliCompress" })],
+    plugins: [
+        react(),
+        tailwindcss(),
+        compression({ algorithm: "brotliCompress" }),
+        webFontDownload()
+    ],
     resolve: {
         alias: {
             "@": path.resolve(__dirname, "./src"),
