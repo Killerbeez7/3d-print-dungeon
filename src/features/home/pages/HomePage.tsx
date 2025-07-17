@@ -6,14 +6,14 @@ import { STATIC_ASSETS } from "@/config/assetsConfig";
 // service
 import { fetchModels, PAGE_SIZE } from "@/features/models/services/modelsService";
 // components
-import { FilterPanel } from "./FilterPanel";
+import { FilterPanel } from "../components/FilterPanel";
 import { Spinner } from "@/features/shared/reusable/Spinner";
-import { FeaturedCarousel } from "./FeaturedCarousel";
-import { featuredMockData } from "./featuredMockData";
+import { FeaturedCarousel } from "../components/FeaturedCarousel";
+import { featuredMockData } from "../components/featuredMockData";
 import { ModelCardSkeleton } from "@/features/models/components/ModelCardSkeleton";
 import { InfiniteScrollList } from "@/features/shared/InfiniteScrollList";
 import { SequentialImage } from "@/features/shared/reusable/SequentialImage";
-import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
+import { getThumbnailUrl } from "@/utils/imageUtils";
 import { Artwork, SortBy } from "@/features/home/types/home";
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { InfiniteData } from "@tanstack/react-query";
@@ -72,7 +72,7 @@ function applyCategoryFilter(items: Artwork[], category: string): Artwork[] {
     );
 }
 
-export const Home = (): React.ReactNode => {
+export const HomePage = (): React.ReactNode => {
     const [sortBy, setSortBy] = useState<SortBy>("community");
     const [categoryFilter, setCategoryFilter] = useState<string>("all");
     const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
@@ -114,7 +114,7 @@ export const Home = (): React.ReactNode => {
     // map to "artwork" shape
     const artworks: Artwork[] = raw.map((m) => {
         const thumbUrl =
-            getThumbnailUrl(m.renderPrimaryUrl ?? null, THUMBNAIL_SIZES.MEDIUM) ||
+            getThumbnailUrl(m.renderPrimaryUrl ?? null, "MEDIUM") ||
             STATIC_ASSETS.PLACEHOLDER_IMAGE;
 
         return {
