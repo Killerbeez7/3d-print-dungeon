@@ -15,7 +15,6 @@ export class PaymentService {
             try {
                 if (attempt > 0) {
                     const delay = this.retryDelay * Math.pow(2, attempt - 1);
-                    // eslint-disable-next-line no-console
                     console.log(`Retrying ${name} in ${delay}ms...`);
                     await new Promise((r) => setTimeout(r, delay));
                 }
@@ -37,24 +36,17 @@ export class PaymentService {
             if (!auth.currentUser) {
                 throw new Error("User not authenticated. Please log in.");
             }
-            // eslint-disable-next-line no-console
             console.log("currentUser", auth.currentUser);
-            // eslint-disable-next-line no-console
             console.log("currentToken", auth.currentUser.getIdToken());
-            // eslint-disable-next-line no-console
             console.log("refreshing token...");
             await auth.currentUser.getIdToken(true);
-            // eslint-disable-next-line no-console
             console.log("token refreshed", auth.currentUser);
-            // eslint-disable-next-line no-console
             console.log("newToken", auth.currentUser.getIdToken());
             const callable = httpsCallable<unknown, T>(functions, fnName);
             const result = await callable(data);
-            // eslint-disable-next-line no-console
             console.log("result", result);
             return result.data;
         } catch (error) {
-            // eslint-disable-next-line no-console
             console.error(`❌ [${fnName}] Error:`, (error as Error).message || error);
             throw error;
         }
