@@ -6,6 +6,31 @@ import { fileURLToPath } from "url";
 import compression from "vite-plugin-compression"; // gzip+br
 import webFontDownload from "vite-plugin-webfont-dl";
 
+/**
+ * Replace render-blocking <link rel="stylesheet"> tags that Vite injects
+ * into the generated index.html with the recommended non-blocking preload
+ * pattern:
+ *   <link rel="preload" as="style" href="..." onload="this.rel='stylesheet'">.
+ * A <noscript> fallback is also added for users with JavaScript disabled.
+ */
+function nonBlockingCss() {
+    return {
+        name: "html-non-blocking-css",
+        apply: "build",
+        enforce: "post",
+        transformIndexHtml(html) {
+            return html.replace(/<link[^>]*rel="stylesheet"[^>]*href="([^"]+\.css)"[^>]*>/g, (
+                _fullMatch,
+                href,
+            ) => {
+                const preload = `<link rel="preload" href="${href}" as="style" onload="this.onload=null;this.rel='stylesheet'">`;
+                const fallback = `<noscript><link rel="stylesheet" href="${href}"></noscript>`;
+                return `${preload}\n${fallback}`;
+            });
+        },
+    };
+}
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
@@ -13,7 +38,8 @@ export default defineConfig({
         react(),
         tailwindcss(),
         compression({ algorithm: "brotliCompress" }),
-        webFontDownload()
+        webFontDownload(),
+        nonBlockingCss(),
     ],
     resolve: {
         alias: {
@@ -33,7 +59,7 @@ export default defineConfig({
                         'three/examples/jsm/loaders/OBJLoader',
                         'three/examples/jsm/exporters/GLTFExporter'
                     ]
-                }
+                },
             },
         },
         assetsDir: "assets",
