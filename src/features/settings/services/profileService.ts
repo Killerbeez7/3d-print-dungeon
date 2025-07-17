@@ -29,27 +29,17 @@ interface UserProfile extends ProfileData {
 }
 
 export const profileService = {
-    /**
-     * Upload an image to Firebase Storage
-     * @param file - The file to upload
-     * @param userId - The user's ID
-     * @param type - The type of image ('profile' or 'cover')
-     * @returns The download URL of the uploaded image
-     */
+
     async uploadImage(file: File, userId: string, type: 'profile' | 'cover'): Promise<string> {
         const imageRef = ref(storage, `users/${userId}/${type}`);
-        const snapshot = await uploadBytes(imageRef, file);
+        const snapshot = await uploadBytes(imageRef, file, {
+            contentType: file.type,
+            cacheControl: "public,max-age=31536000,immutable"
+        });
         return await getDownloadURL(snapshot.ref);
     },
 
-    /**
-     * Update user's profile information
-     * @param user - The current user object
-     * @param profileData - The profile data to update
-     * @param profilePicture - Optional new profile picture
-     * @param coverPhoto - Optional new cover photo
-     * @returns Updated photo and cover URLs
-     */
+
     async updateProfile(
         user: User,
         profileData: ProfileData,
@@ -104,16 +94,12 @@ export const profileService = {
         }
     },
 
-    /**
-     * Get user's profile data from Firestore
-     * @param userId - The user's ID
-     * @returns The user's profile data
-     */
+
     async getProfileData(userId: string): Promise<UserProfile | null> {
         try {
             const userDocRef = doc(db, "users", userId);
             const userDoc = await getDoc(userDocRef);
-            
+
             if (!userDoc.exists()) {
                 return null;
             }
