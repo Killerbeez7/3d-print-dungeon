@@ -33,7 +33,6 @@ export const AppRoutes: React.FC = () => {
         ...searchRoutes,
         ...homeRoutes,
         ...modelsRoutes,
-        ...eventsRoutes,
         ...businessRoutes,
         ...settingsRoutes,
         ...adminRoutes,
