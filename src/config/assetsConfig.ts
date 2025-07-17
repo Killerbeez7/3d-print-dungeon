@@ -52,14 +52,14 @@ export const STATIC_ASSETS: StaticAssets = {
         STORE_3D: "/assets/carousel-images/3d-store.png",
         PROJECT_IDEAS: "/assets/carousel-images/ProjectIdeas.png",
 
-        MINIATURES_COMPETITION: "/assets/carousel-images/MiniaturesCompetition.jpg",
-        SCHEDULED_MODELS: "/assets/carousel-images/ScheduledModels.jpg",
-        TRENDING_MODELS: "/assets/carousel-images/TrendingModels.jpg",
-        UPCOMING_MODELS: "/assets/carousel-images/UpcomingModels.jpg",
+        MINIATURES_COMPETITION: "/assets/carousel-images/MiniaturesCompetition_270.webp",
+        SCHEDULED_MODELS: "/assets/carousel-images/ScheduledModels_270.webp",
+        TRENDING_MODELS: "/assets/carousel-images/TrendingModels_270.webp",
+        UPCOMING_MODELS: "/assets/carousel-images/UpcomingModels_270.webp",
 
-        ARENA_MODELS: "/assets/carousel-images/ArenaModels.jpg",
+        ARENA_MODELS: "/assets/carousel-images/ArenaModels_270.webp",
         DUNGEON_MODELS: "/assets/carousel-images/DungeonModels.jpg",
-        BATTLE_MODELS: "/assets/carousel-images/BattleModels.jpg",
+        BATTLE_MODELS: "/assets/carousel-images/BattleModels_270.webp",
     },
 
     // 3D View images
