@@ -21,9 +21,10 @@ export interface FeaturedCarouselProps {
 interface FeaturedCarouselSlideProps {
     item: FeaturedCarouselItem;
     itemHeight: number;
+    priority?: boolean; // mark first visible slide for high fetch priority
 }
 
-const FeaturedCarouselSlide: FC<FeaturedCarouselSlideProps> = ({ item, itemHeight }) => {
+const FeaturedCarouselSlide: FC<FeaturedCarouselSlideProps> = ({ item, itemHeight, priority = false }) => {
     const linkRef = useRef<HTMLAnchorElement>(null);
     const [isHidden, setIsHidden] = useState<boolean>(false);
 
@@ -51,6 +52,11 @@ const FeaturedCarouselSlide: FC<FeaturedCarouselSlideProps> = ({ item, itemHeigh
                     alt={item.title}
                     className="w-full object-cover rounded-xl"
                     style={{ height: itemHeight }}
+                    loading={priority ? "eager" : "lazy"}
+                    fetchPriority={priority ? "high" : undefined}
+                    decoding="async"
+                    width="100%"
+                    height={itemHeight}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                     <div className="text-center">
@@ -80,8 +86,12 @@ export const FeaturedCarousel: FC<FeaturedCarouselProps> = ({
     return (
         <ReusableCarousel<FeaturedCarouselItem>
             items={items}
-            renderItem={(item) => (
-                <FeaturedCarouselSlide item={item} itemHeight={itemHeight} />
+            renderItem={(item, idx) => (
+                <FeaturedCarouselSlide
+                    item={item}
+                    itemHeight={itemHeight}
+                    priority={idx === 0}
+                />
             )}
             slidesToShow={slidesToShow}
             slidesToScroll={slidesToShow}
