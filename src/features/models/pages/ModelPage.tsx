@@ -4,10 +4,16 @@ import { useParams } from "react-router-dom";
 import { useModels } from "../hooks/useModels";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useModal } from "@/hooks/useModal";
-import { useViewTracker, useModelViewCount } from "@/features/models/services/viewService";
+import {
+    useViewTracker,
+    useModelViewCount,
+} from "@/features/models/services/viewService";
+import { useModelViewer } from "@/hooks/useModelViewer";
 
 const ModelViewer = lazy(() =>
-    import("../components/model-view/ModelViewer").then((module) => ({ default: module.ModelViewer }))
+    import("../components/model-view/ModelViewer").then((module) => ({
+        default: module.ModelViewer,
+    }))
 );
 
 //components
@@ -23,10 +29,13 @@ export function ModelPage() {
     const { currentUser } = useAuth();
     const { open } = useModal("auth");
     const [selectedRenderIndex, setSelectedRenderIndex] = useState<number>(-1);
+    const modelViewerLoaded = useModelViewer("timeout");
 
     // Use new lightweight view tracking system
     useViewTracker(modelId ?? "", currentUser ?? undefined);
-    const { count: viewCount, loading: viewCountLoading } = useModelViewCount(modelId ?? "");
+    const { count: viewCount, loading: viewCountLoading } = useModelViewCount(
+        modelId ?? ""
+    );
 
     useEffect(() => {
         const m = models.find((m: ModelData) => m.id === modelId);
@@ -52,19 +61,25 @@ export function ModelPage() {
         <div>
             <div className="text-txt-primary flex flex-col lg:flex-row gap-4 p-4 lg:p-6">
                 {/* VIEWER  --------------------------------------------------- */}
-                <Suspense
-                    fallback={
-                        <div className="relative w-full h-[40vh] lg:h-[calc(80vh-120px)] bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center contain-layout content-visibility-auto">
-                            <Spinner size={32} />
-                        </div>
-                    }
-                >
-                    <ModelViewer
-                        model={model}
-                        selectedRenderIndex={selectedRenderIndex}
-                        setSelectedRenderIndex={setSelectedRenderIndex}
-                    />
-                </Suspense>
+                {modelViewerLoaded ? (
+                    <Suspense
+                        fallback={
+                            <div className="relative w-full h-[40vh] lg:h-[calc(80vh-120px)] bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center contain-layout content-visibility-auto">
+                                <Spinner size={32} />
+                            </div>
+                        }
+                    >
+                        <ModelViewer
+                            model={model}
+                            selectedRenderIndex={selectedRenderIndex}
+                            setSelectedRenderIndex={setSelectedRenderIndex}
+                        />
+                    </Suspense>
+                ) : (
+                    <div className="relative w-full h-[40vh] lg:h-[calc(80vh-120px)] bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center contain-layout content-visibility-auto">
+                        <Spinner size={32} />
+                    </div>
+                )}
 
                 <ModelSidebar
                     model={model}

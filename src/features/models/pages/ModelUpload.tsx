@@ -2,6 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { createAdvancedModel } from "@/features/models/services/modelsService";
 import { finalConvertFileToGLB } from "@/features/models/utils/converter";
+import { useModelViewer } from "@/hooks/useModelViewer";
 
 // components
 import { FilesUpload } from "../components/model-upload/FilesUpload";
@@ -26,6 +27,7 @@ export function ModelUpload() {
     const [convertedBlob, setConvertedBlob] = useState<Blob | null>(null);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showSellerVerification, setShowSellerVerification] = useState(false);
+    const modelViewerLoaded = useModelViewer("timeout");
 
     const [modelData, setModelData] = useState<ModelData>({
         id: "",
@@ -75,6 +77,10 @@ export function ModelUpload() {
 
         let cleanupFn: (() => void) | undefined;
         async function loadIntoModelViewer() {
+            if (!modelViewerLoaded) {
+                console.log("Model viewer script not loaded yet, waiting...");
+                return;
+            }
             let blobToLoad: File | Blob = files[0];
             const lower = files[0].name.toLowerCase();
 
@@ -144,7 +150,7 @@ export function ModelUpload() {
         return () => {
             if (cleanupFn) cleanupFn();
         };
-    }, [files]);
+    }, [files, modelViewerLoaded]);
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
