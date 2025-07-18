@@ -90,7 +90,7 @@ export const FeaturedCarousel: FC<FeaturedCarouselProps> = ({
                 <FeaturedCarouselSlide
                     item={item}
                     itemHeight={itemHeight}
-                    priority={idx === 0}
+                    priority={idx < slidesToShow}
                 />
             )}
             slidesToShow={slidesToShow}
