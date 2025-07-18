@@ -126,7 +126,7 @@ export function ReusableCarousel<T = { id?: string | number }>(
                 {items.map((item, index) => (
                     <div
                         key={(item as { id?: string | number })?.id ?? index}
-                        className={`inline-block px-2 w-full sm:w-1/2 md:w-1/3 lg:w-1/6 ${itemClassName}`}
+                        className={`inline-block px-2 ${itemClassName}`}
                     >
                         {renderItem(item, index)}
                     </div>
