@@ -1,12 +1,20 @@
-import { SettingsPage } from "../pages/SettingsPage";
-import { ArtistProfilePage } from "@/features/artists/pages/ArtistProfilePage";
-import { ArtistsListPage } from "@/features/artists/pages/ArtistsListPage";
-import { withMaintenance, withProtectedMaintenance } from "@/helpers/routeHelpers";
+import { lazy, Suspense } from "react";
+import { withProtectedMaintenance } from "@/helpers/routeHelpers";
 import { ROUTES } from "@/constants/routeConstants";
 import type { RouteObject } from "react-router-dom";
+import { SettingsPageSkeleton } from "../components/SettingsPageSkeleton";
+
+const SettingsPage = lazy(() =>
+    import("../pages/SettingsPage").then((m) => ({ default: m.SettingsPage }))
+);
 
 export const settingsRoutes: RouteObject[] = [
-    { path: ROUTES.SETTINGS, element: withProtectedMaintenance(<SettingsPage />, { allowedRoles: ["admin", "artist", "user"] }) },
-    { path: ROUTES.ARTISTS_LIST, element: withMaintenance(<ArtistsListPage />) },
-    { path: ROUTES.ARTIST_PROFILE, element: withMaintenance(<ArtistProfilePage />) },
+    {
+        path: ROUTES.SETTINGS,
+        element: withProtectedMaintenance(
+            <Suspense fallback={<SettingsPageSkeleton />}>
+                <SettingsPage />
+            </Suspense>
+        ),
+    },
 ];

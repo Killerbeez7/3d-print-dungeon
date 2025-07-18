@@ -3,16 +3,16 @@ import { withMaintenance } from "@/helpers/routeHelpers";
 import { ROUTES } from "@/constants/routeConstants";
 import type { RouteObject } from "react-router-dom";
 
-const DynamicSearch = lazy(() =>
-    import("../components/DynamicSearch").then((m) => ({ default: m.DynamicSearch }))
+const CollectionsPage = lazy(() =>
+    import("../pages/CollectionsPage").then((m) => ({ default: m.CollectionsPage }))
 );
 
-export const searchRoutes: RouteObject[] = [
+export const collectionsRoutes: RouteObject[] = [
     {
-        path: ROUTES.SEARCH,
+        path: ROUTES.COLLECTIONS,
         element: withMaintenance(
             <Suspense>
-                <DynamicSearch />
+                <CollectionsPage />
             </Suspense>
         ),
     },

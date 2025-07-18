@@ -2,7 +2,7 @@ import React from "react";
 import { useRoutes, Navigate, RouteObject } from "react-router-dom";
 import { ROUTES } from "./constants/routeConstants";
 
-import { collectionsRoutes } from "./features/collections/routes/collectionsRouter";
+import { collectionsRoutes } from "./features/collections/routes/collectionsRoutes";
 import { artistsRoutes } from "./features/artists/routes/artistsRoutes";
 import { eventsRoutes } from "./features/events/routes/eventRoutes";
 import { adminRoutes } from "./features/admin/routes/adminRoutes";

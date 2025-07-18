@@ -1,16 +1,39 @@
+import { lazy, Suspense } from "react";
 import { ForumProvider } from "@/features/forum/providers/forumProvider";
 import { withProtectedMaintenance } from "@/helpers/routeHelpers";
 import type { RouteObject } from "react-router-dom";
 
-//components
-import { ForumLayout } from "../components/ForumLayout";
-import { ForumHome } from "../pages/ForumHome";
-import { ForumCategory } from "../components/ForumCategory";
-import { ForumThread } from "../components/ForumThread";
-import { ForumDashboard } from "../components/ForumDashboard";
-import { ForumMyThreads } from "../components/ForumMyThreads";
-import { ForumRules } from "@/features/forum/components/ForumRules";
-import { ForumHelp } from "@/features/forum/components/ForumHelp";
+// Layout
+const ForumLayout = lazy(() =>
+    import("../components/ForumLayout").then((m) => ({ default: m.ForumLayout }))
+);
+
+// Pages and Components
+const ForumHome = lazy(() =>
+    import("../pages/ForumHome").then((m) => ({ default: m.ForumHome }))
+);
+const ForumCategory = lazy(() =>
+    import("../components/ForumCategory").then((m) => ({ default: m.ForumCategory }))
+);
+const ForumThread = lazy(() =>
+    import("../components/ForumThread").then((m) => ({ default: m.ForumThread }))
+);
+const ForumDashboard = lazy(() =>
+    import("../components/ForumDashboard").then((m) => ({ default: m.ForumDashboard }))
+);
+const ForumMyThreads = lazy(() =>
+    import("../components/ForumMyThreads").then((m) => ({ default: m.ForumMyThreads }))
+);
+const ForumRules = lazy(() =>
+    import("@/features/forum/components/ForumRules").then((m) => ({
+        default: m.ForumRules,
+    }))
+);
+const ForumHelp = lazy(() =>
+    import("@/features/forum/components/ForumHelp").then((m) => ({
+        default: m.ForumHelp,
+    }))
+);
 
 // Route constants
 const FORUM_ROUTES = {
@@ -27,24 +50,83 @@ export const forumRoutes: RouteObject[] = [
         path: FORUM_ROUTES.FORUM,
         element: (
             <ForumProvider>
-                <ForumLayout />
+                <Suspense>
+                    <ForumLayout />
+                </Suspense>
             </ForumProvider>
         ),
         children: [
-            { index: true, element: <ForumHome /> },
-            { path: "category/:categoryId", element: <ForumCategory /> },
-            { path: "thread/:threadId", element: <ForumThread /> },
-            { path: "dashboard", element: <ForumDashboard /> },
-            { path: "my-threads", element: <ForumMyThreads /> },
-            { path: "rules", element: <ForumRules /> },
-            { path: "help", element: <ForumHelp /> },
+            {
+                index: true,
+                element: (
+                    <Suspense>
+                        <ForumHome />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "category/:categoryId",
+                element: (
+                    <Suspense>
+                        <ForumCategory />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "thread/:threadId",
+                element: (
+                    <Suspense>
+                        <ForumThread />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "dashboard",
+                element: (
+                    <Suspense>
+                        <ForumDashboard />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "my-threads",
+                element: (
+                    <Suspense>
+                        <ForumMyThreads />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "rules",
+                element: (
+                    <Suspense>
+                        <ForumRules />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "help",
+                element: (
+                    <Suspense>
+                        <ForumHelp />
+                    </Suspense>
+                ),
+            },
             {
                 path: "new-thread",
-                element: withProtectedMaintenance(<ForumThread isNew />),
+                element: withProtectedMaintenance(
+                    <Suspense>
+                        <ForumThread isNew />
+                    </Suspense>
+                ),
             },
             {
                 path: "thread/:threadId/edit",
-                element: withProtectedMaintenance(<ForumThread />),
+                element: withProtectedMaintenance(
+                    <Suspense>
+                        <ForumThread />
+                    </Suspense>
+                ),
             },
         ],
     },
