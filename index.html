@@ -15,6 +15,15 @@
         <!-- Preconnect to Firestore for faster first query handshake -->
         <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
 
+        <!-- Preload the LCP image for faster rendering on mobile -->
+        <link
+            rel="preload"
+            href="/assets/carousel-images/MiniaturesCompetition_270.webp"
+            as="image"
+            fetchpriority="high"
+        />
+
+        <!-- Preload the stylesheet -->
         <link
             rel="preload"
             href="/src/styles.css"
@@ -41,7 +50,10 @@
             })();
         </script>
         <title>3D Print Dungeon</title>
-        <meta name="description" content="3D Print Dungeon: Discover, share, and purchase 3D printable dungeon models, miniatures, and resources for tabletop gaming. Join our community of creators and enthusiasts!">
+        <meta
+            name="description"
+            content="3D Print Dungeon: Discover, share, and purchase 3D printable dungeon models, miniatures, and resources for tabletop gaming. Join our community of creators and enthusiasts!"
+        />
     </head>
     <body>
         <div id="root"></div>
