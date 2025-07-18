@@ -18,7 +18,7 @@ export const Footer = () => {
     };
 
     return (
-        <footer className="text-txt-secondary py-10 divider-top z-10 h-[160px] md:h-auto ">
+        <footer className="text-txt-secondary py-10 divider-top z-10 min-h-[28rem]">
             <div className="container mx-auto px-6 sm:px-8">
                 {/* Footer Top Section */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-center sm:text-left">
