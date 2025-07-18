@@ -1,7 +1,6 @@
 import { Suspense } from "react";
 import { Outlet } from "react-router-dom";
 
-
 //components
 import { Navbar } from "./navbar/Navbar";
 import { Footer } from "./footer/Footer";
@@ -13,7 +12,7 @@ export const Layout = () => {
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar />
-            <main className="flex-1">
+            <main className="flex-1 min-h-screen">
                 <Suspense
                     fallback={
                         <div className="h-full flex items-center justify-center">
