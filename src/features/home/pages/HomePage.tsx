@@ -4,13 +4,13 @@ import { useState, useCallback, useRef, useEffect } from "react";
 // config
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 // service
-import { fetchModels, PAGE_SIZE } from "@/features/models/services/modelsService";
+import { fetchModels } from "@/features/models/services/modelsService";
 // components
 import { FilterPanel } from "../components/FilterPanel";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import { FeaturedCarousel } from "../components/FeaturedCarousel";
 import { featuredMockData } from "../components/featuredMockData";
-import { ModelCardSkeleton } from "@/features/models/components/ModelCardSkeleton";
+import { ModelGridSkeleton } from "@/features/models/components/skeleton/ModelGridSkeleton";
 import { InfiniteScrollList } from "@/features/shared/InfiniteScrollList";
 import { SequentialImage } from "@/features/shared/reusable/SequentialImage";
 import { getThumbnailUrl } from "@/utils/imageUtils";
@@ -142,16 +142,6 @@ export const HomePage = (): React.ReactNode => {
         if (hasNextPage && !isFetchingNextPage) fetchNextPage();
     }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-    if (isLoading) {
-        return (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 p-4">
-                {Array.from({ length: PAGE_SIZE }).map((_, i) => (
-                    <ModelCardSkeleton key={i} />
-                ))}
-            </div>
-        );
-    }
-
     return (
         <div className="text-txt-primary min-h-screen px-4 md:px-10 2xl:px-18">
             {/* filter FAB */}
@@ -220,31 +210,40 @@ export const HomePage = (): React.ReactNode => {
                         </div>
                     }
                 >
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1">
-                        {filtered.map((art, idx) => (
-                            <Link key={art.id} to={`/model/${art.id}`}>
-                                <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
-                                    <div className="aspect-square min-h-[1px]">
-                                        <SequentialImage
-                                            index={idx}
-                                            loadIndex={loadIndex}
-                                            src={art.thumbnailUrl}
-                                            alt={art.title}
-                                            onLoad={bumpIndex}
-                                            width={400}
-                                            height={400}
-                                        />
-                                    </div>
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#000000dc] to-transparent flex items-end opacity-0 hover:opacity-100 transition-opacity rounded-md">
-                                        <div className="text-white m-2">
-                                            <h2 className="font-semibold" style={{ fontSize: "1rem" }}>{art.title}</h2>
-                                            <p className="text-sm">{art.artist}</p>
+                    {isLoading ? (
+                        <ModelGridSkeleton />
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1">
+                            {filtered.map((art, idx) => (
+                                <Link key={art.id} to={`/model/${art.id}`}>
+                                    <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
+                                        <div className="aspect-square min-h-[1px]">
+                                            <SequentialImage
+                                                index={idx}
+                                                loadIndex={loadIndex}
+                                                src={art.thumbnailUrl}
+                                                alt={art.title}
+                                                onLoad={bumpIndex}
+                                                width={400}
+                                                height={400}
+                                            />
                                         </div>
-                                    </div>
-                                </article>
-                            </Link>
-                        ))}
-                    </div>
+                                        <div className="absolute inset-0 bg-gradient-to-t from-[#000000dc] to-transparent flex items-end opacity-0 hover:opacity-100 transition-opacity rounded-md">
+                                            <div className="text-white m-2">
+                                                <h2
+                                                    className="font-semibold"
+                                                    style={{ fontSize: "1rem" }}
+                                                >
+                                                    {art.title}
+                                                </h2>
+                                                <p className="text-sm">{art.artist}</p>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </Link>
+                            ))}
+                        </div>
+                    )}
                 </InfiniteScrollList>
             </div>
         </div>
