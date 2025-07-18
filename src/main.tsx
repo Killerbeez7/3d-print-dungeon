@@ -3,6 +3,12 @@ import { BrowserRouter } from "react-router-dom";
 import { ScrollToTop } from "./utils/ScrollToTop";
 import { ErrorBoundary } from "@/features/shared/ErrorBoundary";
 
+// NProgress loading bar styles
+import "nprogress/nprogress.css";
+import "@/styles/nprogress.css";
+// Custom animation styles
+import "@/styles/animations.css";
+
 // React-Query
 // import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

@@ -4,17 +4,19 @@ import { ModelsProvider } from "./features/models/providers/modelsProvider";
 import { SearchProvider } from "./features/search/provider/searchProvider";
 import { ForumProvider } from "./features/forum/providers/forumProvider";
 import { Suspense } from "react";
-import { Spinner } from "@/features/shared/reusable/Spinner";
 import { AppRoutes } from "./AppRoutes";
+import { useRouteProgress } from "@/hooks/useRouteProgress";
 
 export const App = () => {
+    useRouteProgress();
+
     return (
         <AuthProvider>
             <ModelsProvider>
                 <SearchProvider>
                     <ForumProvider>
                         <ModalProvider>
-                            <Suspense fallback={<Spinner />}>
+                            <Suspense>
                                 <AppRoutes />
                             </Suspense>
                         </ModalProvider>

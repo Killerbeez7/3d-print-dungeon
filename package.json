@@ -15,6 +15,11 @@
         "hosting": "npm run generate-sitemap && npm run build && firebase deploy --only hosting",
         "generate-sitemap": "node src/scripts/sitemap.cjs"
     },
+    "browserslist": [
+        "defaults",
+        "not IE 11",
+        "not op_mini all"
+    ],
     "dependencies": {
         "@fingerprintjs/fingerprintjs": "^4.6.2",
         "@fortawesome/fontawesome-svg-core": "^6.7.2",
@@ -32,6 +37,7 @@
         "firebase": "^11.8.1",
         "firebase-admin": "^13.4.0",
         "lazysizes": "^5.3.2",
+        "nprogress": "^0.2.0",
         "prop-types": "^15.8.1",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
@@ -56,6 +62,7 @@
         "@testing-library/jest-dom": "^6.6.3",
         "@testing-library/react": "^16.3.0",
         "@types/node": "^22.15.30",
+        "@types/nprogress": "^0.2.3",
         "@types/react": "^19.0.10",
         "@types/react-dom": "^19.0.4",
         "@types/react-slick": "^0.23.13",
