@@ -13,3 +13,4 @@ LOCATION=europe-west1
 MAKE_PUBLIC=true
 MEMORY=1024
 RESIZED_IMAGES_PATH=thumbs 
+CACHE_CONTROL_HEADER=public,max-age=31536000,immutable 
