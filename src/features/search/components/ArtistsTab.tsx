@@ -11,6 +11,7 @@ import {
     limit,
 } from "firebase/firestore";
 import type { Artist } from "@/features/search/types/search";
+import { Spinner } from "@/features/shared/reusable/Spinner";
 
 interface ArtistsTabProps {
     searchTerm: string;
@@ -66,7 +67,9 @@ export const ArtistsTab = ({ searchTerm }: ArtistsTabProps) => {
     return (
         <div className="max-w-xl mx-auto">
             {loading ? (
-                <p className="text-sm text-txt-secondary">Loading artists...</p>
+                <div className="flex justify-center items-center">
+                    <Spinner size={24} />
+                </div>
             ) : artistResults.length === 0 ? (
                 <p className="text-sm text-txt-secondary">
                     {searchTerm.trim()
