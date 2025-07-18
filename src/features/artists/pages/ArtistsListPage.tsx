@@ -1,22 +1,16 @@
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "react-router-dom";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../../../config/firebaseConfig";
-import type { RawUserData } from "@/features/auth/types/auth";
+import { fetchArtists } from "../services/artistsService";
 import { ArtistListGrid } from "../components/ArtistListGrid";
-
-interface Artist extends RawUserData {
-    id: string;
-    bio?: string;
-    photoURL: string | null;
-    displayName: string | null;
-}
+import { ArtistListSkeleton } from "../components/ArtistListSkeleton";
+import type { Artist } from "../types/artists";
 
 export const ArtistsListPage = () => {
-    const [artists, setArtists] = useState<Artist[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const location = useLocation();
+    const { data: artists = [], isLoading, isError, error } = useQuery<Artist[], Error>({
+        queryKey: ["artists"],
+        queryFn: fetchArtists,
+    });
 
     // Determine if we're in the explore section
     const isExplore = location.pathname.startsWith("/explore");
@@ -24,54 +18,23 @@ export const ArtistsListPage = () => {
         return isExplore ? `/explore/artists/${artistId}` : `/artists/${artistId}`;
     };
 
-    useEffect(() => {
-        const fetchArtists = async () => {
-            try {
-                setLoading(true);
-                setError(null);
-
-                // Create a query for users where artist = true
-                const usersRef = collection(db, "users");
-                const artistsQuery = query(usersRef, where("artist", "==", true));
-                const querySnapshot = await getDocs(artistsQuery);
-
-                const artistsList: Artist[] = querySnapshot.docs.map((doc) => {
-                    const data = doc.data() as RawUserData & { bio?: string };
-                    return {
-                        ...data,
-                        id: doc.id,
-                        uid: data.uid ?? doc.id,
-                        email: data.email ?? null,
-                        displayName: data.displayName ?? null,
-                        photoURL: data.photoURL ?? null,
-                        bio: data.bio,
-                    };
-                });
-
-                setArtists(artistsList);
-            } catch (error) {
-                console.error("Error fetching artists:", error);
-                setError("Failed to load artists. Please try again later.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchArtists();
-    }, []);
-
-    if (loading) {
+    if (isLoading) {
         return (
-            <div className="flex justify-center items-center min-h-screen">
-                <p className="text-lg">Loading artists...</p>
-            </div>
+            <section className="text-txt-primary min-h-screen">
+                <div className="p-4">
+                    <h1 className="font-bold mb-4">Artists</h1>
+                    <ArtistListSkeleton />
+                </div>
+            </section>
         );
     }
 
-    if (error) {
+    if (isError) {
         return (
             <div className="flex flex-col justify-center items-center min-h-screen">
-                <p className="text-lg text-error mb-4">{error}</p>
+                <p className="text-lg text-error mb-4">
+                    Error: {error?.message || "Failed to load artists."}
+                </p>
                 <button
                     onClick={() => window.location.reload()}
                     className="px-4 py-2 bg-accent text-white rounded hover:bg-accent-hover"
@@ -95,7 +58,10 @@ export const ArtistsListPage = () => {
             <div className="p-4">
                 <h1 className="font-bold mb-4">Artists</h1>
                 <article>
-                    <ArtistListGrid artists={artistCardData} getArtistPath={getArtistPath} />
+                    <ArtistListGrid
+                        artists={artistCardData}
+                        getArtistPath={getArtistPath}
+                    />
                 </article>
             </div>
         </section>
