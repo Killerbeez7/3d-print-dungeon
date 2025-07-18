@@ -32,7 +32,7 @@ import type { NavSection } from "@/types/navbar";
 
 export const Navbar = (): React.ReactNode => {
     const { isAdmin } = useUserRole();
-    const { currentUser, handleSignOut } = useAuth();
+    const { currentUser, handleSignOut, loading } = useAuth();
     const { setShowDropdown } = useSearch();
     const { open } = useModal("auth");
 
@@ -216,6 +216,7 @@ export const Navbar = (): React.ReactNode => {
 
                             {!currentUser ? (
                                 <AuthButtons
+                                    isLoading={loading}
                                     onLoginClick={() => open({ mode: "login" })}
                                     onSignUpClick={() => open({ mode: "signup" })}
                                 />

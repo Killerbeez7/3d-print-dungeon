@@ -1,9 +1,19 @@
 interface AuthButtonsProps {
     onLoginClick: () => void;
     onSignUpClick: () => void;
+    isLoading: boolean;
 }
 
-export const AuthButtons = ({ onLoginClick, onSignUpClick }: AuthButtonsProps) => {
+export const AuthButtons = ({ onLoginClick, onSignUpClick, isLoading }: AuthButtonsProps) => {
+    if (isLoading) {
+        return (
+            <div className="hidden md:flex items-center space-x-4 animate-pulse">
+                <div className="bg-gray-300 rounded-full h-7 w-7"></div>
+                <div className="bg-gray-300 rounded-full h-7 w-7"></div>
+                <div className="bg-gray-300 rounded-full h-7 w-7"></div>
+            </div>
+        )
+    }
     return (
         <>
             {/* Desktop Version */}
