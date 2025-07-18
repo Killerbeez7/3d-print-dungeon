@@ -1,5 +1,3 @@
-import "./polyfills";
-import "@google/model-viewer";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { ScrollToTop } from "./utils/ScrollToTop";
