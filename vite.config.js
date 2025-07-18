@@ -19,14 +19,14 @@ function nonBlockingCss() {
         apply: "build",
         enforce: "post",
         transformIndexHtml(html) {
-            return html.replace(/<link[^>]*rel="stylesheet"[^>]*href="([^"]+\.css)"[^>]*>/g, (
-                _fullMatch,
-                href,
-            ) => {
-                const preload = `<link rel="preload" href="${href}" as="style" onload="this.onload=null;this.rel='stylesheet'">`;
-                const fallback = `<noscript><link rel="stylesheet" href="${href}"></noscript>`;
-                return `${preload}\n${fallback}`;
-            });
+            return html.replace(
+                /<link[^>]*rel="stylesheet"[^>]*href="([^"]+\.css)"[^>]*>/g,
+                (_fullMatch, href) => {
+                    const preload = `<link rel="preload" href="${href}" as="style" onload="this.onload=null;this.rel='stylesheet'">`;
+                    const fallback = `<noscript><link rel="stylesheet" href="${href}"></noscript>`;
+                    return `${preload}\n${fallback}`;
+                }
+            );
         },
     };
 }
@@ -48,23 +48,33 @@ export default defineConfig({
     },
     base: "/",
     build: {
+        target: "es2017", // ✅ Modern output to avoid legacy transpilation
         chunkSizeWarningLimit: 1500,
         assetsInlineLimit: 4096,
         rollupOptions: {
             output: {
                 manualChunks: {
-                    'three-core': ['three'],
-                    'three-loaders': [
-                        'three/examples/jsm/loaders/STLLoader',
-                        'three/examples/jsm/loaders/OBJLoader',
-                        'three/examples/jsm/exporters/GLTFExporter'
-                    ]
+                    "three-core": ["three"],
+                    "three-loaders": [
+                        "three/examples/jsm/loaders/STLLoader",
+                        "three/examples/jsm/loaders/OBJLoader",
+                        "three/examples/jsm/exporters/GLTFExporter",
+                    ],
+                    stripe: ["@stripe/stripe-js", "@stripe/react-stripe-js"],
+                    fontawesome: [
+                        "@fortawesome/fontawesome-svg-core",
+                        "@fortawesome/free-brands-svg-icons",
+                        "@fortawesome/free-regular-svg-icons",
+                        "@fortawesome/free-solid-svg-icons",
+                        "@fortawesome/react-fontawesome",
+                    ],
+                    "react-icons": ["react-icons"],
                 },
             },
         },
         assetsDir: "assets",
         copyPublicDir: true,
         sourcemap: true,
-        minify: 'terser',
-    }
+        minify: "terser",
+    },
 });
