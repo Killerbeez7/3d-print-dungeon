@@ -2,7 +2,6 @@ import "./polyfills";
 import "@google/model-viewer";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
-import { App } from "./App";
 import { ScrollToTop } from "./utils/ScrollToTop";
 import { ErrorBoundary } from "@/features/shared/ErrorBoundary";
 
@@ -21,28 +20,25 @@ const queryClient = new QueryClient({
 console.log("Starting app initialization...");
 
 const container = document.getElementById("root");
-console.log("=========== Main.tsx ===========");
-console.log("Root element:", container ? "✅ Found" : "❌ Missing");
 
 try {
     if (!container) throw new Error("Root container not found");
     const root = createRoot(container as HTMLElement);
-    console.log("Root created: ✅ True");
 
-    root.render(
-        <ErrorBoundary>
-            <QueryClientProvider client={queryClient}>
-                <BrowserRouter>
-                    <ScrollToTop />
-                    <App />
-                </BrowserRouter>
-
-                {/* Devtools overlay - remove in production */}
-                {/* <ReactQueryDevtools initialIsOpen={false} /> */}
-            </QueryClientProvider>
-        </ErrorBoundary>
-    );
-    console.log("Initial render called");
+    // Dynamically import App (and all Firebase-heavy providers) AFTER
+    // the first paint so it lands in a separate, non-blocking chunk.
+    import("./App").then(({ App }) => {
+        root.render(
+            <ErrorBoundary>
+                <QueryClientProvider client={queryClient}>
+                    <BrowserRouter>
+                        <ScrollToTop />
+                        <App />
+                    </BrowserRouter>
+                </QueryClientProvider>
+            </ErrorBoundary>
+        );
+    });
 } catch (error) {
     const err = error instanceof Error ? error : new Error(String(error));
     console.error("Error during app initialization:", err);
