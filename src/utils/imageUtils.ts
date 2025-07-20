@@ -15,12 +15,27 @@ export function getThumbnailUrl(
         const pathParam = url.searchParams.get("o") || url.pathname.split("/o/")[1];
         if (!pathParam) return originalUrl;
         const decodedPath = decodeURIComponent(pathParam);
-        const lastSlashIndex = decodedPath.lastIndexOf("/");
-        const directory = decodedPath.substring(0, lastSlashIndex);
-        const filename = decodedPath.substring(lastSlashIndex + 1);
-        const nameWithoutExt = filename.replace(/\.[^.]+$/, "");
+
+        // Separate directory and filename, taking into account existing "/thumbs/" folders
+        let baseDirectory: string;
+        let filename: string;
+
+        if (decodedPath.includes("/thumbs/")) {
+            const [dir, file] = decodedPath.split("/thumbs/");
+            baseDirectory = dir; // path before the existing "thumbs" segment
+            filename = file;     // filename that follows
+        } else {
+            const lastSlashIndex = decodedPath.lastIndexOf("/");
+            baseDirectory = decodedPath.substring(0, lastSlashIndex);
+            filename = decodedPath.substring(lastSlashIndex + 1);
+        }
+
+        // Remove file extension and any existing dimension suffix (e.g. _200x200)
+        const nameWithoutExt = filename
+            .replace(/\.[^.]+$/, "") // remove extension
+            .replace(/_\d+x\d+$/, ""); // strip existing size suffix if present
         const thumbnailFilename = `${nameWithoutExt}_${dim}.webp`;
-        const thumbnailPath = `${directory}/thumbs/${thumbnailFilename}`;
+        const thumbnailPath = `${baseDirectory}/thumbs/${thumbnailFilename}`;
         const thumbnailUrl = originalUrl.replace(
             encodeURIComponent(decodedPath),
             encodeURIComponent(thumbnailPath)
