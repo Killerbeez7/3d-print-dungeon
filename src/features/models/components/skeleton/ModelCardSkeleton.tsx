@@ -1,12 +1,25 @@
-export function ModelCardSkeleton() {
+export interface ModelCardSkeletonProps {
+    // Zero-based index used to calculate animation delay for sequential fade-in.
+    index?: number;
+}
+
+export function ModelCardSkeleton({ index = 0 }: ModelCardSkeletonProps) {
+    const delayMs = index * 15; // 15 ms stagger per card (twice as fast)
+
     return (
-        <div className="relative bg-bg-surface rounded-md overflow-hidden animate-pulse w-full aspect-square flex flex-col">
-            {/* Image placeholder */}
-            <div className="bg-bg-secondary h-2/3 w-full" />
-            {/* Title bar placeholder */}
-            <div className="bg-bg-secondary h-6 w-3/4 mt-4 mx-auto rounded" />
-            {/* Subtitle/avatar placeholder */}
-            <div className="bg-bg-secondary h-4 w-1/2 mt-2 mx-auto rounded" />
+        <div
+            className="relative bg-bg-secondary rounded-md overflow-hidden animate-pulse w-full aspect-square flex items-center justify-center"
+            style={{
+                opacity: 0,
+                animation: "fadeIn 0.25s ease-out forwards",
+                animationDelay: `${delayMs}ms`,
+            }}
+        >
+            <img
+                src="/assets/images/logo.png"
+                alt="3D Print Dungeon Logo"
+                className="h-1/2 w-1/2 object-contain filter grayscale brightness-50"
+            />
         </div>
     );
-} 
+}
