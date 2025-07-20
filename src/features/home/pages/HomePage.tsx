@@ -204,6 +204,7 @@ export const HomePage = (): React.ReactNode => {
                     items={filtered}
                     hasMore={hasNextPage}
                     loadMore={loadMore}
+                    isLoading={isFetchingNextPage || isLoading}
                     loader={
                         <div className="flex justify-center my-4">
                             <Spinner size={24} />
@@ -216,7 +217,14 @@ export const HomePage = (): React.ReactNode => {
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1">
                             {filtered.map((art, idx) => (
                                 <Link key={art.id} to={`/model/${art.id}`}>
-                                    <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
+                                    <article
+                                        className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full"
+                                        style={{
+                                            opacity: 0,
+                                            animation: "fadeIn 0.5s ease-out forwards",
+                                            animationDelay: `${idx * 30}ms`,
+                                        }}
+                                    >
                                         <div className="aspect-square min-h-[1px]">
                                             <SequentialImage
                                                 index={idx}
