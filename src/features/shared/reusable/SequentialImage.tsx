@@ -1,5 +1,19 @@
 import { memo } from "react";
 
+/**
+*Example usage:
+
+<SequentialImage
+    index={idx}
+    loadIndex={loadIndex}
+    src={art.thumbnailUrl}
+    alt={art.title}
+    onLoad={bumpIndex}
+    width={400}
+    height={400}
+/>
+ **/
+
 export interface SequentialImageProps {
     src: string;
     alt: string;
