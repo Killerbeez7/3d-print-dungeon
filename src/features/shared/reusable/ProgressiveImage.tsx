@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
+import { getThumbnailUrl } from "@/utils/imageUtils";
 
 export type ProgressiveImageUseCase = "card" | "hero" | "xlarge" | "grid" | "thumbnail";
 
@@ -18,11 +18,19 @@ export const ProgressiveImage = ({
 }: ProgressiveImageProps) => {
     const [highLoaded, setHighLoaded] = useState(false);
 
-    const lowResSrc = getThumbnailUrl(src, THUMBNAIL_SIZES.SMALL);
-    const highResSrc =
-        useCase === "hero" || useCase === "xlarge"
-            ? getThumbnailUrl(src, THUMBNAIL_SIZES.XLARGE)
-            : getThumbnailUrl(src, THUMBNAIL_SIZES.LARGE);
+    const lowResSrc = getThumbnailUrl(src, "SMALL") || getThumbnailUrl(src, "MEDIUM") || src;
+    let highResSrc: string | null;
+    switch (useCase) {
+        case "hero":
+        case "xlarge":
+            highResSrc = getThumbnailUrl(src, "XLARGE");
+            break;
+        case "grid":
+            highResSrc = getThumbnailUrl(src, "MEDIUM"); // 400×400 thumb for grid cards
+            break;
+        default:
+            highResSrc = getThumbnailUrl(src, "LARGE");
+    }
 
     return (
         <div
@@ -32,7 +40,7 @@ export const ProgressiveImage = ({
             aria-label={alt}
         >
             <img
-                src={lowResSrc ?? undefined}
+                src={lowResSrc}
                 alt=""
                 aria-hidden="true"
                 className={`
