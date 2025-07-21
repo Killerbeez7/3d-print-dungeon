@@ -56,6 +56,14 @@ export const Navbar = (): React.ReactNode => {
         setShowDropdown(false);
     };
 
+    const handleLogoClick = (): void => {
+        if (location.pathname === "/") {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        } else {
+            navigate("/");
+        }
+    };
+
     const toggleDropdown = (dropdownName: string): void => {
         setActiveDropdown((prev) => (prev === dropdownName ? null : dropdownName));
     };
@@ -141,7 +149,11 @@ export const Navbar = (): React.ReactNode => {
 
                             {/* logo desktop */}
                             <div className="hidden md:block whitespace-nowrap flex-shrink-0 w-[50px]">
-                                <Link to="/" className="flex items-center space-x-2 ml-2">
+                                <Link
+                                    to="/"
+                                    className="flex items-center space-x-2 ml-2"
+                                    onClick={handleLogoClick}
+                                >
                                     <img
                                         src={STATIC_ASSETS.LOGO}
                                         alt="Site Logo"
