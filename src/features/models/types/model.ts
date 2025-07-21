@@ -1,31 +1,34 @@
-export interface ModelData {
-    id: string;
-    name: string;
-    description?: string;
-    category?: string;
-    tags?: string[];
-    renderFiles?: File[];
-    renderPreviewUrls?: string[];
-    selectedRenderIndex?: number;
-    price?: number;
-    isPaid?: boolean;
-    uploaderId?: string;
-    uploaderDisplayName?: string;
-    convertedFileUrl?: string;
-    originalFileUrl?: string;
-    renderExtraUrls?: string[];
-    posterUrl?: string;
-    renderPrimaryUrl?: string;
-    likes?: number;
-    views?: number;
-    createdAt?: { seconds?: number } | number | string | null;
+import { z } from "zod";
+
+export const modelSchema = z.object ({
+    id: z.string(),
+    name: z.string(),
+    description: z.string().optional(),
+    category: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    renderFiles: z.array(z.instanceof(File)).optional(),
+    renderPreviewUrls: z.array(z.string()).optional(),
+    selectedRenderIndex: z.number().optional(),
+    price: z.number().optional(),
+    isPaid: z.boolean().optional(),
+    uploaderId: z.string().optional(),
+    uploaderDisplayName: z.string().optional(),
+    convertedFileUrl: z.string().optional(),
+    originalFileUrl: z.string().optional(),
+    renderExtraUrls: z.array(z.string()).optional(),
+    posterUrl: z.string().optional(),
+    renderPrimaryUrl: z.string().optional(),
+    likes: z.number().optional(),
+    views: z.number().optional(),
+    createdAt: z.union([z.object({ seconds: z.number() }), z.number(), z.string(), z.null()]).optional(),
     /* extra */
-    medium?: string;
-    subjects?: string[];
-    subject?: string;
-    isAI?: boolean;
-    [key: string]: unknown;
-}
+    medium: z.string().optional(),
+    subjects: z.array(z.string()).optional(),
+    subject: z.string().optional(),
+    isAI: z.boolean().optional(),
+}).catchall(z.unknown());
+
+export type ModelData = z.infer<typeof modelSchema>;
 
 
 
