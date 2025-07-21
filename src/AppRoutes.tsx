@@ -21,8 +21,8 @@ import { settingsRoutes } from "./features/settings/routes/settingsRoutes";
 import Layout from "./features/shared/Layout";
 
 export const AppRoutes: React.FC = () => {
-    // Aggregate all child routes into a single RouteObject array
-    const childRoutes: RouteObject[] = [
+    const mainRoutes: RouteObject[] = [
+        ...homeRoutes,
         ...maintenanceRoutes,
         ...collectionsRoutes,
         ...artistsRoutes,
@@ -31,26 +31,18 @@ export const AppRoutes: React.FC = () => {
         ...marketplaceRoutes,
         ...printedFiguresRoutes,
         ...searchRoutes,
-        ...homeRoutes,
         ...modelsRoutes,
         ...businessRoutes,
         ...settingsRoutes,
         ...adminRoutes,
         ...forumRoutes,
-
-        // fallback for unknown routes
-        {
-            path: "*",
-            element: <Navigate to={ROUTES.HOME} replace />,
-        },
+        { path: "*", element: <Navigate to={ROUTES.HOME} replace /> },
     ];
 
-    // Define the top-level route
     const routesConfig: RouteObject[] = [
         {
-            path: ROUTES.HOME,
             element: <Layout />,
-            children: childRoutes,
+            children: mainRoutes,
         },
     ];
 
