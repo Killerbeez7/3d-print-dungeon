@@ -244,26 +244,38 @@ export const incrementModelViews = async (modelId: string): Promise<void> => {
     }
 };
 
-export const PAGE_SIZE = 30;
+export const PAGE_SIZE = 32;
+
+export interface FetchModelsOptions {
+    limit?: number;
+    cursor?: QueryDocumentSnapshot<DocumentData>;
+}
 
 /**
  * Fetch models with pagination.
  */
-export async function fetchModels(pageParam?: QueryDocumentSnapshot<DocumentData>): Promise<{
+export async function fetchModels(
+    pageParam?: QueryDocumentSnapshot<DocumentData>
+): Promise<{
     models: ModelData[];
-    nextCursor: QueryDocumentSnapshot<DocumentData> | undefined;
+    nextCursor?: QueryDocumentSnapshot<DocumentData>;
 }> {
-    const base = query(collection(db, "models"), orderBy("createdAt", "desc"));
-    const q = pageParam
-        ? query(base, startAfter(pageParam), limit(PAGE_SIZE))
-        : query(base, limit(PAGE_SIZE));
-    const snap = await getDocs(q);
+    const baseQuery = query(collection(db, "models"), orderBy("createdAt", "desc"));
+    const paginatedQuery = pageParam
+        ? query(baseQuery, startAfter(pageParam), limit(PAGE_SIZE))
+        : query(baseQuery, limit(PAGE_SIZE));
+
+    const snapshot = await getDocs(paginatedQuery);
+
     return {
-        models: snap.docs.map((d) => ({
-            ...(d.data() as ModelData),
-            id: d.id,
+        models: snapshot.docs.map((doc) => ({
+            ...(doc.data() as ModelData),
+            id: doc.id,
         })),
-        nextCursor:
-            snap.docs.length === PAGE_SIZE ? snap.docs[snap.docs.length - 1] : undefined,
+        nextCursor: snapshot.docs.length === PAGE_SIZE
+            ? snapshot.docs[snapshot.docs.length - 1]
+            : undefined,
     };
 }
+
+

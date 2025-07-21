@@ -7,8 +7,10 @@ import { Footer } from "./footer/Footer";
 import { AuthModal } from "../auth/components/AuthModal";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import { ScrollToTopButton } from "@/features/shared/ScrollToTopButton";
+import { LayoutProvider, useLayout } from "./context/layoutContext";
 
-export const Layout = () => {
+const AppLayout = () => {
+    const { isFooterHidden } = useLayout();
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar />
@@ -25,9 +27,18 @@ export const Layout = () => {
                 </Suspense>
             </main>
             <AuthModal />
-            <Footer />
+            {!isFooterHidden && <Footer />}
         </div>
     );
 };
+
+
+export const Layout = () => {
+    return (
+        <LayoutProvider>
+            <AppLayout />
+        </LayoutProvider>
+    )
+}
 
 export default Layout;

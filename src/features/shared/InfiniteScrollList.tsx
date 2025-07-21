@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 
