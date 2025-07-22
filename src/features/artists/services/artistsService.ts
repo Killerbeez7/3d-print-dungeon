@@ -1,15 +1,15 @@
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { db } from "../../../config/firebaseConfig";
-import type { Artist } from "../types/artists";
+import type { ArtistData } from "../types/artists";
 
 
-export const fetchArtists = async (): Promise<Artist[]> => {
+export const fetchArtists = async (): Promise<ArtistData[]> => {
     const usersRef = collection(db, "users");
     const artistsQuery = query(usersRef, where("artist", "==", true));
     const querySnapshot = await getDocs(artistsQuery);
 
-    const artistsList: Artist[] = querySnapshot.docs.map((doc) => {
-        const data = doc.data() as Artist;
+    const artistsList: ArtistData[] = querySnapshot.docs.map((doc) => {
+        const data = doc.data() as ArtistData;
         return {
             ...data,
             id: doc.id,
