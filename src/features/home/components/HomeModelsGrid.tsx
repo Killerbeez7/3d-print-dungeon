@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { ModelData } from "@/features/models/types/model";
 import { SequentialImage } from "@/features/shared/reusable/SequentialImage";
 
-export const ModelsListGrid = ({models, loadIndex, bumpIndex}: {models: ModelData[], loadIndex: number, bumpIndex: () => void}) => {
+export const HomeModelsGrid = ({models, loadIndex, bumpIndex}: {models: ModelData[], loadIndex: number, bumpIndex: () => void}) => {
     return (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1">
             {models.map((m, idx) => (

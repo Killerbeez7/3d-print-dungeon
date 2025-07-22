@@ -4,7 +4,7 @@ import { featuredMockData } from "../components/featuredMockData";
 import { InfiniteScrollList } from "@/features/shared/InfiniteScrollList";
 import { useFetchModels } from "@/features/models/hooks/useFetchModels";
 
-import { ModelsListGrid } from "./ModelsListGrid";
+import { HomeModelsGrid } from "../components/HomeModelsGrid";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 
 import { useState, useCallback, useEffect } from "react";
@@ -69,7 +69,7 @@ export const HomePage = (): React.ReactNode => {
                     {isLoading && !models.length ? (
                         showSpinner()
                     ) : (
-                        <ModelsListGrid
+                        <HomeModelsGrid
                             models={models}
                             loadIndex={loadIndex}
                             bumpIndex={bumpIndex}
