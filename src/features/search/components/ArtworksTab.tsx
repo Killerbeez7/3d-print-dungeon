@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { LazyImage } from "@/features/shared/reusable/LazyImage";
-import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
+import { getThumbnailUrl } from "@/utils/imageUtils";
 import type { SortBy, Medium, Subject } from "@/features/search/types/search";
 import type { ModelData } from "@/features/models/types/model";
 
@@ -198,7 +198,7 @@ export const ArtworksTab = ({ searchTerm, models }: ArtworksTabProps) => {
                                 <div className="relative w-full aspect-square">
                                     <LazyImage
                                         src={
-                                            getThumbnailUrl(m.renderPrimaryUrl ?? null, THUMBNAIL_SIZES.MEDIUM) ?? undefined
+                                            getThumbnailUrl(m.renderPrimaryUrl ?? null, "SMALL") ?? undefined
                                         }
                                         alt={m.name}
                                         className="absolute inset-0 w-full h-full object-cover rounded-lg"

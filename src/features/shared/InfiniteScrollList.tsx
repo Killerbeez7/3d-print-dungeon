@@ -21,6 +21,7 @@ export const InfiniteScrollList = ({
 }: InfiniteScrollListProps) => {
     return (
         <InfiniteScroll
+            style={{ overflow: "visible" }}
             dataLength={items.length}
             next={loadMore}
             hasMore={hasMore}

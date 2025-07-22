@@ -1,21 +1,25 @@
-import { useQuery } from "@tanstack/react-query";
-import { fetchArtists } from "../services/artistsService";
+import { useFetchArtists } from "../hooks/useFetchArtists";
 import { ArtistListGrid } from "../components/ArtistListGrid";
 import { ArtistListSkeleton } from "../components/ArtistListSkeleton";
+import { InfiniteScrollList } from "@/features/shared/InfiniteScrollList";
+import { Spinner } from "@/features/shared/reusable/Spinner";
 import type { ArtistData } from "../types/artists";
 
 export const ArtistsListPage = () => {
     const {
-        data: artists = [],
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
         isLoading,
         isError,
         error,
-    } = useQuery<ArtistData[], Error>({
-        queryKey: ["artists"],
-        queryFn: fetchArtists,
-    });
+    } = useFetchArtists({});
 
-    if (isLoading) {
+    const pages = data?.pages ?? [];
+    const artists: ArtistData[] = pages.flatMap((p) => p.artists);
+
+    if (isLoading && artists.length === 0) {
         return (
             <section className="text-txt-primary min-h-screen">
                 <div className="p-4">
@@ -42,7 +46,6 @@ export const ArtistsListPage = () => {
         );
     }
 
-    // Prepare data for ArtistListGrid (no getArtistPath in the object)
     const artistCardData = artists.map((artist) => ({
         id: artist.id,
         displayName: artist.displayName,
@@ -50,15 +53,26 @@ export const ArtistsListPage = () => {
         bio: artist.bio,
     }));
 
+    const loader = (
+        <div className="col-span-full flex justify-center py-10">
+            <Spinner size={24} />
+        </div>
+    );
+
     return (
         <section className="text-txt-primary min-h-screen">
             <div className="p-4">
                 <h1 className="font-bold mb-4">Artists</h1>
                 <article>
-                    <ArtistListGrid
-                        artists={artistCardData}
-                        getArtistPath={(id) => `/artists/${id}`}
-                    />
+                    <InfiniteScrollList
+                        items={artists}
+                        hasMore={Boolean(hasNextPage)}
+                        loadMore={fetchNextPage}
+                        isLoading={isFetchingNextPage}
+                        loader={loader}
+                    >
+                        <ArtistListGrid artists={artistCardData} />
+                    </InfiniteScrollList>
                 </article>
             </div>
         </section>
