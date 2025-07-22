@@ -17,11 +17,12 @@ export const HomePage = (): React.ReactNode => {
 
     const queryClient = useQueryClient();
 
+    // Clear models cache whenever route changes away from home
     useEffect(() => {
-        // Cleanup function to remove the query cache on unmount
         return () => {
-            console.log("HomePage unmounting: removing 'models' query from cache.");
-            queryClient.removeQueries({ queryKey: ["models"], exact: true });
+            queryClient.removeQueries({
+                predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === "models",
+            });
         };
     }, [queryClient]);
 
