@@ -8,7 +8,7 @@ import {
     MdThumbUp,
     MdDelete,
 } from "react-icons/md";
-import { getThumbnailUrl, THUMBNAIL_SIZES } from "../../../utils/imageUtils";
+import { getThumbnailUrl } from "../../../utils/imageUtils";
 import type { AdminModel, AdminUser } from "@/features/admin/types/admin";
 
 // Cache duration in milliseconds (5 minutes)
@@ -116,7 +116,7 @@ export const Analytics = () => {
                 id: doc.id,
                 ...doc.data(),
                 thumbnail:
-                    getThumbnailUrl(doc.data().renderPrimaryUrl, THUMBNAIL_SIZES.SMALL) ||
+                    getThumbnailUrl(doc.data().renderPrimaryUrl, "SMALL") ||
                     doc.data().posterUrl ||
                     "/placeholder.png",
             })) as AdminModel[];
@@ -128,7 +128,7 @@ export const Analytics = () => {
                 .map((model) => ({
                     ...model,
                     thumbnail:
-                        getThumbnailUrl(model.renderPrimaryUrl as string, THUMBNAIL_SIZES.SMALL) ||
+                        getThumbnailUrl(model.renderPrimaryUrl as string, "SMALL") ||
                         model.posterUrl ||
                         "/placeholder.png",
                 })) as AdminModel[];
@@ -295,7 +295,8 @@ export const Analytics = () => {
                                     </p>
                                     <p className="text-sm text-txt-secondary">
                                         {new Date(
-                                            (model.createdAt as { seconds: number })?.seconds * 1000
+                                            (model.createdAt as { seconds: number })
+                                                ?.seconds * 1000
                                         ).toLocaleDateString()}
                                     </p>
                                     <p className="text-xs text-txt-secondary">
@@ -327,7 +328,9 @@ export const Analytics = () => {
                                             {model.name as string}
                                         </p>
                                         <p className="text-sm text-txt-secondary">
-                                            By {model.uploaderDisplayName as string || "Anonymous"}
+                                            By{" "}
+                                            {(model.uploaderDisplayName as string) ||
+                                                "Anonymous"}
                                         </p>
                                         <div className="flex items-center space-x-2 text-txt-secondary text-sm">
                                             <MdRemoveRedEye className="w-4 h-4" />
@@ -351,13 +354,16 @@ export const Analytics = () => {
                             >
                                 <div className="flex items-center space-x-3">
                                     <img
-                                        src={user.photoURL as string || "/default-avatar.png"}
+                                        src={
+                                            (user.photoURL as string) ||
+                                            "/default-avatar.png"
+                                        }
                                         alt={user.displayName as string}
                                         className="w-10 h-10 rounded-full bg-bg-surface"
                                     />
                                     <div>
                                         <p className="text-txt-primary font-medium">
-                                            {user.displayName as string || "Anonymous"}
+                                            {(user.displayName as string) || "Anonymous"}
                                         </p>
                                         <p className="text-sm text-txt-secondary">
                                             {user.uploadCount || 0} uploads

@@ -66,7 +66,7 @@ export const UploadsTab = ({ userId }: UploadsTabProps) => {
                                 src={
                                     getThumbnailUrl(
                                         art.renderPrimaryUrl ?? null,
-                                        THUMBNAIL_SIZES.MEDIUM
+                                        "MEDIUM"
                                     ) || "/default-image.jpg"
                                 }
                                 alt={art.name || "Untitled"}

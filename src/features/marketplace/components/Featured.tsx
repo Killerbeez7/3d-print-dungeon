@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { LazyImage } from "@/features/shared/reusable/LazyImage";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
-import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
+import { getThumbnailUrl } from "@/utils/imageUtils";
 import type { ModelData } from "@/features/models/types/model";
 import type { FC } from "react";
 interface FeaturedProps { previewCount?: number; }
@@ -87,7 +87,7 @@ export const Featured: FC<FeaturedProps> = ({ previewCount }) => {
                                         src={
                                             getThumbnailUrl(
                                                 model.renderPrimaryUrl,
-                                                THUMBNAIL_SIZES.MEDIUM
+                                                "MEDIUM"
                                             ) || "/assets/images/default-image.png"
                                         }
                                         alt={model.name}

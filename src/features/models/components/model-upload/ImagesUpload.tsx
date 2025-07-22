@@ -61,7 +61,7 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ modelData, setModelData })
                 {/* 4:3 Cover */}
                 <ImageUploadBox
                     label="Desktop cover 4:3"
-                    image={modelData.renderPreviewUrls[0]}
+                    image={modelData.renderPreviewUrls?.[0]}
                     onUpload={(e) => handleImageUpload(e, "cover4_3")}
                     onRemove={() => handleRemoveImage(0)}
                     id="cover4_3"
@@ -70,7 +70,7 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ modelData, setModelData })
                 {/* 3:4 Cover */}
                 <ImageUploadBox
                     label="Mobile cover 3:4"
-                    image={modelData.renderPreviewUrls[1]}
+                    image={modelData.renderPreviewUrls?.[1]}
                     onUpload={(e) => handleImageUpload(e, "cover3_4")}
                     onRemove={() => handleRemoveImage(1)}
                     id="cover3_4"
@@ -79,7 +79,7 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ modelData, setModelData })
             </div>
             {/* Additional Model Images */}
             <h4 className="font-semibold mt-4 mb-2">
-                Model Pictures ({modelData.renderPreviewUrls.length} / 16)
+                Model Pictures ({modelData.renderPreviewUrls?.length} / 16)
             </h4>
             <p className="text-sm text-gray-400">
                 Photos of the printed model, png/jpg/webp/gif, ≤ 30MB/piece, 4:3 ratio
@@ -100,7 +100,7 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ modelData, setModelData })
                 + Add Photo
             </label>
             <div className="flex flex-wrap gap-2 mt-3">
-                {modelData.renderPreviewUrls.slice(2).map((url, index) => (
+                {modelData.renderPreviewUrls?.slice(2).map((url, index) => (
                     <ImagePreview
                         key={index + 2}
                         url={url}

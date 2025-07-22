@@ -8,7 +8,7 @@ import {
     getDoc,
     doc,
 } from "firebase/firestore";
-import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
+import { getThumbnailUrl } from "@/utils/imageUtils";
 
 interface LikesTabProps {
     userId: string;
@@ -65,7 +65,7 @@ export const LikesTab = ({ userId }: LikesTabProps) => {
                                     imageUrl:
                                         getThumbnailUrl(
                                             data.renderPrimaryUrl,
-                                            THUMBNAIL_SIZES.MEDIUM
+                                            "MEDIUM"
                                         ) || "/default-artwork.png",
                                     likes: data.likes || 0,
                                     views: data.views || 0,

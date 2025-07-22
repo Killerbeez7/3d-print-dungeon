@@ -3,7 +3,7 @@ import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import { fullscreenConfig } from "@/config/fullscreenConfig";
 import { LazyImage } from "@/features/shared/reusable/LazyImage";
 import { Model3DIcon } from "@/features/shared/Model3DIcon";
-import { getThumbnailUrl, THUMBNAIL_SIZES } from "@/utils/imageUtils";
+import { getThumbnailUrl } from "@/utils/imageUtils";
 import type { ModelViewerElement } from "@google/model-viewer";
 
 import type {
@@ -612,7 +612,7 @@ export const ModelViewer = ({
                     src={
                         getThumbnailUrl(
                             renderExtraUrls[selectedRenderIndex],
-                            THUMBNAIL_SIZES.LARGE
+                            "LARGE"
                         ) ?? undefined
                     }
                     alt={`Render ${selectedRenderIndex + 1}`}
@@ -681,7 +681,7 @@ export const ModelViewer = ({
                             >
                                 <LazyImage
                                     src={
-                                        getThumbnailUrl(url, THUMBNAIL_SIZES.SMALL) ??
+                                        getThumbnailUrl(url, "SMALL") ??
                                         undefined
                                     }
                                     alt={`Render ${idx + 1}`}
