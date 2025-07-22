@@ -170,6 +170,10 @@ service cloud.firestore {
       allow read: if true; // Public read access
       // Write rules as needed
     }
+
+    match /categories/{docId} {
+      allow read: if true;   // for production tighten this
+    }
   }
 }
 
