@@ -1,4 +1,6 @@
 import { useState, ChangeEvent, KeyboardEvent, FC } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchCategories, type Category } from "@/features/models/services/categoryService";
 import { TiDelete } from "react-icons/ti";
 import { ImagesUpload } from "./ImagesUpload";
 import type { ModelData } from "@/features/models/types/model";
@@ -10,6 +12,11 @@ interface InfoFormProps {
 
 export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
     const [newTag, setNewTag] = useState<string>("");
+
+    const { data: categories } = useQuery<Category[]>({
+        queryKey: ["categories"],
+        queryFn: fetchCategories,
+    });
 
     const handleTagInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
         setNewTag(e.target.value);
@@ -72,22 +79,26 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
                         />
                     </div>
 
+                    {/* Category multi-select */}
                     <div>
-                        <label className="block text-txt-secondary font-semibold">
-                            Category <span className="text-error">*</span>
+                        <label className="block text-txt-secondary font-semibold mb-1">
+                            Categories <span className="text-error">*</span>
                         </label>
-                        <input
-                            name="category"
-                            value={
-                                typeof modelData.category === "string"
-                                    ? modelData.category
-                                    : ""
-                            }
-                            onChange={handleModelDataChange}
-                            className="w-full p-2 border rounded-md bg-bg-surface"
-                            placeholder="Enter category"
-                            required
-                        />
+                        <select
+                            multiple
+                            value={modelData.categoryIds ?? []}
+                            onChange={(e) => {
+                                const vals = Array.from(e.target.selectedOptions).map((o) => o.value);
+                                setModelData((prev) => ({ ...prev, categoryIds: vals }));
+                            }}
+                            className="w-full p-2 border rounded-md bg-bg-surface h-40"
+                        >
+                            {categories?.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                    {c.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
 
                     <div>
@@ -106,6 +117,19 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
                             placeholder="Enter model description"
                             required
                         />
+                    </div>
+
+                    {/* AI Checkbox */}
+                    <div className="flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            checked={Boolean(modelData.isAI)}
+                            onChange={e =>
+                                setModelData(prev => ({ ...prev, isAI: e.target.checked }))
+                            }
+                            className="accent-accent h-4 w-4"
+                        />
+                        <label className="text-txt-secondary">Model is AI-generated</label>
                     </div>
 
                     {/* Tags Section */}

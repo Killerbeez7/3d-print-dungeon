@@ -14,6 +14,7 @@ import {
     startAfter,
     QueryDocumentSnapshot,
     DocumentData,
+    where,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { finalConvertFileToGLB } from "../utils/converter";
@@ -23,7 +24,7 @@ import type { ModelData } from "../types/model";
 export interface CreateModelParams {
     name: string;
     description: string;
-    category: string;
+    categoryIds: string[];
     tags: string[];
     file: File;
     renderFiles: File[];
@@ -35,6 +36,7 @@ export interface CreateModelParams {
     preConvertedFile?: Blob;
     price?: number;
     isPaid?: boolean;
+    isAI?: boolean;
 }
 
 export interface CreateModelResult {
@@ -52,7 +54,7 @@ export interface CreateModelResult {
 export async function createAdvancedModel({
     name,
     description,
-    category,
+    categoryIds,
     tags,
     file,
     renderFiles,
@@ -64,6 +66,7 @@ export async function createAdvancedModel({
     preConvertedFile,
     price = 0,
     isPaid = false,
+    isAI = false,
 }: CreateModelParams): Promise<CreateModelResult> {
     const progressFn = onProgress || (() => { });
     let progress = 0;
@@ -193,7 +196,7 @@ export async function createAdvancedModel({
     const modelDoc = await addDoc(collection(db, "models"), {
         name,
         description,
-        category,
+        categoryIds,
         tags,
         uploaderId,
         uploaderDisplayName,
@@ -204,6 +207,7 @@ export async function createAdvancedModel({
         posterUrl,
         price: parseFloat(String(price)) || 0,
         isPaid: Boolean(isPaid),
+        isAI: Boolean(isAI),
         currency: "usd",
         createdAt: serverTimestamp(),
         views: 0,
@@ -247,34 +251,53 @@ export const incrementModelViews = async (modelId: string): Promise<void> => {
 export const PAGE_SIZE = 32;
 
 export interface FetchModelsOptions {
-    limit?: number;
     cursor?: QueryDocumentSnapshot<DocumentData>;
+    limit?: number;
+    categoryIds?: string[]; // array of category document ids
+    search?: string;
+    hideAI?: boolean;
 }
 
 /**
- * Fetch models with pagination.
+ * Fetch models with pagination + optional filters
  */
-export async function fetchModels(
-    pageParam?: QueryDocumentSnapshot<DocumentData>
-): Promise<{
+export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
     models: ModelData[];
     nextCursor?: QueryDocumentSnapshot<DocumentData>;
 }> {
-    const baseQuery = query(collection(db, "models"), orderBy("createdAt", "desc"));
-    const paginatedQuery = pageParam
-        ? query(baseQuery, startAfter(pageParam), limit(PAGE_SIZE))
-        : query(baseQuery, limit(PAGE_SIZE));
+    const {
+        cursor,
+        limit: lim = PAGE_SIZE,
+        search,
+        hideAI,
+    } = opts;
 
-    const snapshot = await getDocs(paginatedQuery);
+    let q = query(collection(db, "models"), orderBy("createdAt", "desc"));
 
+    if (opts.categoryIds?.length) {
+        q = query(
+            q,
+            where("categoryIds", "array-contains-any", opts.categoryIds.slice(0, 10))
+        );
+    }
+    if (search) {
+        q = query(
+            q,
+            where("name", ">=", search),
+            where("name", "<=", search + "\uf8ff")
+        );
+    }
+    if (hideAI) {
+        q = query(q, where("isAI", "==", false));
+    }
+
+    q = cursor ? query(q, startAfter(cursor), limit(lim)) : query(q, limit(lim));
+
+    const snap = await getDocs(q);
     return {
-        models: snapshot.docs.map((doc) => ({
-            ...(doc.data() as ModelData),
-            id: doc.id,
-        })),
-        nextCursor: snapshot.docs.length === PAGE_SIZE
-            ? snapshot.docs[snapshot.docs.length - 1]
-            : undefined,
+        models: snap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id })),
+        nextCursor:
+            snap.docs.length === lim ? snap.docs[snap.docs.length - 1] : undefined,
     };
 }
 

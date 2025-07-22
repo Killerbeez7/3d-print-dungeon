@@ -13,7 +13,7 @@ import { useLayout } from "@/features/shared/context/layoutContext";
 
 export const HomePage = (): React.ReactNode => {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError } =
-        useFetchModels();
+        useFetchModels({});
 
     const queryClient = useQueryClient();
 

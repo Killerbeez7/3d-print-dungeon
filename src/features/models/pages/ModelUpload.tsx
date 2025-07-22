@@ -33,7 +33,7 @@ export function ModelUpload() {
         id: "",
         name: "",
         description: "",
-        category: "",
+        categoryIds: [],
         tags: [],
         renderFiles: [],
         renderPreviewUrls: [],
@@ -47,6 +47,7 @@ export function ModelUpload() {
         posterUrl: "",
         renderPrimaryUrl: "",
         uploaderDisplayName: "",
+        isAI: false,
     });
     // @ts-expect-error FIX later
     const modelViewerRef = useRef();
@@ -60,7 +61,7 @@ export function ModelUpload() {
                 ...prevData,
                 name: savedModelData.name || "",
                 description: savedModelData.description || "",
-                category: savedModelData.category || "",
+                categoryIds: savedModelData.categoryIds || [],
                 tags: savedModelData.tags || [],
                 price: savedModelData.price || 0,
                 isPaid: savedModelData.isPaid || false,
@@ -165,8 +166,8 @@ export function ModelUpload() {
             setError("Please enter a model name.");
             return;
         }
-        if (!modelData.category?.trim()) {
-            setError("Please enter a category.");
+        if (!modelData.categoryIds?.length) {
+            setError("Please choose at least one category.");
             return;
         }
         if (!modelData.description?.trim()) {
@@ -214,7 +215,7 @@ export function ModelUpload() {
             await createAdvancedModel({
                 name: modelData.name,
                 description: modelData.description,
-                category: modelData.category,
+                categoryIds: modelData.categoryIds,
                 tags: modelData.tags ?? [],
                 file: firstFile,
                 renderFiles: modelData.renderFiles ?? [],
@@ -226,6 +227,7 @@ export function ModelUpload() {
                 preConvertedFile: convertedBlob ?? undefined,
                 price: modelData.price,
                 isPaid: modelData.isPaid,
+                isAI: modelData.isAI,
             });
 
             setShowSuccessModal(true);
@@ -248,7 +250,7 @@ export function ModelUpload() {
     const canProceedToStep2 = files.length > 0;
     const canProceedToStep3 =
         modelData.name.trim() &&
-        modelData.category?.trim() &&
+        modelData.categoryIds?.length &&
         modelData.description?.trim() &&
         modelData.renderFiles?.length &&
         modelData.renderFiles.length > 0;

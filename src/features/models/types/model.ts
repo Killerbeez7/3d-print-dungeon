@@ -1,10 +1,10 @@
 import { z } from "zod";
 
-export const modelSchema = z.object ({
+export const modelSchema = z.object({
     id: z.string(),
     name: z.string(),
     description: z.string().optional(),
-    category: z.string().optional(),
+    categoryIds: z.array(z.string()).optional(),
     tags: z.array(z.string()).optional(),
     renderFiles: z.array(z.instanceof(File)).optional(),
     renderPreviewUrls: z.array(z.string()).optional(),
