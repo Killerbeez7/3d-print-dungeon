@@ -2,10 +2,9 @@ import { ArtistCard, ArtistCardProps } from "./ArtistCard";
 
 export interface ArtistListGridProps {
     artists: ArtistCardProps[];
-    getArtistPath: (id: string) => string;
 }
 
-export function ArtistListGrid({ artists, getArtistPath }: ArtistListGridProps) {
+export function ArtistListGrid({ artists }: ArtistListGridProps) {
     if (artists.length === 0) {
         return <p className="text-lg text-txt-secondary">No artists found.</p>;
     }
@@ -16,7 +15,7 @@ export function ArtistListGrid({ artists, getArtistPath }: ArtistListGridProps) 
             tabIndex={0}
         >
             {artists.map((artist) => (
-                <ArtistCard key={artist.id} {...artist} getArtistPath={getArtistPath} />
+                <ArtistCard key={artist.id} {...artist} />
             ))}
         </div>
     );

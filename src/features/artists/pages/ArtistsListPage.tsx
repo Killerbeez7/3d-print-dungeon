@@ -1,22 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
-import { useLocation } from "react-router-dom";
 import { fetchArtists } from "../services/artistsService";
 import { ArtistListGrid } from "../components/ArtistListGrid";
 import { ArtistListSkeleton } from "../components/ArtistListSkeleton";
-import type { Artist } from "../types/artists";
+import type { ArtistData } from "../types/artists";
 
 export const ArtistsListPage = () => {
-    const location = useLocation();
-    const { data: artists = [], isLoading, isError, error } = useQuery<Artist[], Error>({
+    const {
+        data: artists = [],
+        isLoading,
+        isError,
+        error,
+    } = useQuery<ArtistData[], Error>({
         queryKey: ["artists"],
         queryFn: fetchArtists,
     });
-
-    // Determine if we're in the explore section
-    const isExplore = location.pathname.startsWith("/explore");
-    const getArtistPath = (artistId: string) => {
-        return isExplore ? `/explore/artists/${artistId}` : `/artists/${artistId}`;
-    };
 
     if (isLoading) {
         return (
@@ -60,7 +57,7 @@ export const ArtistsListPage = () => {
                 <article>
                     <ArtistListGrid
                         artists={artistCardData}
-                        getArtistPath={getArtistPath}
+                        getArtistPath={(id) => `/artists/${id}`}
                     />
                 </article>
             </div>
