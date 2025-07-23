@@ -20,10 +20,10 @@ const SidebarLink: FC<SidebarLinkProps> = ({ icon: Icon, label, to, onClick, cla
     <Link
         to={to}
         onClick={onClick}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--bg-surface)] ${className}`}
+        className={`flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-[var(--bg-surface)] transition-all duration-200 ${className}`}
     >
-        {Icon && <Icon className="text-lg" />}
-        {label && <span>{label}</span>}
+        {Icon && <Icon className="text-lg flex-shrink-0" />}
+        {label && <span className="truncate">{label}</span>}
     </Link>
 );
 
@@ -43,7 +43,7 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
             {/* Mobile overlay backdrop */}
             {isSidebarOpen && (
                 <div 
-                    className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-all duration-300 ease-in-out"
                     onClick={toggleSidebar}
                 />
             )}
@@ -51,16 +51,16 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
             <div className="sticky top-20 h-[calc(100vh-120px)] z-50">
                 {/* Compact Sidebar */}
                 <div
-                    className={`absolute mt-2 left-0 w-[60px] h-[calc(100vh-120px)] flex flex-col transition-transform duration-200 ${
-                        !isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                    className={`absolute mt-2 left-0 w-[60px] h-[calc(100vh-120px)] flex flex-col transition-all duration-300 ease-in-out ${
+                        !isSidebarOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
                     }`}
                 >
-                    <section className="text-[var(--txt-primary)] h-full">
+                    <section className="text-[var(--txt-primary)] h-full bg-[var(--bg-primary)] border-r border-[var(--br-secondary)] shadow-lg">
                         <div className="p-2">
                             <div className="flex justify-center items-center">
                                 <button
                                     onClick={toggleSidebar}
-                                    className="p-2 mt-2 rounded-[10px] text-[var(--txt-secondary)] hover:bg-[var(--bg-surface)]"
+                                    className="p-2 mt-2 rounded-lg text-[var(--txt-secondary)] hover:bg-[var(--bg-surface)] hover:text-[var(--txt-primary)] transition-all duration-200"
                                     aria-label="Toggle sidebar"
                                 >
                                     <LuPanelLeftOpen size={24} className="text-lg" />
@@ -69,7 +69,7 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                         </div>
 
                         <div className="divider-top p-[10px] flex-1">
-                            <nav className="space-y-1 flex flex-col items-center">
+                            <nav className="space-y-2 flex flex-col items-center">
                                 {categories && (
                                     <>
                                         {/* MAIN */}
@@ -94,7 +94,7 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                                             onClick={handleSidebarClick}
                                             className="justify-center w-10 h-10 flex items-center mx-auto"
                                         />
-                                        <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
+                                        <div className="my-3 border-t border-[var(--br-secondary)] w-full" />
                                         {/* CATEGORIES */}
                                         {categories.map((category) => {
                                             const Icon = category.icon;
@@ -108,19 +108,19 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                                                     className={`justify-center w-10 h-10 flex items-center mx-auto ${
                                                         location.pathname ===
                                                         `/forum/category/${category.id}`
-                                                            ? "bg-[var(--bg-surface)] text-[var(--txt-primary)]"
+                                                            ? "bg-[var(--bg-surface)] text-[var(--txt-primary)] shadow-sm"
                                                             : "hover:bg-[var(--bg-surface)]"
                                                     }`}
                                                 />
                                             );
                                         })}
-                                        <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
+                                        <div className="my-3 border-t border-[var(--br-secondary)] w-full" />
                                         {/* ACTIONS */}
                                         <button
                                             aria-label="New Thread"
                                             className="flex items-center justify-center w-12 h-12 mx-auto
              rounded-full bg-[var(--accent)] text-[var(--txt-highlight)]
-             hover:bg-[var(--accent-hover)] transition shadow-lg mb-2"
+             hover:bg-[var(--accent-hover)] hover:scale-105 transition-all duration-200 shadow-lg mb-2"
                                             onClick={() => {
                                                 if (!currentUser) {
                                                     open({ mode: "login" });
@@ -132,7 +132,7 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                                         >
                                             <FaPlusSquare className="text-2xl" />
                                         </button>
-                                        <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
+                                        <div className="my-3 border-t border-[var(--br-secondary)] w-full" />
                                         {/* INFO */}
                                         <SidebarLink
                                             icon={FaInfoCircle}
@@ -157,97 +157,104 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
 
                 {/* Full Sidebar */}
                 <div
-                    className={`absolute left-0 h-[calc(100vh-120px)] flex flex-col transition-transform duration-200 ${
+                    className={`absolute left-0 h-[calc(100vh-120px)] flex flex-col transition-all duration-300 ease-in-out transform ${
                         isSidebarOpen 
-                            ? "translate-x-0" 
-                            : "-translate-x-full"
+                            ? "translate-x-0 opacity-100" 
+                            : "-translate-x-full opacity-0"
                     } ${
                         isSidebarOpen 
-                            ? "w-full md:w-[300px]" 
-                            : "w-[300px]"
+                            ? "w-full md:w-[320px]" 
+                            : "w-[320px]"
                     }`}
                 >
-                    <section className="text-[var(--txt-primary)] h-full bg-[var(--bg-primary)] md:bg-transparent">
-                        <div className="p-4">
-                            <div className="flex justify-between items-center mb-2">
-                                <h1 className="font-bold">Forum</h1>
+                    <section className="text-[var(--txt-primary)] h-full bg-[var(--bg-primary)] md:bg-[var(--bg-primary)] border-r border-[var(--br-secondary)] shadow-2xl md:shadow-lg">
+                        {/* Header */}
+                        <div className="p-6 border-b border-[var(--br-secondary)]">
+                            <div className="flex justify-between items-center mb-3">
+                                <h1 className="text-xl font-bold text-[var(--txt-primary)]">Forum</h1>
                                 <button
                                     onClick={toggleSidebar}
-                                    className="p-2 rounded-[10px] text-[var(--txt-secondary)] hover:bg-[var(--bg-surface)]"
+                                    className="p-2 rounded-lg text-[var(--txt-secondary)] hover:bg-[var(--bg-surface)] hover:text-[var(--txt-primary)] transition-all duration-200"
                                     aria-label="Toggle sidebar"
                                 >
                                     <LuPanelLeftClose size={24} className="text-lg" />
                                 </button>
                             </div>
                             <p className="text-sm text-[var(--txt-secondary)]">
-                                Discuss 3D printing topics
+                                Discuss 3D printing topics and connect with the community
                             </p>
                         </div>
 
-                        <div className="divider-top p-4 flex-1">
-                            <nav className="space-y-1">
+                        {/* Content */}
+                        <div className="p-6 flex-1 overflow-y-auto">
+                            <nav className="space-y-6">
                                 {categories && (
                                     <>
                                         {/* MAIN */}
-                                        <div className="mb-4">
-                                            <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
+                                        <div>
+                                            <h4 className="px-2 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-3">
                                                 MAIN
                                             </h4>
-                                            <SidebarLink
-                                                icon={MdHome}
-                                                label="Home"
-                                                to="/forum"
-                                                onClick={handleSidebarClick}
-                                            />
-                                            <SidebarLink
-                                                icon={MdDashboard}
-                                                label="Dashboard"
-                                                to="/forum/dashboard"
-                                                onClick={handleSidebarClick}
-                                            />
-                                            <SidebarLink
-                                                icon={FaUser}
-                                                label="My Threads"
-                                                to="/forum/my-threads"
-                                                onClick={handleSidebarClick}
-                                            />
+                                            <div className="space-y-1">
+                                                <SidebarLink
+                                                    icon={MdHome}
+                                                    label="Home"
+                                                    to="/forum"
+                                                    onClick={handleSidebarClick}
+                                                />
+                                                <SidebarLink
+                                                    icon={MdDashboard}
+                                                    label="Dashboard"
+                                                    to="/forum/dashboard"
+                                                    onClick={handleSidebarClick}
+                                                />
+                                                <SidebarLink
+                                                    icon={FaUser}
+                                                    label="My Threads"
+                                                    to="/forum/my-threads"
+                                                    onClick={handleSidebarClick}
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="my-2 border-t border-[var(--br-secondary)]" />
+                                        
                                         {/* CATEGORIES */}
-                                        <div className="mb-4">
-                                            <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
+                                        <div>
+                                            <h4 className="px-2 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-3">
                                                 CATEGORIES
                                             </h4>
-                                            {categories.map((category) => {
-                                                const Icon = category.icon;
-                                                return (
-                                                    <SidebarLink
-                                                        key={category.id}
-                                                        icon={Icon}
-                                                        label={category.name}
-                                                        to={`/forum/category/${category.id}`}
-                                                        onClick={handleSidebarClick}
-                                                        className={`$${
-                                                            location.pathname ===
-                                                            `/forum/category/${category.id}`
-                                                                ? "bg-[var(--bg-surface)] text-[var(--txt-primary)] font-semibold"
-                                                                : "hover:bg-[var(--bg-surface)]"
-                                                        }`}
-                                                    />
-                                                );
-                                            })}
+                                            <div className="space-y-1">
+                                                {categories.map((category) => {
+                                                    const Icon = category.icon;
+                                                    return (
+                                                        <SidebarLink
+                                                            key={category.id}
+                                                            icon={Icon}
+                                                            label={category.name}
+                                                            to={`/forum/category/${category.id}`}
+                                                            onClick={handleSidebarClick}
+                                                            className={`${
+                                                                location.pathname ===
+                                                                `/forum/category/${category.id}`
+                                                                    ? "bg-[var(--bg-surface)] text-[var(--txt-primary)] font-semibold shadow-sm border-l-4 border-[var(--accent)]"
+                                                                    : "hover:bg-[var(--bg-surface)]"
+                                                            }`}
+                                                        />
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
-                                        <div className="my-2 border-t border-[var(--br-secondary)]" />
+                                        
                                         {/* ACTIONS */}
-                                        <div className="mb-4">
-                                            <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
+                                        <div>
+                                            <h4 className="px-2 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-3">
                                                 ACTIONS
                                             </h4>
                                             <button
-                                                className="flex items-center min-w-4/5 gap-2 px-3 py-2 rounded-lg
+                                                className="flex items-center w-full gap-3 px-4 py-3 rounded-lg
              font-semibold bg-[var(--accent)]
              text-[var(--txt-highlight)]
-             hover:bg-[var(--accent-hover)]"
+             hover:bg-[var(--accent-hover)] hover:scale-[1.02]
+             transition-all duration-200 shadow-md"
                                                 onClick={() => {
                                                     if (!currentUser) {
                                                         open({ mode: "login" });
@@ -257,28 +264,30 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                                                     handleSidebarClick();
                                                 }}
                                             >
-                                                <FaPlusSquare className="text-lg" />
+                                                <FaPlusSquare className="text-lg flex-shrink-0" />
                                                 <span>New Thread</span>
                                             </button>
                                         </div>
-                                        <div className="my-2 border-t border-[var(--br-secondary)]" />
+                                        
                                         {/* INFO */}
                                         <div>
-                                            <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
+                                            <h4 className="px-2 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-3">
                                                 INFO
                                             </h4>
-                                            <SidebarLink
-                                                icon={FaInfoCircle}
-                                                label="Forum Rules"
-                                                to="/forum/rules"
-                                                onClick={handleSidebarClick}
-                                            />
-                                            <SidebarLink
-                                                icon={FaQuestionCircle}
-                                                label="Help"
-                                                to="/forum/help"
-                                                onClick={handleSidebarClick}
-                                            />
+                                            <div className="space-y-1">
+                                                <SidebarLink
+                                                    icon={FaInfoCircle}
+                                                    label="Forum Rules"
+                                                    to="/forum/rules"
+                                                    onClick={handleSidebarClick}
+                                                />
+                                                <SidebarLink
+                                                    icon={FaQuestionCircle}
+                                                    label="Help"
+                                                    to="/forum/help"
+                                                    onClick={handleSidebarClick}
+                                                />
+                                            </div>
                                         </div>
                                     </>
                                 )}

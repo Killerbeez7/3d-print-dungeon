@@ -16,13 +16,18 @@ export const ForumLayout = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(window.innerWidth >= 768);
 
     useEffect(() => {
-        const handleResize = () => {
-            setIsSidebarOpen(window.innerWidth >= 768);
-        };
+        // Disable body scroll when sidebar is open on mobile
+        if (isSidebarOpen && window.innerWidth < 768) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
 
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+        // Cleanup on unmount
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isSidebarOpen]);
 
     const toggleSidebar = () => {
         setIsSidebarOpen((prev) => !prev);
@@ -44,7 +49,7 @@ export const ForumLayout = () => {
             />
             {/* Main content */}
             <div
-                className={`flex-1 mt-2 p-4 transition-all duration-200 ${
+                className={`flex-1 mt-2 p-4 transition-all duration-300 ease-in-out ${
                     isSidebarOpen 
                         ? "md:ml-[300px] ml-[60px]" 
                         : "ml-[60px]"
