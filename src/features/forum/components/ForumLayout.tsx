@@ -45,7 +45,9 @@ export const ForumLayout = () => {
             {/* Main content */}
             <div
                 className={`flex-1 mt-2 p-4 transition-all duration-200 ${
-                    isSidebarOpen ? "ml-[300px]" : "ml-[60px]"
+                    isSidebarOpen 
+                        ? "md:ml-[300px] ml-[60px]" 
+                        : "ml-[60px]"
                 }`}
             >
                 <Outlet />
