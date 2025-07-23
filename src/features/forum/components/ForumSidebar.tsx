@@ -43,15 +43,15 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
             {/* Mobile overlay backdrop */}
             {isSidebarOpen && (
                 <div 
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-all duration-300 ease-in-out"
+                    className="fixed inset-0 bg-black/80 backdrop-blur-[2px] z-[9998] md:hidden transition-all duration-300 ease-in-out"
                     onClick={toggleSidebar}
                 />
             )}
             
-            <div className="sticky top-20 h-[calc(100vh-120px)] z-50">
+            <div className="sticky top-20 h-[calc(100vh-120px)] z-[9999]">
                 {/* Compact Sidebar */}
                 <div
-                    className={`absolute mt-2 left-0 w-[60px] h-[calc(100vh-120px)] flex flex-col transition-all duration-300 ease-in-out ${
+                    className={`absolute mt-2 left-0 w-[60px] h-[calc(100vh-120px)] flex flex-col transition-all duration-300 ease-in-out z-[9999] ${
                         !isSidebarOpen ? "translate-x-0 opacity-100" : "-translate-x-full opacity-0"
                     }`}
                 >
@@ -157,7 +157,7 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
 
                 {/* Full Sidebar */}
                 <div
-                    className={`absolute left-0 h-[calc(100vh-120px)] flex flex-col transition-all duration-300 ease-in-out transform ${
+                    className={`absolute left-0 h-[calc(100vh-120px)] flex flex-col transition-all duration-300 ease-in-out transform z-[9999] ${
                         isSidebarOpen 
                             ? "translate-x-0 opacity-100" 
                             : "-translate-x-full opacity-0"
