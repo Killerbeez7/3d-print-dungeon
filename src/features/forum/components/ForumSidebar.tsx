@@ -16,13 +16,19 @@ interface SidebarLinkProps {
     className?: string;
 }
 
-const SidebarLink: FC<SidebarLinkProps> = ({ icon: Icon, label, to, onClick, className = "" }) => (
+const SidebarLink: FC<SidebarLinkProps> = ({
+    icon: Icon,
+    label,
+    to,
+    onClick,
+    className = "",
+}) => (
     <Link
         to={to}
         onClick={onClick}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-[var(--bg-surface)] ${className}`}
+        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-[var(--bg-surface)] ${className}`}
     >
-        {Icon && <Icon className="text-lg" />}
+        {Icon && <Icon size={20} width={20} height={20} />}
         {label && <span>{label}</span>}
     </Link>
 );
@@ -32,6 +38,7 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
     toggleSidebar,
     handleSidebarClick,
     categories,
+    className,
 }) => {
     const { currentUser } = useAuth();
     const { open } = useModal("auth");
@@ -39,22 +46,24 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
     const location = useLocation();
 
     return (
-        <div className="sticky top-20 h-[calc(100vh-120px)]">
+        <div className={`${className} sticky top-20 h-[calc(100vh-120px)]`}>
             {/* Compact Sidebar */}
             <div
-                className={`absolute mt-2 left-0 w-[60px] h-[calc(100vh-120px)] flex flex-col transition-transform duration-200 ${
-                    !isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+                className={`absolute left-0 w-[70px] h-[calc(100vh-120px)] flex flex-col transition-all duration-300 ease-in-out ${
+                    !isSidebarOpen
+                        ? "translate-x-0 opacity-100"
+                        : "-translate-x-full opacity-0"
                 }`}
             >
                 <section className="text-[var(--txt-primary)] h-full">
-                    <div className="p-2">
+                    <div className="p-3">
                         <div className="flex justify-center items-center">
                             <button
                                 onClick={toggleSidebar}
-                                className="p-2 mt-2 rounded-[10px] text-[var(--txt-secondary)] hover:bg-[var(--bg-surface)]"
+                                className="p-2 rounded-[10px] text-[var(--txt-secondary)] hover:bg-[var(--bg-surface)]"
                                 aria-label="Toggle sidebar"
                             >
-                                <LuPanelLeftOpen size={24} className="text-lg" />
+                                <LuPanelLeftOpen size={20} width={20} height={20} />
                             </button>
                         </div>
                     </div>
@@ -64,27 +73,27 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                             {categories && (
                                 <>
                                     {/* MAIN */}
-                                    <SidebarLink
-                                        icon={MdHome}
-                                        label={null}
-                                        to="/forum"
-                                        onClick={handleSidebarClick}
-                                        className="justify-center w-10 h-10 flex items-center mx-auto"
-                                    />
-                                    <SidebarLink
-                                        icon={MdDashboard}
-                                        label={null}
-                                        to="/forum/dashboard"
-                                        onClick={handleSidebarClick}
-                                        className="justify-center w-10 h-10 flex items-center mx-auto"
-                                    />
-                                    <SidebarLink
-                                        icon={FaUser}
-                                        label={null}
-                                        to="/forum/my-threads"
-                                        onClick={handleSidebarClick}
-                                        className="justify-center w-10 h-10 flex items-center mx-auto"
-                                    />
+                                                                         <SidebarLink
+                                         icon={MdHome}
+                                         label={null}
+                                         to="/forum"
+                                         onClick={handleSidebarClick}
+                                         className="justify-center flex items-center mx-auto p-2"
+                                     />
+                                                                         <SidebarLink
+                                         icon={MdDashboard}
+                                         label={null}
+                                         to="/forum/dashboard"
+                                         onClick={handleSidebarClick}
+                                         className="justify-center flex items-center mx-auto p-2"
+                                     />
+                                                                         <SidebarLink
+                                         icon={FaUser}
+                                         label={null}
+                                         to="/forum/my-threads"
+                                         onClick={handleSidebarClick}
+                                         className="justify-center flex items-center mx-auto p-2"
+                                     />
                                     <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
                                     {/* CATEGORIES */}
                                     {categories.map((category) => {
@@ -96,12 +105,12 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                                                 label={null}
                                                 to={`/forum/category/${category.id}`}
                                                 onClick={handleSidebarClick}
-                                                className={`justify-center w-10 h-10 flex items-center mx-auto ${
-                                                    location.pathname ===
-                                                    `/forum/category/${category.id}`
-                                                        ? "bg-[var(--bg-surface)] text-[var(--txt-primary)]"
-                                                        : "hover:bg-[var(--bg-surface)]"
-                                                }`}
+                                                                                                 className={`justify-center flex items-center mx-auto p-2 ${
+                                                     location.pathname ===
+                                                     `/forum/category/${category.id}`
+                                                         ? "bg-[var(--bg-surface)] text-[var(--txt-primary)]"
+                                                         : "hover:bg-[var(--bg-surface)]"
+                                                 }`}
                                             />
                                         );
                                     })}
@@ -120,25 +129,25 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                                             navigate("/forum/new-thread");
                                             handleSidebarClick();
                                         }}
-                                    >
-                                        <FaPlusSquare className="text-2xl" />
-                                    </button>
+                                                                         >
+                                         <FaPlusSquare size={20} width={20} height={20} />
+                                     </button>
                                     <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
                                     {/* INFO */}
-                                    <SidebarLink
-                                        icon={FaInfoCircle}
-                                        label={null}
-                                        to="/forum/rules"
-                                        onClick={handleSidebarClick}
-                                        className="justify-center w-10 h-10 flex items-center mx-auto"
-                                    />
-                                    <SidebarLink
-                                        icon={FaQuestionCircle}
-                                        label={null}
-                                        to="/forum/help"
-                                        onClick={handleSidebarClick}
-                                        className="justify-center w-10 h-10 flex items-center mx-auto"
-                                    />
+                                                                         <SidebarLink
+                                         icon={FaInfoCircle}
+                                         label={null}
+                                         to="/forum/rules"
+                                         onClick={handleSidebarClick}
+                                         className="justify-center flex items-center mx-auto p-2"
+                                     />
+                                                                         <SidebarLink
+                                         icon={FaQuestionCircle}
+                                         label={null}
+                                         to="/forum/help"
+                                         onClick={handleSidebarClick}
+                                         className="justify-center flex items-center mx-auto p-2"
+                                     />
                                 </>
                             )}
                         </nav>
@@ -148,61 +157,69 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
 
             {/* Full Sidebar */}
             <div
-                className={`absolute left-0 w-[300px] h-[calc(100vh-120px)] flex flex-col transition-transform duration-200 ${
-                    isSidebarOpen ? "translate-x-0" : "-translate-x-[300px]"
+                className={`hidden md:flex absolute left-0 w-[100vw] lg:w-[300px] h-[calc(100vh-120px)] flex-col transition-transform duration-200 ${
+                    isSidebarOpen
+                        ? "translate-x-0 opacity-100"
+                        : "-translate-x-[100vw] opacity-0"
                 }`}
             >
-                <section className="text-[var(--txt-primary)] h-full">
-                    <div className="p-4">
-                        <div className="flex justify-between items-center mb-2">
-                            <h1 className="font-bold">Forum</h1>
+                <section
+                    className={`text-[var(--txt-primary)] h-full ${
+                        isSidebarOpen
+                            ? "bg-[var(--bg-primary)]"
+                            : "bg-[var(--bg-primary)]"
+                    }`}
+                >
+                    <div className="p-3">
+                        <div className="flex justify-end items-center">
                             <button
                                 onClick={toggleSidebar}
                                 className="p-2 rounded-[10px] text-[var(--txt-secondary)] hover:bg-[var(--bg-surface)]"
                                 aria-label="Toggle sidebar"
                             >
-                                <LuPanelLeftClose size={24} className="text-lg" />
+                                <LuPanelLeftClose size={20} width={20} height={20} />
                             </button>
                         </div>
-                        <p className="text-sm text-[var(--txt-secondary)]">
-                            Discuss 3D printing topics
-                        </p>
                     </div>
 
-                    <div className="divider-top p-4 flex-1">
+                    <div className="divider-top p-3 flex-1">
                         <nav className="space-y-1">
                             {categories && (
                                 <>
                                     {/* MAIN */}
-                                    <div className="mb-4">
-                                        <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
-                                            MAIN
-                                        </h4>
-                                        <SidebarLink
-                                            icon={MdHome}
-                                            label="Home"
-                                            to="/forum"
-                                            onClick={handleSidebarClick}
-                                        />
-                                        <SidebarLink
-                                            icon={MdDashboard}
-                                            label="Dashboard"
-                                            to="/forum/dashboard"
-                                            onClick={handleSidebarClick}
-                                        />
-                                        <SidebarLink
-                                            icon={FaUser}
-                                            label="My Threads"
-                                            to="/forum/my-threads"
-                                            onClick={handleSidebarClick}
-                                        />
+
+                                    <div className="mb-2">
+                                        <div>
+                                            <SidebarLink
+                                                icon={MdHome}
+                                                label="Home"
+                                                to="/forum"
+                                                onClick={handleSidebarClick}
+                                            />
+                                        </div>
+                                        <div>
+                                            <SidebarLink
+                                                icon={MdDashboard}
+                                                label="Dashboard"
+                                                to="/forum/dashboard"
+                                                onClick={handleSidebarClick}
+                                            />
+                                        </div>
+                                        <div>
+                                            <SidebarLink
+                                                icon={FaUser}
+                                                label="My Threads"
+                                                to="/forum/my-threads"
+                                                onClick={handleSidebarClick}
+                                            />
+                                        </div>
                                     </div>
-                                    <div className="my-2 border-t border-[var(--br-secondary)]" />
+                                    <div className="my-1 border-t border-[var(--br-secondary)]" />
                                     {/* CATEGORIES */}
-                                    <div className="mb-4">
-                                        <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
+                                    <div className="mb-2">
+                                        <h5 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-1">
                                             CATEGORIES
-                                        </h4>
+                                        </h5>
                                         {categories.map((category) => {
                                             const Icon = category.icon;
                                             return (
@@ -222,14 +239,14 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                                             );
                                         })}
                                     </div>
-                                    <div className="my-2 border-t border-[var(--br-secondary)]" />
+                                    <div className="my-1 border-t border-[var(--br-secondary)]" />
                                     {/* ACTIONS */}
-                                    <div className="mb-4">
-                                        <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
+                                    <div className="mb-2">
+                                        <h5 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-1">
                                             ACTIONS
-                                        </h4>
+                                        </h5>
                                         <button
-                                            className="flex items-center min-w-4/5 gap-2 px-3 py-2 rounded-lg
+                                            className="flex items-center md:w-full w-auto gap-2 px-3 py-1.5 rounded-lg
              font-semibold bg-[var(--accent)]
              text-[var(--txt-highlight)]
              hover:bg-[var(--accent-hover)]"
@@ -241,17 +258,17 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                                                 navigate("/forum/new-thread");
                                                 handleSidebarClick();
                                             }}
-                                        >
-                                            <FaPlusSquare className="text-lg" />
-                                            <span>New Thread</span>
-                                        </button>
+                                                                                 >
+                                             <FaPlusSquare size={20} width={20} height={20} />
+                                             <span>New Thread</span>
+                                         </button>
                                     </div>
-                                    <div className="my-2 border-t border-[var(--br-secondary)]" />
+                                    <div className="my-1 border-t border-[var(--br-secondary)]" />
                                     {/* INFO */}
                                     <div>
-                                        <h4 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-2">
+                                        <h5 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-1">
                                             INFO
-                                        </h4>
+                                        </h5>
                                         <SidebarLink
                                             icon={FaInfoCircle}
                                             label="Forum Rules"

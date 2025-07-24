@@ -3,33 +3,41 @@ import { Outlet } from "react-router-dom";
 import { useForum } from "@/features/forum/hooks/useForum";
 import { ForumSidebar } from "./ForumSidebar";
 import type { ForumCategory } from "@/features/forum/types/forum";
+import { useScreenSize } from "@/hooks/useScreenSize";
 
 export interface ForumSidebarProps {
     isSidebarOpen: boolean;
     toggleSidebar: () => void;
     handleSidebarClick: () => void;
     categories: ForumCategory[];
+    className?: string;
 }
 
 export const ForumLayout = () => {
     const { categories } = useForum();
-    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(window.innerWidth >= 768);
+    const { isTablet } = useScreenSize();
+    const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
+    // Disable body scroll when sidebar is open on mobile
     useEffect(() => {
-        const handleResize = () => {
-            setIsSidebarOpen(window.innerWidth >= 768);
-        };
+        if (isSidebarOpen && isTablet) {
+            document.body.style.overflow = "hidden";
+        } else {
+            document.body.style.overflow = "unset";
+        }
 
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
+        // Cleanup on unmount
+        return () => {
+            document.body.style.overflow = "unset";
+        };
+    }, [isSidebarOpen, isTablet]);
 
     const toggleSidebar = () => {
         setIsSidebarOpen((prev) => !prev);
     };
 
     const handleSidebarClick = () => {
-        if (window.innerWidth < 768) {
+        if (isTablet) {
             setIsSidebarOpen(false);
         }
     };
@@ -41,11 +49,12 @@ export const ForumLayout = () => {
                 toggleSidebar={toggleSidebar}
                 handleSidebarClick={handleSidebarClick}
                 categories={categories}
+                className={`hidden md:flex z-[2]`}
             />
             {/* Main content */}
             <div
-                className={`flex-1 mt-2 p-4 transition-all duration-200 ${
-                    isSidebarOpen ? "ml-[300px]" : "ml-[60px]"
+                className={`flex-1 mt-2 p-4 transition-all duration-300 ease-in-out ${
+                    isSidebarOpen ? "md:ml-[300px] ml-0" : "md:ml-[70px] ml-0"
                 }`}
             >
                 <Outlet />
