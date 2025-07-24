@@ -2,12 +2,12 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useForum } from "@/features/forum/hooks/useForum";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { formatDistanceToNow } from "date-fns";
 import { FaEdit, FaTrash, FaReply, FaEye, FaCalendar, FaUser } from "react-icons/fa";
 import Skeleton from "@/features/shared/Skeleton";
 import { ThreadEditor } from "./ThreadEditor";
 import { ReplyEditor } from "./ReplyEditor";
 import { Spinner } from "@/features/shared/reusable/Spinner";
+import { formatRelativeTime } from "@/features/forum/utils/threadUtils";
 import type { FC } from "react";
 
 interface ForumThreadProps {
@@ -98,15 +98,6 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
         } finally {
             setLoadingMore(false);
         }
-    };
-
-    const formatDate = (timestamp: unknown): string => {
-        if (!timestamp) return "Unknown date";
-        const ts = timestamp as { toDate?: () => Date } | Date;
-        const date = typeof ts === "object" && typeof (ts as { toDate?: () => Date }).toDate === "function"
-            ? (ts as { toDate: () => Date }).toDate()
-            : new Date(ts as string | number | Date);
-        return formatDistanceToNow(date, { addSuffix: true });
     };
 
     // Render new thread form
@@ -204,7 +195,8 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
                     to={`/forum/category/${currentThread.categoryId}`}
                     className="hover:text-[var(--accent)]"
                 >
-                    {categories.find((cat) => cat.id === currentThread.categoryId)?.name || "Category"}
+                    {categories.find((cat) => cat.id === currentThread.categoryId)
+                        ?.name || "Category"}
                 </Link>
             </div>
 
@@ -237,7 +229,9 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
 
                         <div className="flex items-center">
                             <FaCalendar className="mr-1" size={12} />
-                            <span>Posted {formatDate(currentThread.createdAt)}</span>
+                            <span>
+                                Posted {formatRelativeTime(currentThread.createdAt)}
+                            </span>
                         </div>
 
                         <div className="flex items-center">
@@ -299,7 +293,8 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
                     {currentThread.replyCount || 0} Replies
                 </h2>
 
-                {Array.isArray(currentThread.replies) && currentThread.replies.length > 0 ? (
+                {Array.isArray(currentThread.replies) &&
+                currentThread.replies.length > 0 ? (
                     <div className="space-y-4">
                         {currentThread.replies.map((reply) => (
                             <div
@@ -321,10 +316,10 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
                                             <FaCalendar className="mr-1" size={12} />
                                             <span>
                                                 {reply.isEdited
-                                                    ? `Edited ${formatDate(
+                                                    ? `Edited ${formatRelativeTime(
                                                           reply.updatedAt
                                                       )}`
-                                                    : `Posted ${formatDate(
+                                                    : `Posted ${formatRelativeTime(
                                                           reply.createdAt
                                                       )}`}
                                             </span>

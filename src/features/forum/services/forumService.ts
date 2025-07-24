@@ -18,11 +18,11 @@ import {
     DocumentData,
     writeBatch,
 } from "firebase/firestore";
-import type { ForumThread, ForumReply } from "@/features/forum/types/forum";
+
+import type { ForumThread, ForumReply, CreateThreadInput } from "@/features/forum/types/forum";
 
 
 export const forumService = {
-
     async getThreadsByCategory(categoryId: string, sortBy: string = "lastActivity", pageSize: number = 20): Promise<{ threads: ForumThread[]; lastVisible: unknown; hasMore: boolean }> {
         try {
             const threadsRef = collection(db, "forumThreads");
@@ -147,11 +147,18 @@ export const forumService = {
     },
 
 
-    async createThread(threadData: Partial<ForumThread>): Promise<string> {
+    async createThread(input: CreateThreadInput): Promise<string> {
         try {
             const threadsRef = collection(db, "forumThreads");
+
             const newThread = {
-                ...threadData,
+                title: input.title.trim(),
+                content: input.content.trim(),
+                categoryId: input.categoryId,
+                authorId: input.authorId,
+                authorName: input.authorName.trim(),
+                authorPhotoURL: input.authorPhotoURL || "",
+                tags: input.tags || [],
                 createdAt: serverTimestamp(),
                 lastActivity: serverTimestamp(),
                 views: 0,
@@ -161,6 +168,7 @@ export const forumService = {
             };
 
             const docRef = await addDoc(threadsRef, newThread);
+            console.log(`[forumService] Created thread with ID: ${docRef.id}`);
             return docRef.id;
         } catch (error) {
             console.error("Error creating thread:", error);
@@ -464,6 +472,7 @@ export const forumService = {
 
 function normalizeThread(doc: QueryDocumentSnapshot<DocumentData>): ForumThread {
     const data = doc.data();
+
     return {
         id: doc.id,
         title: typeof data.title === "string" ? data.title : "Untitled",
@@ -472,8 +481,8 @@ function normalizeThread(doc: QueryDocumentSnapshot<DocumentData>): ForumThread 
         authorId: typeof data.authorId === "string" ? data.authorId : "",
         authorName: typeof data.authorName === "string" ? data.authorName : "",
         authorPhotoURL: typeof data.authorPhotoURL === "string" ? data.authorPhotoURL : "",
-        createdAt: data.createdAt instanceof Date ? data.createdAt : new Date(0),
-        lastActivity: data.lastActivity instanceof Date ? data.lastActivity : new Date(0),
+        createdAt: data.createdAt as Date,
+        lastActivity: data.lastActivity as Date,
         views: typeof data.views === "number" ? data.views : 0,
         replyCount: typeof data.replyCount === "number" ? data.replyCount : 0,
         isPinned: Boolean(data.isPinned),

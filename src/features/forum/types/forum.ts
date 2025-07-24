@@ -12,6 +12,16 @@ export interface ForumCategory {
     updatedAt?: Date;
 }
 
+export interface CreateThreadInput {
+    title: string;
+    content: string;
+    categoryId: string;
+    authorId: string;
+    authorName: string;
+    authorPhotoURL?: string;
+    tags?: string[];
+}
+
 export interface ForumThread {
     id: string;
     title: string;

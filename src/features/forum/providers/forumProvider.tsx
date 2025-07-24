@@ -248,13 +248,17 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             setLoading(true);
             setError(null);
             try {
-                const threadData = {
-                    ...data,
+                // Use the new improved createThread method
+                const threadId = await forumService.createThread({
+                    title: data.title || "",
+                    content: data.content || "",
+                    categoryId: data.categoryId || "",
                     authorId: currentUser.uid,
                     authorName: currentUser.displayName || "Anonymous",
                     authorPhotoURL: currentUser.photoURL || undefined,
-                };
-                const threadId = await forumService.createThread(threadData);
+                    tags: data.tags || [],
+                });
+                
                 const thread = (await forumService.getThreadById(
                     threadId
                 )) as ForumThread;

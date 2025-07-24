@@ -1,18 +1,16 @@
 import { useEffect, useState, useRef, FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
-import { formatDistanceToNow } from "date-fns";
 import { useForum } from "@/features/forum/hooks/useForum";
 import { forumService } from "@/features/forum/services/forumService";
 import Skeleton from "@/features/shared/Skeleton";
 import { Spinner } from "@/features/shared/reusable/Spinner";
+import { isThreadNew, formatRelativeTime } from "@/features/forum/utils/threadUtils";
 import type { ForumThread, ForumCategory } from "@/features/forum/types/forum";
 
 interface ThreadCardProps {
     thread: ForumThread;
     categories: ForumCategory[];
-    isNewThread: (thread: ForumThread) => boolean;
-    formatRelativeTime: (timestamp: unknown) => string;
 }
 
 export const ForumHome = () => {
@@ -53,7 +51,9 @@ export const ForumHome = () => {
             setLoadingMore(true);
             try {
                 const result = await forumService.getNewestThreads(10);
-                const threads: ForumThread[] = Array.isArray(result) ? result : result.threads || [];
+                const threads: ForumThread[] = Array.isArray(result)
+                    ? result
+                    : result.threads || [];
                 setDisplayedThreads(threads);
                 setLastVisible(result.lastVisible || null);
                 setHasMore(
@@ -123,29 +123,6 @@ export const ForumHome = () => {
         };
     }, [hasMore, loadingMore, lastVisible]);
 
-    // Format relative time
-    const formatRelativeTime = (timestamp: unknown): string => {
-        if (!timestamp) return "Unknown time";
-        // Firestore Timestamp or Date
-        const ts = timestamp as { toDate?: () => Date } | Date;
-        const date = typeof ts === "object" && typeof (ts as { toDate?: () => Date }).toDate === "function"
-            ? (ts as { toDate: () => Date }).toDate()
-            : new Date(ts as string | number | Date);
-        return formatDistanceToNow(date, { addSuffix: true });
-    };
-
-    // Check if a thread is new (less than 24 hours old)
-    const isNewThread = (thread: ForumThread): boolean => {
-        if (!thread.createdAt) return false;
-        const ts = thread.createdAt as { toDate?: () => Date } | Date;
-        const createdAt = typeof ts === "object" && typeof (ts as { toDate?: () => Date }).toDate === "function"
-            ? (ts as { toDate: () => Date }).toDate()
-            : new Date(ts as string | number | Date);
-        const now = new Date();
-        const hoursDiff = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
-        return hoursDiff < 24;
-    };
-
     const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -163,7 +140,7 @@ export const ForumHome = () => {
     };
 
     // Thread card component for reuse
-    const ThreadCard = ({ thread, categories, isNewThread, formatRelativeTime }: ThreadCardProps) => (
+    const ThreadCard = ({ thread, categories }: ThreadCardProps) => (
         <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
             <div className="flex justify-between items-start">
                 <Link
@@ -171,7 +148,7 @@ export const ForumHome = () => {
                     className="text-lg font-medium hover:text-[var(--accent)]"
                 >
                     {thread.title}
-                    {isNewThread(thread) && (
+                    {isThreadNew(thread) && (
                         <span className="ml-2 text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full">
                             New
                         </span>
@@ -193,7 +170,8 @@ export const ForumHome = () => {
                 {thread.replyCount !== undefined && (
                     <>
                         {" · "}
-                        {thread.replyCount} {thread.replyCount === 1 ? "reply" : "replies"}
+                        {thread.replyCount}{" "}
+                        {thread.replyCount === 1 ? "reply" : "replies"}
                     </>
                 )}
                 {thread.views !== undefined && (
@@ -215,7 +193,11 @@ export const ForumHome = () => {
                     </h2>
                     <div className="space-y-4">
                         {searchResults.map((thread) => (
-                            <ThreadCard key={thread.id} thread={thread} categories={categories} isNewThread={isNewThread} formatRelativeTime={formatRelativeTime} />
+                            <ThreadCard
+                                key={thread.id}
+                                thread={thread}
+                                categories={categories}
+                            />
                         ))}
                     </div>
                 </div>
@@ -240,7 +222,11 @@ export const ForumHome = () => {
                     {displayedThreads.length > 0 ? (
                         <div className="space-y-4">
                             {displayedThreads.map((thread) => (
-                                <ThreadCard key={thread.id} thread={thread} categories={categories} isNewThread={isNewThread} formatRelativeTime={formatRelativeTime} />
+                                <ThreadCard
+                                    key={thread.id}
+                                    thread={thread}
+                                    categories={categories}
+                                />
                             ))}
                         </div>
                     ) : (
@@ -267,7 +253,11 @@ export const ForumHome = () => {
                         {threads.popular?.length > 0 ? (
                             <div className="space-y-4">
                                 {threads.popular.map((thread) => (
-                                    <ThreadCard key={thread.id} thread={thread} categories={categories} isNewThread={isNewThread} formatRelativeTime={formatRelativeTime} />
+                                    <ThreadCard
+                                        key={thread.id}
+                                        thread={thread}
+                                        categories={categories}
+                                    />
                                 ))}
                             </div>
                         ) : (
@@ -289,7 +279,11 @@ export const ForumHome = () => {
                         {threads.unanswered?.length > 0 ? (
                             <div className="space-y-4">
                                 {threads.unanswered.map((thread) => (
-                                    <ThreadCard key={thread.id} thread={thread} categories={categories} isNewThread={isNewThread} formatRelativeTime={formatRelativeTime} />
+                                    <ThreadCard
+                                        key={thread.id}
+                                        thread={thread}
+                                        categories={categories}
+                                    />
                                 ))}
                             </div>
                         ) : (
