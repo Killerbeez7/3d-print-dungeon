@@ -281,11 +281,54 @@ export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
         );
     }
     if (search) {
-        q = query(
-            q,
+        // For now, we'll fetch all models and filter client-side
+        // This is not ideal for large datasets but works for development
+        // In production, consider using Algolia or Firebase Extensions
+        
+        // First try to find by name prefix (most efficient)
+        const nameQuery = query(
+            collection(db, "models"),
             where("name", ">=", search),
-            where("name", "<=", search + "\uf8ff")
+            where("name", "<=", search + "\uf8ff"),
+            orderBy("createdAt", "desc"),
+            limit(lim)
         );
+        
+        const nameSnap = await getDocs(nameQuery);
+        const nameMatches = nameSnap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id }));
+        
+        // If we have enough results, return them
+        if (nameMatches.length >= lim) {
+            return {
+                models: nameMatches,
+                nextCursor: nameMatches.length === lim ? nameSnap.docs[nameSnap.docs.length - 1] : undefined,
+            };
+        }
+        
+        // Otherwise, fetch more and filter client-side
+        const allQuery = query(
+            collection(db, "models"),
+            orderBy("createdAt", "desc"),
+            limit(100) // Fetch more to filter from
+        );
+        
+        const allSnap = await getDocs(allQuery);
+        const allModels = allSnap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id }));
+        
+        // Filter by search term across multiple fields (name, description, tags only)
+        const filteredModels = allModels.filter((model) => {
+            const searchLower = search.toLowerCase();
+            return (
+                model.name?.toLowerCase().includes(searchLower) ||
+                model.description?.toLowerCase().includes(searchLower) ||
+                model.tags?.some(tag => tag.toLowerCase().includes(searchLower))
+            );
+        });
+        
+        return {
+            models: filteredModels.slice(0, lim),
+            nextCursor: filteredModels.length > lim ? allSnap.docs[allSnap.docs.length - 1] : undefined,
+        };
     }
     if (hideAI) {
         q = query(q, where("isAI", "==", false));

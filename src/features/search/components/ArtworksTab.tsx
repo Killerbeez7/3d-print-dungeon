@@ -1,224 +1,28 @@
-import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import { LazyImage } from "@/features/shared/reusable/LazyImage";
-import { getThumbnailUrl } from "@/utils/imageUtils";
-import type { SortBy, Medium, Subject } from "@/features/search/types/search";
-import type { ModelData } from "@/features/models/types/model";
+import { useState } from "react";
+import { useArtworks } from "@/features/search/hooks/useArtworks";
+import { HomeModelsGrid } from "@/features/home/components/HomeModelsGrid";
+import { Spinner } from "@/features/shared/reusable/Spinner";
+import { useFilters } from "@/features/search-filters/hooks/useFilters";
 
-interface ArtworksTabProps {
-    searchTerm: string;
-    models: ModelData[];
-}
+export const ArtworksTab = ({ search }: { search: string }) => {
+    const { filters } = useFilters();
+    const { data, isLoading, error } = useArtworks(filters, search);
+    const [loadIndex, setLoadIndex] = useState<number>(0);
 
-const toggleArrayValue = (arr: string[], value: string): string[] =>
-    arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
+    console.log("ArtworksTab:", { search, filters, data, isLoading, error });
 
-export const ArtworksTab = ({ searchTerm, models }: ArtworksTabProps) => {
-    const [sortBy, setSortBy] = useState<SortBy>("relevance");
-    const [selectedMedia, setSelectedMedia] = useState<Medium[]>([]);
-    const [selectedSubjects, setSelectedSubjects] = useState<Subject[]>([]);
-    const [hideAI, setHideAI] = useState<boolean>(false);
-    const [filteredModels, setFilteredModels] = useState<ModelData[]>([]);
+    if (!search.trim()) return null;
+    if (isLoading) return <Spinner size={24} />;
+    if (error) return <p>Error loading artworks: {error.message}</p>;
 
-    const sortOptions: { value: SortBy; label: string }[] = [
-        { value: "relevance", label: "Relevance" },
-        { value: "likes", label: "Most Liked" },
-        { value: "latest", label: "Newest" },
-    ];
-    const mediumOptions: { value: Medium; label: string }[] = [
-        { value: "2D", label: "2D" },
-        { value: "3D", label: "3D" },
-        { value: "miniatures", label: "Miniatures" },
-    ];
-    const subjectOptions: { value: Subject; label: string }[] = [
-        { value: "abstract", label: "Abstract" },
-        { value: "anatomy", label: "Anatomy" },
-        { value: "animals", label: "Animals & Wildlife" },
-        { value: "props", label: "Props" },
-    ];
+    const models = data?.pages.flatMap((p) => p.models) ?? [];
+    console.log("Models found:", models.length);
 
-    const applyAdvancedFilters = (list: ModelData[]): ModelData[] => {
-        let filtered = [...list];
-        if (selectedMedia.length > 0) {
-            filtered = filtered.filter((m) => m.medium && selectedMedia.includes(m.medium as Medium));
-        }
-        if (selectedSubjects.length > 0) {
-            filtered = filtered.filter((m) => {
-                if (Array.isArray(m.subjects)) {
-                    return m.subjects.some((sub) => selectedSubjects.includes(sub as Subject));
-                }
-                return m.subject && selectedSubjects.includes(m.subject as Subject);
-            });
-        }
-        if (hideAI) {
-            filtered = filtered.filter((m) => !m.isAI);
-        }
-        switch (sortBy) {
-            case "likes":
-                filtered.sort((a, b) => (b.likes || 0) - (a.likes || 0));
-                break;
-            case "latest":
-                filtered.sort(
-                    (a, b) => {
-                        const aTime =
-                            a.createdAt && typeof a.createdAt === "object" && "seconds" in a.createdAt && a.createdAt.seconds != null
-                                ? a.createdAt.seconds
-                                : typeof a.createdAt === "number"
-                                ? a.createdAt
-                                : 0;
-                        const bTime =
-                            b.createdAt && typeof b.createdAt === "object" && "seconds" in b.createdAt && b.createdAt.seconds != null
-                                ? b.createdAt.seconds
-                                : typeof b.createdAt === "number"
-                                ? b.createdAt
-                                : 0;
-                        return bTime - aTime;
-                    }
-                );
-                break;
-            default:
-                break;
-        }
-        return filtered;
+    if (models.length === 0) return <p>No artworks found for &quot;{search}&quot;.</p>;
+
+    const handleBumpIndex = () => {
+        setLoadIndex(prev => prev + 1);
     };
 
-    useEffect(() => {
-        if (!searchTerm.trim()) {
-            setFilteredModels([]);
-            return;
-        }
-        const matched = models.filter((m) =>
-            m.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        setFilteredModels(applyAdvancedFilters(matched));
-    }, [searchTerm, models, sortBy, selectedMedia, selectedSubjects, hideAI]);
-
-    return (
-        <div className="max-w-6xl mx-auto">
-            {/* Advanced Filters */}
-            <div className="mb-6 p-4 bg-bg-surface rounded shadow border border-br-primary">
-                <h3 className="text-xl font-semibold mb-3">Refine Your Search</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {/* Sort Field */}
-                    <div>
-                        <label className="block mb-1 text-sm font-medium text-txt-secondary">
-                            Sort By
-                        </label>
-                        <select
-                            value={sortBy}
-                            onChange={(e) => setSortBy(e.target.value as SortBy)}
-                            className="w-full bg-bg-primary border border-br-primary rounded px-2 py-1 focus:outline-none focus:border-accent"
-                        >
-                            {sortOptions.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
-                                    {opt.label}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    {/* Medium Multi-check */}
-                    <div>
-                        <label className="block mb-1 text-sm font-medium text-txt-secondary">
-                            Medium
-                        </label>
-                        <div className="bg-bg-primary border border-br-primary rounded p-2 flex flex-wrap gap-2">
-                            {mediumOptions.map((opt) => (
-                                <label
-                                    key={opt.value}
-                                    className="flex items-center space-x-1 text-sm"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedMedia.includes(opt.value)}
-                                        onChange={() =>
-                                            setSelectedMedia((prev) =>
-                                                toggleArrayValue(prev, opt.value) as Medium[]
-                                            )
-                                        }
-                                    />
-                                    <span>{opt.label}</span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                    {/* Subject Multi-check */}
-                    <div>
-                        <label className="block mb-1 text-sm font-medium text-txt-secondary">
-                            Subject Matter
-                        </label>
-                        <div className="bg-bg-primary border border-br-primary rounded p-2 flex flex-wrap gap-2">
-                            {subjectOptions.map((opt) => (
-                                <label
-                                    key={opt.value}
-                                    className="flex items-center space-x-1 text-sm"
-                                >
-                                    <input
-                                        type="checkbox"
-                                        checked={selectedSubjects.includes(opt.value)}
-                                        onChange={() =>
-                                            setSelectedSubjects((prev) =>
-                                                toggleArrayValue(prev, opt.value) as Subject[]
-                                            )
-                                        }
-                                    />
-                                    <span>{opt.label}</span>
-                                </label>
-                            ))}
-                        </div>
-                    </div>
-                    {/* Hide AI Option */}
-                    <div>
-                        <label className="block mb-1 text-sm font-medium text-txt-secondary">
-                            Quick Options
-                        </label>
-                        <label className="bg-bg-primary border border-br-primary rounded px-3 py-2 inline-flex items-center space-x-2 text-sm cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={hideAI}
-                                onChange={() => setHideAI((prev) => !prev)}
-                            />
-                            <span>Hide AI-based</span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            {/* Display Results */}
-            {filteredModels.length === 0 ? (
-                <p className="text-sm text-txt-secondary">
-                    {searchTerm.trim()
-                        ? "No artworks found."
-                        : "Start typing to search for artworks."}
-                </p>
-            ) : (
-                <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7 gap-2 sm:gap-3 md:gap-4">
-                    {filteredModels.map((m) => (
-                        <Link key={m.id} to={`/model/${m.id}`}>
-                            <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full">
-                                <div className="relative w-full aspect-square">
-                                    <LazyImage
-                                        src={
-                                            getThumbnailUrl(m.renderPrimaryUrl ?? null, "SMALL") ?? undefined
-                                        }
-                                        alt={m.name}
-                                        className="absolute inset-0 w-full h-full object-cover rounded-lg"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-[#0000006f] to-transparent flex items-end justify-start opacity-100 sm:opacity-0 sm:hover:opacity-100 transition-opacity">
-                                        <div className="text-white p-2 sm:m-2">
-                                            <h4 className="font-semibold text-sm sm:text-base truncate">
-                                                {m.name}
-                                            </h4>
-                                            <p className="text-xs sm:text-sm truncate">
-                                                {m.uploaderDisplayName}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </article>
-                        </Link>
-                    ))}
-                </div>
-            )}
-        </div>
-    );
+    return <HomeModelsGrid models={models} loadIndex={loadIndex} bumpIndex={handleBumpIndex} />;
 };

@@ -2,6 +2,7 @@ export const ROUTES = {
     /* Public */
     HOME: "/",
     SEARCH: "/search",
+    SEARCH_ARTISTS: "/search/artists",
     MAINTENANCE: "/maintenance",
 
     /* Artists */

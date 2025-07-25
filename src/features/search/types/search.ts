@@ -1,10 +1,10 @@
-export interface Artist {
-    uid: string;
-    displayName?: string;
-    photoURL?: string;
-    [key: string]: unknown;
-}
+import type { ModelData } from "@/features/models/types/model";
+import type { ArtistData } from "@/features/artists/types/artists";
 
-export type SortBy = "relevance" | "likes" | "latest";
-export type Medium = "2D" | "3D" | "miniatures";
-export type Subject = "abstract" | "anatomy" | "animals" | "props"; 
+
+export interface SearchResultsProps {
+    query: string;
+    activeTab: "artworks" | "artists";
+    artworks: ModelData[];
+    artists: ArtistData[];
+}

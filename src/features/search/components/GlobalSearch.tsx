@@ -1,6 +1,13 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { useState, useEffect, useRef, type ChangeEvent, type FormEvent, type MouseEvent } from "react";
+import {
+    useState,
+    useEffect,
+    useRef,
+    type ChangeEvent,
+    type FormEvent,
+    type MouseEvent,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearch } from "@/features/search/hooks/useSearch";
 import {
@@ -11,7 +18,7 @@ import {
     limit,
     getDocs,
 } from "firebase/firestore";
-import type { Artist } from "@/features/search/types/search";
+import type { ArtistData } from "@/features/artists/types/artists";
 
 export function GlobalSearch() {
     const {
@@ -22,7 +29,7 @@ export function GlobalSearch() {
         setShowDropdown,
         handleClearSearch,
     } = useSearch();
-    const [artistResults, setArtistResults] = useState<Artist[]>([]);
+    const [artistResults, setArtistResults] = useState<ArtistData[]>([]);
     const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
     const containerRef = useRef<HTMLFormElement>(null);
     const navigate = useNavigate();
@@ -58,10 +65,16 @@ export function GlobalSearch() {
                 const colRef = collection(db, "users");
                 const q = firestoreQuery(colRef, orderBy("displayName"), limit(50));
                 const snap = await getDocs(q);
-                const allArtists: Artist[] = snap.docs.map((doc) => ({
-                    uid: doc.id,
-                    ...doc.data(),
-                }));
+                const allArtists: ArtistData[] = snap.docs.map((doc) => {
+                    const data = doc.data();
+                    return {
+                        uid: doc.id,
+                        email: data.email ?? null,
+                        displayName: data.displayName ?? null,
+                        photoURL: data.photoURL ?? null,
+                        ...data,
+                    } as ArtistData;
+                });
                 const filteredArtists = allArtists.filter((a) =>
                     a.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
                 );
@@ -78,7 +91,15 @@ export function GlobalSearch() {
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const queryValue = searchTerm.trim();
-        navigate(`/search?query=${encodeURIComponent(queryValue)}`);
+        
+        // Only add query parameter if there's actually a query
+        if (queryValue) {
+            navigate(`/search?sort_by=relevance&query=${encodeURIComponent(queryValue)}`);
+        } else {
+            navigate(`/search?sort_by=relevance`);
+        }
+        
+        setActiveTab("artworks");
         setSearchTerm("");
         setShowDropdown(false);
         if (document.activeElement instanceof HTMLElement) {
@@ -91,7 +112,22 @@ export function GlobalSearch() {
     const handlePresetClick = (preset: string) => {
         setActiveTab(preset);
         const currentQuery = searchTerm.trim();
-        navigate(`/search?query=${encodeURIComponent(currentQuery)}`);
+        
+        // Navigate to the appropriate route based on the preset
+        if (preset === "artworks") {
+            if (currentQuery) {
+                navigate(`/search?sort_by=relevance&query=${encodeURIComponent(currentQuery)}`);
+            } else {
+                navigate(`/search?sort_by=relevance`);
+            }
+        } else {
+            if (currentQuery) {
+                navigate(`/search/artists?sort_by=followers&query=${encodeURIComponent(currentQuery)}`);
+            } else {
+                navigate(`/search/artists?sort_by=followers`);
+            }
+        }
+        
         setSearchTerm("");
         setShowDropdown(false);
     };
@@ -99,7 +135,10 @@ export function GlobalSearch() {
     // Close dropdown on click outside (but do not reset the input).
     useEffect(() => {
         function handleClickOutside(e: MouseEvent | globalThis.MouseEvent) {
-            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+            if (
+                containerRef.current &&
+                !containerRef.current.contains(e.target as Node)
+            ) {
                 setShowDropdown(false);
             }
         }
@@ -115,7 +154,7 @@ export function GlobalSearch() {
 
     // Clicking on an artist in the dropdown navigates to their profile.
     const handleArtistSelect = (uid: string) => {
-        navigate(`/artist/${uid}`);
+        navigate(`/artists/${uid}`);
         setShowDropdown(false);
     };
 

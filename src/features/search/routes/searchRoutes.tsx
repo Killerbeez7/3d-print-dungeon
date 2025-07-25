@@ -1,19 +1,16 @@
-import { lazy, Suspense } from "react";
+import { SearchPage } from "../pages/SearchPage";
+import { ArtistsSearchPage } from "../pages/ArtistsSearchPage";
 import { withMaintenance } from "@/helpers/routeHelpers";
 import { ROUTES } from "@/constants/routeConstants";
 import type { RouteObject } from "react-router-dom";
 
-const DynamicSearch = lazy(() =>
-    import("../components/DynamicSearch").then((m) => ({ default: m.DynamicSearch }))
-);
-
 export const searchRoutes: RouteObject[] = [
     {
         path: ROUTES.SEARCH,
-        element: withMaintenance(
-            <Suspense>
-                <DynamicSearch />
-            </Suspense>
-        ),
+        element: withMaintenance(<SearchPage />),
+    },
+    {
+        path: ROUTES.SEARCH_ARTISTS,
+        element: withMaintenance(<ArtistsSearchPage />),
     },
 ];
