@@ -274,7 +274,7 @@ export const ForumHome: FC = () => {
     return (
         <div className="space-y-6">
             {/* Header with search and new thread button */}
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div className="flex justify-between items-center gap-20 px-5 sm:px-0">
                 <form onSubmit={handleSearch} className="flex-1 max-w-md">
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -299,7 +299,7 @@ export const ForumHome: FC = () => {
                 </form>
 
                 <button
-                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition-colors"
+                    className="flex items-center border border-[var(--br-secondary)] rounded-[15px] gap-2 px-4 py-2.5 font-semibold text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition-colors whitespace-nowrap"
                     onClick={() => {
                         if (!currentUser) {
                             open({ mode: "login" });
@@ -308,8 +308,9 @@ export const ForumHome: FC = () => {
                         navigate("/forum/new-thread");
                     }}
                 >
-                    <FaPlusSquare size={16} />
-                    <span>New Thread</span>
+                    <FaPlusSquare size={16} className="text-[var(--accent)]"/>
+                    <span className="hidden sm:inline">New Thread</span>
+                    <span className="sm:hidden">New</span>
                 </button>
             </div>
 
