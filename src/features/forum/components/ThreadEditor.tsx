@@ -123,7 +123,7 @@ export const ThreadEditor: FC<ThreadEditorProps> = ({
                     name="categoryId"
                     value={formData.categoryId}
                     onChange={handleChange}
-                    disabled={isLoading || isEdit}
+                    disabled={isLoading}
                     className={`mt-1 block w-full rounded-lg border-[var(--br-secondary)] bg-[var(--bg-surface)] text-[var(--txt-primary)] shadow-sm focus:border-[var(--accent)] focus:ring-[var(--accent)] ${
                         errors.categoryId ? "border-red-500" : ""
                     }`}

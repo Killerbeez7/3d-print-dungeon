@@ -1,7 +1,21 @@
 import { useState, useEffect, useCallback, useMemo, type ReactNode } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ForumContext } from "@/features/forum/context/forumContext";
-import { forumService } from "@/features/forum/services/forumService";
+import {
+    getRecentThreads,
+    getPopularThreads,
+    getUnansweredThreads,
+    getThreadById,
+    createThread as createThreadService,
+    createReply,
+    updateThread as updateThreadService,
+    updateReply as updateReplyService,
+    deleteThread as deleteThreadService,
+    deleteReply as deleteReplyService,
+    incrementThreadViews,
+    fetchThreads,
+    fetchReplies,
+} from "@/features/forum/services/forumService";
 import { FORUM_CATEGORIES } from "@/config/forumCategories";
 import type {
     ForumContextValue,
@@ -11,6 +25,7 @@ import type {
     ForumThreadsState,
     ForumPagination,
 } from "@/features/forum/types/forum";
+import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
 interface ForumProviderProps {
     children: ReactNode;
@@ -43,9 +58,9 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             setLoading(true);
             try {
                 const [recent, popular, unanswered] = await Promise.all([
-                    forumService.getRecentThreads(),
-                    forumService.getPopularThreads(),
-                    forumService.getUnansweredThreads(),
+                    getRecentThreads(),
+                    getPopularThreads(),
+                    getUnansweredThreads(),
                 ]);
                 setThreads((prev) => ({
                     ...prev,
@@ -86,32 +101,36 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
 
     // Get threads by category
     const getThreadsByCategory = useCallback(
-        async (categoryId: string, sortBy: string = "lastActivity") => {
+        async (
+            categoryId: string,
+            sortBy: "createdAt" | "lastActivity" | "views" | "replyCount" = "lastActivity"
+        ) => {
             if (threads.byCategory[categoryId]) {
                 return threads.byCategory[categoryId];
             }
             setLoading(true);
             setError(null);
             try {
-                const result = await forumService.getThreadsByCategory(
+                const result = await fetchThreads({
                     categoryId,
-                    sortBy
-                );
+                    sortBy,
+                    limit: 20,
+                });
                 setPagination((prev) => ({
                     ...prev,
                     threads: {
-                        lastVisible: result.lastVisible,
-                        hasMore: result.hasMore,
+                        lastVisible: result.nextCursor || null,
+                        hasMore: !!result.nextCursor,
                     },
                 }));
                 setThreads((prev) => ({
                     ...prev,
                     byCategory: {
                         ...prev.byCategory,
-                        [categoryId]: result.threads as ForumThread[],
+                        [categoryId]: result.threads,
                     },
                 }));
-                return result.threads as ForumThread[];
+                return result.threads;
             } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
                 console.error("Error getting threads by category:", msg);
@@ -126,22 +145,26 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
 
     // Load more threads (pagination)
     const loadMoreThreads = useCallback(
-        async (categoryId: string, sortBy: string = "lastActivity") => {
+        async (
+            categoryId: string,
+            sortBy: "createdAt" | "lastActivity" | "views" | "replyCount" = "lastActivity"
+        ) => {
             if (!pagination.threads.hasMore || !pagination.threads.lastVisible) {
                 return;
             }
             setLoading(true);
             try {
-                const result = await forumService.getMoreThreadsByCategory(
+                const result = await fetchThreads({
                     categoryId,
                     sortBy,
-                    pagination.threads.lastVisible
-                );
+                    cursor: pagination.threads.lastVisible,
+                    limit: 20,
+                });
                 setPagination((prev) => ({
                     ...prev,
                     threads: {
-                        lastVisible: result.lastVisible,
-                        hasMore: result.hasMore,
+                        lastVisible: result.nextCursor || null,
+                        hasMore: !!result.nextCursor,
                     },
                 }));
                 setThreads((prev) => ({
@@ -150,11 +173,11 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
                         ...prev.byCategory,
                         [categoryId]: [
                             ...(prev.byCategory[categoryId] || []),
-                            ...(result.threads as ForumThread[]),
+                            ...result.threads,
                         ],
                     },
                 }));
-                return result.threads as ForumThread[];
+                return result.threads;
             } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
                 console.error("Error loading more threads:", msg);
@@ -171,21 +194,24 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
         setLoading(true);
         setError(null);
         try {
-            const thread = (await forumService.getThreadById(threadId)) as ForumThread;
-            const result = await forumService.getThreadReplies(threadId);
+            const thread = (await getThreadById(threadId)) as ForumThread;
+            const result = await fetchReplies({
+                threadId,
+                limit: 20,
+            });
             setPagination((prev) => ({
                 ...prev,
                 replies: {
-                    lastVisible: result.lastVisible,
-                    hasMore: result.hasMore,
+                    lastVisible: result.nextCursor || null,
+                    hasMore: !!result.nextCursor,
                 },
             }));
             const threadWithReplies: ForumThread & { replies?: ForumReply[] } = {
                 ...thread,
-                replies: result.replies as ForumReply[],
+                replies: result.replies,
             };
             setCurrentThread(threadWithReplies);
-            forumService.incrementThreadViews(threadId);
+            incrementThreadViews(threadId);
             return threadWithReplies;
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
@@ -205,28 +231,26 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             }
             setLoading(true);
             try {
-                const result = await forumService.getMoreThreadReplies(
+                const result = await fetchReplies({
                     threadId,
-                    pagination.replies.lastVisible
-                );
+                    cursor: pagination.replies.lastVisible,
+                    limit: 20,
+                });
                 setPagination((prev) => ({
                     ...prev,
                     replies: {
-                        lastVisible: result.lastVisible,
-                        hasMore: result.hasMore,
+                        lastVisible: result.nextCursor || null,
+                        hasMore: !!result.nextCursor,
                     },
                 }));
                 setCurrentThread((prev) => {
                     if (!prev) return null;
                     return {
                         ...prev,
-                        replies: [
-                            ...(prev.replies || []),
-                            ...(result.replies as ForumReply[]),
-                        ],
+                        replies: [...(prev.replies || []), ...result.replies],
                     };
                 });
-                return result.replies as ForumReply[];
+                return result.replies;
             } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
                 console.error("Error loading more replies:", msg);
@@ -240,7 +264,7 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
 
     // Create new thread
     const createThread = useCallback(
-        async (data: Partial<ForumThread>) => {
+        async (data: Partial<ForumThread>): Promise<string> => {
             if (!currentUser) {
                 setError("You must be logged in to create a thread");
                 throw new Error("Not authenticated");
@@ -248,23 +272,32 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             setLoading(true);
             setError(null);
             try {
-                // Use the new improved createThread method
-                const threadId = await forumService.createThread({
-                    title: data.title || "",
-                    content: data.content || "",
-                    categoryId: data.categoryId || "",
+                // Validate required fields before calling service
+                if (!data.title?.trim()) {
+                    throw new Error("Thread title is required");
+                }
+                if (!data.content?.trim()) {
+                    throw new Error("Thread content is required");
+                }
+                if (!data.categoryId) {
+                    throw new Error("Category is required");
+                }
+
+                // Use the service createThread method
+                const threadId = await createThreadService({
+                    title: data.title.trim(),
+                    content: data.content.trim(),
+                    categoryId: data.categoryId,
                     authorId: currentUser.uid,
                     authorName: currentUser.displayName || "Anonymous",
                     authorPhotoURL: currentUser.photoURL || undefined,
                     tags: data.tags || [],
                 });
-                
-                const thread = (await forumService.getThreadById(
-                    threadId
-                )) as ForumThread;
+
+                const thread = await getThreadById(threadId);
                 setThreads((prev) => ({
                     ...prev,
-                    recent: [thread, ...prev.recent].slice(0, prev.recent.length),
+                    recent: [thread, ...(prev.recent || [])].slice(0, 10), // Keep only 10 most recent
                     byCategory: {
                         ...prev.byCategory,
                         [thread.categoryId]: prev.byCategory[thread.categoryId]
@@ -292,14 +325,70 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             setLoading(true);
             setError(null);
             try {
+                // Validate required fields before calling service
+                if (!content?.trim()) {
+                    throw new Error("Reply content is required");
+                }
+                if (!threadId) {
+                    throw new Error("Thread ID is required");
+                }
+
                 const replyData = {
-                    content,
+                    content: content.trim(),
                     authorId: currentUser.uid,
                     authorName: currentUser.displayName || "Anonymous",
                     authorPhotoURL: currentUser.photoURL || undefined,
                 };
-                const replyId = await forumService.addReply(threadId, replyData);
+                const replyId = await createReply({
+                    threadId,
+                    content: replyData.content,
+                    authorId: replyData.authorId,
+                    authorName: replyData.authorName,
+                    authorPhotoURL: replyData.authorPhotoURL,
+                });
+
+                // Refresh the current thread
                 await loadThread(threadId);
+
+                // Update global thread lists to reflect the new reply
+                setThreads((prev) => {
+                    const updatedThreads = { ...prev };
+
+                    // Remove from unanswered list since it now has a reply
+                    updatedThreads.unanswered = prev.unanswered.filter(
+                        (thread) => thread.id !== threadId
+                    );
+
+                    // Update recent threads (the thread will move to top due to lastActivity update)
+                    const updatedRecent = prev.recent.map((thread) =>
+                        thread.id === threadId
+                            ? { ...thread, replyCount: (thread.replyCount || 0) + 1 }
+                            : thread
+                    );
+                    updatedThreads.recent = updatedRecent;
+
+                    // Update popular threads
+                    const updatedPopular = prev.popular.map((thread) =>
+                        thread.id === threadId
+                            ? { ...thread, replyCount: (thread.replyCount || 0) + 1 }
+                            : thread
+                    );
+                    updatedThreads.popular = updatedPopular;
+
+                    // Update category-specific threads
+                    Object.keys(updatedThreads.byCategory).forEach((categoryId) => {
+                        updatedThreads.byCategory[categoryId] = updatedThreads.byCategory[
+                            categoryId
+                        ].map((thread) =>
+                            thread.id === threadId
+                                ? { ...thread, replyCount: (thread.replyCount || 0) + 1 }
+                                : thread
+                        );
+                    });
+
+                    return updatedThreads;
+                });
+
                 return replyId;
             } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
@@ -320,7 +409,7 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             setLoading(true);
             setError(null);
             try {
-                await forumService.updateThread(threadId, data);
+                await updateThreadService(threadId, data);
                 setCurrentThread((prev) =>
                     prev?.id === threadId ? { ...prev, ...data } : prev
                 );
@@ -344,7 +433,7 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             setLoading(true);
             setError(null);
             try {
-                await forumService.updateReply(replyId, { content });
+                await updateReplyService(replyId, { content }, currentUser.uid);
                 setCurrentThread((prev) => {
                     if (!prev) return null;
                     return {
@@ -383,7 +472,7 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             setLoading(true);
             setError(null);
             try {
-                await forumService.deleteThread(threadId);
+                await deleteThreadService(threadId, currentUser.uid);
                 setThreads((prev) => {
                     const newState = { ...prev };
                     newState.recent = newState.recent.filter((t) => t.id !== threadId);
@@ -426,7 +515,7 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             setLoading(true);
             setError(null);
             try {
-                await forumService.deleteReply(replyId, threadId);
+                await deleteReplyService(replyId, threadId);
                 setCurrentThread((prev) => {
                     if (!prev) return null;
                     return {
@@ -456,7 +545,7 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
         setLoading(true);
         setError(null);
         try {
-            const threads: ForumThread[] = await forumService.getRecentThreads(100);
+            const threads: ForumThread[] = await getRecentThreads(100);
             const lowerQuery = searchQuery.toLowerCase();
             const filtered = threads.filter(
                 (thread) =>
@@ -473,30 +562,81 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
         }
     }, []);
 
-    // Get user's threads
-    const getUserThreads = useCallback(async (userId: string) => {
-        setLoading(true);
-        setError(null);
-        try {
-            const result = await forumService.getUserThreads(userId);
-            return result.threads as ForumThread[];
-        } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            console.error("Error getting user threads:", msg);
-            setError(msg);
-            throw err;
-        } finally {
-            setLoading(false);
-        }
-    }, []);
+    // Get user's threads - placeholder implementation
+    const getUserThreads = useCallback(
+        async (
+            userId: string,
+            sortBy: "createdAt" | "lastActivity" | "views" | "replyCount" = "createdAt",
+            sortOrder: "asc" | "desc" = "desc",
+            pageSize: number = 20,
+            lastVisible?: unknown
+        ) => {
+            setLoading(true);
+            setError(null);
+            try {
+                // TODO: Implement getUserThreads in forumService
+                const result = await fetchThreads({
+                    authorId: userId,
+                    sortBy,
+                    sortOrder,
+                    limit: pageSize,
+                    cursor: lastVisible as QueryDocumentSnapshot<DocumentData>,
+                });
+                return result.threads;
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : String(err);
+                console.error("Error getting user threads:", msg);
+                setError(msg);
+                throw err;
+            } finally {
+                setLoading(false);
+            }
+        },
+        []
+    );
 
-    // Get user's replies
+    // Get user's threads with filter - placeholder implementation
+    const getUserThreadsWithFilter = useCallback(
+        async (
+            userId: string,
+            filter: "all" | "recent" | "popular" | "unanswered" | "pinned" = "all",
+            sortBy: "createdAt" | "lastActivity" | "views" | "replyCount" = "createdAt",
+            sortOrder: "asc" | "desc" = "desc",
+            pageSize: number = 50
+        ) => {
+            setLoading(true);
+            setError(null);
+            try {
+                // TODO: Implement getUserThreadsWithFilter in forumService
+                const result = await fetchThreads({
+                    authorId: userId,
+                    filter,
+                    sortBy,
+                    sortOrder,
+                    limit: pageSize,
+                });
+                return result.threads;
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : String(err);
+                console.error("Error getting filtered user threads:", msg);
+                setError(msg);
+                throw err;
+            } finally {
+                setLoading(false);
+            }
+        },
+        []
+    );
+
+    // Get user's replies - placeholder implementation
     const getUserReplies = useCallback(async (userId: string) => {
         setLoading(true);
         setError(null);
         try {
-            const result = await forumService.getUserReplies(userId);
-            return result.replies as ForumReply[];
+            // TODO: Implement getUserReplies in forumService
+            // For now, return empty array
+            console.log("Getting replies for user:", userId);
+            return [] as ForumReply[];
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
             console.error("Error getting user replies:", msg);
@@ -540,6 +680,7 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             deleteReply,
             searchThreads,
             getUserThreads,
+            getUserThreadsWithFilter,
             getUserReplies,
             clearCurrentThread,
             clearError,
@@ -564,6 +705,7 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             deleteReply,
             searchThreads,
             getUserThreads,
+            getUserThreadsWithFilter,
             getUserReplies,
             clearCurrentThread,
             clearError,

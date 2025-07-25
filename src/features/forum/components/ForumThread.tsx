@@ -1,22 +1,17 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useForum } from "@/features/forum/hooks/useForum";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { FaEdit, FaTrash, FaReply, FaEye, FaCalendar, FaUser } from "react-icons/fa";
 import Skeleton from "@/features/shared/Skeleton";
-import { ThreadEditor } from "./ThreadEditor";
 import { ReplyEditor } from "./ReplyEditor";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import { formatRelativeTime } from "@/features/forum/utils/threadUtils";
+import { FORUM_PATHS, FORUM_HOME_PATH } from "@/features/forum/constants/forumPaths";
 import type { FC } from "react";
 
-interface ForumThreadProps {
-    isNew?: boolean;
-}
-
-export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
+export const ForumThread: FC = () => {
     const { threadId } = useParams<Record<string, string | undefined>>();
-    const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
     const { currentUser } = useAuth();
@@ -25,50 +20,22 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
         loadMoreReplies,
         currentThread,
         categories,
-        createThread,
         deleteThread,
         pagination,
         loading,
         error,
+        deleteReply,
     } = useForum();
-
-    const newThreadData = {
-        title: "",
-        content: "",
-        categoryId: searchParams.get("category") || "",
-    };
 
     const [isReplying, setIsReplying] = useState<boolean>(false);
     const [loadingMore, setLoadingMore] = useState<boolean>(false);
+    const [deletingReplyId, setDeletingReplyId] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!isNew && threadId) {
+        if (threadId) {
             loadThread(threadId);
         }
-    }, [isNew, threadId, loadThread]);
-
-    const handleNewThreadSubmit = async (data: {
-        title?: string;
-        content?: string;
-        categoryId?: string;
-        authorId?: string;
-        authorName?: string;
-        authorPhotoURL?: string;
-        createdAt?: Date;
-        lastActivity?: Date;
-        views?: number;
-        replyCount?: number;
-        isPinned?: boolean;
-        isLocked?: boolean;
-        tags?: string[];
-    }) => {
-        try {
-            const threadId = await createThread(data);
-            navigate(`/forum/thread/${threadId}`);
-        } catch (error) {
-            console.error("Error creating thread:", error);
-        }
-    };
+    }, [threadId, loadThread]);
 
     const handleThreadDelete = async () => {
         if (!currentThread) return;
@@ -79,8 +46,8 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
             )
         ) {
             try {
-                await deleteThread(threadId as string, currentThread.categoryId);
-                navigate("/forum");
+                await deleteThread(threadId as string);
+                navigate(FORUM_HOME_PATH);
             } catch (error) {
                 console.error("Error deleting thread:", error);
             }
@@ -100,20 +67,18 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
         }
     };
 
-    // Render new thread form
-    if (isNew) {
-        return (
-            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
-                <h1 className="text-2xl font-bold mb-6">Create New Thread</h1>
-                <ThreadEditor
-                    initialData={newThreadData}
-                    categories={categories}
-                    onSubmit={handleNewThreadSubmit}
-                    isLoading={loading}
-                />
-            </div>
-        );
-    }
+    const handleReplyDelete = async (replyId: string, threadId: string) => {
+        if (!window.confirm("Are you sure you want to delete this reply?")) return;
+        setDeletingReplyId(replyId);
+        try {
+            await deleteReply(replyId, threadId);
+            // Optionally show a toast or update UI
+        } catch (err) {
+            console.error("Error deleting reply:", err);
+        } finally {
+            setDeletingReplyId(null);
+        }
+    };
 
     // Loading state
     if (loading && !currentThread) {
@@ -155,7 +120,7 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
                 <h2 className="text-lg font-semibold mb-2">Error Loading Thread</h2>
                 <p>{error}</p>
                 <Link
-                    to="/forum"
+                    to={FORUM_HOME_PATH}
                     className="mt-4 inline-block text-[var(--accent)] hover:underline"
                 >
                     Return to Forum
@@ -173,7 +138,7 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
                     The thread you&apos;re looking for may have been moved or deleted.
                 </p>
                 <Link
-                    to="/forum"
+                    to={FORUM_HOME_PATH}
                     className="inline-block px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
                 >
                     Return to Forum
@@ -187,12 +152,12 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
         <div className="space-y-6">
             {/* Thread metadata */}
             <div className="flex gap-2 text-sm text-[var(--txt-muted)]">
-                <Link to="/forum" className="hover:text-[var(--accent)]">
+                <Link to={FORUM_HOME_PATH} className="hover:text-[var(--accent)]">
                     Forum
                 </Link>
                 <span>&gt;</span>
                 <Link
-                    to={`/forum/category/${currentThread.categoryId}`}
+                    to={FORUM_PATHS.CATEGORY(currentThread.categoryId)}
                     className="hover:text-[var(--accent)]"
                 >
                     {categories.find((cat) => cat.id === currentThread.categoryId)
@@ -256,7 +221,7 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
                     {currentUser?.uid === currentThread.authorId && (
                         <>
                             <Link
-                                to={`/forum/thread/${threadId}/edit`}
+                                to={FORUM_PATHS.THREAD_EDIT(threadId as string)}
                                 className="inline-flex items-center px-3 py-1.5 text-sm rounded-lg font-semibold bg-[var(--bg-surface)] text-[var(--txt-primary)] hover:bg-[var(--bg-tertiary)] border border-[var(--br-secondary)] transition"
                             >
                                 <FaEdit className="mr-1" size={12} />
@@ -336,9 +301,23 @@ export const ForumThread: FC<ForumThreadProps> = ({ isNew = false }) => {
                                                 Edit
                                             </Link>
 
-                                            <button className="inline-flex items-center text-xs px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition">
+                                            <button
+                                                className="inline-flex items-center text-xs px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                                                onClick={() =>
+                                                    handleReplyDelete(
+                                                        reply.id,
+                                                        currentThread.id
+                                                    )
+                                                }
+                                                disabled={deletingReplyId === reply.id}
+                                                aria-disabled={
+                                                    deletingReplyId === reply.id
+                                                }
+                                            >
                                                 <FaTrash className="mr-1" size={10} />
-                                                Delete
+                                                {deletingReplyId === reply.id
+                                                    ? "Deleting..."
+                                                    : "Delete"}
                                             </button>
                                         </div>
                                     )}

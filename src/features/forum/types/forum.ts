@@ -1,6 +1,52 @@
 import { RawUserData } from "@/features/auth/types/auth";
 import type { IconType } from "react-icons";
 
+
+export interface ForumSidebarProps {
+    isSidebarOpen: boolean;
+    toggleSidebar: () => void;
+    handleSidebarClick: () => void;
+    categories: ForumCategory[];
+    className?: string;
+}
+
+export interface FetchThreadsOptions {
+    cursor?: QueryDocumentSnapshot<DocumentData>;
+    limit?: number;
+    categoryId?: string;
+    authorId?: string;
+    search?: string;
+    sortBy?: "createdAt" | "lastActivity" | "views" | "replyCount";
+    sortOrder?: "asc" | "desc";
+    filter?: "all" | "recent" | "popular" | "unanswered" | "pinned";
+    timeFrame?: "day" | "week" | "month" | "year";
+}
+
+export interface FetchRepliesOptions {
+    cursor?: QueryDocumentSnapshot<DocumentData>;
+    limit?: number;
+    threadId: string;
+}
+
+export interface CreateThreadParams {
+    title: string;
+    content: string;
+    categoryId: string;
+    authorId: string;
+    authorName: string;
+    authorPhotoURL?: string;
+    tags?: string[];
+}
+
+export interface CreateReplyParams {
+    threadId: string;
+    content: string;
+    authorId: string;
+    authorName: string;
+    authorPhotoURL?: string;
+    parentReplyId?: string;
+}
+
 export interface ForumCategory {
     id: string;
     name: string;
@@ -84,13 +130,15 @@ export interface ForumThreadsState {
     byCategory: Record<string, ForumThread[]>;
 }
 
+import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
+
 export interface ForumPagination {
     threads: {
-        lastVisible: unknown;
+        lastVisible: QueryDocumentSnapshot<DocumentData> | null;
         hasMore: boolean;
     };
     replies: {
-        lastVisible: unknown;
+        lastVisible: QueryDocumentSnapshot<DocumentData> | null;
         hasMore: boolean;
     };
 }
@@ -104,18 +152,31 @@ export interface ForumContextValue {
     error: string | null;
     pagination: ForumPagination;
     getCategory: (categoryId: string) => Promise<ForumCategory>;
-    getThreadsByCategory: (categoryId: string, sortBy?: string) => Promise<ForumThread[]>;
-    loadMoreThreads: (categoryId: string, sortBy?: string) => Promise<ForumThread[] | undefined>;
+    getThreadsByCategory: (categoryId: string, sortBy?: "createdAt" | "lastActivity" | "views" | "replyCount") => Promise<ForumThread[]>;
+    loadMoreThreads: (categoryId: string, sortBy?: "createdAt" | "lastActivity" | "views" | "replyCount") => Promise<ForumThread[] | undefined>;
     loadThread: (threadId: string) => Promise<ForumThread & { replies?: ForumReply[] }>;
     loadMoreReplies: (threadId: string) => Promise<ForumReply[] | undefined>;
     createThread: (data: Partial<ForumThread>) => Promise<string>;
     updateThread: (threadId: string, data: Partial<ForumThread>) => Promise<string>;
-    deleteThread: (threadId: string, categoryId: string) => Promise<string>;
+    deleteThread: (threadId: string) => Promise<string>;
     addReply: (threadId: string, content: string) => Promise<string>;
     updateReply: (replyId: string, threadId: string, content: string) => Promise<string>;
     deleteReply: (replyId: string, threadId: string) => Promise<string>;
     searchThreads: (searchQuery: string) => Promise<ForumThread[]>;
-    getUserThreads: (userId: string) => Promise<ForumThread[]>;
+    getUserThreads: (
+        userId: string,
+        sortBy?: "createdAt" | "lastActivity" | "views" | "replyCount",
+        sortOrder?: "asc" | "desc",
+        pageSize?: number,
+        lastVisible?: unknown
+    ) => Promise<ForumThread[]>;
+    getUserThreadsWithFilter: (
+        userId: string,
+        filter?: "all" | "recent" | "popular" | "unanswered" | "pinned",
+        sortBy?: "createdAt" | "lastActivity" | "views" | "replyCount",
+        sortOrder?: "asc" | "desc",
+        pageSize?: number
+    ) => Promise<ForumThread[]>;
     getUserReplies: (userId: string) => Promise<ForumReply[]>;
     clearCurrentThread: () => void;
     clearError: () => void;

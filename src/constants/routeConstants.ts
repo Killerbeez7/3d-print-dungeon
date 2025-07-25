@@ -18,13 +18,6 @@ export const ROUTES = {
     /* Blog */
     BLOG: "/blog",
 
-    /* Forum */
-    FORUM: "/forum",
-    FORUM_CATEGORY: "/forum/category/:categoryId",
-    FORUM_THREAD: "/forum/thread/:threadId",
-    FORUM_NEW_THREAD: "/forum/new-thread",
-    FORUM_THREAD_EDIT: "/forum/thread/:threadId/edit",
-    FORUM_REPLY_EDIT: "/forum/reply/:replyId/edit",
 
     /* Marketplace */
     MARKETPLACE_FEATURED: "/marketplace/featured",
@@ -52,5 +45,5 @@ export const ROUTES = {
 
     /* Printed Figures */
     PRINTED_FIGURES: "/printed-figures",
-}; 
+};
 

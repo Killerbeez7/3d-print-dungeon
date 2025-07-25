@@ -1,11 +1,14 @@
-import { useEffect, useState, useRef, FormEvent } from "react";
-import { Link } from "react-router-dom";
-import { FaSearch } from "react-icons/fa";
-import { useForum } from "@/features/forum/hooks/useForum";
-import { forumService } from "@/features/forum/services/forumService";
+import { useEffect, useState, FormEvent } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { FaSearch, FaPlusSquare } from "react-icons/fa";
+import { useQueryClient } from "@tanstack/react-query";
+import { useFetchThreads, useFetchCategories } from "@/features/forum/hooks";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useModal } from "@/hooks/useModal";
 import Skeleton from "@/features/shared/Skeleton";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import { isThreadNew, formatRelativeTime } from "@/features/forum/utils/threadUtils";
+import { InfiniteScrollList } from "@/features/shared/InfiniteScrollList";
 import type { ForumThread, ForumCategory } from "@/features/forum/types/forum";
 
 interface ThreadCardProps {
@@ -14,128 +17,75 @@ interface ThreadCardProps {
 }
 
 export const ForumHome = () => {
-    const { categories, threads, loading, error, searchThreads } = useForum();
-    const [displayedThreads, setDisplayedThreads] = useState<ForumThread[]>([]);
-    const [lastVisible, setLastVisible] = useState<unknown>(null);
-    const [hasMore, setHasMore] = useState<boolean>(true);
-    const [loadingMore, setLoadingMore] = useState<boolean>(false);
+    const queryClient = useQueryClient();
+    const navigate = useNavigate();
+    const { currentUser } = useAuth();
+    const { open } = useModal("auth");
     const [activeTab, setActiveTab] = useState<string>("recent");
     const [searchQuery, setSearchQuery] = useState<string>("");
-    const [searchResults, setSearchResults] = useState<ForumThread[]>([]);
-    const [isSearching, setIsSearching] = useState<boolean>(false);
-    const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+    // Fetch categories
+    const { data: categories = [], isLoading: categoriesLoading } = useFetchCategories();
+
+    // Fetch threads based on active tab
+    const getThreadFilters = () => {
+        switch (activeTab) {
+            case "popular":
+                return { sortBy: "views" as const, sortOrder: "desc" as const };
+            case "unanswered":
+                return { filter: "unanswered" as const };
+            case "recent":
+            default:
+                return { sortBy: "createdAt" as const, sortOrder: "desc" as const };
+        }
+    };
+
+    const {
+        data: threadsData,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading: threadsLoading,
+        isError: threadsError,
+    } = useFetchThreads(getThreadFilters());
+
+    // Search functionality
+    const {
+        data: searchData,
+        fetchNextPage: fetchNextSearch,
+        hasNextPage: hasNextSearch,
+        isFetchingNextPage: isFetchingNextSearch,
+        isLoading: searchLoading,
+        refetch: refetchSearch,
+    } = useFetchThreads({
+        search: searchQuery,
+        sortBy: "createdAt",
+        sortOrder: "desc",
+    });
+
+    // Clear search cache when tab changes
     useEffect(() => {
-        // Reset search when tab changes
         if (searchQuery) {
             setSearchQuery("");
-            setSearchResults([]);
+            queryClient.removeQueries({
+                queryKey: ["forum-threads", { search: searchQuery }],
+            });
         }
-    }, [activeTab]);
+    }, [activeTab, queryClient]);
 
     // Scroll to top when tab changes
     useEffect(() => {
         window.scrollTo(0, 0);
     }, [activeTab]);
 
-    // Reset loaded threads on refresh
-    useEffect(() => {
-        setDisplayedThreads([]);
-        setLastVisible(null);
-        setHasMore(true);
-    }, []);
-
-    // Fetch first 10 threads on mount
-    useEffect(() => {
-        const fetchInitialThreads = async () => {
-            setLoadingMore(true);
-            try {
-                const result = await forumService.getNewestThreads(10);
-                const threads: ForumThread[] = Array.isArray(result)
-                    ? result
-                    : result.threads || [];
-                setDisplayedThreads(threads);
-                setLastVisible(result.lastVisible || null);
-                setHasMore(
-                    result.hasMore !== undefined ? result.hasMore : threads.length === 10
-                );
-            } catch (error) {
-                console.error("Error fetching initial threads:", error);
-            } finally {
-                setLoadingMore(false);
-            }
-        };
-        fetchInitialThreads();
-    }, []);
-
-    // Throttled scroll handler with inline loadMoreThreads
-    useEffect(() => {
-        const handleScroll = () => {
-            if (scrollTimeoutRef.current) return;
-
-            scrollTimeoutRef.current = setTimeout(async () => {
-                const totalHeight = document.documentElement.scrollHeight;
-                const scrollY = window.scrollY;
-                const innerHeight = window.innerHeight;
-                const scrolled = scrollY + innerHeight;
-                const scrollPercent = scrolled / totalHeight;
-
-                // trigger loading when user has scrolled past 80% of the page
-                if (scrollPercent > 0.8 && hasMore && !loadingMore && lastVisible) {
-                    try {
-                        setLoadingMore(true);
-                        const result = await forumService.getMoreNewestThreads(
-                            lastVisible,
-                            5
-                        );
-                        const threads: ForumThread[] = Array.isArray(result)
-                            ? result
-                            : result.threads || [];
-                        if (threads.length === 0) {
-                            setHasMore(false);
-                            return;
-                        }
-                        setDisplayedThreads((prev) => [...prev, ...threads]);
-                        setLastVisible(result.lastVisible || null);
-                        setHasMore(
-                            result.hasMore !== undefined
-                                ? result.hasMore
-                                : threads.length === 5
-                        );
-                    } catch (error) {
-                        console.error("Error loading more threads:", error);
-                        setHasMore(false);
-                    } finally {
-                        setLoadingMore(false);
-                    }
-                }
-
-                scrollTimeoutRef.current = null;
-            }, 200);
-        };
-
-        window.addEventListener("scroll", handleScroll);
-        return () => {
-            window.removeEventListener("scroll", handleScroll);
-            if (scrollTimeoutRef.current) {
-                clearTimeout(scrollTimeoutRef.current);
-            }
-        };
-    }, [hasMore, loadingMore, lastVisible]);
-
     const handleSearch = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         if (!searchQuery.trim()) return;
 
-        setIsSearching(true);
         try {
-            const results: ForumThread[] = await searchThreads(searchQuery);
-            setSearchResults(results);
+            await refetchSearch();
         } catch (error) {
             console.error("Error searching threads:", error);
-        } finally {
-            setIsSearching(false);
         }
     };
 
@@ -185,26 +135,35 @@ export const ForumHome = () => {
     );
 
     const renderThreadListForTab = () => {
-        if (searchQuery && searchResults.length > 0) {
+        if (searchQuery && searchData) {
+            const searchThreads = searchData.pages.flatMap((page) => page.threads);
             return (
                 <div className="mt-6 space-y-4">
                     <h2 className="text-lg font-medium">
                         Search Results for &quot;{searchQuery}&quot;
                     </h2>
-                    <div className="space-y-4">
-                        {searchResults.map((thread) => (
-                            <ThreadCard
-                                key={thread.id}
-                                thread={thread}
-                                categories={categories}
-                            />
-                        ))}
-                    </div>
+                    <InfiniteScrollList
+                        items={searchThreads}
+                        hasMore={hasNextSearch}
+                        loadMore={fetchNextSearch}
+                        isLoading={isFetchingNextSearch}
+                        loader={<Spinner size={24} />}
+                    >
+                        <div className="space-y-4">
+                            {searchThreads.map((thread) => (
+                                <ThreadCard
+                                    key={thread.id}
+                                    thread={thread}
+                                    categories={categories}
+                                />
+                            ))}
+                        </div>
+                    </InfiniteScrollList>
                 </div>
             );
         }
 
-        if (searchQuery && searchResults.length === 0 && !isSearching) {
+        if (searchQuery && searchData?.pages[0]?.threads.length === 0 && !searchLoading) {
             return (
                 <div className="mt-6 bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
                     <p className="text-[var(--txt-muted)]">
@@ -215,94 +174,52 @@ export const ForumHome = () => {
             );
         }
 
-        if (activeTab === "recent" && !searchQuery) {
+        if (!searchQuery) {
+            const threads = threadsData?.pages.flatMap((page) => page.threads) ?? [];
             return (
                 <div className="mt-6">
-                    <h2 className="text-lg font-medium mb-4">Recent Discussions</h2>
-                    {displayedThreads.length > 0 ? (
-                        <div className="space-y-4">
-                            {displayedThreads.map((thread) => (
-                                <ThreadCard
-                                    key={thread.id}
-                                    thread={thread}
-                                    categories={categories}
-                                />
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
-                            <p className="text-[var(--txt-muted)]">
-                                No recent discussions yet. Start a new thread!
-                            </p>
-                        </div>
-                    )}
-                    {loadingMore && (
-                        <div className="flex justify-center mt-4">
-                            <Spinner size={24} />
-                        </div>
-                    )}
+                    <h2 className="text-lg font-medium mb-4">
+                        {activeTab === "recent" && "Recent Discussions"}
+                        {activeTab === "popular" && "Popular Discussions"}
+                        {activeTab === "unanswered" && "Unanswered Discussions"}
+                    </h2>
+                    <InfiniteScrollList
+                        items={threads}
+                        hasMore={hasNextPage}
+                        loadMore={fetchNextPage}
+                        isLoading={isFetchingNextPage}
+                        loader={<Spinner size={24} />}
+                    >
+                        {threadsLoading && !threads.length ? (
+                            <div className="flex justify-center py-10">
+                                <Spinner size={24} />
+                            </div>
+                        ) : threads.length > 0 ? (
+                            <div className="space-y-4">
+                                {threads.map((thread) => (
+                                    <ThreadCard
+                                        key={thread.id}
+                                        thread={thread}
+                                        categories={categories}
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
+                                <p className="text-[var(--txt-muted)]">
+                                    No {activeTab} discussions yet. Start a new thread!
+                                </p>
+                            </div>
+                        )}
+                    </InfiniteScrollList>
                 </div>
             );
         }
 
-        switch (activeTab) {
-            case "popular":
-                return (
-                    <div className="mt-6">
-                        <h2 className="text-lg font-medium mb-4">Popular Discussions</h2>
-                        {threads.popular?.length > 0 ? (
-                            <div className="space-y-4">
-                                {threads.popular.map((thread) => (
-                                    <ThreadCard
-                                        key={thread.id}
-                                        thread={thread}
-                                        categories={categories}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
-                                <p className="text-[var(--txt-muted)]">
-                                    No popular discussions yet. Start a new thread!
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                );
-
-            case "unanswered":
-                return (
-                    <div className="mt-6">
-                        <h2 className="text-lg font-medium mb-4">
-                            Unanswered Discussions
-                        </h2>
-                        {threads.unanswered?.length > 0 ? (
-                            <div className="space-y-4">
-                                {threads.unanswered.map((thread) => (
-                                    <ThreadCard
-                                        key={thread.id}
-                                        thread={thread}
-                                        categories={categories}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
-                                <p className="text-[var(--txt-muted)]">
-                                    All discussions have been answered. Great job
-                                    community!
-                                </p>
-                            </div>
-                        )}
-                    </div>
-                );
-
-            default:
-                return null;
-        }
+        return null;
     };
 
-    if (loading && !categories.length) {
+    if (categoriesLoading && !categories.length) {
         return (
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
@@ -344,11 +261,11 @@ export const ForumHome = () => {
         );
     }
 
-    if (error) {
+    if (threadsError) {
         return (
             <div className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg text-red-700 dark:text-red-400">
                 <h2 className="text-lg font-semibold mb-2">Error Loading Forum</h2>
-                <p>{error}</p>
+                <p>Failed to load forum threads. Please try again.</p>
             </div>
         );
     }
@@ -356,7 +273,7 @@ export const ForumHome = () => {
     return (
         <div className="space-y-6">
             {/* Header with search and new thread button */}
-            <div className="flex flex-col sm:flex-row justify-between gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
                 <form onSubmit={handleSearch} className="flex-1 max-w-md">
                     <div className="relative">
                         <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -368,17 +285,31 @@ export const ForumHome = () => {
                             placeholder="Search discussions..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            disabled={isSearching}
+                            disabled={searchLoading}
                         />
                         <button
                             type="submit"
                             className="absolute right-1 bottom-1 top-1 px-3 rounded bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] focus:outline-none transition"
-                            disabled={isSearching || !searchQuery.trim()}
+                            disabled={searchLoading || !searchQuery.trim()}
                         >
-                            {isSearching ? "..." : "Search"}
+                            {searchLoading ? "..." : "Search"}
                         </button>
                     </div>
                 </form>
+
+                <button
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition-colors"
+                    onClick={() => {
+                        if (!currentUser) {
+                            open({ mode: "login" });
+                            return;
+                        }
+                        navigate("/forum/new-thread");
+                    }}
+                >
+                    <FaPlusSquare size={16} />
+                    <span>New Thread</span>
+                </button>
             </div>
 
             {/* Tabs */}

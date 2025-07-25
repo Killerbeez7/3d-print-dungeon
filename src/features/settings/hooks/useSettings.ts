@@ -13,7 +13,7 @@ export interface Settings {
 
 export const useSettings = () => {
     const [settings, setSettings] = useState<Settings>({
-        theme: "light",
+        theme: "dark",
         language: "en",
         notifications: true,
         email: "",

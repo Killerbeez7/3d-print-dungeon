@@ -2,16 +2,8 @@ import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { useForum } from "@/features/forum/hooks/useForum";
 import { ForumSidebar } from "./ForumSidebar";
-import type { ForumCategory } from "@/features/forum/types/forum";
-import { useScreenSize } from "@/hooks/useScreenSize";
 
-export interface ForumSidebarProps {
-    isSidebarOpen: boolean;
-    toggleSidebar: () => void;
-    handleSidebarClick: () => void;
-    categories: ForumCategory[];
-    className?: string;
-}
+import { useScreenSize } from "@/hooks/useScreenSize";
 
 export const ForumLayout = () => {
     const { categories } = useForum();
@@ -53,9 +45,10 @@ export const ForumLayout = () => {
             />
             {/* Main content */}
             <div
-                className={`flex-1 mt-2 p-4 transition-all duration-300 ease-in-out ${
+                className={`flex-2 p-4 pb-[20rem] transition-all duration-300 ease-in-out ${
                     isSidebarOpen ? "md:ml-[300px] ml-0" : "md:ml-[70px] ml-0"
                 }`}
+                // style={{ paddingLeft: "20rem", paddingRight: "calc(20rem + 70px)" }}
             >
                 <Outlet />
             </div>

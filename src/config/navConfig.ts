@@ -1,4 +1,5 @@
-import { ROUTES } from "../constants/routeConstants";
+import { ROUTES } from "@/constants/routeConstants";
+import { FORUM_HOME_PATH } from "@/features/forum/constants/forumPaths";
 
 export interface NavItem {
     label: string;
@@ -26,7 +27,7 @@ export const NAV_SECTIONS: NavSection[] = [
         to: null,
         items: [
             { label: "Events", to: ROUTES.EVENTS },
-            { label: "Forum", to: ROUTES.FORUM },
+            { label: "Forum", to: FORUM_HOME_PATH },
             { label: "Blog", to: ROUTES.BLOG },
         ],
     },

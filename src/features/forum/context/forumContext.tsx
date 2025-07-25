@@ -26,6 +26,7 @@ export const ForumContext = createContext<ForumContextType>({
     deleteReply: async () => { throw new Error("deleteReply not implemented") },
     searchThreads: async () => [],
     getUserThreads: async () => [],
+    getUserThreadsWithFilter: async () => [],
     getUserReplies: async () => [],
     clearCurrentThread: noop,
     clearError: noop,

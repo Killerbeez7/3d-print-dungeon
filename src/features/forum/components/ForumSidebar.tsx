@@ -1,10 +1,8 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { LuPanelLeftClose, LuPanelLeftOpen } from "react-icons/lu";
 import { MdHome, MdDashboard } from "react-icons/md";
-import { FaPlusSquare, FaUser, FaInfoCircle, FaQuestionCircle } from "react-icons/fa";
-import { useModal } from "@/hooks/useModal";
-import { useAuth } from "@/features/auth/hooks/useAuth";
-import type { ForumSidebarProps } from "./ForumLayout";
+import { FaUser, FaInfoCircle, FaQuestionCircle } from "react-icons/fa";
+import type { ForumSidebarProps } from "@/features/forum/types/forum";
 import type { IconType } from "react-icons";
 import type { FC, ReactNode } from "react";
 
@@ -40,9 +38,6 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
     categories,
     className,
 }) => {
-    const { currentUser } = useAuth();
-    const { open } = useModal("auth");
-    const navigate = useNavigate();
     const location = useLocation();
 
     return (
@@ -73,27 +68,27 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                             {categories && (
                                 <>
                                     {/* MAIN */}
-                                                                         <SidebarLink
-                                         icon={MdHome}
-                                         label={null}
-                                         to="/forum"
-                                         onClick={handleSidebarClick}
-                                         className="justify-center flex items-center mx-auto p-2"
-                                     />
-                                                                         <SidebarLink
-                                         icon={MdDashboard}
-                                         label={null}
-                                         to="/forum/dashboard"
-                                         onClick={handleSidebarClick}
-                                         className="justify-center flex items-center mx-auto p-2"
-                                     />
-                                                                         <SidebarLink
-                                         icon={FaUser}
-                                         label={null}
-                                         to="/forum/my-threads"
-                                         onClick={handleSidebarClick}
-                                         className="justify-center flex items-center mx-auto p-2"
-                                     />
+                                    <SidebarLink
+                                        icon={MdHome}
+                                        label={null}
+                                        to="/forum"
+                                        onClick={handleSidebarClick}
+                                        className="justify-center flex items-center mx-auto p-2"
+                                    />
+                                    <SidebarLink
+                                        icon={MdDashboard}
+                                        label={null}
+                                        to="/forum/dashboard"
+                                        onClick={handleSidebarClick}
+                                        className="justify-center flex items-center mx-auto p-2"
+                                    />
+                                    <SidebarLink
+                                        icon={FaUser}
+                                        label={null}
+                                        to="/forum/my-threads"
+                                        onClick={handleSidebarClick}
+                                        className="justify-center flex items-center mx-auto p-2"
+                                    />
                                     <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
                                     {/* CATEGORIES */}
                                     {categories.map((category) => {
@@ -105,49 +100,31 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                                                 label={null}
                                                 to={`/forum/category/${category.id}`}
                                                 onClick={handleSidebarClick}
-                                                                                                 className={`justify-center flex items-center mx-auto p-2 ${
-                                                     location.pathname ===
-                                                     `/forum/category/${category.id}`
-                                                         ? "bg-[var(--bg-surface)] text-[var(--txt-primary)]"
-                                                         : "hover:bg-[var(--bg-surface)]"
-                                                 }`}
+                                                className={`justify-center flex items-center mx-auto p-2 ${
+                                                    location.pathname ===
+                                                    `/forum/category/${category.id}`
+                                                        ? "bg-[var(--bg-surface)] text-[var(--txt-primary)]"
+                                                        : "hover:bg-[var(--bg-surface)]"
+                                                }`}
                                             />
                                         );
                                     })}
                                     <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
-                                    {/* ACTIONS */}
-                                    <button
-                                        aria-label="New Thread"
-                                        className="flex items-center justify-center w-12 h-12 mx-auto
-             rounded-full bg-[var(--accent)] text-[var(--txt-highlight)]
-             hover:bg-[var(--accent-hover)] transition shadow-lg mb-2"
-                                        onClick={() => {
-                                            if (!currentUser) {
-                                                open({ mode: "login" });
-                                                return;
-                                            }
-                                            navigate("/forum/new-thread");
-                                            handleSidebarClick();
-                                        }}
-                                                                         >
-                                         <FaPlusSquare size={20} width={20} height={20} />
-                                     </button>
-                                    <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
                                     {/* INFO */}
-                                                                         <SidebarLink
-                                         icon={FaInfoCircle}
-                                         label={null}
-                                         to="/forum/rules"
-                                         onClick={handleSidebarClick}
-                                         className="justify-center flex items-center mx-auto p-2"
-                                     />
-                                                                         <SidebarLink
-                                         icon={FaQuestionCircle}
-                                         label={null}
-                                         to="/forum/help"
-                                         onClick={handleSidebarClick}
-                                         className="justify-center flex items-center mx-auto p-2"
-                                     />
+                                    <SidebarLink
+                                        icon={FaInfoCircle}
+                                        label={null}
+                                        to="/forum/rules"
+                                        onClick={handleSidebarClick}
+                                        className="justify-center flex items-center mx-auto p-2"
+                                    />
+                                    <SidebarLink
+                                        icon={FaQuestionCircle}
+                                        label={null}
+                                        to="/forum/help"
+                                        onClick={handleSidebarClick}
+                                        className="justify-center flex items-center mx-auto p-2"
+                                    />
                                 </>
                             )}
                         </nav>
@@ -238,30 +215,6 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
                                                 />
                                             );
                                         })}
-                                    </div>
-                                    <div className="my-1 border-t border-[var(--br-secondary)]" />
-                                    {/* ACTIONS */}
-                                    <div className="mb-2">
-                                        <h5 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-1">
-                                            ACTIONS
-                                        </h5>
-                                        <button
-                                            className="flex items-center md:w-full w-auto gap-2 px-3 py-1.5 rounded-lg
-             font-semibold bg-[var(--accent)]
-             text-[var(--txt-highlight)]
-             hover:bg-[var(--accent-hover)]"
-                                            onClick={() => {
-                                                if (!currentUser) {
-                                                    open({ mode: "login" });
-                                                    return;
-                                                }
-                                                navigate("/forum/new-thread");
-                                                handleSidebarClick();
-                                            }}
-                                                                                 >
-                                             <FaPlusSquare size={20} width={20} height={20} />
-                                             <span>New Thread</span>
-                                         </button>
                                     </div>
                                     <div className="my-1 border-t border-[var(--br-secondary)]" />
                                     {/* INFO */}

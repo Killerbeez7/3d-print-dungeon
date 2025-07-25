@@ -18,6 +18,17 @@ const ForumCategory = lazy(() =>
 const ForumThread = lazy(() =>
     import("../components/ForumThread").then((m) => ({ default: m.ForumThread }))
 );
+const CreateForumThread = lazy(() =>
+    import("../components/CreateForumThread").then((m) => ({
+        default: m.CreateForumThread,
+    }))
+);
+const EditForumThread = lazy(() =>
+    import("../components/EditForumThread").then((m) => ({ default: m.EditForumThread }))
+);
+const EditReply = lazy(() =>
+    import("../components/EditReply").then((m) => ({ default: m.EditReply }))
+);
 const ForumDashboard = lazy(() =>
     import("../components/ForumDashboard").then((m) => ({ default: m.ForumDashboard }))
 );
@@ -116,7 +127,7 @@ export const forumRoutes: RouteObject[] = [
                 path: "new-thread",
                 element: withProtectedMaintenance(
                     <Suspense>
-                        <ForumThread isNew />
+                        <CreateForumThread />
                     </Suspense>
                 ),
             },
@@ -124,7 +135,15 @@ export const forumRoutes: RouteObject[] = [
                 path: "thread/:threadId/edit",
                 element: withProtectedMaintenance(
                     <Suspense>
-                        <ForumThread />
+                        <EditForumThread />
+                    </Suspense>
+                ),
+            },
+            {
+                path: "reply/:replyId/edit",
+                element: withProtectedMaintenance(
+                    <Suspense>
+                        <EditReply />
                     </Suspense>
                 ),
             },

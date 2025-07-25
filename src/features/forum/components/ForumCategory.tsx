@@ -32,7 +32,7 @@ export const ForumCategory = () => {
     return (
         <div className="space-y-6">
             {/* Category Header */}
-            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+            <div className="text-[var(--txt-primary)] p-6">
                 <h1 className="text-2xl font-bold">{currentCategory.name}</h1>
                 <p className="mt-2 text-[var(--txt-secondary)]">
                     {currentCategory.description}
