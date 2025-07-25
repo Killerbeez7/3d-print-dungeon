@@ -2,8 +2,9 @@ import { useState, ChangeEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FORUM_CATEGORIES } from "@/config/forumCategories";
 import { ThreadList } from "./ThreadList";
+import type { FC } from "react";
 
-export const ForumCategory = () => {
+export const ForumCategory: FC = () => {
     const { categoryId } = useParams<Record<string, string | undefined>>();
     const [sortBy, setSortBy] = useState<string>("lastActivity");
     const currentCategory = FORUM_CATEGORIES.find((cat) => cat.id === categoryId);

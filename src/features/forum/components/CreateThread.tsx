@@ -4,7 +4,7 @@ import { ThreadEditor } from "./ThreadEditor";
 import type { FC } from "react";
 import { FORUM_HOME_PATH } from "@/features/forum/constants/forumPaths";
 
-export const CreateForumThread: FC = () => {
+export const CreateThread: FC = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 

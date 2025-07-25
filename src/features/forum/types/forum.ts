@@ -10,6 +10,13 @@ export interface ForumSidebarProps {
     className?: string;
 }
 
+export interface ThreadListProps {
+    categoryId: string;
+    sortBy?: string;
+    showCategory?: boolean;
+    isCompact?: boolean;
+}
+
 export interface FetchThreadsOptions {
     cursor?: QueryDocumentSnapshot<DocumentData>;
     limit?: number;

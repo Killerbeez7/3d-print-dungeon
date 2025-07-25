@@ -5,7 +5,7 @@ import type { RouteObject } from "react-router-dom";
 
 // Layout
 const ForumLayout = lazy(() =>
-    import("../components/ForumLayout").then((m) => ({ default: m.ForumLayout }))
+    import("../components/Layout").then((m) => ({ default: m.ForumLayout }))
 );
 
 // Pages and Components
@@ -18,13 +18,11 @@ const ForumCategory = lazy(() =>
 const ForumThread = lazy(() =>
     import("../components/ForumThread").then((m) => ({ default: m.ForumThread }))
 );
-const CreateForumThread = lazy(() =>
-    import("../components/CreateForumThread").then((m) => ({
-        default: m.CreateForumThread,
-    }))
+const CreateThread = lazy(() =>
+    import("../components/CreateThread").then((m) => ({ default: m.CreateThread }))
 );
-const EditForumThread = lazy(() =>
-    import("../components/EditForumThread").then((m) => ({ default: m.EditForumThread }))
+const EditThread = lazy(() =>
+    import("../components/EditThread").then((m) => ({ default: m.EditThread }))
 );
 const EditReply = lazy(() =>
     import("../components/EditReply").then((m) => ({ default: m.EditReply }))
@@ -36,14 +34,10 @@ const ForumMyThreads = lazy(() =>
     import("../components/ForumMyThreads").then((m) => ({ default: m.ForumMyThreads }))
 );
 const ForumRules = lazy(() =>
-    import("@/features/forum/components/ForumRules").then((m) => ({
-        default: m.ForumRules,
-    }))
+    import("../components/ForumRules").then((m) => ({ default: m.ForumRules }))
 );
 const ForumHelp = lazy(() =>
-    import("@/features/forum/components/ForumHelp").then((m) => ({
-        default: m.ForumHelp,
-    }))
+    import("../components/ForumHelp").then((m) => ({ default: m.ForumHelp }))
 );
 
 // Route constants
@@ -127,7 +121,7 @@ export const forumRoutes: RouteObject[] = [
                 path: "new-thread",
                 element: withProtectedMaintenance(
                     <Suspense>
-                        <CreateForumThread />
+                        <CreateThread />
                     </Suspense>
                 ),
             },
@@ -135,7 +129,7 @@ export const forumRoutes: RouteObject[] = [
                 path: "thread/:threadId/edit",
                 element: withProtectedMaintenance(
                     <Suspense>
-                        <EditForumThread />
+                        <EditThread />
                     </Suspense>
                 ),
             },

@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useForum } from "@/features/forum/hooks/useForum";
 import { ReplyEditor } from "./ReplyEditor";
 import { Spinner } from "@/features/shared/reusable/Spinner";
+import type { FC } from "react";
 
-export const EditReply = () => {
+export const EditReply: FC = () => {
     const { replyId } = useParams<{ replyId: string }>();
     const navigate = useNavigate();
     const { currentThread, loading, error } = useForum();
@@ -75,4 +76,4 @@ export const EditReply = () => {
             </div>
         </div>
     );
-}; 
+};

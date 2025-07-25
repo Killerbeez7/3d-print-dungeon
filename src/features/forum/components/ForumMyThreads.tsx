@@ -19,7 +19,7 @@ import { FORUM_PATHS, FORUM_HOME_PATH } from "@/features/forum/constants/forumPa
 import Skeleton from "@/features/shared/Skeleton";
 import type { FC } from "react";
 import type { ForumThread } from "@/features/forum/types/forum";
-import type { FetchThreadsOptions } from "../services/forumService";
+import type { FetchThreadsOptions } from "@/features/forum/types/forum";
 
 type SortOption = "newest" | "oldest" | "mostViews" | "mostReplies" | "lastActivity";
 type FilterOption = "all" | "recent" | "popular" | "unanswered" | "pinned";

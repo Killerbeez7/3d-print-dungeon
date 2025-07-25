@@ -7,10 +7,8 @@ import {
     updateReply,
     deleteReply,
     incrementThreadViews,
-    CreateThreadParams,
-    CreateReplyParams,
-} from "../services/forumService";
-import type { ForumThread } from "../types/forum";
+} from "@/features/forum/services/forumService";
+import type { ForumThread, CreateThreadParams, CreateReplyParams } from "@/features/forum/types/forum";
 
 export const useCreateThread = () => {
     const queryClient = useQueryClient();

@@ -6,7 +6,7 @@ import Skeleton from "@/features/shared/Skeleton";
 import { FORUM_PATHS, FORUM_HOME_PATH } from "@/features/forum/constants/forumPaths";
 import type { FC } from "react";
 
-export const EditForumThread: FC = () => {
+export const EditThread: FC = () => {
     const { threadId } = useParams<Record<string, string | undefined>>();
     const navigate = useNavigate();
 

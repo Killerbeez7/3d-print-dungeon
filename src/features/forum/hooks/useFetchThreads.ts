@@ -1,6 +1,6 @@
 import { useInfiniteQuery, InfiniteData } from "@tanstack/react-query";
-import { fetchThreads, FetchThreadsOptions } from "../services/forumService";
-import type { ForumThread } from "../types/forum";
+import { fetchThreads } from "@/features/forum/services/forumService";
+import type { ForumThread, FetchThreadsOptions } from "@/features/forum/types/forum";
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 
 type Page = {

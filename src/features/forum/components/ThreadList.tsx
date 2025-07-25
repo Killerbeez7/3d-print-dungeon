@@ -1,27 +1,23 @@
-import { useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useForum } from "@/features/forum/hooks/useForum";
 import { formatDistanceToNow } from "date-fns";
 import { FaComment, FaEye, FaTag, FaUser, FaCalendar } from "react-icons/fa";
 import Skeleton from "@/features/shared/Skeleton";
 import { Spinner } from "@/features/shared/reusable/Spinner";
-import type { ForumThread } from "@/features/forum/types/forum";
+import type { ForumThread, ThreadListProps } from "@/features/forum/types/forum";
 
-export interface ThreadListProps {
-    categoryId: string;
-    sortBy?: string;
-    showCategory?: boolean;
-    isCompact?: boolean;
-}
+
+
 
 type ThreadWithCategoryName = ForumThread & { categoryName?: string };
 
-export function ThreadList({
+export const ThreadList: FC<ThreadListProps> = ({
     categoryId,
-    sortBy = "lastActivity",
+    sortBy = "lastActivity" as const,
     showCategory = false,
     isCompact = false,
-}: ThreadListProps) {
+}: ThreadListProps) => {
     const { getThreadsByCategory, loadMoreThreads, threads, pagination, loading, error } =
         useForum();
 
@@ -31,7 +27,7 @@ export function ThreadList({
     useEffect(() => {
         const fetchThreads = async () => {
             try {
-                await getThreadsByCategory(categoryId, sortBy);
+                await getThreadsByCategory(categoryId, sortBy as "lastActivity" | "createdAt" | "views" | "replyCount");
             } catch (err) {
                 const msg = err instanceof Error ? err.message : String(err);
                 console.error("Error fetching threads:", msg);
@@ -49,7 +45,7 @@ export function ThreadList({
     const handleLoadMore = async () => {
         setLoadingMore(true);
         try {
-            await loadMoreThreads(categoryId, sortBy);
+            await loadMoreThreads(categoryId, sortBy as "lastActivity" | "createdAt" | "views" | "replyCount");
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
             console.error("Error loading more threads:", msg);

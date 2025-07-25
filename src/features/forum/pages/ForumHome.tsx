@@ -10,13 +10,14 @@ import { Spinner } from "@/features/shared/reusable/Spinner";
 import { isThreadNew, formatRelativeTime } from "@/features/forum/utils/threadUtils";
 import { InfiniteScrollList } from "@/features/shared/InfiniteScrollList";
 import type { ForumThread, ForumCategory } from "@/features/forum/types/forum";
+import type { FC } from "react";
 
 interface ThreadCardProps {
     thread: ForumThread;
     categories: ForumCategory[];
 }
 
-export const ForumHome = () => {
+export const ForumHome: FC = () => {
     const queryClient = useQueryClient();
     const navigate = useNavigate();
     const { currentUser } = useAuth();

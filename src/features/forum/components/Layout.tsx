@@ -2,10 +2,10 @@ import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { useForum } from "@/features/forum/hooks/useForum";
 import { ForumSidebar } from "./ForumSidebar";
-
+import type { FC } from "react";
 import { useScreenSize } from "@/hooks/useScreenSize";
 
-export const ForumLayout = () => {
+export const ForumLayout: FC = () => {
     const { categories } = useForum();
     const { isTablet } = useScreenSize();
     const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
@@ -48,7 +48,10 @@ export const ForumLayout = () => {
                 className={`flex-2 p-4 pb-[20rem] transition-all duration-300 ease-in-out ${
                     isSidebarOpen ? "md:ml-[300px] ml-0" : "md:ml-[70px] ml-0"
                 }`}
-                // style={{ paddingLeft: "20rem", paddingRight: "calc(20rem + 70px)" }}
+                style={{
+                    paddingLeft: isSidebarOpen ? "200px" : "200px",
+                    paddingRight: isSidebarOpen ? "500px" : "270px",
+                }}
             >
                 <Outlet />
             </div>

@@ -4,8 +4,9 @@ import { useForum } from "@/features/forum/hooks/useForum";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import type { ForumThread, ForumReply } from "@/features/forum/types/forum";
+import type { FC } from "react";
 
-export const ForumDashboard = () => {
+export const ForumDashboard: FC = () => {
     const { currentUser } = useAuth();
     const { getUserThreads, getUserReplies } = useForum();
     const [userThreads, setUserThreads] = useState<ForumThread[]>([]);
