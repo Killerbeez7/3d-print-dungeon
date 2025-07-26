@@ -1,6 +1,6 @@
 import { useState, ChangeEvent, KeyboardEvent, FC } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchCategories, type Category } from "@/features/models/services/categoryService";
+import { fetchCategories, type Category } from "@/features/search-filters/services/categoryService";
 import { TiDelete } from "react-icons/ti";
 import { ImagesUpload } from "./ImagesUpload";
 import type { ModelData } from "@/features/models/types/model";

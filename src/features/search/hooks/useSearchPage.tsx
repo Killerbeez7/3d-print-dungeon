@@ -48,7 +48,7 @@ export const useSearchPage = () => {
         return () => clearTimeout(handler);
     }, [localQuery, setSearchParams, searchParams]);
 
-    // Show the prompt when the query is empty
+    // Show the prompt when the query is empty (filter logic will be handled in component)
     const noSearchNoFilters = !debouncedQuery.trim();
 
     // Handle input change

@@ -5,27 +5,33 @@ interface SearchTabsProps {
 
 export const SearchTabs = ({ activeTab, onTabSwitch }: SearchTabsProps) => {
     return (
-        <div className="max-w-xl mx-auto flex space-x-4 mb-6">
+        <div className="flex space-x-8">
             <button
                 onClick={() => onTabSwitch("artworks")}
-                className={`px-4 py-2 rounded font-medium transition-colors ${
-                    activeTab === "artworks"
-                        ? "bg-accent text-white"
-                        : "bg-bg-surface text-txt-secondary hover:bg-accent-hover"
-                }`}
+                className={`
+                    py-4 px-1 text-center border-b-2 font-medium text-lg transition-colors
+                    ${
+                        activeTab === "artworks"
+                            ? "border-accent text-accent border-b-3"
+                            : "border-transparent text-txt-muted hover:text-txt-primary hover:border-br-secondary"
+                    }
+                `}
             >
                 Artworks
             </button>
             <button
                 onClick={() => onTabSwitch("artists")}
-                className={`px-4 py-2 rounded font-medium transition-colors ${
-                    activeTab === "artists"
-                        ? "bg-accent text-white"
-                        : "bg-bg-surface text-txt-secondary hover:bg-accent-hover"
-                }`}
+                className={`
+                    py-4 px-1 text-center border-b-2 font-medium text-lg transition-colors
+                    ${
+                        activeTab === "artists"
+                            ? "border-accent text-accent border-b-3"
+                            : "border-transparent text-txt-muted hover:text-txt-primary hover:border-br-secondary"
+                    }
+                `}
             >
                 Artists
             </button>
         </div>
     );
-}; 
+};

@@ -1,8 +1,5 @@
-import { ArtistCard, ArtistCardProps } from "./ArtistCard";
-
-export interface ArtistListGridProps {
-    artists: ArtistCardProps[];
-}
+import { ArtistCard } from "./ArtistCard";
+import { ArtistListGridProps } from "../types/artists";
 
 export function ArtistListGrid({ artists }: ArtistListGridProps) {
     if (artists.length === 0) {
@@ -15,7 +12,7 @@ export function ArtistListGrid({ artists }: ArtistListGridProps) {
             tabIndex={0}
         >
             {artists.map((artist) => (
-                <ArtistCard key={artist.id} {...artist} />
+                <ArtistCard key={artist.uid} {...artist} />
             ))}
         </div>
     );

@@ -10,26 +10,37 @@ interface SearchInputProps {
 
 export const SearchInput = ({ value, onChange, onClear }: SearchInputProps) => {
     return (
-        <div className="max-w-xl mx-auto mb-4 relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
-                <FontAwesomeIcon icon={faSearch} />
+        <div className="max-w-2xl mx-auto relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-txt-muted pointer-events-none">
+                <FontAwesomeIcon icon={faSearch} className="text-lg" />
             </span>
             <input
                 type="text"
-                placeholder="Search..."
+                placeholder="Search"
                 value={value}
                 onChange={onChange}
-                className="w-full border border-br-primary rounded-full px-4 py-2 pl-10 pr-10 focus:outline-none focus:border-accent"
+                className="
+                    w-full border-2 border-br-secondary rounded-lg 
+                    px-6 py-4 pl-12 pr-12 text-lg
+                    bg-bg-primary text-txt-primary
+                    focus:outline-none focus:border-br-primary
+                    placeholder:text-txt-muted
+                    transition-colors
+                "
             />
             {value && (
                 <button
                     type="button"
                     onClick={onClear}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="
+                        absolute right-4 top-1/2 -translate-y-1/2 
+                        text-txt-muted hover:text-txt-primary
+                        transition-colors
+                    "
                 >
-                    <FontAwesomeIcon icon={faTimes} />
+                    <FontAwesomeIcon icon={faTimes} className="text-lg" />
                 </button>
             )}
         </div>
     );
-}; 
+};

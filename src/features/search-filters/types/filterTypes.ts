@@ -3,6 +3,7 @@ export interface ProductFilters {
   search?: string;
   limit?: number;
   hideAI?: boolean;
+  sortBy?: string;
 } 
 
 export interface FiltersContextValue {

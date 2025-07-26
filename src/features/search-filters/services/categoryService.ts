@@ -1,7 +1,5 @@
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
-import { setLogLevel } from "firebase/firestore";
-setLogLevel("debug");          // add once at app boot (main.tsx)
 
 export interface Category {
   id: string;
@@ -12,6 +10,6 @@ export interface Category {
 }
 
 export async function fetchCategories(): Promise<Category[]> {
-  const snap = await getDocs(collection(db, "categories"));
+  const snap = await getDocs(collection(db, "modelCategories"));
   return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Category, "id">) }));
 } 

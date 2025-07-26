@@ -171,7 +171,8 @@ service cloud.firestore {
       // Write rules as needed
     }
 
-    match /categories/{docId} {
+    // -------------- Model Categories --------------
+    match /modelCategories/{docId} {
       allow read: if true;   // for production tighten this
     }
   }

@@ -1,17 +1,11 @@
 import { Link } from "react-router-dom";
+import { ArtistCardProps } from "../types/artists";
 
-export interface ArtistCardProps {
-    id: string;
-    displayName: string | null;
-    photoURL: string | null;
-    bio?: string;
-}
-
-export function ArtistCard({ id, displayName, photoURL, bio }: ArtistCardProps) {
+export function ArtistCard({ uid, displayName, photoURL, bio }: ArtistCardProps) {
     const name = displayName || "Anonymous";
     return (
         <Link
-            to={`/artists/${id}`}
+            to={`/artists/${uid}`}
             className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md group"
             aria-label={`View profile for ${name}`}
         >

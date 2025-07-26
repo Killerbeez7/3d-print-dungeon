@@ -38,7 +38,6 @@ export interface CreateModelParams {
     isPaid?: boolean;
     isAI?: boolean;
 }
-
 export interface CreateModelResult {
     modelId: string;
     originalFileUrl: string;
@@ -48,9 +47,7 @@ export interface CreateModelResult {
     posterUrl: string | null;
 }
 
-/**
- * Create a new 3D model and upload all related files.
- */
+// Create a new 3D model and upload all related files.
 export async function createAdvancedModel({
     name,
     description,
@@ -233,9 +230,8 @@ export async function createAdvancedModel({
     };
 }
 
-/**
- * Increment the view count for a model.
- */
+
+// Increment the view count for a model.
 export const incrementModelViews = async (modelId: string): Promise<void> => {
     try {
         const modelRef = doc(db, "models", modelId);
@@ -248,8 +244,8 @@ export const incrementModelViews = async (modelId: string): Promise<void> => {
     }
 };
 
-export const PAGE_SIZE = 32;
 
+export const PAGE_SIZE = 32;
 export interface FetchModelsOptions {
     cursor?: QueryDocumentSnapshot<DocumentData>;
     limit?: number;
@@ -257,10 +253,7 @@ export interface FetchModelsOptions {
     search?: string;
     hideAI?: boolean;
 }
-
-/**
- * Fetch models with pagination + optional filters
- */
+// Fetch models with pagination + optional filters
 export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
     models: ModelData[];
     nextCursor?: QueryDocumentSnapshot<DocumentData>;
@@ -270,21 +263,26 @@ export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
         limit: lim = PAGE_SIZE,
         search,
         hideAI,
+        categoryIds,
     } = opts;
 
     let q = query(collection(db, "models"), orderBy("createdAt", "desc"));
 
-    if (opts.categoryIds?.length) {
+    // Apply category filter if provided
+    if (categoryIds?.length) {
         q = query(
             q,
-            where("categoryIds", "array-contains-any", opts.categoryIds.slice(0, 10))
+            where("categoryIds", "array-contains-any", categoryIds.slice(0, 10))
         );
     }
-    if (search) {
-        // For now, we'll fetch all models and filter client-side
-        // This is not ideal for large datasets but works for development
-        // In production, consider using Algolia or Firebase Extensions
-        
+
+    // Apply AI filter if provided
+    if (hideAI) {
+        q = query(q, where("isAI", "==", false));
+    }
+
+    // Handle search query
+    if (search && search.trim()) {
         // First try to find by name prefix (most efficient)
         const nameQuery = query(
             collection(db, "models"),
@@ -293,30 +291,43 @@ export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
             orderBy("createdAt", "desc"),
             limit(lim)
         );
-        
+
         const nameSnap = await getDocs(nameQuery);
         const nameMatches = nameSnap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id }));
-        
-        // If we have enough results, return them
-        if (nameMatches.length >= lim) {
+
+        // Apply additional filters to name matches
+        let filteredMatches = nameMatches;
+
+        if (categoryIds?.length) {
+            filteredMatches = filteredMatches.filter(model =>
+                model.categoryIds?.some(catId => categoryIds.includes(catId))
+            );
+        }
+
+        if (hideAI) {
+            filteredMatches = filteredMatches.filter(model => !model.isAI);
+        }
+
+        // If we have enough results after filtering, return them
+        if (filteredMatches.length >= lim) {
             return {
-                models: nameMatches,
-                nextCursor: nameMatches.length === lim ? nameSnap.docs[nameSnap.docs.length - 1] : undefined,
+                models: filteredMatches.slice(0, lim),
+                nextCursor: filteredMatches.length === lim ? nameSnap.docs[nameSnap.docs.length - 1] : undefined,
             };
         }
-        
+
         // Otherwise, fetch more and filter client-side
         const allQuery = query(
             collection(db, "models"),
             orderBy("createdAt", "desc"),
             limit(100) // Fetch more to filter from
         );
-        
+
         const allSnap = await getDocs(allQuery);
         const allModels = allSnap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id }));
-        
+
         // Filter by search term across multiple fields (name, description, tags only)
-        const filteredModels = allModels.filter((model) => {
+        const searchFiltered = allModels.filter((model) => {
             const searchLower = search.toLowerCase();
             return (
                 model.name?.toLowerCase().includes(searchLower) ||
@@ -324,16 +335,27 @@ export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
                 model.tags?.some(tag => tag.toLowerCase().includes(searchLower))
             );
         });
-        
+
+        // Apply additional filters
+        let finalFiltered = searchFiltered;
+
+        if (categoryIds?.length) {
+            finalFiltered = finalFiltered.filter(model =>
+                model.categoryIds?.some(catId => categoryIds.includes(catId))
+            );
+        }
+
+        if (hideAI) {
+            finalFiltered = finalFiltered.filter(model => !model.isAI);
+        }
+
         return {
-            models: filteredModels.slice(0, lim),
-            nextCursor: filteredModels.length > lim ? allSnap.docs[allSnap.docs.length - 1] : undefined,
+            models: finalFiltered.slice(0, lim),
+            nextCursor: finalFiltered.length > lim ? allSnap.docs[allSnap.docs.length - 1] : undefined,
         };
     }
-    if (hideAI) {
-        q = query(q, where("isAI", "==", false));
-    }
 
+    // No search query - show all models with filters applied
     q = cursor ? query(q, startAfter(cursor), limit(lim)) : query(q, limit(lim));
 
     const snap = await getDocs(q);
