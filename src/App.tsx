@@ -3,6 +3,7 @@ import { AuthProvider } from "./features/auth/providers/authProvider";
 import { ModelsProvider } from "./features/models/providers/modelsProvider";
 import { SearchProvider } from "./features/search/provider/searchProvider";
 import { ForumProvider } from "./features/forum/providers/forumProvider";
+import { CookiesProvider } from "./features/cookies/provider/CookiesProvider";
 import { Suspense } from "react";
 import { AppRoutes } from "./AppRoutes";
 import { useRouteProgress } from "@/hooks/useRouteProgress";
@@ -15,11 +16,13 @@ export const App = () => {
             <ModelsProvider>
                 <SearchProvider>
                     <ForumProvider>
-                        <ModalProvider>
-                            <Suspense>
-                                <AppRoutes />
-                            </Suspense>
-                        </ModalProvider>
+                        <CookiesProvider>
+                            <ModalProvider>
+                                <Suspense>
+                                    <AppRoutes />
+                                </Suspense>
+                            </ModalProvider>
+                        </CookiesProvider>
                     </ForumProvider>
                 </SearchProvider>
             </ModelsProvider>

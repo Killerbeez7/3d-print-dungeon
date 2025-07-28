@@ -8,6 +8,7 @@ import { AuthModal } from "../auth/components/AuthModal";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import { ScrollToTopButton } from "@/features/shared/ScrollToTopButton";
 import { LayoutProvider, useLayout } from "./context/layoutContext";
+import { CookieBanner } from "../cookies/components/CookieBanner";
 
 const AppLayout = () => {
     const { isFooterHidden } = useLayout();
@@ -27,18 +28,19 @@ const AppLayout = () => {
                 </Suspense>
             </main>
             <AuthModal />
+            <CookieBanner />
+
             {!isFooterHidden && <Footer />}
         </div>
     );
 };
-
 
 export const Layout = () => {
     return (
         <LayoutProvider>
             <AppLayout />
         </LayoutProvider>
-    )
-}
+    );
+};
 
 export default Layout;
