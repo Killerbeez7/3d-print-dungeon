@@ -47,7 +47,8 @@ export const ArtistsListPage = () => {
     }
 
     const artistCardData = artists.map((artist) => ({
-        id: artist.id,
+        uid: artist.uid,
+        email: artist.email,
         displayName: artist.displayName,
         photoURL: artist.photoURL,
         bio: artist.bio,
