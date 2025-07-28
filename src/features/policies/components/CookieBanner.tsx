@@ -1,11 +1,24 @@
 import { useCookies } from "../hooks/useCookies";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CookieSettingsModal } from "./CookieSettingsModal";
 
 export function CookieBanner() {
     const { consent, acceptAll, declineAll } = useCookies();
     const [showSettingsModal, setShowSettingsModal] = useState(false);
 
+    // Listen for custom event to open settings modal
+    useEffect(() => {
+        const handleOpenSettings = () => {
+            setShowSettingsModal(true);
+        };
+
+        window.addEventListener("openCookieSettings", handleOpenSettings);
+        return () => {
+            window.removeEventListener("openCookieSettings", handleOpenSettings);
+        };
+    }, []);
+
+    // Show banner if user hasn't made a choice yet
     if (consent.accepted) return null;
 
     return (

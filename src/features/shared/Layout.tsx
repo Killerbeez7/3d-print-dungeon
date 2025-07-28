@@ -9,6 +9,8 @@ import { Spinner } from "@/features/shared/reusable/Spinner";
 import { ScrollToTopButton } from "@/features/shared/ScrollToTopButton";
 import { LayoutProvider, useLayout } from "./context/layoutContext";
 import { CookieBanner } from "../policies/components/CookieBanner";
+//guards
+import { ConsentProtectedRoute } from "../policies/components/ConsentProtectedRoute";
 
 const AppLayout = () => {
     const { isFooterHidden } = useLayout();
@@ -23,8 +25,10 @@ const AppLayout = () => {
                         </div>
                     }
                 >
-                    <Outlet />
-                    <ScrollToTopButton />
+                    <ConsentProtectedRoute>
+                        <Outlet />
+                        <ScrollToTopButton />
+                    </ConsentProtectedRoute>
                 </Suspense>
             </main>
             <AuthModal />

@@ -2,6 +2,9 @@ import { useState } from "react";
 import { duplicateModels } from "../scripts/duplicateModels";
 import { deleteAllModelsAndRelated } from "../scripts/deleteAllModels";
 import { refreshIdToken } from "@/features/auth/utils/refreshIdToken";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUsers } from "@fortawesome/free-solid-svg-icons";
+import { CookieManagement } from "./CookieManagement";
 
 interface ScriptDef {
     name: string;
@@ -65,59 +68,77 @@ export const Scripts = () => {
     return (
         <div>
             <h2 className="text-lg font-bold mb-4">Scripts</h2>
-            <div className="space-y-4">
-                {scripts.map((script, idx) => (
-                    <div
-                        key={script.name}
-                        className="flex items-center space-x-4 border p-2 rounded dark:bg-gray-800"
-                    >
-                        <div className="flex-1">
-                            <div className="font-mono text-sm">{script.name}</div>
-                            <div className="text-xs text-gray-500">
-                                {script.description}
-                            </div>
-                        </div>
-                        <button
-                            className="px-3 py-1 bg-green-600 text-white rounded disabled:opacity-50"
-                            onClick={() => handleRun(idx)}
-                            disabled={running[idx]}
+            
+            {/* Cookie Management Section */}
+            <CookieManagement />
+
+            {/* Database Scripts Section */}
+            <div className="mb-8">
+                <div className="flex items-center mb-4">
+                    <FontAwesomeIcon icon={faUsers} className="mr-2 text-primary" />
+                    <h3 className="text-lg font-semibold text-txt-primary">Database Scripts</h3>
+                </div>
+                
+                <div className="space-y-4">
+                    {scripts.map((script, idx) => (
+                        <div
+                            key={script.name}
+                            className="flex items-center space-x-4 border p-2 rounded dark:bg-gray-800"
                         >
-                            {running[idx] ? "Running..." : "Run"}
-                        </button>
-                        <div className="w-32 h-2 bg-gray-200 rounded overflow-hidden">
-                            <div
-                                className="h-full bg-blue-500 transition-all"
-                                style={{ width: progress[idx] + "%" }}
-                            ></div>
-                        </div>
-                        <span className="ml-2 text-xs w-8 text-right tabular-nums">
-                            {progress[idx]}%
-                        </span>
-                        {complete[idx] && (
-                            <span className="ml-4 text-green-600 font-bold text-xs">
-                                Complete
+                            <div className="flex-1">
+                                <div className="font-mono text-sm">{script.name}</div>
+                                <div className="text-xs text-gray-500">
+                                    {script.description}
+                                </div>
+                            </div>
+                            <button
+                                className="px-3 py-1 bg-green-600 text-white rounded disabled:opacity-50"
+                                onClick={() => handleRun(idx)}
+                                disabled={running[idx]}
+                            >
+                                {running[idx] ? "Running..." : "Run"}
+                            </button>
+                            <div className="w-32 h-2 bg-gray-200 rounded overflow-hidden">
+                                <div
+                                    className="h-full bg-blue-500 transition-all"
+                                    style={{ width: progress[idx] + "%" }}
+                                ></div>
+                            </div>
+                            <span className="ml-2 text-xs w-8 text-right tabular-nums">
+                                {progress[idx]}%
                             </span>
-                        )}
-                    </div>
-                ))}
-            </div>
-            <div className="flex gap-4 items-center">
-                <button
-                    onClick={checkClaims}
-                    className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover"
-                    disabled={loading}
-                >
-                    {loading ? "Checking..." : "Check Current Claims"}
-                </button>
+                            {complete[idx] && (
+                                <span className="ml-4 text-green-600 font-bold text-xs">
+                                    Complete
+                                </span>
+                            )}
+                        </div>
+                    ))}
+                </div>
             </div>
 
-            {claims != null && (
-                <pre className="p-4 bg-bg-secondary rounded-lg overflow-auto">
-                    {typeof claims === "string"
-                        ? claims
-                        : JSON.stringify(claims, null, 2)}
-                </pre>
-            )}
+            {/* Claims Checker */}
+            <div className="mb-8">
+                <h3 className="text-lg font-semibold text-txt-primary mb-4">User Claims Checker</h3>
+                <div className="flex gap-4 items-center">
+                    <button
+                        onClick={checkClaims}
+                        className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover"
+                        disabled={loading}
+                    >
+                        {loading ? "Checking..." : "Check Current Claims"}
+                    </button>
+                </div>
+
+                {claims != null && (
+                    <pre className="p-4 bg-bg-secondary rounded-lg overflow-auto mt-4">
+                        {typeof claims === "string"
+                            ? claims
+                            : JSON.stringify(claims, null, 2)}
+                    </pre>
+                )}
+            </div>
+
         </div>
     );
 };

@@ -1,19 +1,8 @@
-# TODO
+1.Navbar 
+- rewrite the whole component - separate into modules, simpler structure add better responsiveness, keep UI/UX the same
 
-## High Priority
-- [x] fix footer links
-- [ ] implement user authentication
-- [ ] add payment processing
-- [ ] create admin dashboard
+2.Forum
+- Make the sidebar one component instead of 2 and make the compact version show icons and when opened just add the lables with slight fade in effect
 
-## Medium Priority
-- [ ] add search functionality
-- [ ] implement user profiles
-- [ ] add model upload feature
-- [ ] create marketplace
-
-## Low Priority
-- [ ] add social features
-- [ ] implement notifications
-- [ ] add analytics
-- [ ] optimize performance
+3.Footer
+- Check all links and add just whats needed + add sitemap
