@@ -46,5 +46,12 @@ export const ROUTES = {
 
     /* Printed Figures */
     PRINTED_FIGURES: "/printed-figures",
+
+    /* Policies */
+    POLICIES: "/policies",
+    PRIVACY_POLICY: "/policies/privacy",
+    TERMS_OF_USE: "/policies/terms",
+    COOKIE_POLICY: "/policies/cookies",
+    REFUND_POLICY: "/policies/refund",
 };
 

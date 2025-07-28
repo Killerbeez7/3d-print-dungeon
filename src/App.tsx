@@ -1,9 +1,9 @@
 import { ModalProvider } from "@/providers/modalProvider";
 import { AuthProvider } from "./features/auth/providers/authProvider";
 import { ModelsProvider } from "./features/models/providers/modelsProvider";
-import { SearchProvider } from "./features/search/provider/searchProvider";
+import { SearchProvider } from "./features/search/providers/searchProvider";
 import { ForumProvider } from "./features/forum/providers/forumProvider";
-import { CookiesProvider } from "./features/cookies/provider/CookiesProvider";
+import { CookiesProvider } from "./features/policies/providers/CookiesProvider";
 import { Suspense } from "react";
 import { AppRoutes } from "./AppRoutes";
 import { useRouteProgress } from "@/hooks/useRouteProgress";

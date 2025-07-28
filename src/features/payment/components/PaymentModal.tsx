@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useModal } from "@/hooks/useModal";
 import { CheckoutForm } from "./CheckoutForm";
-import { LazyStripeProvider } from "../provider/LazyStripeProvider";
+import { LazyStripeProvider } from "../providers/LazyStripeProvider";
 import type { PaymentModalProps } from "@/features/payment/types/payment";
 import { paymentService } from "@/features/payment/services/paymentService";
 

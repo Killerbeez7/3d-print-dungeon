@@ -8,7 +8,7 @@ import { AuthModal } from "../auth/components/AuthModal";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import { ScrollToTopButton } from "@/features/shared/ScrollToTopButton";
 import { LayoutProvider, useLayout } from "./context/layoutContext";
-import { CookieBanner } from "../cookies/components/CookieBanner";
+import { CookieBanner } from "../policies/components/CookieBanner";
 
 const AppLayout = () => {
     const { isFooterHidden } = useLayout();

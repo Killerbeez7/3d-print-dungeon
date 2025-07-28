@@ -17,6 +17,7 @@ import { businessRoutes } from "./features/business/routes/businessRoutes";
 import { forumRoutes } from "./features/forum/routes/forumRoutes";
 import { modelsRoutes } from "./features/models/routes/modelsRoutes";
 import { settingsRoutes } from "./features/settings/routes/settingsRoutes";
+import { policiesRoutes } from "./features/policies/routes/policiesRoutes";
 
 import Layout from "./features/shared/Layout";
 
@@ -36,6 +37,7 @@ export const AppRoutes: React.FC = () => {
         ...settingsRoutes,
         ...adminRoutes,
         ...forumRoutes,
+        ...policiesRoutes,
         { path: "*", element: <Navigate to={ROUTES.HOME} replace /> },
     ];
 

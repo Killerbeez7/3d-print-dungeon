@@ -119,8 +119,10 @@ h6 {
     --background-second-rgb: 50, 50, 50;
 
     --bg-primary: #141414;
-    --bg-secondary: #202020;
+    --bg-secondary: #1a1a1a;
+    /* --bg-secondary: #202020; */
     --bg-surface: #3a3a3a;
+
     --bg-tertiary: #5a5a5a;
     --bg-reverse: #f5f5f5;
 

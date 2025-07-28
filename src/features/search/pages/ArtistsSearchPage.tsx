@@ -1,4 +1,4 @@
-import { FiltersProvider } from "@/features/search-filters/provider/filtersProvider";
+import { FiltersProvider } from "@/features/search-filters/providers/filtersProvider";
 import { SearchResults } from "../components/SearchResults";
 import { SearchInput } from "../components/SearchInput";
 import { SearchTabs } from "../components/SearchTabs";
