@@ -6,3 +6,8 @@
 
 3.Footer
 - Check all links and add just whats needed + add sitemap
+
+4.Policies
+-set up which features which cookies need to be accessed
+
+
