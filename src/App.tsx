@@ -4,6 +4,7 @@ import { ModelsProvider } from "./features/models/providers/modelsProvider";
 import { SearchProvider } from "./features/search/providers/searchProvider";
 import { ForumProvider } from "./features/forum/providers/forumProvider";
 import { CookiesProvider } from "./features/policies/providers/CookiesProvider";
+import { NotificationProvider, NotificationContainer } from "./features/notifications";
 import { Suspense } from "react";
 import { AppRoutes } from "./AppRoutes";
 import { useRouteProgress } from "@/hooks/useRouteProgress";
@@ -17,11 +18,14 @@ export const App = () => {
                 <SearchProvider>
                     <ForumProvider>
                         <CookiesProvider>
-                            <ModalProvider>
-                                <Suspense>
-                                    <AppRoutes />
-                                </Suspense>
-                            </ModalProvider>
+                            <NotificationProvider>
+                                <ModalProvider>
+                                    <Suspense>
+                                        <AppRoutes />
+                                    </Suspense>
+                                    <NotificationContainer />
+                                </ModalProvider>
+                            </NotificationProvider>
                         </CookiesProvider>
                     </ForumProvider>
                 </SearchProvider>

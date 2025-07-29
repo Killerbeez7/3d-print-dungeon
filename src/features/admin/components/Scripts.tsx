@@ -4,6 +4,7 @@ import { deleteAllModelsAndRelated } from "../scripts/deleteAllModels";
 import { refreshIdToken } from "@/features/auth/utils/refreshIdToken";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers } from "@fortawesome/free-solid-svg-icons";
+import { NotificationTestDropdown } from "./NotificationTestDropdown";
 import { CookieManagement } from "./CookieManagement";
 
 interface ScriptDef {
@@ -68,7 +69,10 @@ export const Scripts = () => {
     return (
         <div>
             <h2 className="text-lg font-bold mb-4">Scripts</h2>
-            
+
+            {/* Notification Testing Section */}
+            <NotificationTestDropdown />
+
             {/* Cookie Management Section */}
             <CookieManagement />
 
@@ -76,9 +80,11 @@ export const Scripts = () => {
             <div className="mb-8">
                 <div className="flex items-center mb-4">
                     <FontAwesomeIcon icon={faUsers} className="mr-2 text-primary" />
-                    <h3 className="text-lg font-semibold text-txt-primary">Database Scripts</h3>
+                    <h3 className="text-lg font-semibold text-txt-primary">
+                        Database Scripts
+                    </h3>
                 </div>
-                
+
                 <div className="space-y-4">
                     {scripts.map((script, idx) => (
                         <div
@@ -119,7 +125,9 @@ export const Scripts = () => {
 
             {/* Claims Checker */}
             <div className="mb-8">
-                <h3 className="text-lg font-semibold text-txt-primary mb-4">User Claims Checker</h3>
+                <h3 className="text-lg font-semibold text-txt-primary mb-4">
+                    User Claims Checker
+                </h3>
                 <div className="flex gap-4 items-center">
                     <button
                         onClick={checkClaims}
@@ -138,7 +146,6 @@ export const Scripts = () => {
                     </pre>
                 )}
             </div>
-
         </div>
     );
 };
