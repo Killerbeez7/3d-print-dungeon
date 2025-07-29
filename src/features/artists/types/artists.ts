@@ -13,7 +13,7 @@ export interface ArtistListGridProps {
 }
 
 export interface ArtistCardProps {
-    uid: string;
+    uid?: string;
     displayName: string | null;
     photoURL: string | null;
     bio?: string;

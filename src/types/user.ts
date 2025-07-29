@@ -29,6 +29,7 @@ export interface RawUserData {
     photoURL: string | null;
     roles?: string[];
     username?: string;
+    searchableName?: string;
     createdAt?: Timestamp | Date;
     lastLogin?: Timestamp | Date;
 }
@@ -42,6 +43,7 @@ export interface BaseUser {
     createdAt: Date;
     updatedAt: Date;
 }
+
 
 export interface UserProfile extends BaseUser {
     bio?: string;

@@ -18,6 +18,7 @@ import { forumRoutes } from "./features/forum/routes/forumRoutes";
 import { modelsRoutes } from "./features/models/routes/modelsRoutes";
 import { settingsRoutes } from "./features/settings/routes/settingsRoutes";
 import { policiesRoutes } from "./features/policies/routes/policiesRoutes";
+import { userRoutes } from "./features/user/profile/routes/userRoutes";
 
 import Layout from "./features/shared/Layout";
 
@@ -31,6 +32,7 @@ export const AppRoutes: React.FC = () => {
         ...blogRoutes,
         ...marketplaceRoutes,
         ...printedFiguresRoutes,
+        ...userRoutes,
         ...searchRoutes,
         ...modelsRoutes,
         ...businessRoutes,

@@ -7,7 +7,6 @@ export const ROUTES = {
 
     /* Artists */
     ARTISTS_LIST: "/artists",
-    ARTIST_PROFILE: "/artists/:artistId",
 
     /* Collections */
     COLLECTIONS: "/collections",
@@ -37,6 +36,7 @@ export const ROUTES = {
 
     /* User */
     SETTINGS: "/settings",
+    USER_PROFILE: "/:displayName",
 
     /* Admin */
     ADMIN_DASHBOARD: "/admin-dashboard",

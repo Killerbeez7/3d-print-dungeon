@@ -19,6 +19,7 @@ import {
     getDocs,
 } from "firebase/firestore";
 import type { ArtistData } from "@/features/artists/types/artists";
+import { toUrlSafeName } from "@/utils/stringUtils";
 
 export function GlobalSearch() {
     const {
@@ -91,14 +92,14 @@ export function GlobalSearch() {
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const queryValue = searchTerm.trim();
-        
+
         // Only add query parameter if there's actually a query
         if (queryValue) {
             navigate(`/search?sort_by=relevance&query=${encodeURIComponent(queryValue)}`);
         } else {
             navigate(`/search?sort_by=relevance`);
         }
-        
+
         setActiveTab("artworks");
         setSearchTerm("");
         setShowDropdown(false);
@@ -112,22 +113,28 @@ export function GlobalSearch() {
     const handlePresetClick = (preset: string) => {
         setActiveTab(preset);
         const currentQuery = searchTerm.trim();
-        
+
         // Navigate to the appropriate route based on the preset
         if (preset === "artworks") {
             if (currentQuery) {
-                navigate(`/search?sort_by=relevance&query=${encodeURIComponent(currentQuery)}`);
+                navigate(
+                    `/search?sort_by=relevance&query=${encodeURIComponent(currentQuery)}`
+                );
             } else {
                 navigate(`/search?sort_by=relevance`);
             }
         } else {
             if (currentQuery) {
-                navigate(`/search/artists?sort_by=followers&query=${encodeURIComponent(currentQuery)}`);
+                navigate(
+                    `/search/artists?sort_by=followers&query=${encodeURIComponent(
+                        currentQuery
+                    )}`
+                );
             } else {
                 navigate(`/search/artists?sort_by=followers`);
             }
         }
-        
+
         setSearchTerm("");
         setShowDropdown(false);
     };
@@ -153,8 +160,9 @@ export function GlobalSearch() {
     };
 
     // Clicking on an artist in the dropdown navigates to their profile.
-    const handleArtistSelect = (uid: string) => {
-        navigate(`/artists/${uid}`);
+    const handleArtistSelect = (artist: ArtistData) => {
+        const urlSafeName = toUrlSafeName(artist.displayName);
+        navigate(`/${urlSafeName}`);
         setShowDropdown(false);
     };
 
@@ -192,7 +200,7 @@ export function GlobalSearch() {
                                 {artistResults.map((a) => (
                                     <li
                                         key={`artist-${a.uid}`}
-                                        onMouseDown={() => handleArtistSelect(a.uid)}
+                                        onMouseDown={() => handleArtistSelect(a)}
                                         className="px-3 py-2 hover:--btn-secondary-hover cursor-pointer"
                                     >
                                         <div className="font-medium">{a.displayName}</div>

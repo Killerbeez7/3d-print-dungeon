@@ -29,6 +29,7 @@ import {
     faChevronDown,
 } from "@fortawesome/free-solid-svg-icons";
 import type { NavSection } from "@/types/navbar";
+import { toUrlSafeName } from "@/utils/stringUtils";
 
 export const Navbar = (): React.ReactNode => {
     const { isAdmin } = useUserRole();
@@ -113,6 +114,9 @@ export const Navbar = (): React.ReactNode => {
     useEffect(() => {
         closeAll();
     }, [location.pathname]);
+
+    const displayName = currentUser?.displayName || "Anonymous";
+    const urlSafeName = toUrlSafeName(displayName);
 
     return (
         <div className="sticky top-0 left-0 right-0 z-50">
@@ -292,7 +296,7 @@ export const Navbar = (): React.ReactNode => {
                                             )}
                                             <div className="divider-top">
                                                 <Link
-                                                    to={`/artists/${currentUser?.uid}`}
+                                                    to={`/${urlSafeName}`}
                                                     className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
                                                     onClick={() =>
                                                         setActiveDropdown(null)

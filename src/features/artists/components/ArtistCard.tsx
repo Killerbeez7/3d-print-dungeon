@@ -1,11 +1,20 @@
+/**
+ * @file ArtistCard.tsx
+ * @description Displays the card for an artist
+ * @usedIn ArtistsListPage
+ */
+
 import { Link } from "react-router-dom";
 import { ArtistCardProps } from "../types/artists";
+import { toUrlSafeName } from "@/utils/stringUtils";
 
-export function ArtistCard({ uid, displayName, photoURL, bio }: ArtistCardProps) {
+export function ArtistCard({ displayName, photoURL, bio }: ArtistCardProps) {
     const name = displayName || "Anonymous";
+    const urlSafeName = toUrlSafeName(displayName);
+    
     return (
         <Link
-            to={`/artists/${uid}`}
+            to={`/${urlSafeName}`}
             className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md group"
             aria-label={`View profile for ${name}`}
         >
