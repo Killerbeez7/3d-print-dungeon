@@ -1,3 +1,9 @@
+/**
+ * @file ArtistListSkeleton.tsx
+ * @description Displays the skeleton for an artist list
+ * @usedIn ArtistsListPage
+ */
+
 export function ArtistListSkeleton() {
     return (
         <div

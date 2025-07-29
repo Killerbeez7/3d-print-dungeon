@@ -1,3 +1,9 @@
+/**
+ * @file ArtistListGrid.tsx
+ * @description Displays the grid for an artist list
+ * @usedIn ArtistsListPage
+ */
+
 import { ArtistCard } from "./ArtistCard";
 import { ArtistListGridProps } from "../types/artists";
 

@@ -6,9 +6,6 @@ import type { RouteObject } from "react-router-dom";
 const ArtistsListPage = lazy(() =>
     import("../pages/ArtistsListPage").then((m) => ({ default: m.ArtistsListPage }))
 );
-const ArtistProfilePage = lazy(() =>
-    import("../pages/ArtistProfilePage").then((m) => ({ default: m.ArtistProfilePage }))
-);
 
 export const artistsRoutes: RouteObject[] = [
     {
@@ -16,14 +13,6 @@ export const artistsRoutes: RouteObject[] = [
         element: withMaintenance(
             <Suspense>
                 <ArtistsListPage />
-            </Suspense>
-        ),
-    },
-    {
-        path: ROUTES.ARTIST_PROFILE,
-        element: withMaintenance(
-            <Suspense>
-                <ArtistProfilePage />
             </Suspense>
         ),
     },

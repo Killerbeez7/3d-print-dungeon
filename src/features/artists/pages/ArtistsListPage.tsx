@@ -1,3 +1,9 @@
+/**
+ * @file ArtistsListPage.tsx
+ * @description Displays the list page for artists
+ * @usedIn ArtistsRoutes
+ */
+
 import { useFetchArtists } from "../hooks/useFetchArtists";
 import { ArtistListGrid } from "../components/ArtistListGrid";
 import { ArtistListSkeleton } from "../components/ArtistListSkeleton";
