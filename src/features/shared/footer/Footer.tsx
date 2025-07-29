@@ -35,26 +35,7 @@ export const Footer = () => {
                 <div className="pt-8 pb-6 sm:pt-15 sm:pb-10" role="footer-top">
                     <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                         {/* Footer Top Section */}
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-6 lg:gap-8 text-center sm:text-left">
-                            {/* Company Logo & Info */}
-                            <div className="col-span-2 sm:col-span-1 mb-4">
-                                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 mb-3">
-                                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary rounded-full flex items-center justify-center">
-                                        <img
-                                            src="/assets/images/logo.png"
-                                            alt="Site Logo"
-                                            className="w-full h-full object-cover"
-                                        />
-                                    </div>
-                                    <h6 className="text-sm sm:text-lg font-bold text-txt-primary text-center sm:text-left whitespace-nowrap">
-                                        PRINT DUNGEON
-                                    </h6>
-                                </div>
-                                <p className="text-xs text-txt-secondary text-center sm:text-left hidden sm:block">
-                                    Your one-stop shop for all things 3D printing.
-                                </p>
-                            </div>
-
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 text-center sm:text-left">
                             {/* EXPLORE Section */}
                             <div className="mb-4">
                                 <h6 className="text-xs sm:text-sm font-bold text-txt-primary mb-2 sm:mb-3">
