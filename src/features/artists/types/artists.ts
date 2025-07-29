@@ -1,4 +1,4 @@
-import type { RawUserData } from "@/features/auth/types/auth";
+import type { RawUserData } from "@/types/user";
 
 export interface ArtistData extends RawUserData {
     uid: string;

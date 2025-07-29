@@ -4,7 +4,7 @@ import { getUserFromDatabase } from "@/features/auth/services/authService";
 import { UploadsTab } from "./UploadsTab";
 import { LikesTab } from "./LikesTab";
 import { AboutTab } from "./AboutTab";
-import type { RawUserData } from "@/features/auth/types/auth";
+import type { RawUserData } from "@/types/user";
 
 export interface ArtistProfileProps {
     artistId: string;

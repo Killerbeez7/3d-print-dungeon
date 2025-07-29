@@ -1,19 +1,14 @@
-import type { User as FirebaseUser } from "firebase/auth";
-import type { Timestamp } from "firebase/firestore";
+import type { RawUserData, CurrentUser } from "@/types/user";
 
-export interface RawUserData {
-    uid: string;
-    stripeConnectId?: string;
-    email: string | null | undefined;
-    displayName: string | null;
-    photoURL: string | null;
-    roles?: string[];
-    username?: string;
-    createdAt?: Timestamp | Date;
-    lastLogin?: Timestamp | Date;
-}
-
-export type CurrentUser = FirebaseUser;
+export type CustomClaims = {
+    [key: string]: unknown;
+    super?: boolean;
+    admin?: boolean;
+    moderator?: boolean;
+    contributor?: boolean;
+    premium?: boolean;
+    // Add other roles if needed
+};
 
 export interface AuthContextValue {
     currentUser: CurrentUser | null;
@@ -37,13 +32,3 @@ export interface AuthContextValue {
     fetchUserData(): Promise<void>;
     handleAuthError(error: unknown, provider: string): never;
 }
-
-export type CustomClaims = {
-    [key: string]: unknown;
-    super?: boolean;
-    admin?: boolean;
-    moderator?: boolean;
-    contributor?: boolean;
-    premium?: boolean;
-    // Add other roles if needed
-};

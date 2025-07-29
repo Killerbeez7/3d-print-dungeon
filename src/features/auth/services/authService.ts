@@ -18,7 +18,7 @@ import {
     EmailAuthProvider,
 } from "firebase/auth";
 import { STATIC_ASSETS } from "../../../config/assetsConfig";
-import type { RawUserData } from "../types/auth";
+import type { RawUserData } from "@/types/user";
 
 export const getHighResPhotoURL = (photoURL?: string | null): string => {
     if (photoURL && photoURL.includes("googleusercontent.com")) {
