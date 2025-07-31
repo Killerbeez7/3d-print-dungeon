@@ -4,7 +4,7 @@ import { db } from "@/config/firebaseConfig";
 import { grantRole, revokeRole } from "@/features/admin/services/adminService";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import { MdEdit, MdCheck, MdClose } from "react-icons/md";
-import type { RawUserData } from "@/types/user";
+import type { RawUserData } from "@/features/user/types/user";
 
 const ALL_ROLES = ["admin", "moderator", "contributor", "premium"] as const;
 export type Role = (typeof ALL_ROLES)[number];

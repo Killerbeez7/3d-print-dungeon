@@ -8,7 +8,7 @@ import { PurchaseButton } from "@/features/payment/components/PurchaseButton";
 //contexts
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 //types
-import type { CurrentUser } from "@/types/user";
+import type { CurrentUser } from "@/features/user/types/user";
 import type { ModelData } from "@/features/models/types/model";
 
 interface Uploader {

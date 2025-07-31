@@ -1,4 +1,4 @@
-import type { RawUserData, CurrentUser } from "@/types/user";
+import type { RawUserData, CurrentUser } from "@/features/user/types/user";
 
 export type CustomClaims = {
     [key: string]: unknown;

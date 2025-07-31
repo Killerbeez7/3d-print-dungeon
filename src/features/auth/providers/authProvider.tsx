@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/config/firebaseConfig";
 import { AuthContext } from "@/features/auth/context/authContext";
-import { RawUserData } from "@/types/user";
+import { RawUserData } from "@/features/user/types/user";
 import { CustomClaims } from "@/features/auth/types/auth";
 import { refreshIdToken } from "@/features/auth/utils/refreshIdToken";
 import { MaintenanceStatus, UserId } from "@/features/maintenance/types/maintenance";

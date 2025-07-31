@@ -3,7 +3,7 @@ import { toggleFavorite, getFavoritesForUser } from "../services/favoritesServic
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
 import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
-import type { CurrentUser } from "@/types/user";
+import type { CurrentUser } from "@/features/user/types/user";
 
 export interface FavoritesButtonUser {
     uid: string;

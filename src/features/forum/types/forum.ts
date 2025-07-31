@@ -1,4 +1,4 @@
-import { RawUserData } from "@/types/user";
+import { RawUserData } from "@/features/user/types/user";
 import type { IconType } from "react-icons";
 
 
