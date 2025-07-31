@@ -3,6 +3,7 @@ export type CookieCategories = "essential" | "analytics" | "marketing";
 export type CookieConsent = {
     essential: boolean;
     analytics: boolean;
+    payment: boolean;
     marketing: boolean;
     accepted: boolean;
 };
