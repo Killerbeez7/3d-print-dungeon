@@ -20,8 +20,8 @@ service cloud.firestore {
       // Allow admins to read all users
       allow read: if isAdmin();
 
-      // Allow anyone to read user documents where artist == true (public artist profiles)
-      allow read: if resource.data.artist == true;
+      // Allow anyone to read user documents where isArtist == true (public artist profiles)
+      allow read: if resource.data.isArtist == true;
 
       // Allow users to read their own profile (even if not an artist)
       allow read: if request.auth != null && request.auth.uid == userId;
