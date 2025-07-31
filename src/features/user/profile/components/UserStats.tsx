@@ -4,10 +4,10 @@
  * @usedIn UserProfilePage
  */
 
-import type { ArtistProfile } from "@/types/user";
+import type { UserProfileValues } from "../types/profile";
 
 interface UserStatsProps {
-    user: ArtistProfile;
+    user: UserProfileValues;
 }
 
 export const UserStats = ({ user }: UserStatsProps): React.ReactNode => {
@@ -56,14 +56,14 @@ export const UserStats = ({ user }: UserStatsProps): React.ReactNode => {
 
                     <div className="text-center">
                         <div className="text-2xl font-bold text-txt-primary mb-2">
-                            {user.portfolio.categories.length}
+                            {user.portfolio?.categories?.length ?? 0}
                         </div>
                         <div className="text-sm text-txt-secondary">Categories</div>
                     </div>
 
                     <div className="text-center">
                         <div className="text-2xl font-bold text-txt-primary mb-2">
-                            {user.portfolio.featuredWorks.length}
+                            {user.portfolio?.featuredWorks?.length ?? 0}
                         </div>
                         <div className="text-sm text-txt-secondary">Featured Works</div>
                     </div>
@@ -71,7 +71,7 @@ export const UserStats = ({ user }: UserStatsProps): React.ReactNode => {
                     <div className="text-center">
                         <div className="text-2xl font-bold text-txt-primary mb-2">
                             {user.createdAt
-                                ? new Date(user.createdAt).getFullYear()
+                                ? new Date(user.createdAt as Date).getFullYear()
                                 : "N/A"}
                         </div>
                         <div className="text-sm text-txt-secondary">Member Since</div>

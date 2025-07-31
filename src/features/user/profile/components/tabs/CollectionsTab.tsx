@@ -51,10 +51,17 @@ export const CollectionsTab = ({ userId }: CollectionsTabProps) => {
                 const modelsQuery = query(modelsRef, where("uploaderId", "==", userId));
                 const modelsSnapshot = await getDocs(modelsQuery);
                 
-                const models: Model[] = modelsSnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                }));
+                const models: Model[] = modelsSnapshot.docs.map((doc) => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        name: data.name || "Untitled Model",
+                        renderPrimaryUrl: data.renderPrimaryUrl,
+                        likes: data.likes ?? 0,
+                        views: data.views ?? 0,
+                        category: data.category,
+                    };
+                });
                 setUserModels(models);
 
                 // Fetch user's collections
@@ -62,12 +69,19 @@ export const CollectionsTab = ({ userId }: CollectionsTabProps) => {
                 const collectionsQuery = query(collectionsRef, where("userId", "==", userId));
                 const collectionsSnapshot = await getDocs(collectionsQuery);
                 
-                const userCollections: UserCollection[] = collectionsSnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                    createdAt: doc.data().createdAt?.toDate() || new Date(),
-                    updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-                }));
+                const userCollections: UserCollection[] = collectionsSnapshot.docs.map((doc) => {
+                    const data = doc.data();
+                    return {
+                        id: doc.id,
+                        name: data.name || "Untitled Collection",
+                        description: data.description,
+                        isPublic: data.isPublic ?? true,
+                        modelCount: data.modelCount ?? 0,
+                        coverImage: data.coverImage,
+                        createdAt: data.createdAt?.toDate() || new Date(),
+                        updatedAt: data.updatedAt?.toDate() || new Date(),
+                    };
+                });
                 setCollections(userCollections);
             } catch (error) {
                 console.error("Error fetching collections:", error);
@@ -103,12 +117,19 @@ export const CollectionsTab = ({ userId }: CollectionsTabProps) => {
             const collectionsQuery = query(collectionsRef, where("userId", "==", userId));
             const collectionsSnapshot = await getDocs(collectionsQuery);
             
-            const userCollections: UserCollection[] = collectionsSnapshot.docs.map((doc) => ({
-                id: doc.id,
-                ...doc.data(),
-                createdAt: doc.data().createdAt?.toDate() || new Date(),
-                updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-            }));
+            const userCollections: UserCollection[] = collectionsSnapshot.docs.map((doc) => {
+                const data = doc.data();
+                return {
+                    id: doc.id,
+                    name: data.name || "Untitled Collection",
+                    description: data.description,
+                    isPublic: data.isPublic ?? true,
+                    modelCount: data.modelCount ?? 0,
+                    coverImage: data.coverImage,
+                    createdAt: data.createdAt?.toDate() || new Date(),
+                    updatedAt: data.updatedAt?.toDate() || new Date(),
+                };
+            });
             setCollections(userCollections);
         } catch (error) {
             console.error("Error creating collection:", error);

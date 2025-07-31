@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { AccountSettings } from "@/features/settings/components/AccountSettings";
-import { SecuritySettings } from "@/features/settings/components/SecuritySettings";
-import { ProfileSettings } from "@/features/settings/components/ProfileSettings";
+import { AccountSettings } from "@/features/user/settings/components/AccountSettings";
+import { SecuritySettings } from "@/features/user/settings/components/SecuritySettings";
+import { ProfileSettings } from "@/features/user/settings/components/ProfileSettings";
 
 type Tab = {
     id: string;

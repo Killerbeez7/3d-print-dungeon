@@ -1,17 +1,19 @@
 // Components
-export { UserProfile } from "./components/UserProfile";
+export { UserHeader } from "./components/UserHeader";
 export { UserStats } from "./components/UserStats";
 export { UserPortfolio } from "./components/UserPortfolio";
 
 // Pages
-export { UserProfilePage } from "./pages/UserProfilePage";
+export { PublicProfilePage } from "./pages/PublicProfilePage";
+export { SettingsPage } from "../settings/pages/SettingsPage";
+export { MyProfilePage } from "./pages/MyProfilePage";
 
 // Hooks
 export { useProfile } from "./hooks/useProfile";
 
 // Types
 export type {
-    ProfileUserData,
+    UserProfileValues,
     Tab,
     UploadedArtwork,
     LikedArtwork,

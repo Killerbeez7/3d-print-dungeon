@@ -1,4 +1,4 @@
-import { storage } from "../../../config/firebaseConfig";
+import { storage } from "@/config/firebaseConfig";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { updateProfile, User } from "firebase/auth";
 import { doc, updateDoc, getDoc, getFirestore } from "firebase/firestore";

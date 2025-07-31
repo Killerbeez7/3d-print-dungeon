@@ -1,21 +1,13 @@
-import type { ProfileUserData } from "../../types/profile";
+import type { UserProfileValues } from "../../types/profile";
 
-interface UserData extends ProfileUserData {
+interface UserData extends UserProfileValues {
     bio?: string;
     location?: string;
     website?: string;
     socialLinks?: {
         twitter?: string;
         instagram?: string;
-        website?: string;
-        linkedin?: string;
         facebook?: string;
-        youtube?: string;
-        twitch?: string;
-        discord?: string;
-        github?: string;
-        behance?: string;
-        artstation?: string;
     };
 }
 
@@ -34,56 +26,14 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
             color: "text-pink-400 hover:text-pink-500",
         },
         {
-            name: "LinkedIn",
-            icon: "fab fa-linkedin",
-            url: userData?.socialLinks?.linkedin,
-            color: "text-blue-600 hover:text-blue-700",
-        },
-        {
             name: "Facebook",
             icon: "fab fa-facebook",
             url: userData?.socialLinks?.facebook,
             color: "text-blue-600 hover:text-blue-700",
         },
-        {
-            name: "YouTube",
-            icon: "fab fa-youtube",
-            url: userData?.socialLinks?.youtube,
-            color: "text-red-500 hover:text-red-600",
-        },
-        {
-            name: "Twitch",
-            icon: "fab fa-twitch",
-            url: userData?.socialLinks?.twitch,
-            color: "text-purple-500 hover:text-purple-600",
-        },
-        {
-            name: "Discord",
-            icon: "fab fa-discord",
-            url: userData?.socialLinks?.discord,
-            color: "text-indigo-500 hover:text-indigo-600",
-        },
-        {
-            name: "GitHub",
-            icon: "fab fa-github",
-            url: userData?.socialLinks?.github,
-            color: "text-gray-600 hover:text-gray-700",
-        },
-        {
-            name: "Behance",
-            icon: "fab fa-behance",
-            url: userData?.socialLinks?.behance,
-            color: "text-blue-600 hover:text-blue-700",
-        },
-        {
-            name: "ArtStation",
-            icon: "fas fa-palette",
-            url: userData?.socialLinks?.artstation,
-            color: "text-orange-500 hover:text-orange-600",
-        },
     ];
 
-    const hasAnySocialLinks = socialLinks.some(link => link.url);
+    const hasAnySocialLinks = socialLinks.some((link) => link.url);
 
     return (
         <div className="space-y-8">
@@ -96,7 +46,8 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                     <h3 className="text-xl font-semibold text-txt-primary">About Me</h3>
                 </div>
                 <p className="text-txt-secondary text-lg leading-relaxed">
-                    {userData?.bio || "This user hasn't added a bio yet. Check back later to learn more about them!"}
+                    {userData?.bio ||
+                        "This user hasn't added a bio yet. Check back later to learn more about them!"}
                 </p>
             </div>
 
@@ -106,7 +57,9 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                     <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
                         <i className="fas fa-info text-white text-sm"></i>
                     </div>
-                    <h3 className="text-xl font-semibold text-txt-primary">Personal Information</h3>
+                    <h3 className="text-xl font-semibold text-txt-primary">
+                        Personal Information
+                    </h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {userData?.location && (
@@ -114,7 +67,9 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                             <i className="fas fa-map-marker-alt text-accent"></i>
                             <div>
                                 <div className="text-sm text-txt-secondary">Location</div>
-                                <div className="text-txt-primary font-medium">{userData.location}</div>
+                                <div className="text-txt-primary font-medium">
+                                    {userData.location}
+                                </div>
                             </div>
                         </div>
                     )}
@@ -138,13 +93,18 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                         <div className="flex items-center gap-3 p-3 bg-bg-surface rounded-lg">
                             <i className="fas fa-calendar-alt text-accent"></i>
                             <div>
-                                <div className="text-sm text-txt-secondary">Member Since</div>
+                                <div className="text-sm text-txt-secondary">
+                                    Member Since
+                                </div>
                                 <div className="text-txt-primary font-medium">
-                                    {new Date(userData.joinDate).toLocaleDateString("en-US", {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric"
-                                    })}
+                                    {new Date(userData.joinDate).toLocaleDateString(
+                                        "en-US",
+                                        {
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric",
+                                        }
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -153,13 +113,18 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                         <div className="flex items-center gap-3 p-3 bg-bg-surface rounded-lg">
                             <i className="fas fa-clock text-accent"></i>
                             <div>
-                                <div className="text-sm text-txt-secondary">Last Active</div>
+                                <div className="text-sm text-txt-secondary">
+                                    Last Active
+                                </div>
                                 <div className="text-txt-primary font-medium">
-                                    {new Date(userData.lastActive).toLocaleDateString("en-US", {
-                                        year: "numeric",
-                                        month: "short",
-                                        day: "numeric"
-                                    })}
+                                    {new Date(userData.lastActive).toLocaleDateString(
+                                        "en-US",
+                                        {
+                                            year: "numeric",
+                                            month: "short",
+                                            day: "numeric",
+                                        }
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -174,11 +139,13 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                         <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
                             <i className="fas fa-share-alt text-white text-sm"></i>
                         </div>
-                        <h3 className="text-xl font-semibold text-txt-primary">Connect & Follow</h3>
+                        <h3 className="text-xl font-semibold text-txt-primary">
+                            Connect & Follow
+                        </h3>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         {socialLinks
-                            .filter(link => link.url)
+                            .filter((link) => link.url)
                             .map((link, index) => (
                                 <a
                                     key={index}
@@ -189,7 +156,9 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                                     title={link.name}
                                 >
                                     <i className={`${link.icon} text-2xl`}></i>
-                                    <span className="text-sm font-medium">{link.name}</span>
+                                    <span className="text-sm font-medium">
+                                        {link.name}
+                                    </span>
                                 </a>
                             ))}
                     </div>
@@ -202,7 +171,9 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                     <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
                         <i className="fas fa-tools text-white text-sm"></i>
                     </div>
-                    <h3 className="text-xl font-semibold text-txt-primary">Skills & Interests</h3>
+                    <h3 className="text-xl font-semibold text-txt-primary">
+                        Skills & Interests
+                    </h3>
                 </div>
                 <div className="flex flex-wrap gap-2">
                     {[
@@ -215,7 +186,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                         "Game Art",
                         "Character Design",
                         "Environment Design",
-                        "Concept Art"
+                        "Concept Art",
                     ].map((skill, index) => (
                         <span
                             key={index}
@@ -234,7 +205,9 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                         <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
                             <i className="fas fa-trophy text-white text-sm"></i>
                         </div>
-                        <h3 className="text-xl font-semibold text-txt-primary">Badges & Achievements</h3>
+                        <h3 className="text-xl font-semibold text-txt-primary">
+                            Badges & Achievements
+                        </h3>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {userData.badges.map((badge, index) => (
@@ -245,7 +218,9 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                                 <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center">
                                     <i className="fas fa-medal text-white text-lg"></i>
                                 </div>
-                                <span className="text-sm font-medium text-txt-primary text-center">{badge}</span>
+                                <span className="text-sm font-medium text-txt-primary text-center">
+                                    {badge}
+                                </span>
                             </div>
                         ))}
                     </div>
@@ -258,10 +233,13 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                     <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
                         <i className="fas fa-envelope text-white text-sm"></i>
                     </div>
-                    <h3 className="text-xl font-semibold text-txt-primary">Get in Touch</h3>
+                    <h3 className="text-xl font-semibold text-txt-primary">
+                        Get in Touch
+                    </h3>
                 </div>
                 <p className="text-txt-secondary mb-4">
-                    Interested in collaborating or have questions? Feel free to reach out through any of the social links above or send a direct message.
+                    Interested in collaborating or have questions? Feel free to reach out
+                    through any of the social links above or send a direct message.
                 </p>
                 <div className="flex gap-3">
                     <button className="cta-button px-6 py-3 rounded-lg flex items-center gap-2">

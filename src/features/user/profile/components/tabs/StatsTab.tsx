@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import type { ProfileUserData } from "./ArtistProfile";
+import type { UserProfileValues } from "../../types/profile";
 
 interface StatsTabProps {
-    userData: ProfileUserData;
+    userData: UserProfileValues;
 }
 
 interface ChartData {
@@ -20,6 +20,8 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
     const [chartData, setChartData] = useState<ChartData | null>(null);
     const [selectedPeriod, setSelectedPeriod] = useState<"week" | "month" | "year">("month");
 
+    console.log(chartData);
+    
     useEffect(() => {
         // Generate mock chart data - in real app, this would come from analytics
         const generateChartData = () => {

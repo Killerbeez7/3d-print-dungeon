@@ -4,37 +4,22 @@ import type { Timestamp } from "firebase/firestore";
 /**
  * USER TYPE ORGANIZATION:
  * 
- * Firebase Layer (Infrastructure):
+ * Firestore Layer (Infrastructure):
  * - RawUserData: Raw data from Firestore
  * - CurrentUser: Firebase Auth user object
  * 
  * Domain Layer (Business Logic):
  * - BaseUser: Clean domain model
- * - UserProfile: Extended user profile
- * - ArtistProfile: Artist-specific profile
+ * - UserProfile: Extended user profile with artist capabilities
  * - UserSettings: User preferences
  * 
  * Usage:
  * - Use RawUserData/CurrentUser for Firebase operations
- * - Use UserProfile/ArtistProfile for UI components
+ * - Use UserProfile for UI components
  * - Use UserSettings for settings pages
  */
 
-// Base Firebase user data (from Firestore)
-export interface RawUserData {
-    uid: string;
-    stripeConnectId?: string;
-    email: string | null | undefined;
-    displayName: string | null;
-    photoURL: string | null;
-    roles?: string[];
-    username?: string;
-    searchableName?: string;
-    createdAt?: Timestamp | Date;
-    lastLogin?: Timestamp | Date;
-}
-
-// Domain models (for UI and business logic)
+// Domain user data
 export interface BaseUser {
     id: string;
     email: string;
@@ -44,8 +29,20 @@ export interface BaseUser {
     updatedAt: Date;
 }
 
-
-export interface UserProfile extends BaseUser {
+// Base Firestore user data
+export interface RawUserData {
+    uid: string;
+    stripeConnectId?: string;
+    email: string | null | undefined;
+    displayName: string | null;
+    photoURL: string | null;
+    roles?: string[];
+    username: string; // Make username required and unique
+    createdAt?: Timestamp | Date;
+    lastLogin?: Timestamp | Date;
+    // Simple artist flag
+    isArtist?: boolean;
+    // Additional fields for extended user profiles
     bio?: string;
     location?: string;
     website?: string;
@@ -59,29 +56,31 @@ export interface UserProfile extends BaseUser {
         pushNotifications: boolean;
         privacyLevel: "public" | "private" | "friends";
     };
+    // Artist-specific fields (only used if isArtist is true)
+    uploads?: string[]; // Array of model IDs
+    featuredWorks?: string[];
+    categories?: string[];
+    commissionRates?: {
+        small: number;
+        medium: number;
+        large: number;
+    };
+    // Flat count fields (better for Firestore)
+    uploadsCount?: number;
+    likesCount?: number;
+    followersCount?: number;
+    followingCount?: number;
+    // Legacy fields (for backward compatibility)
+    totalUploads?: number;
+    totalLikes?: number;
+    totalViews?: number;
+    followers?: number;
+    following?: number;
 }
 
-export interface ArtistProfile extends UserProfile {
-    isArtist: true;
-    portfolio: {
-        featuredWorks: string[];
-        categories: string[];
-        commissionRates?: {
-            small: number;
-            medium: number;
-            large: number;
-        };
-    };
-    stats: {
-        totalUploads: number;
-        totalLikes: number;
-        totalViews: number;
-        followers: number;
-        following: number;
-    };
-}
 
-export interface UserSettings {
+
+export interface UserSettings extends RawUserData {
     account: {
         email: string;
         displayName: string;
@@ -105,10 +104,3 @@ export interface UserSettings {
 
 // Type aliases for clarity
 export type CurrentUser = FirebaseUser;
-
-// Utility types for converting between Firebase and domain models
-export type UserProfileFromFirebase = Omit<UserProfile, "id" | "createdAt" | "updatedAt"> & {
-    uid: string;
-    createdAt?: Timestamp | Date;
-    lastLogin?: Timestamp | Date;
-};

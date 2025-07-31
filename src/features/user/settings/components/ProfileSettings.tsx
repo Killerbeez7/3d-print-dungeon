@@ -1,6 +1,6 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { profileService } from "@/features/settings/services/profileService";
+import { profileService } from "@/features/user/settings/services/profileService";
 import { countries } from "@/data/countries";
 import { AlertModal } from "@/features/shared/AlertModal";
 

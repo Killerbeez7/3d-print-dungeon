@@ -7,14 +7,14 @@
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser, faEdit } from "@fortawesome/free-solid-svg-icons";
-import type { ArtistProfile as UserProfileType } from "@/types/user";
+import type { UserProfileValues } from "../types/profile";
 
 interface UserProfileProps {
-    user: UserProfileType;
+    user: UserProfileValues;
     isOwnProfile: boolean;
 }
 
-export const UserProfile = ({
+export const UserHeader = ({
     user,
     isOwnProfile,
 }: UserProfileProps): React.ReactNode => {
@@ -27,7 +27,7 @@ export const UserProfile = ({
                         {user.photoURL ? (
                             <img
                                 src={user.photoURL}
-                                alt={user.displayName}
+                                alt={user.displayName || "User Avatar"}
                                 className="w-full h-full object-cover"
                             />
                         ) : (

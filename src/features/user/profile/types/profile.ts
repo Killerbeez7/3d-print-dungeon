@@ -1,29 +1,27 @@
-import type { RawUserData } from "@/types/user";
+import type { RawUserData } from "@/features/user/types/user";
 
-export interface ProfileUserData extends RawUserData {
-    bio?: string;
-    location?: string;
-    website?: string;
+// Profile-specific properties that extend RawUserData
+export interface UserProfileValues extends RawUserData {
+    // Override optional properties to make them required for profiles
+    isArtist: boolean;
+    
+    // Profile-specific additions
     coverURL?: string;
-    socialLinks?: {
-        twitter?: string;
-        instagram?: string;
-        website?: string;
-        linkedin?: string;
-        facebook?: string;
-        youtube?: string;
-        twitch?: string;
-        discord?: string;
-        github?: string;
-        behance?: string;
-        artstation?: string;
+    portfolio?: {
+        featuredWorks: string[];
+        categories: string[];
+        commissionRates?: {
+            small: number;
+            medium: number;
+            large: number;
+        };
     };
-    stats?: {
-        totalUploads?: number;
-        totalLikes?: number;
-        totalViews?: number;
-        followers?: number;
-        following?: number;
+    stats: {
+        totalUploads: number;
+        totalLikes: number;
+        totalViews: number;
+        followers: number;
+        following: number;
     };
     badges?: string[];
     joinDate?: Date;
