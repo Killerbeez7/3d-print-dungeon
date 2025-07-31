@@ -213,10 +213,11 @@ export async function createAdvancedModel({
         totalRevenue: 0,
     });
 
-    // link to user
+    // link to user and increment upload count
     await updateDoc(doc(db, "users", uploaderId), {
         uploads: arrayUnion(modelDoc.id),
         artist: true,
+        uploadsCount: increment(1),
     });
 
     progressFn(100);
