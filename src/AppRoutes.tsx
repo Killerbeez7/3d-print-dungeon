@@ -16,9 +16,8 @@ import { maintenanceRoutes } from "./features/maintenance/routes/maintenanceRout
 import { businessRoutes } from "./features/business/routes/businessRoutes";
 import { forumRoutes } from "./features/forum/routes/forumRoutes";
 import { modelsRoutes } from "./features/models/routes/modelsRoutes";
-import { settingsRoutes } from "./features/settings/routes/settingsRoutes";
 import { policiesRoutes } from "./features/policies/routes/policiesRoutes";
-import { userRoutes } from "./features/user/profile/routes/userRoutes";
+import { userRoutes } from "./features/user/routes/userRoutes";
 
 import Layout from "./features/shared/Layout";
 
@@ -36,7 +35,6 @@ export const AppRoutes: React.FC = () => {
         ...searchRoutes,
         ...modelsRoutes,
         ...businessRoutes,
-        ...settingsRoutes,
         ...adminRoutes,
         ...forumRoutes,
         ...policiesRoutes,
