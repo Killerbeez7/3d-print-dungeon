@@ -35,8 +35,8 @@ export const ROUTES = {
     MODEL_EDIT: "/model/:modelId/edit",
 
     /* User */
-    SETTINGS: "/settings",
-    USER_PROFILE: "/:displayName",
+    USER_SETTINGS: "/settings",
+    USER_PROFILE: "/:username",
 
     /* Admin */
     ADMIN_DASHBOARD: "/admin-dashboard",
