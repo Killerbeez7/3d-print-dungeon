@@ -273,8 +273,16 @@
                 { "fieldPath": "threadId", "order": "ASCENDING" },
                 { "fieldPath": "userId", "order": "ASCENDING" }
             ]
+        },
+        {
+            "collectionGroup": "usernameReservations",
+            "queryScope": "COLLECTION",
+            "fields": [
+                { "fieldPath": "username", "order": "ASCENDING" },
+                { "fieldPath": "expiresAt", "order": "ASCENDING" }
+            ]
         }
     ],
-    "fieldOverrides": [
-    ]
+
+    "fieldOverrides": []
 }

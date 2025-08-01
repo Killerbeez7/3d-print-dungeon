@@ -15,6 +15,27 @@ service cloud.firestore {
     allow write: if isSuperAdmin(); 
     }
 
+    // -------------- Username Reservations --------------
+    match /usernameReservations/{reservationId} {
+      // Only authenticated users can create reservations
+      allow create: if isSignedIn() && 
+        request.resource.data.uid == request.auth.uid;
+      
+      // Users can read their own reservations
+      allow read: if isSignedIn() && 
+        resource.data.uid == request.auth.uid;
+      
+      // Users can delete their own reservations
+      allow delete: if isSignedIn() && 
+        resource.data.uid == request.auth.uid;
+      
+      // No updates allowed (reservations are immutable)
+      allow update: if false;
+      
+      // Admins can read all reservations
+      allow read: if isAdmin();
+    }
+
     // -------------- Users --------------
     match /users/{userId} {
       // Allow admins to read all users
