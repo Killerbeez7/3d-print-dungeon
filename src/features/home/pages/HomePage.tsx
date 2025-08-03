@@ -57,8 +57,8 @@ export const HomePage = (): React.ReactNode => {
                 itemHeight={180}
                 slidesToShow={5}
             />
-            <section className="p-4 md:p-8">
-                <h1 className="text-2xl font-bold mb-6">Discover 3D Models</h1>
+            <section className="px-4 md:px-8">
+                <h4 className="text-xl font-black mb-6 px-2">ALL MODELS</h4>
                 <InfiniteScrollList
                     items={models}
                     hasMore={hasNextPage}
