@@ -3,6 +3,7 @@ export interface ModelPaymentInfo {
     name: string;
     price: number;
     uploaderId: string;
+    uploaderUsername?: string;
     uploaderDisplayName?: string;
     renderPrimaryUrl?: string;
     isPaid?: boolean;

@@ -12,6 +12,7 @@ export const modelSchema = z.object({
     price: z.number().optional(),
     isPaid: z.boolean().optional(),
     uploaderId: z.string().optional(),
+    uploaderUsername: z.string().optional(),
     uploaderDisplayName: z.string().optional(),
     convertedFileUrl: z.string().optional(),
     originalFileUrl: z.string().optional(),

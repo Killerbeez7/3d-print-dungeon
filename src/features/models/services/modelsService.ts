@@ -30,6 +30,7 @@ export interface CreateModelParams {
     renderFiles: File[];
     selectedRenderIndex: number;
     uploaderId: string;
+    uploaderUsername: string;
     uploaderDisplayName: string;
     onProgress?: (progress: number) => void;
     posterBlob?: Blob;
@@ -57,6 +58,7 @@ export async function createAdvancedModel({
     renderFiles,
     selectedRenderIndex,
     uploaderId,
+    uploaderUsername,
     uploaderDisplayName,
     onProgress,
     posterBlob,
@@ -196,6 +198,7 @@ export async function createAdvancedModel({
         categoryIds,
         tags,
         uploaderId,
+        uploaderUsername,
         uploaderDisplayName,
         originalFileUrl,
         convertedFileUrl,

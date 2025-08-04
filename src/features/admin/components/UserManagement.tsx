@@ -114,8 +114,8 @@ export const UserManagement = () => {
     const q = searchQuery.toLowerCase();
     const filtered = users.filter(
         (u) =>
+            u.username?.toLowerCase().includes(q) ||
             u.displayName?.toLowerCase().includes(q) ||
-            "" ||
             u.email?.toLowerCase().includes(q) ||
             ""
     );

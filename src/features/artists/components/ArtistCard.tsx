@@ -6,17 +6,16 @@
 
 import { Link } from "react-router-dom";
 import { ArtistCardProps } from "../types/artists";
-import { toUrlSafeName } from "@/utils/stringUtils";
+import { toUrlSafeUsername } from "@/utils/stringUtils";
 
-export function ArtistCard({ displayName, photoURL, bio }: ArtistCardProps) {
+export function ArtistCard({ displayName, username, photoURL, bio }: ArtistCardProps) {
     const name = displayName || "Anonymous";
-    const urlSafeName = toUrlSafeName(displayName);
+    const urlSafeUsername = toUrlSafeUsername(username);
     
     return (
         <Link
-            to={`/${urlSafeName}`}
-            className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-md group"
-            aria-label={`View profile for ${name}`}
+            to={`/${urlSafeUsername}`}
+            className="block bg-bg-surface rounded-lg p-4 hover:shadow-md transition-shadow"
         >
             <article className="relative bg-bg-surface border border-br-primary rounded-md overflow-hidden shadow-sm transition-transform duration-300 ease-[cubic-bezier(.4,0,.2,1)] group-hover:shadow-xl group-hover:scale-[1.035] group-focus:shadow-xl group-focus:scale-[1.035]">
                 <img

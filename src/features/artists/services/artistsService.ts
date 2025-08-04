@@ -38,7 +38,7 @@ export async function fetchArtists(
     let q = query(
         collection(db, "users"),
         where("isArtist", "==", true),
-        orderBy("displayName")
+        orderBy("username")
     );
 
     if (search?.trim()) {

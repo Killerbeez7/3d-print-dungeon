@@ -20,7 +20,7 @@ export const useArtists = (search: string) =>
             const q = query(
                 collection(db, "users"),
                 where("isArtist", "==", true),
-                orderBy("displayName")
+                orderBy("username")
             );
 
             const snap = await getDocs(q);
@@ -32,9 +32,13 @@ export const useArtists = (search: string) =>
             // Filter by search term client-side
             if (search.trim()) {
                 const searchLower = search.toLowerCase();
-                return allArtists.filter((artist) =>
-                    artist.displayName?.toLowerCase().includes(searchLower)
-                );
+                const filteredArtists = allArtists.filter((artist) => {
+                    return (
+                        artist.username?.toLowerCase().includes(searchLower) ||
+                        artist.displayName?.toLowerCase().includes(searchLower)
+                    );
+                });
+                return filteredArtists;
             }
 
             return allArtists;

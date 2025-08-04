@@ -19,7 +19,7 @@ import {
     getDocs,
 } from "firebase/firestore";
 import type { ArtistData } from "@/features/artists/types/artists";
-import { toUrlSafeName } from "@/utils/stringUtils";
+import { toUrlSafeUsername } from "@/utils/stringUtils";
 
 export function GlobalSearch() {
     const {
@@ -64,7 +64,7 @@ export function GlobalSearch() {
         const timer = setTimeout(async () => {
             try {
                 const colRef = collection(db, "users");
-                const q = firestoreQuery(colRef, orderBy("displayName"), limit(50));
+                const q = firestoreQuery(colRef, orderBy("username"), limit(50));
                 const snap = await getDocs(q);
                 const allArtists: ArtistData[] = snap.docs.map((doc) => {
                     const data = doc.data();
@@ -72,12 +72,15 @@ export function GlobalSearch() {
                         uid: doc.id,
                         email: data.email ?? null,
                         displayName: data.displayName ?? null,
+                        username: data.username ?? null,
                         photoURL: data.photoURL ?? null,
                         ...data,
                     } as ArtistData;
                 });
-                const filteredArtists = allArtists.filter((a) =>
-                    a.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
+                const filteredArtists = allArtists.filter(
+                    (a) =>
+                        a.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        a.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
                 );
                 setArtistResults(filteredArtists.slice(0, 5));
             } catch (err) {
@@ -161,9 +164,10 @@ export function GlobalSearch() {
 
     // Clicking on an artist in the dropdown navigates to their profile.
     const handleArtistSelect = (artist: ArtistData) => {
-        const urlSafeName = toUrlSafeName(artist.displayName);
-        navigate(`/${urlSafeName}`);
+        const urlSafeUsername = toUrlSafeUsername(artist.username);
+        navigate(`/${urlSafeUsername}`);
         setShowDropdown(false);
+        setSearchTerm("");
     };
 
     return (

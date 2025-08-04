@@ -14,6 +14,7 @@ import type { ModelData } from "@/features/models/types/model";
 interface Uploader {
     photoURL?: string;
     displayName?: string;
+    username?: string;
 }
 
 interface ModelSidebarProps {
