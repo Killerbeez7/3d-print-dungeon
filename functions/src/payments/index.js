@@ -6,7 +6,7 @@ import {
     getOrCreateStripeCustomerId,
     db,
 } from "../shared/config.js";
-import { requireAuth, validateRequiredFields, handleError } from "../shared/utils.js";
+import { requireAuth, validateRequiredFields, handleError } from "../auth/utils.js";
 
 // Test Stripe connection
 export const testStripeConnection = onCall(

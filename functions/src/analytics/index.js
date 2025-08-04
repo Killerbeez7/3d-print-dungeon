@@ -2,14 +2,10 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { FieldValue } from "firebase-admin/firestore";
 import { db } from "../shared/config.js";
-import {
-    validateRequiredFields,
-    handleError,
-    COOLDOWN_MS,
-    BATCH_SIZE,
-    VIEW_BUFFER_COLLECTION,
-    CACHE_TTL,
-} from "../shared/utils.js";
+import { validateRequiredFields, handleError } from "../auth/utils.js";
+import { constants } from "../shared/constants.js";
+
+const { COOLDOWN_MS, BATCH_SIZE, VIEW_BUFFER_COLLECTION, CACHE_TTL } = constants;
 
 // Cache for recent views
 const recentViewsCache = new Map();

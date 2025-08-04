@@ -3,6 +3,15 @@ import * as analytics from "./src/analytics/index.js";
 import * as auth from "./src/auth/index.js";
 import * as models from "./src/models/index.js";
 
+
+// Auth functions
+export const {
+    setUserRole,
+    checkUsernameAvailability,
+    checkEmailAvailability,
+    createValidatedUser,
+} = auth;
+
 // Payment functions
 export const {
     testStripeConnection,
@@ -24,8 +33,7 @@ export const {
     cleanupViewBuffer,
 } = analytics;
 
-// Auth functions
-export const { setUserRole } = auth;
+
 
 // Models functions (placeholder for now)
 export const { placeholder } = models;
