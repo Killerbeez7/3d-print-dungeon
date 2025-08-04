@@ -58,7 +58,7 @@ export const HomePage = (): React.ReactNode => {
                 slidesToShow={5}
             />
             <section className="p-4 md:p-8">
-                <h1 className="text-2xl font-bold mb-6">Discover 3D Models</h1>
+                <h2 className="text-2xl font-bold mb-6">All Models</h2>
                 <InfiniteScrollList
                     items={models}
                     hasMore={hasNextPage}

@@ -6,34 +6,65 @@ export const HomeModelsGrid = ({models, loadIndex, bumpIndex}: {models: ModelDat
     return (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1">
             {models.map((m, idx) => (
-                <Link key={m.id} to={`/model/${m.id}`}>
+                <Link key={m.id} to={`/model/${m.id}`} className="group">
                     <article
-                        className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow w-full"
+                        className="relative bg-bg-surface rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ease-out w-full cursor-pointer"
                         style={{
                             opacity: 0,
                             animation: "fadeIn 0.5s ease-out forwards",
                             // animationDelay: `${idx * 5}ms`,
                         }}
                     >
-                        <div className="aspect-square min-h-[1px]">
-                            <SequentialImage
-                                index={idx}
-                                loadIndex={loadIndex}
-                                src={m.renderPrimaryUrl ?? ""}
-                                alt={m.name}
-                                onLoad={bumpIndex}
-                                width={400}
-                                height={400}
-                            />
-                        </div>
-                        <div className="absolute inset-0 bg-gradient-to-t from-[#000000dc] to-transparent flex items-end opacity-0 hover:opacity-100 transition-opacity rounded-md">
-                            <div className="text-white m-2">
-                                <h2 className="font-semibold" style={{ fontSize: "1rem" }}>
-                                    {m.name}
-                                </h2>
-                                <p className="text-sm">{m.uploaderDisplayName}</p>
+                        {/* Image container with zoom effect */}
+                        <div className="aspect-square min-h-[1px] overflow-hidden">
+                            <div className="w-full h-full transform transition-transform duration-500 ease-out group-hover:scale-110">
+                                <SequentialImage
+                                    index={idx}
+                                    loadIndex={loadIndex}
+                                    src={m.renderPrimaryUrl ?? ""}
+                                    alt={m.name}
+                                    onLoad={bumpIndex}
+                                    width={400}
+                                    height={400}
+                                />
                             </div>
                         </div>
+                        
+                        {/* Enhanced overlay with slide-up animation */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/60 via-black/30 to-transparent flex items-end opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out transform translate-y-4 group-hover:translate-y-0 rounded-lg">
+                            <div className="text-white p-3 w-full">
+                                <div className="mb-1.5">
+                                    <h2 className="font-bold text-xs leading-tight mb-0.5 truncate text-white drop-shadow-lg" style={{ fontSize: '16px' }}>
+                                        {m.name}
+                                    </h2>
+                                    <div className="flex items-center gap-1.5">
+                                        <span className="text-[12px] text-gray-300 font-medium">
+                                            by {m.uploaderDisplayName}
+                                        </span>
+                                        <div className="w-0.5 h-0.5 bg-white/60 rounded-full"></div>
+                                        <span className="text-[10px] text-gray-400">
+                                            3D Model
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                {/* Action indicator */}
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-1">
+                                        <div className="w-1.5 h-1.5 bg-white/80 rounded-full animate-pulse"></div>
+                                        <span className="text-[10px] text-white/90 font-medium">View</span>
+                                    </div>
+                                    <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+                                        <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        {/* Subtle border glow on hover */}
+                        <div className="absolute inset-0 rounded-lg border-2 border-transparent group-hover:border-white/20 transition-colors duration-300 pointer-events-none"></div>
                     </article>
                 </Link>
             ))}
