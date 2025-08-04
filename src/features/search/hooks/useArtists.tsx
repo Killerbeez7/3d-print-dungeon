@@ -5,9 +5,7 @@ import {
     getDocs,
     query,
     orderBy,
-    startAt,
-    endAt,
-    limit,
+    where,
 } from "firebase/firestore";
 import type { ArtistData } from "@/features/artists/types/artists";
 
@@ -18,19 +16,27 @@ export const useArtists = (search: string) =>
         queryFn: async (): Promise<ArtistData[]> => {
             const db = getFirestore();
 
-            // Use searchableName for efficient prefix search
+            // Get all artists and filter client-side for search
             const q = query(
                 collection(db, "users"),
-                orderBy("searchableName"),
-                startAt(search.toLowerCase()),
-                endAt(search.toLowerCase() + "\uf8ff"),
-                limit(50)
+                where("isArtist", "==", true),
+                orderBy("displayName")
             );
 
             const snap = await getDocs(q);
-            return snap.docs.map((d) => ({
+            const allArtists = snap.docs.map((d) => ({
                 ...(d.data() as ArtistData),
                 uid: d.id,
             }));
+
+            // Filter by search term client-side
+            if (search.trim()) {
+                const searchLower = search.toLowerCase();
+                return allArtists.filter((artist) =>
+                    artist.displayName?.toLowerCase().includes(searchLower)
+                );
+            }
+
+            return allArtists;
         },
     });

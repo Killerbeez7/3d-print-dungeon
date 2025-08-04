@@ -32,3 +32,26 @@ export interface AuthContextValue {
     fetchUserData(): Promise<void>;
     handleAuthError(error: unknown, provider: string): never;
 }
+
+export interface UsernameReservationResponse {
+    available: boolean;
+    reserved: boolean;
+    reservationId?: string;
+    expiresAt?: string;
+    message: string;
+}
+
+export interface UsernameConfirmationResponse {
+    success: boolean;
+    username: string;
+    message: string;
+}
+
+export interface UserData {
+    email: string | null;
+    displayName: string;
+    photoURL?: string;
+    username: string;
+    createdAt?: Date;
+    updatedAt?: Date;
+}

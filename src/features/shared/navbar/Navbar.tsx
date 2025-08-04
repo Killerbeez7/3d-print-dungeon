@@ -233,7 +233,7 @@ export const Navbar = (): React.ReactNode => {
                             {!currentUser ? (
                                 <AuthButtons
                                     isLoading={loading}
-                                    onLoginClick={() => open({ mode: "login" })}
+                                    onLoginClick={() => open({ mode: "signin" })}
                                     onSignUpClick={() => open({ mode: "signup" })}
                                 />
                             ) : (

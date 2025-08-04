@@ -1,11 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/config/firebaseConfig";
-import { AuthContext } from "@/features/auth/context/authContext";
-import { RawUserData } from "@/features/user/types/user";
-import { CustomClaims } from "@/features/auth/types/auth";
+// services, context, utils
 import { refreshIdToken } from "@/features/auth/utils/refreshIdToken";
-import { MaintenanceStatus, UserId } from "@/features/maintenance/types/maintenance";
+import { AuthContext } from "@/features/auth/context/authContext";
 import {
     signUpWithEmail,
     signInWithEmail,
@@ -18,6 +16,11 @@ import {
     checkMaintenanceStatus,
     subscribeToMaintenanceStatus,
 } from "@/features/maintenance/services/maintenanceService";
+// types
+import type { MaintenanceStatus, UserId } from "@/features/maintenance/types/maintenance";
+import type { RawUserData } from "@/features/user/types/user";
+import type { CustomClaims } from "@/features/auth/types/auth";
+import { handleAuthError } from "@/features/auth/utils/errorHandling";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -29,57 +32,65 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [maintenanceMessage, setMaintenanceMessage] = useState<string | null>(null);
     const [maintenanceEndTime, setMaintenanceEndTime] = useState<Date | null>(null);
 
-    const handleAuthError = useCallback((error: unknown, provider: string) => {
-        const errorMessage =
-            error instanceof Error ? error.message : `Unknown error with ${provider}`;
-        console.error(`${provider} error:`, error);
-        setAuthError(errorMessage);
+    const handleAuthErrorWrapper = useCallback((error: unknown, provider: string): never => {
+        const authError = handleAuthError(error, provider);
+        setAuthError(authError.message);
         setLoading(false);
-        throw error;
+        throw authError;
     }, []);
 
     const changePassword = async (currentPassword: string, newPassword: string) => {
+        setLoading(true);
         if (!currentUser) throw new Error("No user is currently signed in");
         try {
             await changeUserPassword(currentUser, currentPassword, newPassword);
         } catch (error) {
-            handleAuthError(error, "Password Change");
+            handleAuthErrorWrapper(error, "Password Change");
         }
     };
 
     const handleEmailSignUp = async (email: string, password: string) => {
-        // setLoading(true);
+        setLoading(true);
         try {
             await signUpWithEmail(email, password);
+            setLoading(false);
         } catch (error) {
-            handleAuthError(error, "Email Sign-up");
+            handleAuthErrorWrapper(error, "Email Sign-up");
         }
     };
 
     const handleEmailSignIn = async (email: string, password: string) => {
-        // setLoading(true);
+        setLoading(true);
         try {
             await signInWithEmail(email, password);
+            setLoading(false);
         } catch (error) {
-            handleAuthError(error, "Email Sign-in");
+            handleAuthErrorWrapper(error, "Email Sign-in");
         }
     };
 
     const handleGoogleSignIn = async () => {
-        // setLoading(true);
+        setLoading(true);
         try {
             await signInWithGoogle();
+            setLoading(false);
         } catch (error) {
-            handleAuthError(error, "Google Sign-in");
+            handleAuthErrorWrapper(error, "Google Sign-in");
         }
     };
 
     const handleSignOut = async () => {
-        // setLoading(true);
+        setLoading(true);
         try {
+            // Clear user data before signing out to avoid permission errors
+            setCurrentUser(null);
+            setUserData(null);
+            setClaims(null);
             await signOut();
         } catch (error) {
-            handleAuthError(error, "Sign-out");
+            handleAuthErrorWrapper(error, "Sign-out");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -100,7 +111,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     });
                 } catch (error) {
                     console.error("Failed to fetch user data on auth change", error);
-                    await signOut();
+                    // Don't call signOut here as it creates a loop
+                    setCurrentUser(null);
+                    setUserData(null);
+                    setClaims(null);
+                    setLoading(false);
                 }
             } else {
                 setCurrentUser(null);
@@ -172,7 +187,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         handleGoogleSignIn,
         handleSignOut,
         changePassword,
-        handleAuthError,
+        handleAuthError: handleAuthErrorWrapper,
         fetchUserData: () => Promise.resolve(), // placeholder if needed
         handleFacebookSignIn,
         handleTwitterSignIn,

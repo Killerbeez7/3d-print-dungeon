@@ -28,7 +28,8 @@
         "functions",
         "vite.config.ts",
         "__tests__",
-        "src/types/react.d.ts"
+        "src/types/react.d.ts",
+        "scripts/switch-firebase-config.js"
     ],
     "exclude": ["dist", "node_modules"]
 }

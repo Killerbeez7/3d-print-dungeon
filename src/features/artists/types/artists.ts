@@ -5,6 +5,7 @@ export interface ArtistData extends RawUserData {
     bio?: string;
     displayName: string;
     photoURL: string;
+    username: string;
     email: string;
 }
 

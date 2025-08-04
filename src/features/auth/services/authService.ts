@@ -1,13 +1,12 @@
-import { doc, setDoc, onSnapshot, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../../../config/firebaseConfig";
+import { doc, setDoc, getDoc, onSnapshot } from "firebase/firestore";
+import { auth, db } from "@/config/firebaseConfig";
+import { isUsernameAvailableInDB } from "../utils/authUtils";
 import {
-    createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     FacebookAuthProvider,
     TwitterAuthProvider,
     GoogleAuthProvider,
     signInWithPopup,
-    updateProfile,
     signOut,
     User as FirebaseUser,
     UserCredential,
@@ -17,42 +16,10 @@ import {
     reauthenticateWithCredential,
     EmailAuthProvider,
 } from "firebase/auth";
-import { STATIC_ASSETS } from "../../../config/assetsConfig";
-import type { RawUserData } from "@/types/user";
-
-export const getHighResPhotoURL = (photoURL?: string | null): string => {
-    if (photoURL && photoURL.includes("googleusercontent.com")) {
-        return photoURL.replace(/=s\d+-c/, "=s512-c");
-    }
-    return photoURL || "/user.png";
-};
-
-
-export const addUserToDatabase = async (
-    uid: string,
-    email: string | null | undefined,
-    displayName: string = "Anonymous",
-    photoURL: string = STATIC_ASSETS.DEFAULT_AVATAR
-): Promise<void> => {
-    const userDocRef = doc(db, "users", uid);
-    try {
-        await setDoc(
-            userDocRef,
-            {
-                displayName,
-                searchableName: displayName.toLowerCase(),
-                email,
-                photoURL,
-                createdAt: serverTimestamp(),
-                uploads: [],
-            },
-            { merge: true }
-        );
-    } catch (error) {
-        console.error("Error adding user to Firestore:", error);
-        throw error;
-    }
-};
+import type { RawUserData } from "@/features/user/types/user";
+import { handleAuthError } from "../utils/errorHandling";
+import { httpsCallable } from "firebase/functions";
+import { functions } from "@/config/firebaseConfig";
 
 
 export const getUserFromDatabase = (
@@ -71,42 +38,54 @@ export const getUserFromDatabase = (
             if (snapshot.exists()) {
                 callback(snapshot.data() as RawUserData);
             } else {
-                console.log(`No user document found for uid: ${uid}`);
                 callback(null);
             }
         },
         (error) => {
-            console.error("Error reading user doc:", error);
-            callback(null);
+            // Handle permission denied errors gracefully during sign out
+            if (error.code === "permission-denied") {
+                // Silent handling for expected sign-out behavior
+                callback(null);
+            } else {
+                console.error("Error reading user doc:", error);
+                callback(null);
+            }
         }
     );
     return unsubscribe;
 };
 
-
 export const signUpWithEmail = async (
     email: string,
-    password: string
+    password: string,
 ): Promise<FirebaseUser> => {
     try {
-        const userCredential: UserCredential = await createUserWithEmailAndPassword(
-            auth,
+        console.log("🔄 Starting sign-up process for:", email);
+
+        // Use atomic backend validation and user creation
+        const createValidatedUser = httpsCallable(functions, "createValidatedUser");
+        console.log("📞 Calling createValidatedUser function...");
+
+        const result = await createValidatedUser({
             email,
             password
-        );
-        const user = userCredential.user;
-        await updateProfile(user, {
-            displayName: "Anonymous",
         });
-        await addUserToDatabase(user.uid, email ?? undefined, user.displayName ?? undefined);
-        return user;
+
+        console.log("✅ User created successfully:", result.data);
+
+        // Sign in the user after successful creation
+        console.log("🔐 Signing in user after creation...");
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log("✅ User signed in successfully:", userCredential.user.uid);
+
+        return userCredential.user;
     } catch (error: unknown) {
-        const errMsg = error instanceof Error ? error.message : String(error);
+        console.error("❌ Error in signUpWithEmail:", error);
+        const authError = handleAuthError(error, "Email Sign-up");
         console.error("Error signing up with email:", error);
-        throw new Error(errMsg);
+        throw authError;
     }
 };
-
 
 export const signInWithEmail = async (
     email: string,
@@ -116,75 +95,89 @@ export const signInWithEmail = async (
         const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
         return userCredential.user;
     } catch (error: unknown) {
-        const errMsg = error instanceof Error ? error.message : String(error);
+        const authError = handleAuthError(error, "Email Sign-in");
         console.error("Error signing in with email:", error);
-        throw new Error(errMsg);
+        throw authError;
     }
 };
-
 
 export const signInWithGoogle = async (): Promise<FirebaseUser> => {
     try {
         const provider = new GoogleAuthProvider();
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        const upscalePhotoURL = getHighResPhotoURL(user.photoURL);
-        await addUserToDatabase(
-            user.uid,
-            user.email,
-            user.displayName || "Anonymous",
-            upscalePhotoURL || "/user.png"
-        );
+
+        // Check if user already exists in database
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+            // New user - backend will handle user creation with auto-generated username
+            console.log("🆕 New user, backend will handle user creation");
+        } else {
+            // User exists - backend already handled this
+            console.log("✅ Existing user found");
+        }
+
         return user;
     } catch (error: unknown) {
-        const errMsg = error instanceof Error ? error.message : String(error);
+        const authError = handleAuthError(error, "Google Sign-in");
         console.error("Error with Google Sign-In:", error);
-        throw new Error(errMsg);
+        throw authError;
     }
 };
-
 
 export const signInWithFacebook = async (): Promise<FirebaseUser> => {
     try {
         const provider = new FacebookAuthProvider();
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        const upscalePhotoURL = getHighResPhotoURL(user.photoURL);
-        await addUserToDatabase(
-            user.uid,
-            user.email,
-            user.displayName || "Facebook User",
-            upscalePhotoURL || "/user.png"
-        );
+
+        // Check if user already exists in database
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+            // New user - backend will handle user creation with auto-generated username
+            console.log("🆕 New user, backend will handle user creation");
+        } else {
+            // User exists - backend already handled this
+            console.log("✅ Existing user found");
+        }
+
         return user;
     } catch (error: unknown) {
-        const errMsg = error instanceof Error ? error.message : String(error);
+        const authError = handleAuthError(error, "Facebook Sign-in");
         console.error("Error with Facebook Sign-In:", error);
-        throw new Error(errMsg);
+        throw authError;
     }
 };
-
 
 export const signInWithTwitter = async (): Promise<FirebaseUser> => {
     try {
         const provider = new TwitterAuthProvider();
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        const upscalePhotoURL = getHighResPhotoURL(user.photoURL);
-        await addUserToDatabase(
-            user.uid,
-            user.email,
-            user.displayName || "Twitter User",
-            upscalePhotoURL || "/user.png"
-        );
+
+        // Check if user already exists in database
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+            // New user - backend will handle user creation with auto-generated username
+            console.log("🆕 New user, backend will handle user creation");
+        } else {
+            // User exists - backend already handled this
+            console.log("✅ Existing user found");
+        }
+
         return user;
     } catch (error: unknown) {
-        const errMsg = error instanceof Error ? error.message : String(error);
-        console.error("Error with Twitter Sign-In:", error);
-        throw new Error(errMsg);
+        const authError = handleAuthError(error, "Twitter Sign-in");
+        console.error("Error with Twitter Sign-in:", error);
+        throw authError;
     }
 };
-
 
 export const changePassword = async (
     currentUser: FirebaseUser,
@@ -199,19 +192,41 @@ export const changePassword = async (
         await reauthenticateWithCredential(currentUser, credential);
         await updatePassword(currentUser, newPassword);
     } catch (error: unknown) {
-        const errMsg = error instanceof Error ? error.message : String(error);
+        const authError = handleAuthError(error, "Password Change");
         console.error("Error updating password:", error);
-        throw new Error(errMsg);
+        throw authError;
     }
 };
-
 
 export const signOutUser = async (): Promise<void> => {
     try {
         await signOut(auth);
     } catch (error: unknown) {
-        const errMsg = error instanceof Error ? error.message : String(error);
+        const authError = handleAuthError(error, "Sign-out");
         console.error("Error signing out:", error);
-        throw new Error(errMsg);
+        throw authError;
     }
 };
+
+export const updateUserUsername = async (uid: string, newUsername: string): Promise<void> => {
+    try {
+        // Check if username is available
+        const isAvailable = await isUsernameAvailableInDB(newUsername);
+        if (!isAvailable) {
+            throw new Error("Username is already taken");
+        }
+
+        const userDocRef = doc(db, "users", uid);
+        await setDoc(
+            userDocRef,
+            { username: newUsername },
+            { merge: true }
+        );
+    } catch (error) {
+        console.error("Error updating username:", error);
+        throw error;
+    }
+};
+
+
+

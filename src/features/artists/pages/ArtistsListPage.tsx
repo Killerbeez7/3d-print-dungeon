@@ -56,6 +56,7 @@ export const ArtistsListPage = () => {
         uid: artist.uid,
         email: artist.email,
         displayName: artist.displayName,
+        username: artist.username,
         photoURL: artist.photoURL,
         bio: artist.bio,
     }));
