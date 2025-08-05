@@ -67,6 +67,10 @@ export interface RawUserData {
         medium: number;
         large: number;
     };
+    portfolio?: {
+        featuredWorks: string[];
+        categories: string[];
+    };
 
     /* Stripe (seller) */
     stripeConnectId?: string;

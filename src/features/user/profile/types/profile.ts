@@ -1,26 +1,3 @@
-import type { RawUserData } from "@/features/user/types/user";
-
-// Profile-specific properties that extend RawUserData
-export interface UserProfileValues extends RawUserData {
-    // Override optional properties to make them required for profiles
-    isArtist: boolean;
-
-    // Profile-specific additions
-    coverURL?: string;
-    portfolio?: {
-        featuredWorks: string[];
-        categories: string[];
-        commissionRates?: {
-            small: number;
-            medium: number;
-            large: number;
-        };
-    };
-    badges?: string[];
-    joinDate?: Date;
-    lastActive?: Date;
-}
-
 export interface Tab {
     id: string;
     label: string;

@@ -219,9 +219,18 @@ export async function createAdvancedModel({
     // link to user and increment upload count
     await updateDoc(doc(db, "users", uploaderId), {
         uploads: arrayUnion(modelDoc.id),
-        artist: true,
-        uploadsCount: increment(1),
+        isArtist: true,
+        "stats.uploadsCount": increment(1),
     });
+
+    // Create or update artist profile when user becomes an artist
+    // const artistRef = doc(db, "artists", uploaderId);
+    // await setDoc(artistRef, {
+    //     username: uploaderUsername,
+    //     displayName: uploaderDisplayName,
+    //     isArtist: true,
+    //     updatedAt: serverTimestamp(),
+    // }, { merge: true });
 
     progressFn(100);
     return {

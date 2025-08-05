@@ -41,7 +41,7 @@ export async function toggleLike(modelId: string, userId: string): Promise<boole
             // Unlike: Remove like document, decrement model likes, decrement user likes
             transaction.delete(likeRef);
             transaction.update(modelRef, { likes: increment(-1) });
-            transaction.update(uploaderRef, { likesCount: increment(-1) });
+            transaction.update(uploaderRef, { "stats.likesCount": increment(-1) });
             return false;
         } else {
             // Like: Create like document, increment model likes, increment user likes
@@ -51,7 +51,7 @@ export async function toggleLike(modelId: string, userId: string): Promise<boole
                 createdAt: serverTimestamp(),
             });
             transaction.update(modelRef, { likes: increment(1) });
-            transaction.update(uploaderRef, { likesCount: increment(1) });
+            transaction.update(uploaderRef, { "stats.likesCount": increment(1) });
             return true;
         }
     });

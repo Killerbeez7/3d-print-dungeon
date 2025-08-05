@@ -1,12 +1,7 @@
-/**
- * @file UserProfile.tsx
- * @description Displays the profile for a user
- * @usedIn UserProfilePage
- */
-
 import { Link } from "react-router-dom";
+import { getAvatarUrl } from "@/utils/avatar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faEdit } from "@fortawesome/free-solid-svg-icons";
 import type { UserProfileValues } from "../types/profile";
 
 interface UserProfileProps {
@@ -14,30 +9,18 @@ interface UserProfileProps {
     isOwnProfile: boolean;
 }
 
-export const UserHeader = ({
-    user,
-    isOwnProfile,
-}: UserProfileProps): React.ReactNode => {
+export const UserHeader = ({ user, isOwnProfile }: UserProfileProps): React.ReactNode => {
     return (
         <div className="bg-bg-secondary rounded-lg p-6 shadow-md">
             <div className="flex items-start space-x-6">
                 {/* User Avatar */}
                 <div className="flex-shrink-0">
                     <div className="w-24 h-24 rounded-full overflow-hidden bg-bg-surface">
-                        {user.photoURL ? (
-                            <img
-                                src={user.photoURL}
-                                alt={user.displayName || "User Avatar"}
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-bg-primary">
-                                <FontAwesomeIcon
-                                    icon={faUser}
-                                    className="text-3xl text-txt-secondary"
-                                />
-                            </div>
-                        )}
+                        <img
+                            src={getAvatarUrl(user.photoURL)}
+                            alt={user.displayName || "User Avatar"}
+                            className="w-full h-full object-cover"
+                        />
                     </div>
                 </div>
 
@@ -70,7 +53,7 @@ export const UserHeader = ({
                     <div className="flex space-x-8 mt-4">
                         <div className="text-center">
                             <div className="text-2xl font-bold text-txt-primary">
-                                {user.stats.totalUploads}
+                                {user.stats.uploadsCount}
                             </div>
                             <div className="text-sm text-txt-secondary">Uploads</div>
                         </div>
@@ -82,7 +65,7 @@ export const UserHeader = ({
                         </div>
                         <div className="text-center">
                             <div className="text-2xl font-bold text-txt-primary">
-                                {user.stats.totalLikes}
+                                {user.stats.likesCount}
                             </div>
                             <div className="text-sm text-txt-secondary">Likes</div>
                         </div>
@@ -127,4 +110,4 @@ export const UserHeader = ({
             </div>
         </div>
     );
-}; 
+};

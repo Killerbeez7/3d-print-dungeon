@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import type { ArtistData } from "../types/artists";
+import { getHighResPhotoURL } from "@/features/auth/utils/imageUtils";
 
 const PAGE_SIZE = 32;
 
@@ -62,7 +63,7 @@ export async function fetchArtists(
             uid: data.uid ?? doc.id,
             email: data.email ?? null,
             displayName: data.displayName ?? null,
-            photoURL: data.photoURL ?? null,
+            photoURL: getHighResPhotoURL(data.photoURL),
             bio: data.bio,
         };
     });

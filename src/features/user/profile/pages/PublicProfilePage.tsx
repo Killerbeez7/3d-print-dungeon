@@ -15,12 +15,12 @@ import { UserPortfolio } from "../components/UserPortfolio";
 import { UserStats } from "../components/UserStats";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 // types
-import type { UserProfileValues } from "../types/profile";
+import type { RawUserData } from "@/features/user/types/user";
 
 export const PublicProfilePage = (): React.ReactNode => {
     const { username } = useParams<{ username: string }>();
     const { currentUser } = useAuth();
-    const [artist, setArtist] = useState<UserProfileValues | null>(null);
+    const [artist, setArtist] = useState<RawUserData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
