@@ -4,7 +4,7 @@ import type { RawUserData } from "@/features/user/types/user";
 export interface UserProfileValues extends RawUserData {
     // Override optional properties to make them required for profiles
     isArtist: boolean;
-    
+
     // Profile-specific additions
     coverURL?: string;
     portfolio?: {
@@ -15,13 +15,6 @@ export interface UserProfileValues extends RawUserData {
             medium: number;
             large: number;
         };
-    };
-    stats: {
-        totalUploads: number;
-        totalLikes: number;
-        totalViews: number;
-        followers: number;
-        following: number;
     };
     badges?: string[];
     joinDate?: Date;

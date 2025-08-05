@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "@/config/firebaseConfig";
 import { isUsernameAvailableInDB } from "../utils/authUtils";
 import {
@@ -18,8 +18,19 @@ import {
 } from "firebase/auth";
 import type { RawUserData } from "@/features/user/types/user";
 import { handleAuthError } from "../utils/errorHandling";
+
 import { httpsCallable } from "firebase/functions";
 import { functions } from "@/config/firebaseConfig";
+
+// Callable to ensure a user document exists/updated after each login
+const ensureUserDocumentCallable = httpsCallable(functions, "ensureUserDocument");
+const ensureUserDoc = async () => {
+    try {
+        await ensureUserDocumentCallable();
+    } catch (err) {
+        console.error("ensureUserDocument failed", err);
+    }
+};
 
 
 export const getUserFromDatabase = (
@@ -36,7 +47,8 @@ export const getUserFromDatabase = (
         userDocRef,
         (snapshot) => {
             if (snapshot.exists()) {
-                callback(snapshot.data() as RawUserData);
+                const raw = snapshot.data();
+                callback(raw as RawUserData);
             } else {
                 callback(null);
             }
@@ -61,8 +73,6 @@ export const signUpWithEmail = async (
 ): Promise<FirebaseUser> => {
     try {
         console.log("🔄 Starting sign-up process for:", email);
-
-        // Use atomic backend validation and user creation
         const createValidatedUser = httpsCallable(functions, "createValidatedUser");
         console.log("📞 Calling createValidatedUser function...");
 
@@ -70,14 +80,12 @@ export const signUpWithEmail = async (
             email,
             password
         });
-
         console.log("✅ User created successfully:", result.data);
 
-        // Sign in the user after successful creation
         console.log("🔐 Signing in user after creation...");
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         console.log("✅ User signed in successfully:", userCredential.user.uid);
-
+        await ensureUserDoc();
         return userCredential.user;
     } catch (error: unknown) {
         console.error("❌ Error in signUpWithEmail:", error);
@@ -93,6 +101,7 @@ export const signInWithEmail = async (
 ): Promise<FirebaseUser> => {
     try {
         const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+        await ensureUserDoc();
         return userCredential.user;
     } catch (error: unknown) {
         const authError = handleAuthError(error, "Email Sign-in");
@@ -104,21 +113,11 @@ export const signInWithEmail = async (
 export const signInWithGoogle = async (): Promise<FirebaseUser> => {
     try {
         const provider = new GoogleAuthProvider();
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
+        provider.addScope('email');
+        provider.addScope('profile');
 
-        // Check if user already exists in database
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
-
-        if (!userDoc.exists()) {
-            // New user - backend will handle user creation with auto-generated username
-            console.log("🆕 New user, backend will handle user creation");
-        } else {
-            // User exists - backend already handled this
-            console.log("✅ Existing user found");
-        }
-
+        const { user } = await signInWithPopup(auth, provider);
+        await ensureUserDoc();
         return user;
     } catch (error: unknown) {
         const authError = handleAuthError(error, "Google Sign-in");
@@ -130,21 +129,11 @@ export const signInWithGoogle = async (): Promise<FirebaseUser> => {
 export const signInWithFacebook = async (): Promise<FirebaseUser> => {
     try {
         const provider = new FacebookAuthProvider();
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
+        provider.addScope('email');
+        provider.addScope('public_profile');
 
-        // Check if user already exists in database
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
-
-        if (!userDoc.exists()) {
-            // New user - backend will handle user creation with auto-generated username
-            console.log("🆕 New user, backend will handle user creation");
-        } else {
-            // User exists - backend already handled this
-            console.log("✅ Existing user found");
-        }
-
+        const { user } = await signInWithPopup(auth, provider);
+        await ensureUserDoc();
         return user;
     } catch (error: unknown) {
         const authError = handleAuthError(error, "Facebook Sign-in");
@@ -156,21 +145,11 @@ export const signInWithFacebook = async (): Promise<FirebaseUser> => {
 export const signInWithTwitter = async (): Promise<FirebaseUser> => {
     try {
         const provider = new TwitterAuthProvider();
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
+        provider.addScope('email');
+        provider.addScope('public_profile');
 
-        // Check if user already exists in database
-        const userDocRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userDocRef);
-
-        if (!userDoc.exists()) {
-            // New user - backend will handle user creation with auto-generated username
-            console.log("🆕 New user, backend will handle user creation");
-        } else {
-            // User exists - backend already handled this
-            console.log("✅ Existing user found");
-        }
-
+        const { user } = await signInWithPopup(auth, provider);
+        await ensureUserDoc();
         return user;
     } catch (error: unknown) {
         const authError = handleAuthError(error, "Twitter Sign-in");

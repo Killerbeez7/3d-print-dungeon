@@ -236,14 +236,23 @@ export const createValidatedUser = onCall(async (request) => {
 
             // Create user document
             const userRef = db.collection("users").doc(userRecord.uid);
-            transaction.set(userRef, {
-                email: userRecord.email,
-                username: username,
-                displayName: username, // Use auto-generated username as displayName
-                createdAt: admin.firestore.Timestamp.now(),
-                updatedAt: admin.firestore.Timestamp.now(),
-                roles: [],
-            });
+            const now = admin.firestore.Timestamp.now();
+                transaction.set(userRef, {
+                    email: userRecord.email,
+                    username,
+                    displayName: "Anonymous",
+                    photoURL: null,
+                    authProvider: "password",
+                    createdAt: now,
+                    updatedAt: now,
+                    roles: [],
+                    profileComplete: false,
+                    preferences: { emailNotifications: true, theme: "auto" },
+                    stats: {
+                        loginCount: 1,
+                        lastLoginAt: now,
+                    },
+                });
 
             return {
                 success: true,
@@ -261,6 +270,67 @@ export const createValidatedUser = onCall(async (request) => {
         }
         throw new HttpsError("internal", err.message || "Unknown error");
     }
+});
+
+// Ensure user document exists
+export const ensureUserDocument = onCall(async ({ auth }) => {
+    if (!auth) throw new HttpsError("unauthenticated", "Login required");
+
+    const { uid, token } = auth; // token has email, name, picture, provider_id
+    const db = admin.firestore();
+    const userRef = db.collection("users").doc(uid);
+    const userSnap = await userRef.get();
+
+    // If user doc already exists just touch the “lastLoginAt” field
+    if (userSnap.exists) {
+        await userRef.set(
+            { lastLoginAt: admin.firestore.FieldValue.serverTimestamp() },
+            { merge: true }
+        );
+        return { created: false };
+    }
+
+    // ----- create new document -----
+    const displayName = token.name || "Anonymous";
+    let username = generateRandomUsername();
+
+    // ensure unique username; fall back to UUID if 10 random attempts fail
+    let attempts = 0;
+    while (attempts < 10) {
+        const q = await db
+            .collection("users")
+            .where("username", "==", username)
+            .limit(1)
+            .get();
+        if (q.empty) break;
+        username = generateRandomUsername();
+        attempts++;
+    }
+
+    if (attempts >= 10) {
+        console.log("Initial random usernames taken - using UUID fallback");
+        username = generateUUIDUsername();
+    }
+
+    // ----- create user document -----
+    await userRef.set({
+        email: token.email ?? null,
+        username,
+        displayName,
+        photoURL: token.picture ?? null,
+        authProvider: token.firebase.sign_in_provider,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        roles: [],
+        stats: {
+            loginCount: 1,
+            lastLoginAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        profileComplete: false,
+        preferences: { emailNotifications: true, theme: "auto" },
+    });
+
+    return { created: true, username };
 });
 
 // Password reset functionality (TODO)

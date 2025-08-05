@@ -10,6 +10,7 @@ export const {
     checkUsernameAvailability,
     checkEmailAvailability,
     createValidatedUser,
+    ensureUserDocument,
 } = auth;
 
 // Payment functions

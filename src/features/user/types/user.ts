@@ -1,23 +1,6 @@
 import type { User as FirebaseUser } from "firebase/auth";
 import type { Timestamp } from "firebase/firestore";
 
-/**
- * USER TYPE ORGANIZATION:
- * 
- * Firestore Layer (Infrastructure):
- * - RawUserData: Raw data from Firestore
- * - CurrentUser: Firebase Auth user object
- * 
- * Domain Layer (Business Logic):
- * - BaseUser: Clean domain model
- * - UserProfile: Extended user profile with artist capabilities
- * - UserSettings: User preferences
- * 
- * Usage:
- * - Use RawUserData/CurrentUser for Firebase operations
- * - Use UserProfile for UI components
- * - Use UserSettings for settings pages
- */
 
 // Domain user data
 export interface BaseUser {
@@ -31,18 +14,40 @@ export interface BaseUser {
 
 // Base Firestore user data
 export interface RawUserData {
+    /* Identity */
     uid: string;
-    stripeConnectId?: string;
-    email: string | null | undefined;
-    displayName: string | null;
+    email: string | null;
+    username: string;
+    displayName: string;
     photoURL: string | null;
-    roles?: string[];
-    username: string; // Make username required and unique
-    createdAt?: Timestamp | Date;
-    lastLogin?: Timestamp | Date;
-    // Simple artist flag
-    isArtist?: boolean;
-    // Additional fields for extended user profiles
+    authProvider: string; // "password", "google.com", etc.
+
+    /* Timestamps */
+    createdAt: Timestamp | Date;
+    updatedAt: Timestamp | Date;
+    lastLoginAt: Timestamp | Date;
+
+    /* Access */
+    roles: string[];
+
+    /* Profile */
+    profileComplete: boolean;
+    preferences: {
+        emailNotifications: boolean;
+        theme: "light" | "dark" | "auto";
+    };
+
+    /* Stats */
+    stats: {
+        loginCount: number;
+        uploadsCount: number;
+        likesCount: number;
+        viewsCount: number;
+        followers: number;
+        following: number;
+    };
+
+    /* Optional extended fields */
     bio?: string;
     location?: string;
     website?: string;
@@ -51,13 +56,10 @@ export interface RawUserData {
         instagram?: string;
         facebook?: string;
     };
-    preferences?: {
-        emailNotifications: boolean;
-        pushNotifications: boolean;
-        privacyLevel: "public" | "private" | "friends";
-    };
-    // Artist-specific fields (only used if isArtist is true)
-    uploads?: string[]; // Array of model IDs
+
+    /* Artist extras */
+    isArtist?: boolean;
+    uploads?: string[];
     featuredWorks?: string[];
     categories?: string[];
     commissionRates?: {
@@ -65,17 +67,9 @@ export interface RawUserData {
         medium: number;
         large: number;
     };
-    // Flat count fields (better for Firestore)
-    uploadsCount?: number;
-    likesCount?: number;
-    followersCount?: number;
-    followingCount?: number;
-    // Legacy fields (for backward compatibility)
-    totalUploads?: number;
-    totalLikes?: number;
-    totalViews?: number;
-    followers?: number;
-    following?: number;
+
+    /* Stripe (seller) */
+    stripeConnectId?: string;
 }
 
 
