@@ -15,8 +15,8 @@
         "hosting": "npm run generate-sitemap && npm run build && firebase deploy --only hosting",
         "generate-sitemap": "node src/scripts/sitemap.cjs",
         "firebase:prod": "node scripts/switch-firebase-config.js production",
-        "firebase:emulator": "node scripts/switch-firebase-config.js emulator",
-        "firebase:functions-only": "node scripts/switch-firebase-config.js emulator && firebase emulators:start --only functions"
+        "firebase:emulators": "node scripts/switch-firebase-config.js emulator",
+        "firebase:emulators-start": "firebase emulators:start --only auth,functions,firestore,storage"
     },
     "browserslist": [
         "defaults",
