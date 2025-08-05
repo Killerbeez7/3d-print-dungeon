@@ -1,9 +1,3 @@
-/**
- * @file ArtistCard.tsx
- * @description Displays the card for an artist
- * @usedIn ArtistsListPage
- */
-
 import { Link } from "react-router-dom";
 import { ArtistCardProps } from "../types/artists";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
