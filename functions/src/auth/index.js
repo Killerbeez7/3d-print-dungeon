@@ -63,6 +63,7 @@ export const setUserRole = onCall(async (request) => {
     }
 });
 
+// Check if username is available
 export const checkUsernameAvailability = onCall(async (request) => {
     try {
         const { data } = request;
@@ -108,6 +109,7 @@ export const checkUsernameAvailability = onCall(async (request) => {
     }
 });
 
+// Check if email is available
 export const checkEmailAvailability = onCall(async (request) => {
     try {
         const { data } = request;
@@ -237,22 +239,28 @@ export const createValidatedUser = onCall(async (request) => {
             // Create user document
             const userRef = db.collection("users").doc(userRecord.uid);
             const now = admin.firestore.Timestamp.now();
-                transaction.set(userRef, {
-                    email: userRecord.email,
-                    username,
-                    displayName: "Anonymous",
-                    photoURL: null,
-                    authProvider: "password",
-                    createdAt: now,
-                    updatedAt: now,
-                    roles: [],
-                    profileComplete: false,
-                    preferences: { emailNotifications: true, theme: "auto" },
-                    stats: {
-                        loginCount: 1,
-                        lastLoginAt: now,
-                    },
-                });
+            transaction.set(userRef, {
+                email: userRecord.email,
+                username,
+                displayName: "Anonymous",
+                photoURL: null,
+                authProvider: "password",
+                createdAt: now,
+                updatedAt: now,
+                roles: [],
+                profileComplete: false,
+                preferences: { emailNotifications: true, theme: "auto" },
+                stats: {
+                    loginCount: 1,
+                    lastLoginAt: now,
+                    uploadsCount: 0,
+                    likesCount: 0,
+                    viewsCount: 0,
+                    followers: 0,
+                    following: 0,
+                },
+                isArtist: false,
+            });
 
             return {
                 success: true,
@@ -313,21 +321,28 @@ export const ensureUserDocument = onCall(async ({ auth }) => {
     }
 
     // ----- create user document -----
+    const now = admin.firestore.FieldValue.serverTimestamp();
     await userRef.set({
         email: token.email ?? null,
         username,
         displayName,
         photoURL: token.picture ?? null,
         authProvider: token.firebase.sign_in_provider,
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        createdAt: now,
+        updatedAt: now,
         roles: [],
-        stats: {
-            loginCount: 1,
-            lastLoginAt: admin.firestore.FieldValue.serverTimestamp(),
-        },
         profileComplete: false,
         preferences: { emailNotifications: true, theme: "auto" },
+        stats: {
+            loginCount: 1,
+            lastLoginAt: now,
+            uploadsCount: 0,
+            likesCount: 0,
+            viewsCount: 0,
+            followers: 0,
+            following: 0,
+        },
+        isArtist: false,
     });
 
     return { created: true, username };
