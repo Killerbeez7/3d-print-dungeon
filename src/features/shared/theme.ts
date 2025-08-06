@@ -30,16 +30,32 @@ export function useTheme(): [Theme, Dispatch<SetStateAction<Theme>>] {
         return getStoredTheme() ?? SYSTEM;
     });
 
+    // Apply theme whenever it changes
     useEffect(() => {
-        const applied: NonSystemTheme =
-            theme === SYSTEM ? getSystemTheme() : theme;
-
+        const applied: NonSystemTheme = theme === SYSTEM ? getSystemTheme() : theme;
         if (typeof document !== "undefined") {
             document.documentElement.setAttribute("data-theme", applied);
         }
-
         if (typeof localStorage !== "undefined") {
             localStorage.setItem(THEME_KEY, theme);
+        }
+    }, [theme]);
+
+    // Sync when the user changes their OS preference while in "system" mode
+    useEffect(() => {
+        if (theme !== SYSTEM || typeof window === "undefined") return;
+        const mq = window.matchMedia("(prefers-color-scheme: dark)");
+        const syncSystem = () => {
+            const applied = mq.matches ? DARK : LIGHT;
+            if (typeof document !== "undefined") {
+                document.documentElement.setAttribute("data-theme", applied);
+            }
+        };
+        syncSystem();
+        // Newer browsers
+        if (typeof mq.addEventListener === "function") {
+            mq.addEventListener("change", syncSystem);
+            return () => mq.removeEventListener("change", syncSystem);
         }
     }, [theme]);
 
