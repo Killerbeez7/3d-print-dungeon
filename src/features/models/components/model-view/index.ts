@@ -1,1 +1,1 @@
-export { NavigationArrow, NavigationDots, useNavigationHandlers } from "./NavItems"; 
+export { NavigationArrow, NavigationDots } from "./NavItems"; 

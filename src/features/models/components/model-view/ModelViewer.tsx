@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { fullscreenConfig } from "@/config/fullscreenConfig";
 import { LazyImage } from "@/features/shared/reusable/LazyImage";
-import { useModelLoadState } from "@/features/models/hooks/useModelLoadState";
+import { useModelLoader } from "@/features/models/hooks/useModelLoader";
 
 //components
 import { NavigationArrow, NavigationDots } from "./NavItems";
@@ -53,20 +53,29 @@ export const ModelViewer = ({
     // Global load state for this model URL
     const {
         status: modelGlobalStatus,
+        progress: modelGlobalProgress,
         markLoading: markModelLoading,
         markLoaded: markModelLoaded,
-    } = useModelLoadState(modelUrl);
+        updateProgress: updateModelProgress,
+    } = useModelLoader(modelUrl);
 
     // derive from global status
     useEffect(() => {
         if (modelGlobalStatus === "loaded") {
             setModelFileLoaded(true);
             setModelLoadProgress(1);
+        } else if (modelGlobalStatus === "loading") {
+            setModelLoadProgress(modelGlobalProgress);
         }
-    }, [modelGlobalStatus]);
+    }, [modelGlobalStatus, modelGlobalProgress]);
 
     // Navigation Handlers
     const handlePrevious = () => {
+        // Save current progress before switching
+        if (modelGlobalStatus === "loading" && modelGlobalProgress > 0) {
+            updateModelProgress(modelGlobalProgress);
+        }
+
         if (selectedRenderIndex === -1) {
             setSelectedRenderIndex(renderExtraUrls.length - 1);
         } else if (selectedRenderIndex === 0) {
@@ -76,6 +85,11 @@ export const ModelViewer = ({
         }
     };
     const handleNext = () => {
+        // Save current progress before switching
+        if (modelGlobalStatus === "loading" && modelGlobalProgress > 0) {
+            updateModelProgress(modelGlobalProgress);
+        }
+
         if (selectedRenderIndex === -1) {
             setSelectedRenderIndex(0);
         } else if (selectedRenderIndex === renderExtraUrls.length - 1) {
@@ -261,7 +275,6 @@ export const ModelViewer = ({
         if (modelGlobalStatus === "loaded") {
             setUserRequestedModelLoad(true);
             setModelFileLoaded(true);
-            setModelLoadProgress(1);
             return;
         }
         if (modelGlobalStatus === "idle") {
@@ -269,7 +282,6 @@ export const ModelViewer = ({
         }
         setUserRequestedModelLoad(true);
         setModelFileLoaded(false);
-        setModelLoadProgress(0);
     };
 
     // Model Load Handlers
@@ -277,6 +289,7 @@ export const ModelViewer = ({
         if (!threeImported || !userRequestedModelLoad) return;
 
         let cleanup: (() => void) | null = null;
+        let currentProgress = 0;
 
         // Small delay to ensure model-viewer element is properly mounted
         const timeoutId = setTimeout(() => {
@@ -293,10 +306,16 @@ export const ModelViewer = ({
                     typeof (event as CustomEvent<{ totalProgress: number }>).detail
                         ?.totalProgress === "number"
                 ) {
-                    setModelLoadProgress(
-                        (event as CustomEvent<{ totalProgress: number }>).detail
-                            .totalProgress
-                    );
+                    currentProgress = (event as CustomEvent<{ totalProgress: number }>)
+                        .detail.totalProgress;
+
+                    // Update local progress for smooth UI updates
+                    setModelLoadProgress(currentProgress);
+
+                    // Only update global progress if it's significantly different (every 10%)
+                    if (Math.abs(currentProgress - modelGlobalProgress) >= 0.1) {
+                        updateModelProgress(currentProgress);
+                    }
                 }
             };
 
@@ -310,6 +329,10 @@ export const ModelViewer = ({
 
             // Store cleanup function
             cleanup = () => {
+                // Save final progress when component unmounts (user navigates away)
+                if (currentProgress > 0 && currentProgress < 1) {
+                    updateModelProgress(currentProgress);
+                }
                 viewer.removeEventListener("progress", handleProgress);
                 viewer.removeEventListener("load", handleLoad);
             };
@@ -322,13 +345,12 @@ export const ModelViewer = ({
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps -- markModelLoaded is stable from hook
-    }, [modelUrl, threeImported, userRequestedModelLoad]);
+    }, [modelUrl, threeImported, userRequestedModelLoad, modelGlobalProgress]);
 
     // Reset model file loaded state when user requests model and Three.js is imported
     useEffect(() => {
         if (threeImported && userRequestedModelLoad && modelGlobalStatus !== "loaded") {
             setModelFileLoaded(false);
-            setModelLoadProgress(0);
         }
     }, [threeImported, userRequestedModelLoad, modelGlobalStatus]);
 
