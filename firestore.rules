@@ -6,8 +6,10 @@ service cloud.firestore {
 
     // ------------- Helpers --------------
     function isSignedIn()   { return request.auth != null; }
+    function isOwner(userId) { return request.auth.uid == userId; }
     function isAdmin()      { return request.auth.token.admin  == true; }
     function isSuperAdmin() { return request.auth.token.super  == true; }
+    function rolesUnchanged() { return !("roles" in request.writeFields); }
 
     // -------------- Admins List--------------
     match /admins/{uid} {
@@ -20,11 +22,13 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if true;
       allow create: if isSignedIn() && request.auth.uid == userId;
-      allow update: if isSignedIn() &&
-                    request.auth.uid == userId &&
-                    !("roles" in request.resource.data);
-      allow update: if isAdmin();
-      allow delete: if isSuperAdmin();
+
+      allow update: 
+                if isOwner(userId)
+                && rolesUnchanged()
+                || isAdmin(); 
+
+      allow delete: if isOwner(userId) || isAdmin();
     }
 
     // -------------- Artists (Public Profiles) --------------
