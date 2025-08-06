@@ -67,6 +67,9 @@ export const ModelViewer = ({
     model,
     selectedRenderIndex,
     setSelectedRenderIndex,
+    threeJsLoaded = false,
+    threeJsLoading = false,
+    loadThreeJs,
 }: ModelViewerProps) => {
     const [modelLoaded, setModelLoaded] = useState<boolean>(false);
     const [loadProgress, setLoadProgress] = useState<number>(0);
@@ -75,6 +78,7 @@ export const ModelViewer = ({
     const [autoRotate, setAutoRotate] = useState<boolean>(true);
     const [controlsVisible, setControlsVisible] = useState<boolean>(true);
     const [isHovering, setIsHovering] = useState<boolean>(false);
+    const [userRequestedLoad, setUserRequestedLoad] = useState<boolean>(false);
     const modelViewerRef = useRef<ModelViewerElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const autoHideTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -246,7 +250,25 @@ export const ModelViewer = ({
             viewer.removeEventListener("progress", handleProgress);
             viewer.removeEventListener("load", handleLoad);
         };
-    }, [fallback3DUrl]);
+    }, [fallback3DUrl, threeJsLoaded]);
+
+    // Reset model loaded state when Three.js becomes available and component mounts
+    useEffect(() => {
+        if (threeJsLoaded && userRequestedLoad) {
+            setModelLoaded(false);
+            setLoadProgress(0);
+            
+            // Small delay to ensure model-viewer element is mounted
+            setTimeout(() => {
+                const viewer = modelViewerRef.current;
+                if (viewer) {
+                    console.log("Model viewer element found after Three.js load");
+                } else {
+                    console.log("Model viewer element NOT found after Three.js load");
+                }
+            }, 100);
+        }
+    }, [threeJsLoaded, userRequestedLoad]);
 
     useEffect(() => {
         const shouldAutoHide =
@@ -336,12 +358,105 @@ export const ModelViewer = ({
         return `${baseClasses} ${heightClasses} ${borderClasses}`;
     };
 
+    const handleLoadModel = async () => {
+        if (loadThreeJs) {
+            setUserRequestedLoad(true);
+            try {
+                await loadThreeJs();
+            } catch (error) {
+                console.error("Failed to load Three.js:", error);
+                setUserRequestedLoad(false);
+            }
+        }
+    };
+
     const mainPreview =
         selectedRenderIndex === -1 ? (
             fallback3DUrl ? (
-                <div className={getContainerClasses()}>
-                    {/* @ts-expect-error - model-viewer is not a valid HTML element */}
-                    <model-viewer
+                !threeJsLoaded && !userRequestedLoad ? (
+                    // Show poster with Load Model button when Three.js isn't loaded
+                    <div className={getContainerClasses()}>
+                        <div 
+                            className="relative w-full h-full overflow-hidden"
+                            style={{
+                                backgroundColor: "#616161"
+                            }}
+                        >
+                            {/* Poster image positioned exactly like model-viewer poster */}
+                            {posterUrl && (
+                                <img
+                                    src={posterUrl}
+                                    alt="3D Model Preview"
+                                    className="absolute inset-0 w-full h-full object-contain"
+                                    style={{
+                                        filter: 'blur(2px)'
+                                    }}
+                                />
+                            )}
+                            
+                            {/* Overlay for darkening */}
+                            <div className="absolute inset-0 bg-black/20" />
+                            
+                            {/* Center the load button */}
+                            <div className="absolute inset-0 flex items-center justify-center z-10">
+                                {/* Load Model Button */}
+                                <button
+                                    onClick={handleLoadModel}
+                                    className="group px-8 py-4 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-700 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-out"
+                            >
+                                <div className="flex items-center gap-3">
+                                    <svg 
+                                        className="w-6 h-6 group-hover:scale-110 transition-transform duration-300" 
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    </svg>
+                                    <span>Load 3D Model</span>
+                                </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ) : threeJsLoading ? (
+                    // Show loading state with gentle spinner on blurred poster
+                    <div className={getContainerClasses()}>
+                        <div 
+                            className="relative w-full h-full overflow-hidden"
+                            style={{
+                                backgroundColor: "#616161"
+                            }}
+                        >
+                            {/* Poster image positioned exactly like model-viewer poster */}
+                            {posterUrl && (
+                                <img
+                                    src={posterUrl}
+                                    alt="3D Model Preview"
+                                    className="absolute inset-0 w-full h-full object-contain"
+                                    style={{
+                                        filter: 'blur(4px)'
+                                    }}
+                                />
+                            )}
+                            
+                            {/* Stronger overlay for loading */}
+                            <div className="absolute inset-0 bg-black/40" />
+                            
+                            {/* Center the loading content */}
+                            <div className="absolute inset-0 flex items-center justify-center z-10">
+                                {/* Gentle Loading Spinner */}
+                                <div className="flex flex-col items-center gap-4">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-3 border-white/30 border-t-white"></div>
+                                    <p className="text-white font-medium">Loading 3D viewer...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className={getContainerClasses()}>
+                        {/* @ts-expect-error - model-viewer is not a valid HTML element */}
+                        <model-viewer
                         ref={modelViewerRef}
                         poster={posterUrl}
                         src={fallback3DUrl}
@@ -378,17 +493,9 @@ export const ModelViewer = ({
                         </div>
                     )}
 
-                    {/* Navigation Arrows and Dots */}
+                    {/* Navigation Controls for 3D Model */}
                     {renderExtraUrls.length > 0 && (
                         <div>
-                            <NavigationArrow direction="left" onClick={handlePrevious} />
-                            <NavigationArrow direction="right" onClick={handleNext} />
-                            <NavigationDots
-                                selectedIndex={selectedRenderIndex}
-                                totalItems={renderExtraUrls.length}
-                                onSelect={setSelectedRenderIndex}
-                            />
-
                             {/* Toggle Arrow */}
                             <div
                                 className={`${
@@ -593,6 +700,7 @@ export const ModelViewer = ({
                         </div>
                     )}
                 </div>
+                )
             ) : (
                 <div className="flex items-center justify-center w-full h-[40vh] lg:h-[calc(80vh-120px)] bg-gray-200 rounded-md">
                     No 3D preview available
@@ -621,18 +729,7 @@ export const ModelViewer = ({
                     className="w-full h-full object-contain rounded-md shadow-lg"
                 />
 
-                {/* Navigation Controls */}
-                {renderExtraUrls.length > 0 && (
-                    <div className="invisible md:visible">
-                        <NavigationArrow direction="left" onClick={handlePrevious} />
-                        <NavigationArrow direction="right" onClick={handleNext} />
-                        <NavigationDots
-                            selectedIndex={selectedRenderIndex}
-                            totalItems={renderExtraUrls.length}
-                            onSelect={setSelectedRenderIndex}
-                        />
-                    </div>
-                )}
+
             </div>
         );
 
@@ -647,7 +744,22 @@ export const ModelViewer = ({
             }`}
             ref={containerRef}
         >
-            <div className={getContainerClasses()}>{mainPreview}</div>
+            <div className={getContainerClasses()}>
+                {mainPreview}
+                
+                {/* Global Navigation Arrows - Always visible when there are multiple views */}
+                {renderExtraUrls.length > 0 && (
+                    <>
+                        <NavigationArrow direction="left" onClick={handlePrevious} />
+                        <NavigationArrow direction="right" onClick={handleNext} />
+                        <NavigationDots
+                            selectedIndex={selectedRenderIndex}
+                            totalItems={renderExtraUrls.length}
+                            onSelect={setSelectedRenderIndex}
+                        />
+                    </>
+                )}
+            </div>
         </div>
     );
 };

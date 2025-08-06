@@ -8,7 +8,7 @@ import {
     useViewTracker,
     useModelViewCount,
 } from "@/features/models/services/viewService";
-import { useModelViewer } from "@/hooks/useModelViewer";
+import { useOnDemandModelViewer } from "@/hooks/useOnDemandModelViewer";
 import { fullscreenConfig } from "@/config/fullscreenConfig";
 
 const ModelViewer = lazy(() =>
@@ -32,7 +32,7 @@ export function ModelPage() {
     const { open } = useModal("auth");
     const [selectedRenderIndex, setSelectedRenderIndex] = useState<number>(-1);
     const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-    const modelViewerLoaded = useModelViewer("timeout");
+    const { loaded: modelViewerLoaded, loading: modelViewerLoading, loadModelViewer } = useOnDemandModelViewer();
 
     // Use new lightweight view tracking system
     useViewTracker(modelId ?? "", currentUser ?? undefined);
@@ -81,35 +81,26 @@ export function ModelPage() {
             <div className="text-txt-primary flex flex-col lg:flex-row gap-4 p-4 lg:p-6">
                 {/* VIEWER  --------------------------------------------------- */}
                 <div className="flex-1 flex flex-col gap-4">
-                    {modelViewerLoaded ? (
-                        <Suspense
-                            fallback={
-                                <div className="relative w-full h-[40vh] lg:h-[calc(80vh-120px)] bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center contain-layout content-visibility-auto">
-                                    <Spinner size={32} />
-                                </div>
-                            }
-                        >
-                            {(() => {
-                                const viewerModel = {
-                                    ...model,
-                                    // Pass the merged array so the viewer can work unchanged
-                                    renderExtraUrls: combinedRenderUrls,
-                                } as typeof model;
+                    <Suspense fallback={<div />}>
+                        {(() => {
+                            const viewerModel = {
+                                ...model,
+                                // Pass the merged array so the viewer can work unchanged
+                                renderExtraUrls: combinedRenderUrls,
+                            } as typeof model;
 
-                                return (
-                                    <ModelViewer
-                                        model={viewerModel}
-                                        selectedRenderIndex={selectedRenderIndex}
-                                        setSelectedRenderIndex={setSelectedRenderIndex}
-                                    />
-                                );
-                            })()}
-                        </Suspense>
-                    ) : (
-                        <div className="relative w-full h-[40vh] lg:h-[calc(80vh-120px)] bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center contain-layout content-visibility-auto">
-                            <Spinner size={32} />
-                        </div>
-                    )}
+                            return (
+                                <ModelViewer
+                                    model={viewerModel}
+                                    selectedRenderIndex={selectedRenderIndex}
+                                    setSelectedRenderIndex={setSelectedRenderIndex}
+                                    threeJsLoaded={modelViewerLoaded}
+                                    threeJsLoading={modelViewerLoading}
+                                    loadThreeJs={loadModelViewer}
+                                />
+                            );
+                        })()}
+                    </Suspense>
 
                     {/* Thumbnails - Visible when not in fullscreen */}
                     {!isFullscreen && (

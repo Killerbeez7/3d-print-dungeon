@@ -4,6 +4,8 @@ export interface ModelViewerProps {
   model: ModelData;
   selectedRenderIndex: number;
   setSelectedRenderIndex: (idx: number) => void;
+  threeJsLoaded?: boolean;
+  threeJsLoading?: boolean;
 }
 
 export interface NavigationArrowProps {
