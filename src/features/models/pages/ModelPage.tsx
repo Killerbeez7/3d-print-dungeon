@@ -9,6 +9,7 @@ import {
     useModelViewCount,
 } from "@/features/models/services/viewService";
 import { useModelViewer } from "@/hooks/useModelViewer";
+import { fullscreenConfig } from "@/config/fullscreenConfig";
 
 const ModelViewer = lazy(() =>
     import("../components/model-view/ModelViewer").then((module) => ({
@@ -18,6 +19,7 @@ const ModelViewer = lazy(() =>
 
 //components
 import { ModelSidebar } from "../components/model-view/ModelSidebar";
+import { ModelThumbnails } from "../components/model-view/ModelThumbnails";
 import { CommentsProvider } from "@/features/models/providers/commentsProvider";
 import { ModelComments } from "../components/model-view/ModelComments";
 import { Spinner } from "@/features/shared/reusable/Spinner";
@@ -29,6 +31,7 @@ export function ModelPage() {
     const { currentUser } = useAuth();
     const { open } = useModal("auth");
     const [selectedRenderIndex, setSelectedRenderIndex] = useState<number>(-1);
+    const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
     const modelViewerLoaded = useModelViewer("timeout");
 
     // Use new lightweight view tracking system
@@ -42,7 +45,23 @@ export function ModelPage() {
         if (m?.uploaderId) fetchUploader(m.uploaderId);
     }, [modelId, models, fetchUploader]);
 
+    // Track fullscreen state changes
+    useEffect(() => {
+        const cleanup = fullscreenConfig.onChange(() => {
+            setIsFullscreen(fullscreenConfig.isFullscreen());
+        });
+        return cleanup;
+    }, []);
+
     const model: ModelData | undefined = models.find((m: ModelData) => m.id === modelId);
+
+    // Prepare combined render URLs for both viewer and thumbnails
+    const combinedRenderUrls = model
+        ? [
+              ...(model.renderPrimaryUrl ? [model.renderPrimaryUrl] : []),
+              ...(Array.isArray(model.renderExtraUrls) ? model.renderExtraUrls : []),
+          ]
+        : [];
 
     if (loading)
         return (
@@ -61,44 +80,46 @@ export function ModelPage() {
         <div>
             <div className="text-txt-primary flex flex-col lg:flex-row gap-4 p-4 lg:p-6">
                 {/* VIEWER  --------------------------------------------------- */}
-                {modelViewerLoaded ? (
-                    <Suspense
-                        fallback={
-                            <div className="relative w-full h-[40vh] lg:h-[calc(80vh-120px)] bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center contain-layout content-visibility-auto">
-                                <Spinner size={32} />
-                            </div>
-                        }
-                    >
-                        {(() => {
-                            // Ensure primary render is included first in the list of renders shown in the viewer.
-                            // The ModelViewer component currently expects all image renders in the `renderExtraUrls` array.
-                            // After recent changes, the primary render is stored separately as `renderPrimaryUrl`,
-                            // which caused it not to appear on the model page.  We merge it back here so the
-                            // viewer receives a unified array: [primary, ...extras].
-                            const combinedRenderUrls = [
-                                ...(model.renderPrimaryUrl ? [model.renderPrimaryUrl] : []),
-                                ...(Array.isArray(model.renderExtraUrls) ? model.renderExtraUrls : []),
-                            ];
-                            const viewerModel = {
-                                ...model,
-                                // Pass the merged array so the viewer can work unchanged
-                                renderExtraUrls: combinedRenderUrls,
-                            } as typeof model;
+                <div className="flex-1 flex flex-col gap-4">
+                    {modelViewerLoaded ? (
+                        <Suspense
+                            fallback={
+                                <div className="relative w-full h-[40vh] lg:h-[calc(80vh-120px)] bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center contain-layout content-visibility-auto">
+                                    <Spinner size={32} />
+                                </div>
+                            }
+                        >
+                            {(() => {
+                                const viewerModel = {
+                                    ...model,
+                                    // Pass the merged array so the viewer can work unchanged
+                                    renderExtraUrls: combinedRenderUrls,
+                                } as typeof model;
 
-                            return (
-                                <ModelViewer
-                                    model={viewerModel}
-                                    selectedRenderIndex={selectedRenderIndex}
-                                    setSelectedRenderIndex={setSelectedRenderIndex}
-                                />
-                            );
-                        })()}
-                    </Suspense>
-                ) : (
-                    <div className="relative w-full h-[40vh] lg:h-[calc(80vh-120px)] bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center contain-layout content-visibility-auto">
-                        <Spinner size={32} />
-                    </div>
-                )}
+                                return (
+                                    <ModelViewer
+                                        model={viewerModel}
+                                        selectedRenderIndex={selectedRenderIndex}
+                                        setSelectedRenderIndex={setSelectedRenderIndex}
+                                    />
+                                );
+                            })()}
+                        </Suspense>
+                    ) : (
+                        <div className="relative w-full h-[40vh] lg:h-[calc(80vh-120px)] bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center contain-layout content-visibility-auto">
+                            <Spinner size={32} />
+                        </div>
+                    )}
+
+                    {/* Thumbnails - Visible when not in fullscreen */}
+                    {!isFullscreen && (
+                        <ModelThumbnails
+                            renderUrls={combinedRenderUrls}
+                            selectedRenderIndex={selectedRenderIndex}
+                            setSelectedRenderIndex={setSelectedRenderIndex}
+                        />
+                    )}
+                </div>
 
                 <ModelSidebar
                     model={model}
