@@ -8,7 +8,7 @@ import {
     useViewTracker,
     useModelViewCount,
 } from "@/features/models/services/viewService";
-import { useThreeJsImporter } from "@/hooks/useOnDemandModelViewer";
+import { useThreeJsImporter } from "@/features/models/hooks/useOnDemandModelViewer";
 import { fullscreenConfig } from "@/config/fullscreenConfig";
 
 const ModelViewer = lazy(() =>

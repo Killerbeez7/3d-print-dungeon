@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { createAdvancedModel } from "@/features/models/services/modelsService";
 import { finalConvertFileToGLB } from "@/features/models/utils/converter";
-import { useModelViewer } from "@/hooks/useModelViewer";
+import { useModelViewer } from "@/features/models/hooks/useModelViewer";
 
 // components
 import { FilesUpload } from "../components/model-upload/FilesUpload";
