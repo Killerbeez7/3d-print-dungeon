@@ -97,9 +97,9 @@ export function ModelSidebar({
     };
 
     return (
-        <aside className="w-full lg:w-[400px] flex flex-col h-full rounded-lg">
+        <aside className="w-full lg:w-[400px] flex flex-col h-full rounded-lg overflow-y-auto">
             {/* Model Info Section */}
-            <div className="p-6">
+            <div className="p-4 lg:p-6">
                 {isEditing ? (
                     <>
                         <input
@@ -107,14 +107,14 @@ export function ModelSidebar({
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
-                            className="w-full border border-br-primary rounded px-3 py-2 text-2xl font-bold mb-3"
+                            className="w-full border border-br-primary rounded px-3 py-2 text-lg lg:text-2xl font-bold mb-3"
                             required
                         />
                         <textarea
                             name="description"
                             value={formData.description}
                             onChange={handleChange}
-                            className="w-full border border-br-primary rounded px-3 py-2 mb-4"
+                            className="w-full border border-br-primary rounded px-3 py-2 mb-4 text-sm lg:text-base"
                             rows={3}
                         />
                         <input
@@ -122,22 +122,22 @@ export function ModelSidebar({
                             name="tags"
                             value={formData.tags}
                             onChange={handleChange}
-                            className="w-full border border-br-primary rounded px-3 py-2 mb-4"
+                            className="w-full border border-br-primary rounded px-3 py-2 mb-4 text-sm lg:text-base"
                             placeholder="Tags (comma-separated)"
                         />
-                        {error && <p className="text-red-600 mb-2">{error}</p>}
+                        {error && <p className="text-red-600 mb-2 text-sm">{error}</p>}
                         <div className="flex gap-2 mb-4">
                             <button
                                 onClick={handleSave}
                                 disabled={isUpdating}
-                                className="bg-btn-primary text-white py-1 px-4 rounded"
+                                className="bg-btn-primary text-white py-2 px-4 rounded text-sm lg:text-base flex-1"
                             >
                                 {isUpdating ? "Saving..." : "Save"}
                             </button>
                             <button
                                 onClick={handleCancel}
                                 disabled={isUpdating}
-                                className="bg-bg-tertiary text-txt-primary py-1 px-4 rounded border border-br-primary"
+                                className="bg-bg-tertiary text-txt-primary py-2 px-4 rounded border border-br-primary text-sm lg:text-base flex-1"
                             >
                                 Cancel
                             </button>
@@ -145,16 +145,16 @@ export function ModelSidebar({
                     </>
                 ) : (
                     <>
-                        <h1 className="text-2xl font-bold text-txt-primary mb-3">
+                        <h1 className="text-lg lg:text-2xl font-bold text-txt-primary mb-3">
                             {formData.name}
                         </h1>
-                        <p className="text-txt-secondary mb-4">{formData.description}</p>
+                        <p className="text-txt-secondary mb-4 text-sm lg:text-base leading-relaxed">{formData.description}</p>
                         {formData.tags && (
-                            <div className="flex flex-wrap gap-2 mt-4">
+                            <div className="flex flex-wrap gap-1 lg:gap-2 mt-4">
                                 {formData.tags.split(",").map((tag, i) => (
                                     <span
                                         key={i}
-                                        className="px-3 py-1 text-sm rounded-full bg-bg-surface text-txt-secondary"
+                                        className="px-2 lg:px-3 py-1 text-xs lg:text-sm rounded-full bg-bg-surface text-txt-secondary"
                                     >
                                         {tag.trim()}
                                     </span>
@@ -167,23 +167,23 @@ export function ModelSidebar({
 
             {/* Pricing Section */}
             {model.isPaid && model.price && model.price > 0 && (
-                <div className="px-6 pb-4">
-                    <div className="bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20 rounded-lg p-4">
-                        <div className="flex items-center justify-between">
+                <div className="px-4 lg:px-6 pb-4">
+                    <div className="bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20 rounded-lg p-3 lg:p-4">
+                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
                             <div>
-                                <p className="text-sm text-txt-secondary">Price</p>
-                                <p className="text-2xl font-bold text-accent">
+                                <p className="text-xs lg:text-sm text-txt-secondary">Price</p>
+                                <p className="text-xl lg:text-2xl font-bold text-accent">
                                     ${model.price}
                                 </p>
                             </div>
-                            <div className="text-right">
+                            <div className="text-left lg:text-right">
                                 <p className="text-xs text-txt-muted">
                                     Platform fee (5%)
                                 </p>
-                                <p className="text-sm text-txt-secondary">
+                                <p className="text-xs lg:text-sm text-txt-secondary">
                                     -${(model.price * 0.05).toFixed(2)}
                                 </p>
-                                <p className="text-sm font-medium text-txt-primary">
+                                <p className="text-xs lg:text-sm font-medium text-txt-primary">
                                     Seller earns: ${(model.price * 0.95).toFixed(2)}
                                 </p>
                             </div>
@@ -193,8 +193,8 @@ export function ModelSidebar({
             )}
 
             {/* Action Buttons Section */}
-            <div className="p-6 divider-top">
-                <div className="flex gap-4 mb-4">
+            <div className="p-4 lg:p-6 divider-top">
+                <div className="flex gap-3 lg:gap-4 mb-4">
                     <LikeButton
                         modelId={model.id}
                         initialLikes={model.likes}
@@ -209,10 +209,10 @@ export function ModelSidebar({
                 </div>
 
                 {/* Purchase/Download Button */}
-                <div className="mb-6">
+                <div className="mb-4 lg:mb-6">
                     <PurchaseButton
                         model={{ ...model, price: model.price ?? 0, uploaderId: model.uploaderId ?? "" }}
-                        className="w-full py-4 text-base font-medium"
+                        className="w-full py-3 lg:py-4 text-sm lg:text-base font-medium"
                     />
                 </div>
 
@@ -220,11 +220,11 @@ export function ModelSidebar({
                 {currentUser && currentUser.uid === model.uploaderId && !isEditing && (
                     <button
                         onClick={handleEdit}
-                        className="flex items-center justify-center gap-2 w-full mt-3 py-2.5 px-4 transition-colors secondary-button"
+                        className="flex items-center justify-center gap-2 w-full mt-3 py-2 lg:py-2.5 px-4 transition-colors secondary-button text-sm lg:text-base"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            className="h-5 w-5"
+                            className="h-4 w-4 lg:h-5 lg:w-5"
                             viewBox="0 0 20 20"
                             fill="currentColor"
                         >
@@ -236,25 +236,25 @@ export function ModelSidebar({
             </div>
 
             {/* Creator Info Section */}
-            <div className="p-6 divider-top">
-                <div className="flex items-center gap-4">
+            <div className="p-4 lg:p-6 divider-top">
+                <div className="flex items-center gap-3 lg:gap-4">
                     <img
                         src={uploader?.photoURL || STATIC_ASSETS.DEFAULT_AVATAR}
                         alt={uploader?.displayName || "Unknown User"}
-                        className="w-[7em] rounded-[10px] object-cover border-2 border-br-primary"
+                        className="w-16 h-16 lg:w-[7em] lg:h-[7em] rounded-lg lg:rounded-[10px] object-cover border-2 border-br-primary"
                     />
-                    <div className="flex-1">
-                        <h2 className="text-xl font-semibold text-txt-primary">
+                    <div className="flex-1 min-w-0">
+                        <h2 className="text-lg lg:text-xl font-semibold text-txt-primary truncate">
                             {uploader?.displayName || "Anonymous"}
                         </h2>
-                        <p className="text-sm text-txt-secondary mt-1">
+                        <p className="text-xs lg:text-sm text-txt-secondary mt-1">
                             Senior 3D Artist
                         </p>
-                        <div className="flex items-center gap-3 mt-2">
-                            <button className="bg-accent hover:bg-accent-hover text-white px-4 py-1.5 rounded-full text-sm font-medium transition-colors">
+                        <div className="flex items-center gap-2 lg:gap-3 mt-2">
+                            <button className="bg-accent hover:bg-accent-hover text-white px-3 lg:px-4 py-1 lg:py-1.5 rounded-full text-xs lg:text-sm font-medium transition-colors">
                                 Follow
                             </button>
-                            <span className="text-sm text-txt-secondary">
+                            <span className="text-xs lg:text-sm text-txt-secondary">
                                 {viewCountLoading ? "Loading..." : `${viewCount} views`}
                             </span>
                         </div>
