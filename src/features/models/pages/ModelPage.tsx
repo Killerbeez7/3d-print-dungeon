@@ -69,11 +69,30 @@ export function ModelPage() {
                             </div>
                         }
                     >
-                        <ModelViewer
-                            model={model}
-                            selectedRenderIndex={selectedRenderIndex}
-                            setSelectedRenderIndex={setSelectedRenderIndex}
-                        />
+                        {(() => {
+                            // Ensure primary render is included first in the list of renders shown in the viewer.
+                            // The ModelViewer component currently expects all image renders in the `renderExtraUrls` array.
+                            // After recent changes, the primary render is stored separately as `renderPrimaryUrl`,
+                            // which caused it not to appear on the model page.  We merge it back here so the
+                            // viewer receives a unified array: [primary, ...extras].
+                            const combinedRenderUrls = [
+                                ...(model.renderPrimaryUrl ? [model.renderPrimaryUrl] : []),
+                                ...(Array.isArray(model.renderExtraUrls) ? model.renderExtraUrls : []),
+                            ];
+                            const viewerModel = {
+                                ...model,
+                                // Pass the merged array so the viewer can work unchanged
+                                renderExtraUrls: combinedRenderUrls,
+                            } as typeof model;
+
+                            return (
+                                <ModelViewer
+                                    model={viewerModel}
+                                    selectedRenderIndex={selectedRenderIndex}
+                                    setSelectedRenderIndex={setSelectedRenderIndex}
+                                />
+                            );
+                        })()}
                     </Suspense>
                 ) : (
                     <div className="relative w-full h-[40vh] lg:h-[calc(80vh-120px)] bg-gray-100 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden flex items-center justify-center contain-layout content-visibility-auto">

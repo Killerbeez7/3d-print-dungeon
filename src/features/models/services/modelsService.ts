@@ -4,6 +4,7 @@ import {
     addDoc,
     serverTimestamp,
     doc,
+    
     updateDoc,
     arrayUnion,
     increment,
@@ -17,6 +18,7 @@ import {
     where,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { setDoc } from "firebase/firestore";
 import { finalConvertFileToGLB } from "../utils/converter";
 import { STORAGE_PATHS } from '../../../constants/storagePaths';
 import type { ModelData } from "../types/model";
@@ -217,11 +219,29 @@ export async function createAdvancedModel({
     });
 
     // link to user and increment upload count
-    await updateDoc(doc(db, "users", uploaderId), {
-        uploads: arrayUnion(modelDoc.id),
-        isArtist: true,
-        "stats.uploadsCount": increment(1),
-    });
+    if (uploaderId) {
+        const userRef = doc(db, "users", uploaderId);
+        try {
+            // 1. create/merge base doc (no transforms)
+            await setDoc(
+                userRef,
+                {
+                    uploads: [],
+                    isArtist: true,
+                    stats: { uploadsCount: 0 },
+                },
+                { merge: true }
+            );
+
+            // 2. atomic increment + arrayUnion (requires existing doc)
+            await updateDoc(userRef, {
+                uploads: arrayUnion(modelDoc.id),
+                "stats.uploadsCount": increment(1),
+            });
+        } catch (err) {
+            console.warn("User stats update failed:", err);
+        }
+    }
 
     // Create or update artist profile when user becomes an artist
     // const artistRef = doc(db, "artists", uploaderId);

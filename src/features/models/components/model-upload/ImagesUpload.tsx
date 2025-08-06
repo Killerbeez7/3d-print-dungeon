@@ -1,207 +1,223 @@
-import { TiDelete } from "react-icons/ti";
-import type { FC, ChangeEvent } from "react";
+import { FC, useState, useRef, ChangeEvent, useEffect } from "react";
 import type { ModelData } from "@/features/models/types/model";
+import { PrimaryPreview } from "./PrimaryPreview";
+import { RenderList } from "./RenderList";
+import { ImageCropModal } from "./ImageCropModal";
 
-/**
- * Props for ImagesUpload component
- */
+// Now storing original and cropped versions
+interface RenderItem {
+    id: string;
+    originalFile: File;
+    originalPreview: string;
+    croppedFile: File;
+    croppedPreview: string;
+}
+
 interface ImagesUploadProps {
     modelData: ModelData;
     setModelData: React.Dispatch<React.SetStateAction<ModelData>>;
 }
 
-/**
- * Image upload section for model upload flow.
- */
-export const ImagesUpload: FC<ImagesUploadProps> = ({ modelData, setModelData }) => {
-    const handleImageUpload = (e: ChangeEvent<HTMLInputElement>, type: string): void => {
-        const files = Array.from(e.target.files ?? []);
-        if (!files.length) return;
-        setModelData((prev) => {
-            let updatedFiles = [...(prev.renderFiles as File[])];
-            let updatedPreviews = [...(prev.renderPreviewUrls as string[])];
-            if (type === "cover4_3") {
-                updatedFiles[0] = files[0];
-                updatedPreviews[0] = URL.createObjectURL(files[0]);
-            } else if (type === "cover3_4") {
-                updatedFiles[1] = files[0];
-                updatedPreviews[1] = URL.createObjectURL(files[0]);
-            } else {
-                files.forEach((file) => {
-                    if (file.type.startsWith("image/")) {
-                        updatedFiles.push(file);
-                        updatedPreviews.push(URL.createObjectURL(file));
-                    }
-                });
-            }
-            return {
-                ...prev,
-                renderFiles: updatedFiles,
-                renderPreviewUrls: updatedPreviews,
-            };
-        });
-    };
-    const handleRemoveImage = (index: number): void => {
+export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
+    const [renders, setRenders] = useState<RenderItem[]>([]);
+    const [primaryId, setPrimaryId] = useState<string | null>(null);
+    const [isCropModalOpen, setCropModalOpen] = useState(false);
+    const [croppingItem, setCroppingItem] = useState<RenderItem | null>(null);
+    const [cropImageUrl, setCropImageUrl] = useState<string | null>(null);
+    const [cropModalKey, setCropModalKey] = useState(0); // Force remount of modal
+
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        const primaryRender = renders.find(r => r.id === primaryId);
+        const secondaryRenders = renders.filter(r => r.id !== primaryId);
+        const orderedRenders = primaryRender ? [primaryRender, ...secondaryRenders] : renders;
+
         setModelData((prev) => ({
             ...prev,
-            renderFiles: (prev.renderFiles as File[]).filter((_, i) => i !== index),
-            renderPreviewUrls: (prev.renderPreviewUrls as string[]).filter(
-                (_, i) => i !== index
-            ),
+            renderFiles: orderedRenders.map(r => r.croppedFile), // Always use the cropped file for upload
+            renderPreviewUrls: orderedRenders.map(r => r.croppedPreview),
+        }));
+    }, [renders, primaryId, setModelData]);
+
+    const handleFileSelect = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const newRender: RenderItem = {
+            id: `render-${Date.now()}-${Math.random()}`,
+            originalFile: file,
+            originalPreview: URL.createObjectURL(file),
+            croppedFile: file, // Initially, cropped is the same as original
+            croppedPreview: URL.createObjectURL(file),
+        };
+        
+        openCropForItem(newRender);
+        e.target.value = "";
+    };
+
+    const handleCropComplete = (croppedBlob: Blob) => {
+        if (!croppingItem) return;
+
+        const croppedFile = new File([croppedBlob], croppingItem.originalFile.name, { type: "image/jpeg" });
+        const updatedRender: RenderItem = {
+            ...croppingItem,
+            croppedFile: croppedFile,
+            croppedPreview: URL.createObjectURL(croppedBlob),
+        };
+        
+        // Don't revoke originalPreview, we need it for re-cropping
+        
+        const existingIndex = renders.findIndex(r => r.id === croppingItem.id);
+        if (existingIndex > -1) {
+            // Revoke the old *cropped* preview before updating
+            URL.revokeObjectURL(renders[existingIndex].croppedPreview);
+            const newRenders = [...renders];
+            newRenders[existingIndex] = updatedRender;
+            setRenders(newRenders);
+        } else {
+            setRenders(prev => [...prev, updatedRender]);
+            if (!primaryId) { // Set as primary if it's the first image
+                setPrimaryId(updatedRender.id);
+            }
+        }
+
+        setCropModalOpen(false);
+        setCroppingItem(null);
+    };
+    
+    const handleCropModalClose = () => {
+        if (cropImageUrl) {
+            URL.revokeObjectURL(cropImageUrl);
+            setCropImageUrl(null);
+        }
+        // If it was a new image we also clean up its previews
+        const isNew = !renders.some(r => r.id === croppingItem?.id);
+        if (croppingItem && isNew) {
+            URL.revokeObjectURL(croppingItem.croppedPreview);
+        }
+        setCropModalOpen(false);
+        setCroppingItem(null);
+    };
+
+    const handleRemove = (idToRemove: string) => {
+        const indexToRemove = renders.findIndex(r => r.id === idToRemove);
+        if (indexToRemove === -1) return;
+
+        // Clean up both blob URLs
+        URL.revokeObjectURL(renders[indexToRemove].originalPreview);
+        URL.revokeObjectURL(renders[indexToRemove].croppedPreview);
+
+        const newRenders = renders.filter((_, i) => i !== indexToRemove);
+        setRenders(newRenders);
+
+        if (primaryId === idToRemove) {
+            setPrimaryId(newRenders.length > 0 ? newRenders[0].id : null);
+        }
+    };
+    
+    const handleReorder = (sourceIndex: number, destIndex: number) => {
+        const newRenders = [...renders];
+        const [removed] = newRenders.splice(sourceIndex, 1);
+        newRenders.splice(destIndex, 0, removed);
+        setRenders(newRenders);
+    };
+
+    const handleRevert = (idToRevert: string) => {
+        setRenders(prevRenders => prevRenders.map(r => {
+            if (r.id === idToRevert) {
+                // Revoke the old cropped URL before replacing it
+                URL.revokeObjectURL(r.croppedPreview);
+                return {
+                    ...r,
+                    croppedFile: r.originalFile,
+                    croppedPreview: URL.createObjectURL(r.originalFile),
+                };
+            }
+            return r;
         }));
     };
+
+    const openCropForItem = (item: RenderItem) => {
+        setCroppingItem(item);
+        const freshUrl = URL.createObjectURL(item.originalFile);
+        setCropImageUrl(freshUrl);
+        setCropModalKey(prev => prev + 1); // Force modal remount with fresh data
+        setCropModalOpen(true);
+    };
+
+    const primaryRender = renders.find(r => r.id === primaryId);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            renders.forEach(render => {
+                URL.revokeObjectURL(render.originalPreview);
+                URL.revokeObjectURL(render.croppedPreview);
+            });
+        };
+    }, []);
+
     return (
-        <div className="border rounded p-4 mb-2">
-            <h4 className="font-semibold mb-2">Model Covers</h4>
-            <p className="text-sm text-gray-400">
-                jpg/gif/png, ≤ 30MB. Please use{" "}
-                <span className="text-primary">real print photos</span>
-            </p>
-            <div className="flex gap-4 mt-3 bg-bg-surface">
-                {/* 4:3 Cover */}
-                <ImageUploadBox
-                    label="Desktop cover 4:3"
-                    image={modelData.renderPreviewUrls?.[0]}
-                    onUpload={(e) => handleImageUpload(e, "cover4_3")}
-                    onRemove={() => handleRemoveImage(0)}
-                    id="cover4_3"
-                    aspectRatio="4/3"
+        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm space-y-6">
+            <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                accept="image/png, image/jpeg, image/webp" 
+                onChange={handleFileChange} 
+            />
+
+            <div>
+                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Primary Render</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">This is the main image for your model.</p>
+            </div>
+            
+            <PrimaryPreview
+                previewUrl={primaryRender?.croppedPreview}
+                onSelect={handleFileSelect}
+                onRemove={() => primaryRender && handleRemove(primaryRender.id)}
+                onCrop={() => primaryRender && openCropForItem(primaryRender)}
+                onRevert={() => primaryRender && handleRevert(primaryRender.id)}
+            />
+
+            {renders.length > 0 && (
+                 <div>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">All Renders</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Click to set a primary render. Drag to reorder.</p>
+                </div>
+            )}
+            
+            <RenderList
+                renders={renders.map(r => ({ id: r.id, preview: r.croppedPreview }))}
+                primaryId={primaryId}
+                onRemove={handleRemove}
+                onReorder={handleReorder}
+                onSetPrimary={setPrimaryId}
+            />
+
+            {renders.length > 0 && renders.length < 16 && (
+                <button 
+                    onClick={handleFileSelect}
+                    className="w-full py-2 px-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:border-accent hover:text-accent transition-colors"
+                >
+                    Add More Renders
+                </button>
+            )}
+
+            {isCropModalOpen && croppingItem && (
+                <ImageCropModal
+                    key={cropModalKey} // Force re-mount on each open to ensure fresh state
+                    isOpen={isCropModalOpen}
+                    imageUrl={cropImageUrl || croppingItem.originalPreview}
+                    onClose={handleCropModalClose}
+                    onComplete={handleCropComplete}
                 />
-                {/* 3:4 Cover */}
-                <ImageUploadBox
-                    label="Mobile cover 3:4"
-                    image={modelData.renderPreviewUrls?.[1]}
-                    onUpload={(e) => handleImageUpload(e, "cover3_4")}
-                    onRemove={() => handleRemoveImage(1)}
-                    id="cover3_4"
-                    aspectRatio="3/4"
-                />
-            </div>
-            {/* Additional Model Images */}
-            <h4 className="font-semibold mt-4 mb-2">
-                Model Pictures ({modelData.renderPreviewUrls?.length} / 16)
-            </h4>
-            <p className="text-sm text-gray-400">
-                Photos of the printed model, png/jpg/webp/gif, ≤ 30MB/piece, 4:3 ratio
-                recommended
-            </p>
-            <input
-                type="file"
-                multiple
-                accept="image/*"
-                className="hidden "
-                id="modelImages"
-                onChange={(e) => handleImageUpload(e, "additional")}
-            />
-            <label
-                htmlFor="modelImages"
-                className=" bg-bg-surface mt-2 border-dashed border-2 rounded-md w-full h-20 flex items-center justify-center text-primary cursor-pointer"
-            >
-                + Add Photo
-            </label>
-            <div className="flex flex-wrap gap-2 mt-3">
-                {modelData.renderPreviewUrls?.slice(2).map((url, index) => (
-                    <ImagePreview
-                        key={index + 2}
-                        url={url}
-                        onRemove={() => handleRemoveImage(index + 2)}
-                    />
-                ))}
-            </div>
-        </div>
-    );
-};
-
-/**
- * Props for ImageUploadBox component
- */
-interface ImageUploadBoxProps {
-    label: string;
-    image?: string;
-    onUpload: (e: ChangeEvent<HTMLInputElement>) => void;
-    onRemove: () => void;
-    id: string;
-    aspectRatio: string;
-}
-
-/**
- * Upload box for a single image.
- */
-const ImageUploadBox: FC<ImageUploadBoxProps> = ({
-    label,
-    image,
-    onUpload,
-    onRemove,
-    id,
-    aspectRatio,
-}) => {
-    return (
-        <div className="flex flex-col items-center border rounded p-2 h-full w-[150px]">
-            <label className="mb-2 text-sm font-medium">{label}</label>
-            <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                id={id}
-                onChange={onUpload}
-            />
-            <div
-                className={`relative border-dashed border-2 flex items-center justify-center cursor-pointer rounded-md`}
-                style={{ aspectRatio, width: "100%" }}
-                onClick={() => document.getElementById(id)?.click()}
-            >
-                {image ? (
-                    <>
-                        <img
-                            src={image}
-                            alt={label}
-                            className="w-full h-auto object-cover rounded-md"
-                        />
-                        <button
-                            type="button"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onRemove();
-                            }}
-                            className="absolute top-1 right-1 bg-error text-white rounded-full p-1"
-                        >
-                            <TiDelete size={18} />
-                        </button>
-                    </>
-                ) : (
-                    <span className="text-primary text-lg">+</span>
-                )}
-            </div>
-        </div>
-    );
-};
-
-/**
- * Props for ImagePreview component
- */
-interface ImagePreviewProps {
-    url: string;
-    onRemove: () => void;
-}
-
-/**
- * Preview for an uploaded image.
- */
-const ImagePreview: FC<ImagePreviewProps> = ({ url, onRemove }) => {
-    return (
-        <div className="relative w-24 h-24">
-            <img
-                src={url}
-                alt="Model Preview"
-                className="w-full h-full object-cover rounded-md"
-            />
-            <button
-                type="button"
-                onClick={onRemove}
-                className="absolute top-1 right-1 bg-error text-white rounded-full p-1"
-            >
-                <TiDelete size={18} />
-            </button>
+            )}
         </div>
     );
 };

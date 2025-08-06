@@ -608,13 +608,16 @@ export const ModelViewer = ({
                         : "h-[40vh] lg:h-[calc(80vh-120px)]"
                 }`}
             >
+                {/* <img
+                    src={renderExtraUrls[selectedRenderIndex]}
+                    alt={`Render ${selectedRenderIndex + 1}`}
+                    className="max-h-full max-w-full object-contain rounded-md shadow-lg"
+                /> */}
                 <LazyImage
-                    src={
-                        getThumbnailUrl(
-                            renderExtraUrls[selectedRenderIndex],
-                            "LARGE"
-                        ) ?? undefined
-                    }
+                    wrapperClassName="w-full h-full"
+                    src={renderExtraUrls[selectedRenderIndex]}
+                    // Use the full-resolution render for the main preview. No thumbnail fallback.
+                    sizes="(max-width: 1024px) 100vw, 80vw"
                     alt={`Render ${selectedRenderIndex + 1}`}
                     loading="lazy"
                     className="w-full h-full object-contain rounded-md shadow-lg"
@@ -680,10 +683,8 @@ export const ModelViewer = ({
                                 }`}
                             >
                                 <LazyImage
-                                    src={
-                                        getThumbnailUrl(url, "SMALL") ??
-                                        undefined
-                                    }
+                                    wrapperClassName="w-full h-full"
+                                    src={getThumbnailUrl(url, "SMALL") || url}
                                     alt={`Render ${idx + 1}`}
                                     loading="lazy"
                                     className="w-full h-full object-cover"
