@@ -1,60 +1,18 @@
 import { useState, useRef, useEffect } from "react";
-import { FaArrowRight, FaArrowLeft } from "react-icons/fa";
 import { fullscreenConfig } from "@/config/fullscreenConfig";
 import { LazyImage } from "@/features/shared/reusable/LazyImage";
 import { useModelLoadState } from "@/features/models/hooks/useModelLoadState";
+
+//components
+import { NavigationArrow, NavigationDots } from "./NavItems";
+import { LoadModelButton } from "./LoadModelButton";
+
+//utils
+import { getContainerClasses } from "@/features/models/utils/getContainerClasses";
+
+//types
 import type { ModelViewerElement } from "@google/model-viewer";
-
-import type {
-    ModelViewerProps,
-    NavigationArrowProps,
-    NavigationDotsProps,
-} from "@/features/models/types/modelViewer";
-
-const NavigationArrow = ({ direction, onClick }: NavigationArrowProps) => (
-    <button
-        onClick={onClick}
-        className={`absolute ${
-            direction === "left" ? "left-4" : "right-4"
-        } top-1/2 transform -translate-y-1/2 flex items-center justify-center w-[35px] h-[35px] rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 z-40 group invisible md:visible`}
-        aria-label={direction === "left" ? "Previous view" : "Next view"}
-        type="button"
-    >
-        {direction === "left" ? (
-            <FaArrowLeft className="text-white text-xl group-hover:scale-110 transition-transform" />
-        ) : (
-            <FaArrowRight className="text-white text-xl group-hover:scale-110 transition-transform" />
-        )}
-    </button>
-);
-
-const NavigationDots = ({ selectedIndex, totalItems, onSelect }: NavigationDotsProps) => (
-    <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex items-center gap-2 z-40 invisible md:visible">
-        <button
-            onClick={() => onSelect(-1)}
-            className={`w-2.5 h-2.5 rounded-full transition-all ${
-                selectedIndex === -1
-                    ? "bg-white scale-110"
-                    : "bg-white/50 hover:bg-white/70"
-            }`}
-            aria-label="View 3D model"
-            type="button"
-        />
-        {Array.from({ length: totalItems }, (_, index) => (
-            <button
-                key={index}
-                onClick={() => onSelect(index)}
-                className={`w-2.5 h-2.5 rounded-full transition-all ${
-                    selectedIndex === index
-                        ? "bg-white scale-110"
-                        : "bg-white/50 hover:bg-white/70"
-                }`}
-                aria-label={`View image ${index + 1}`}
-                type="button"
-            />
-        ))}
-    </div>
-);
+import type { ModelViewerProps } from "@/features/models/types/modelViewer";
 
 const isIOS =
     typeof navigator !== "undefined" &&
@@ -70,35 +28,34 @@ export const ModelViewer = ({
     setSelectedRenderIndex,
     threeImported = false,
 }: ModelViewerProps) => {
+    //Menu State
+    const [autoRotate, setAutoRotate] = useState<boolean>(true);
+    const [isHovering, setIsHovering] = useState<boolean>(false);
+    const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
+    const [controlsVisible, setControlsVisible] = useState<boolean>(true);
+    const [customFullscreen, setCustomFullscreen] = useState<boolean>(false);
+
+    //Model State
     const [modelFileLoaded, setModelFileLoaded] = useState<boolean>(false);
     const [modelLoadProgress, setModelLoadProgress] = useState<number>(0);
-    const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-    const [customFullscreen, setCustomFullscreen] = useState<boolean>(false);
-    const [autoRotate, setAutoRotate] = useState<boolean>(true);
-    const [controlsVisible, setControlsVisible] = useState<boolean>(true);
-    const [isHovering, setIsHovering] = useState<boolean>(false);
     const [userRequestedModelLoad, setUserRequestedModelLoad] = useState<boolean>(false);
-    const modelViewerRef = useRef<ModelViewerElement | null>(null);
+
+    //Refs
     const containerRef = useRef<HTMLDivElement | null>(null);
     const autoHideTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const modelViewerRef = useRef<ModelViewerElement | null>(null);
 
-    const fallback3DUrl =
-        typeof model.convertedFileUrl === "string" && model.convertedFileUrl.length > 0
-            ? model.convertedFileUrl
-            : typeof model.originalFileUrl === "string"
-            ? model.originalFileUrl
-            : "";
-    const renderExtraUrls = Array.isArray(model.renderExtraUrls)
-        ? model.renderExtraUrls
-        : [];
-    const posterUrl = typeof model.posterUrl === "string" ? model.posterUrl : undefined;
+    //Model URLs
+    const modelUrl = model.convertedFileUrl || "";
+    const posterUrl = model.posterUrl || "";
+    const renderExtraUrls = model.renderExtraUrls || [];
 
     // Global load state for this model URL
     const {
         status: modelGlobalStatus,
         markLoading: markModelLoading,
         markLoaded: markModelLoaded,
-    } = useModelLoadState(fallback3DUrl);
+    } = useModelLoadState(modelUrl);
 
     // derive from global status
     useEffect(() => {
@@ -108,10 +65,29 @@ export const ModelViewer = ({
         }
     }, [modelGlobalStatus]);
 
-    //handlers
+    // Navigation Handlers
+    const handlePrevious = () => {
+        if (selectedRenderIndex === -1) {
+            setSelectedRenderIndex(renderExtraUrls.length - 1);
+        } else if (selectedRenderIndex === 0) {
+            setSelectedRenderIndex(-1);
+        } else {
+            setSelectedRenderIndex(selectedRenderIndex - 1);
+        }
+    };
+    const handleNext = () => {
+        if (selectedRenderIndex === -1) {
+            setSelectedRenderIndex(0);
+        } else if (selectedRenderIndex === renderExtraUrls.length - 1) {
+            setSelectedRenderIndex(-1);
+        } else {
+            setSelectedRenderIndex(selectedRenderIndex + 1);
+        }
+    };
+    /////////////////////////////////////////////         Menu Handlers         ///////////////////////////////////////////////////////
     const handleTouchStart = () => {
         setIsHovering(true);
-        // Only set controls visible on touch if in fullscreen mode
+        // Only set menu visible on touch if in fullscreen mode
         if (isFullscreen || (isIOS && customFullscreen)) {
             setControlsVisible(true);
             if (autoHideTimerRef.current) {
@@ -119,22 +95,18 @@ export const ModelViewer = ({
             }
         }
     };
-
     const handleTouchEnd = () => {
         setIsHovering(false);
     };
-
     const toggleRotation = () => {
         const viewer = modelViewerRef.current;
         if (viewer) {
             setAutoRotate((prev) => !prev);
         }
     };
-
     const toggleMenu = () => {
         setControlsVisible((prev) => !prev);
     };
-
     const resetView = () => {
         const mainViewer = modelViewerRef.current;
         if (mainViewer) {
@@ -142,7 +114,25 @@ export const ModelViewer = ({
             mainViewer.fieldOfView = "50deg";
         }
     };
+    const takeScreenshot = () => {
+        const viewer = modelViewerRef.current;
+        if (!viewer) return;
 
+        try {
+            viewer.toBlob({ idealAspect: true, mimeType: "image/png" }).then((blob) => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${model.name || "model"}-screenshot.png`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        } catch (error) {
+            console.error("Error taking screenshot:", error);
+        }
+    };
     const toggleFullscreen = () => {
         const container = containerRef.current;
         if (!container) return;
@@ -194,48 +184,95 @@ export const ModelViewer = ({
             }
         }
     };
+    /////////////////////////////////////////////         Menu Effects         ///////////////////////////////////////////////////////
+    useEffect(() => {
+        const handleKeyPress = (e: KeyboardEvent) => {
+            const container = containerRef.current;
+            if (!container) return;
 
-    const takeScreenshot = () => {
-        const viewer = modelViewerRef.current;
-        if (!viewer) return;
+            switch (e.key) {
+                case "r":
+                    toggleRotation();
+                    break;
+                case "f":
+                    e.preventDefault();
+                    if (fullscreenConfig.isFullscreen()) {
+                        fullscreenConfig.exit();
+                    } else {
+                        toggleFullscreen();
+                    }
+                    break;
+                case "h":
+                    resetView();
+                    break;
+                case "m":
+                    toggleMenu();
+                    break;
+                default:
+                    break;
+            }
+        };
 
-        try {
-            viewer.toBlob({ idealAspect: true, mimeType: "image/png" }).then((blob) => {
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = `${model.name || "model"}-screenshot.png`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            });
-        } catch (error) {
-            console.error("Error taking screenshot:", error);
+        window.addEventListener("keydown", handleKeyPress);
+        return () => window.removeEventListener("keydown", handleKeyPress);
+    });
+    useEffect(() => {
+        const shouldAutoHide =
+            (isFullscreen || (isIOS && customFullscreen)) &&
+            controlsVisible &&
+            (!isHovering || isMobile);
+
+        if (shouldAutoHide) {
+            autoHideTimerRef.current = setTimeout(() => {
+                setControlsVisible(false);
+            }, getTimeoutDuration());
         }
-    };
 
-    const handlePrevious = () => {
-        if (selectedRenderIndex === -1) {
-            setSelectedRenderIndex(renderExtraUrls.length - 1);
-        } else if (selectedRenderIndex === 0) {
-            setSelectedRenderIndex(-1);
+        return () => {
+            if (autoHideTimerRef.current) {
+                clearTimeout(autoHideTimerRef.current);
+            }
+        };
+    }, [isFullscreen, customFullscreen, controlsVisible, isHovering]);
+    useEffect(() => {
+        const cleanup = fullscreenConfig.onChange(() => {
+            setIsFullscreen(fullscreenConfig.isFullscreen());
+            if (!fullscreenConfig.isFullscreen()) {
+                setControlsVisible(true);
+            }
+        });
+
+        return cleanup;
+    }, []);
+    useEffect(() => {
+        if (isIOS && customFullscreen) {
+            document.body.style.overflow = "hidden";
         } else {
-            setSelectedRenderIndex(selectedRenderIndex - 1);
+            document.body.style.overflow = "";
         }
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [customFullscreen]);
+
+    /////////////////////////////////////////////         Load Model Handlers       ///////////////////////////////////////////////////////
+    const handleLoadModel = () => {
+        // Three.js should already be imported, just request the model file loading
+        if (modelGlobalStatus === "loaded") {
+            setUserRequestedModelLoad(true);
+            setModelFileLoaded(true);
+            setModelLoadProgress(1);
+            return;
+        }
+        if (modelGlobalStatus === "idle") {
+            markModelLoading();
+        }
+        setUserRequestedModelLoad(true);
+        setModelFileLoaded(false);
+        setModelLoadProgress(0);
     };
 
-    const handleNext = () => {
-        if (selectedRenderIndex === -1) {
-            setSelectedRenderIndex(0);
-        } else if (selectedRenderIndex === renderExtraUrls.length - 1) {
-            setSelectedRenderIndex(-1);
-        } else {
-            setSelectedRenderIndex(selectedRenderIndex + 1);
-        }
-    };
-
-    // Effects
+    // Model Load Handlers
     useEffect(() => {
         if (!threeImported || !userRequestedModelLoad) return;
 
@@ -285,7 +322,7 @@ export const ModelViewer = ({
             }
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps -- markModelLoaded is stable from hook
-    }, [fallback3DUrl, threeImported, userRequestedModelLoad]);
+    }, [modelUrl, threeImported, userRequestedModelLoad]);
 
     // Reset model file loaded state when user requests model and Three.js is imported
     useEffect(() => {
@@ -295,116 +332,18 @@ export const ModelViewer = ({
         }
     }, [threeImported, userRequestedModelLoad, modelGlobalStatus]);
 
-    useEffect(() => {
-        const shouldAutoHide =
-            (isFullscreen || (isIOS && customFullscreen)) &&
-            controlsVisible &&
-            (!isHovering || isMobile);
-
-        if (shouldAutoHide) {
-            autoHideTimerRef.current = setTimeout(() => {
-                setControlsVisible(false);
-            }, getTimeoutDuration());
-        }
-
-        return () => {
-            if (autoHideTimerRef.current) {
-                clearTimeout(autoHideTimerRef.current);
-            }
-        };
-    }, [isFullscreen, customFullscreen, controlsVisible, isHovering]);
-
-    useEffect(() => {
-        const cleanup = fullscreenConfig.onChange(() => {
-            setIsFullscreen(fullscreenConfig.isFullscreen());
-            if (!fullscreenConfig.isFullscreen()) {
-                setControlsVisible(true);
-            }
-        });
-
-        return cleanup;
-    }, []);
-
-    useEffect(() => {
-        const handleKeyPress = (e: KeyboardEvent) => {
-            const container = containerRef.current;
-            if (!container) return;
-
-            switch (e.key) {
-                case "r":
-                    toggleRotation();
-                    break;
-                case "f":
-                    e.preventDefault();
-                    if (fullscreenConfig.isFullscreen()) {
-                        fullscreenConfig.exit();
-                    } else {
-                        toggleFullscreen();
-                    }
-                    break;
-                case "h":
-                    resetView();
-                    break;
-                case "m":
-                    toggleMenu();
-                    break;
-                default:
-                    break;
-            }
-        };
-
-        window.addEventListener("keydown", handleKeyPress);
-        return () => window.removeEventListener("keydown", handleKeyPress);
-    }); // Remove empty dependency array to avoid stale closure issues
-
-    useEffect(() => {
-        if (isIOS && customFullscreen) {
-            document.body.style.overflow = "hidden";
-        } else {
-            document.body.style.overflow = "";
-        }
-        return () => {
-            document.body.style.overflow = "";
-        };
-    }, [customFullscreen]);
-
-    // Helper function for container classes
-    const getContainerClasses = () => {
-        const baseClasses =
-            "relative w-full bg-gray-100 dark:bg-gray-800 overflow-hidden";
-        const heightClasses =
-            (isIOS && customFullscreen) || isFullscreen
-                ? "h-screen"
-                : "h-[40vh] lg:h-[calc(80vh-120px)]";
-        const borderClasses =
-            !customFullscreen && !isFullscreen
-                ? "rounded-lg border border-gray-200 dark:border-gray-700"
-                : "";
-        return `${baseClasses} ${heightClasses} ${borderClasses}`;
-    };
-
-    const handleLoadModel = () => {
-        // Three.js should already be imported, just request the model file loading
-        if (modelGlobalStatus === "loaded") {
-            setUserRequestedModelLoad(true);
-            setModelFileLoaded(true);
-            setModelLoadProgress(1);
-            return;
-        }
-        if (modelGlobalStatus === "idle") {
-            markModelLoading();
-        }
-        setUserRequestedModelLoad(true);
-        setModelFileLoaded(false);
-        setModelLoadProgress(0);
-    };
-
     const mainPreview =
         selectedRenderIndex === -1 ? (
-            fallback3DUrl ? (
+            modelUrl ? (
                 !userRequestedModelLoad ? (
                     // Show poster with Load Model button until user requests model
-                    <div className={getContainerClasses()}>
+                    <div
+                        className={getContainerClasses({
+                            isIOS,
+                            customFullscreen,
+                            isFullscreen,
+                        })}
+                    >
                         <div
                             className="relative w-full h-full overflow-hidden"
                             style={{
@@ -420,43 +359,22 @@ export const ModelViewer = ({
                                 />
                             )}
 
-                            {/* Overlay for darkening */}
-                            <div className="absolute inset-0 bg-black/20" />
-
-                            {/* Center the load button */}
-                            <div className="absolute inset-0 flex items-center justify-center z-10">
-                                {/* Load Model Button */}
-                                <button
-                                    onClick={handleLoadModel}
-                                    className="group px-8 py-4 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-700 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-out"
-                                >
-                                    <div className="flex items-center gap-3">
-                                        <svg
-                                            className="w-6 h-6 group-hover:scale-110 transition-transform duration-300"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            viewBox="0 0 24 24"
-                                        >
-                                            <path
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                                strokeWidth={2}
-                                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                                            />
-                                        </svg>
-                                        <span>Load 3D Model</span>
-                                    </div>
-                                </button>
-                            </div>
+                            <LoadModelButton handleLoadModel={handleLoadModel} />
                         </div>
                     </div>
                 ) : (
-                    <div className={getContainerClasses()}>
+                    <div
+                        className={getContainerClasses({
+                            isIOS,
+                            customFullscreen,
+                            isFullscreen,
+                        })}
+                    >
                         {/* @ts-expect-error - model-viewer is not a valid HTML element */}
                         <model-viewer
                             ref={modelViewerRef}
                             poster={posterUrl}
-                            src={fallback3DUrl}
+                            src={modelUrl}
                             alt="3D Model"
                             camera-controls
                             interaction-prompt="none"
@@ -720,7 +638,9 @@ export const ModelViewer = ({
             }`}
             ref={containerRef}
         >
-            <div className={getContainerClasses()}>
+            <div
+                className={getContainerClasses({ isIOS, customFullscreen, isFullscreen })}
+            >
                 {mainPreview}
 
                 {/* Global Navigation Arrows - Always visible when there are multiple views */}

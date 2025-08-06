@@ -5,7 +5,7 @@ admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
 });
 
-const uid = "yhxP3gGtqSUFkM6FUdDQrqZD5lm2"; // plamen
+const uid = "5wjwku8RE8hO5E58095NryTHoHV2"; // plamen
 
 
 admin

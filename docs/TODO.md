@@ -10,4 +10,11 @@
 4.Policies
 -set up which features which cookies need to be accessed
 
+4.Home
+-add no models found fallback
 
+5.ModelUpoad
+-make tab indicators gray before completed
+-change loading spinner while model is uploading
+-on succesfull upload show the new notifications(success)
+-add prop in each model notForSale that disables the selling mechanism
