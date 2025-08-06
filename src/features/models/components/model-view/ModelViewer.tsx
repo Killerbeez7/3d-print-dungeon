@@ -67,18 +67,16 @@ export const ModelViewer = ({
     model,
     selectedRenderIndex,
     setSelectedRenderIndex,
-    threeJsLoaded = false,
-    threeJsLoading = false,
-    loadThreeJs,
+    threeImported = false,
 }: ModelViewerProps) => {
-    const [modelLoaded, setModelLoaded] = useState<boolean>(false);
-    const [loadProgress, setLoadProgress] = useState<number>(0);
+    const [modelFileLoaded, setModelFileLoaded] = useState<boolean>(false);
+    const [modelLoadProgress, setModelLoadProgress] = useState<number>(0);
     const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
     const [customFullscreen, setCustomFullscreen] = useState<boolean>(false);
     const [autoRotate, setAutoRotate] = useState<boolean>(true);
     const [controlsVisible, setControlsVisible] = useState<boolean>(true);
     const [isHovering, setIsHovering] = useState<boolean>(false);
-    const [userRequestedLoad, setUserRequestedLoad] = useState<boolean>(false);
+    const [userRequestedModelLoad, setUserRequestedModelLoad] = useState<boolean>(false);
     const modelViewerRef = useRef<ModelViewerElement | null>(null);
     const containerRef = useRef<HTMLDivElement | null>(null);
     const autoHideTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -223,52 +221,60 @@ export const ModelViewer = ({
 
     // Effects
     useEffect(() => {
-        const viewer = modelViewerRef.current;
-        if (!viewer) return;
+        if (!threeImported || !userRequestedModelLoad) return;
 
-        const handleProgress = (event: Event) => {
-            // Type guard for CustomEvent with detail
-            if (
-                "detail" in event &&
-                typeof (event as CustomEvent<{ totalProgress: number }>).detail
-                    ?.totalProgress === "number"
-            ) {
-                setLoadProgress(
-                    (event as CustomEvent<{ totalProgress: number }>).detail.totalProgress
-                );
+        let cleanup: (() => void) | null = null;
+
+        // Small delay to ensure model-viewer element is properly mounted
+        const timeoutId = setTimeout(() => {
+            const viewer = modelViewerRef.current;
+            if (!viewer) {
+                console.warn("Model viewer element not found after mount delay");
+                return;
             }
-        };
 
-        const handleLoad = () => {
-            setModelLoaded(true);
-        };
+            const handleProgress = (event: Event) => {
+                // Type guard for CustomEvent with detail
+                if (
+                    "detail" in event &&
+                    typeof (event as CustomEvent<{ totalProgress: number }>).detail
+                        ?.totalProgress === "number"
+                ) {
+                    setModelLoadProgress(
+                        (event as CustomEvent<{ totalProgress: number }>).detail.totalProgress
+                    );
+                }
+            };
 
-        viewer.addEventListener("progress", handleProgress);
-        viewer.addEventListener("load", handleLoad);
+            const handleLoad = () => {
+                setModelFileLoaded(true);
+            };
+
+            viewer.addEventListener("progress", handleProgress);
+            viewer.addEventListener("load", handleLoad);
+
+            // Store cleanup function
+            cleanup = () => {
+                viewer.removeEventListener("progress", handleProgress);
+                viewer.removeEventListener("load", handleLoad);
+            };
+        }, 50);
 
         return () => {
-            viewer.removeEventListener("progress", handleProgress);
-            viewer.removeEventListener("load", handleLoad);
+            clearTimeout(timeoutId);
+            if (cleanup) {
+                cleanup();
+            }
         };
-    }, [fallback3DUrl, threeJsLoaded]);
+    }, [fallback3DUrl, threeImported, userRequestedModelLoad]);
 
-    // Reset model loaded state when Three.js becomes available and component mounts
+    // Reset model file loaded state when user requests model and Three.js is imported
     useEffect(() => {
-        if (threeJsLoaded && userRequestedLoad) {
-            setModelLoaded(false);
-            setLoadProgress(0);
-            
-            // Small delay to ensure model-viewer element is mounted
-            setTimeout(() => {
-                const viewer = modelViewerRef.current;
-                if (viewer) {
-                    console.log("Model viewer element found after Three.js load");
-                } else {
-                    console.log("Model viewer element NOT found after Three.js load");
-                }
-            }, 100);
+        if (threeImported && userRequestedModelLoad) {
+            setModelFileLoaded(false);
+            setModelLoadProgress(0);
         }
-    }, [threeJsLoaded, userRequestedLoad]);
+    }, [threeImported, userRequestedModelLoad]);
 
     useEffect(() => {
         const shouldAutoHide =
@@ -358,23 +364,16 @@ export const ModelViewer = ({
         return `${baseClasses} ${heightClasses} ${borderClasses}`;
     };
 
-    const handleLoadModel = async () => {
-        if (loadThreeJs) {
-            setUserRequestedLoad(true);
-            try {
-                await loadThreeJs();
-            } catch (error) {
-                console.error("Failed to load Three.js:", error);
-                setUserRequestedLoad(false);
-            }
-        }
+    const handleLoadModel = () => {
+        // Three.js should already be imported, just request the model file loading
+        setUserRequestedModelLoad(true);
     };
 
     const mainPreview =
         selectedRenderIndex === -1 ? (
             fallback3DUrl ? (
-                !threeJsLoaded && !userRequestedLoad ? (
-                    // Show poster with Load Model button when Three.js isn't loaded
+                !userRequestedModelLoad ? (
+                    // Show poster with Load Model button until user requests model
                     <div className={getContainerClasses()}>
                         <div 
                             className="relative w-full h-full overflow-hidden"
@@ -388,9 +387,7 @@ export const ModelViewer = ({
                                     src={posterUrl}
                                     alt="3D Model Preview"
                                     className="absolute inset-0 w-full h-full object-contain"
-                                    style={{
-                                        filter: 'blur(2px)'
-                                    }}
+                                  
                                 />
                             )}
                             
@@ -419,8 +416,8 @@ export const ModelViewer = ({
                             </div>
                         </div>
                     </div>
-                ) : threeJsLoading ? (
-                    // Show loading state with gentle spinner on blurred poster
+                ) : !threeImported ? (
+                    // Show loading state while Three.js finishes importing
                     <div className={getContainerClasses()}>
                         <div 
                             className="relative w-full h-full overflow-hidden"
@@ -434,21 +431,16 @@ export const ModelViewer = ({
                                     src={posterUrl}
                                     alt="3D Model Preview"
                                     className="absolute inset-0 w-full h-full object-contain"
-                                    style={{
-                                        filter: 'blur(4px)'
-                                    }}
                                 />
                             )}
                             
-                            {/* Stronger overlay for loading */}
-                            <div className="absolute inset-0 bg-black/40" />
-                            
-                            {/* Center the loading content */}
-                            <div className="absolute inset-0 flex items-center justify-center z-10">
-                                {/* Gentle Loading Spinner */}
-                                <div className="flex flex-col items-center gap-4">
-                                    <div className="animate-spin rounded-full h-12 w-12 border-3 border-white/30 border-t-white"></div>
-                                    <p className="text-white font-medium">Loading 3D viewer...</p>
+                            {/* Loading overlay with same blur as model loading */}
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 z-10">
+                                <div className="bg-black/50 p-6 rounded-lg backdrop-blur-sm">
+                                    <div className="flex flex-col items-center gap-4">
+                                        <div className="animate-spin rounded-full h-12 w-12 border-3 border-white/30 border-t-white"></div>
+                                        <p className="text-white font-medium">Loading 3D viewer...</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -477,16 +469,16 @@ export const ModelViewer = ({
                         }}
                     />
 
-                    {!modelLoaded && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-40">
-                            <div className="bg-black/40 p-6 rounded-lg backdrop-blur-md">
+                    {!modelFileLoaded && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 z-40">
+                            <div className="bg-black/50 p-6 rounded-lg backdrop-blur-sm">
                                 <p className="text-lg text-white animate-pulse mb-3">
                                     Loading 3D model
                                 </p>
                                 <div className="w-52 h-2 bg-white/20 rounded-full overflow-hidden">
                                     <div
                                         className="h-full bg-cyan-300 transition-all duration-300"
-                                        style={{ width: `${loadProgress * 100}%` }}
+                                        style={{ width: `${modelLoadProgress * 100}%` }}
                                     />
                                 </div>
                             </div>
@@ -680,9 +672,9 @@ export const ModelViewer = ({
                                 </div>
                             </div>
 
-                            {!modelLoaded && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm z-40">
-                                    <div className="bg-black/40 p-6 rounded-lg backdrop-blur-md">
+                            {!modelFileLoaded && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/30 z-40">
+                                    <div className="bg-black/50 p-6 rounded-lg backdrop-blur-sm">
                                         <p className="text-lg text-white animate-pulse mb-3">
                                             Loading 3D model
                                         </p>
@@ -690,7 +682,7 @@ export const ModelViewer = ({
                                             <div
                                                 className="h-full bg-cyan-300 transition-all duration-300"
                                                 style={{
-                                                    width: `${loadProgress * 100}%`,
+                                                    width: `${modelLoadProgress * 100}%`,
                                                 }}
                                             ></div>
                                         </div>

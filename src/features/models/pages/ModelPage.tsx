@@ -8,7 +8,7 @@ import {
     useViewTracker,
     useModelViewCount,
 } from "@/features/models/services/viewService";
-import { useOnDemandModelViewer } from "@/hooks/useOnDemandModelViewer";
+import { useThreeJsImporter } from "@/hooks/useOnDemandModelViewer";
 import { fullscreenConfig } from "@/config/fullscreenConfig";
 
 const ModelViewer = lazy(() =>
@@ -32,7 +32,13 @@ export function ModelPage() {
     const { open } = useModal("auth");
     const [selectedRenderIndex, setSelectedRenderIndex] = useState<number>(-1);
     const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-    const { loaded: modelViewerLoaded, loading: modelViewerLoading, loadModelViewer } = useOnDemandModelViewer();
+    const { threeImported, importThreeJs } = useThreeJsImporter();
+
+    // Import Three.js immediately when page opens (one-time background loading)
+    useEffect(() => {
+        importThreeJs();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Empty dependency array - only run once on mount
 
     // Use new lightweight view tracking system
     useViewTracker(modelId ?? "", currentUser ?? undefined);
@@ -94,9 +100,7 @@ export function ModelPage() {
                                     model={viewerModel}
                                     selectedRenderIndex={selectedRenderIndex}
                                     setSelectedRenderIndex={setSelectedRenderIndex}
-                                    threeJsLoaded={modelViewerLoaded}
-                                    threeJsLoading={modelViewerLoading}
-                                    loadThreeJs={loadModelViewer}
+                                    threeImported={threeImported}
                                 />
                             );
                         })()}
