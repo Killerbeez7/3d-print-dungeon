@@ -17,3 +17,9 @@ export interface NavigationDotsProps {
   totalItems: number;
   onSelect: (idx: number) => void;
 } 
+
+export interface markLoaded{
+  status: "loaded";
+  progress: 1;
+  blob: Blob;
+}
