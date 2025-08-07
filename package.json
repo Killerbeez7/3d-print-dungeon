@@ -16,7 +16,8 @@
         "generate-sitemap": "node src/scripts/sitemap.cjs",
         "firebase:prod": "node scripts/switch-firebase-config.js production",
         "firebase:emulators": "node scripts/switch-firebase-config.js emulator",
-        "firebase:emulators-start": "firebase emulators:start --only auth,functions,firestore,storage"
+        "firebase:emulators-start": "firebase emulators:start --only auth,functions,firestore,storage",
+        "pwa:generate": "vite build && vite preview"
     },
     "browserslist": [
         "defaults",
@@ -92,7 +93,9 @@
         "typescript": "^5.8.3",
         "vite": "^6.2.0",
         "vite-plugin-compression": "^0.5.1",
+        "vite-plugin-pwa": "^1.0.2",
         "vite-plugin-webfont-dl": "^3.11.0",
-        "vitest": "^3.2.4"
+        "vitest": "^3.2.4",
+        "workbox-window": "^7.3.0"
     }
 }
