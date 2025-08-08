@@ -63,11 +63,9 @@ export const ModelViewer = ({
     const modelFileLoaded = modelGlobalStatus === "loaded";
     const modelLoadProgress = modelGlobalProgress;
 
-
-
     // Create / revoke object URL when model blob becomes available
     const blobUrlCreatedRef = useRef(false);
-    
+
     useEffect(() => {
         if (modelFileLoaded && !blobUrlCreatedRef.current) {
             const blob = getModelBlob();
@@ -87,39 +85,16 @@ export const ModelViewer = ({
         blobUrlCreatedRef.current = false;
     }, [modelUrl]);
 
-    // Navigation Handlers
-    // const handlePrevious = () => {
-    //     setSelectedRenderIndex((prev: number) =>
-    //         prev <= -1 ? renderExtraUrls.length - 1 : prev - 1
-    //     );
-    // };
-    // const handleNext = () => {
-    //     setSelectedRenderIndex((prev: number) =>
-    //         prev >= renderExtraUrls.length - 1 ? -1 : prev + 1
-    //     );
-    // };
-
+    //////////////////////////////////////////////      Navigation Handlers    ///////////////////////////////////////////////////////
     const handlePrevious = () => {
-        if (selectedRenderIndex === -1) {
-            setSelectedRenderIndex(renderExtraUrls.length - 1);
-        } else if (selectedRenderIndex === 0) {
-            setSelectedRenderIndex(-1);
-        } else {
-            setSelectedRenderIndex(selectedRenderIndex - 1);
-        }
+        const newIndex = selectedRenderIndex <= -1 ? renderExtraUrls.length - 1 : selectedRenderIndex - 1;
+        setSelectedRenderIndex(newIndex);
     };
-
     const handleNext = () => {
-        if (selectedRenderIndex === -1) {
-            setSelectedRenderIndex(0);
-        } else if (selectedRenderIndex === renderExtraUrls.length - 1) {
-            setSelectedRenderIndex(-1);
-        } else {
-            setSelectedRenderIndex(selectedRenderIndex + 1);
-        }
+        const newIndex = selectedRenderIndex >= renderExtraUrls.length - 1 ? -1 : selectedRenderIndex + 1;
+        setSelectedRenderIndex(newIndex);
     };
-    /////////////////////////////////////////////         Menu Handlers         ///////////////////////////////////////////////////////
-
+    //////////////////////////////////////////////      Menu Handlers         ///////////////////////////////////////////////////////
     const handleTouchStart = () => {
         setIsHovering(true);
         // Only set menu visible on touch if in fullscreen mode
@@ -220,7 +195,6 @@ export const ModelViewer = ({
         }
     };
     /////////////////////////////////////////////         Menu Effects         ///////////////////////////////////////////////////////
-
     useEffect(() => {
         const handleKeyPress = (e: KeyboardEvent) => {
             const container = containerRef.current;
@@ -290,9 +264,7 @@ export const ModelViewer = ({
             document.body.style.overflow = "";
         };
     }, [customFullscreen]);
-
     /////////////////////////////////////////////         Load Model Handlers       ///////////////////////////////////////////////////////
-
     const handleLoadModel = () => {
         console.log("🚀 Load Model button clicked:", {
             currentStatus: modelGlobalStatus,
@@ -317,7 +289,7 @@ export const ModelViewer = ({
     // Cleanup object URL on unmount
     const blobUrlRef = useRef<string | null>(null);
     blobUrlRef.current = modelBlobUrl;
-    
+
     useEffect(() => {
         return () => {
             if (blobUrlRef.current) {
@@ -328,13 +300,16 @@ export const ModelViewer = ({
 
     // Model Load Handlers
     const listenersAttachedRef = useRef(false);
-    
-    const handleProgress = useCallback((e: Event) => {
-        const event = e as CustomEvent<{ totalProgress: number }>;
-        const currentProgress = event.detail.totalProgress;
-        
-        updateModelProgress(currentProgress);
-    }, [updateModelProgress]);
+
+    const handleProgress = useCallback(
+        (e: Event) => {
+            const event = e as CustomEvent<{ totalProgress: number }>;
+            const currentProgress = event.detail.totalProgress;
+
+            updateModelProgress(currentProgress);
+        },
+        [updateModelProgress]
+    );
 
     const handleLoad = useCallback(() => {
         console.log("✅ Model viewer: loaded the model");
@@ -344,9 +319,10 @@ export const ModelViewer = ({
     const handleError = useCallback(() => {
         console.error("❌ Model viewer failed to load");
     }, []);
-    
+
     useEffect(() => {
-        if (!threeImported || !isLoadButtonClicked || listenersAttachedRef.current) return;
+        if (!threeImported || !isLoadButtonClicked || listenersAttachedRef.current)
+            return;
 
         console.log("🎯 Setting up model viewer event listeners");
         listenersAttachedRef.current = true;
@@ -412,7 +388,7 @@ export const ModelViewer = ({
                             style={{ backgroundColor: "#616161", borderRadius: "0.5rem" }}
                         />
 
-                        <LoadingOverlay 
+                        <LoadingOverlay
                             isVisible={!modelFileLoaded}
                             isDownloading={modelGlobalStatus === "loading"}
                             downloadProgress={modelLoadProgress}
