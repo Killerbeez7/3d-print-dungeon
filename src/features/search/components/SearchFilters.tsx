@@ -18,7 +18,7 @@ export const SearchFilters = () => {
                 {hasActiveFilters && (
                     <button
                         onClick={clearFilters}
-                        className="text-xs text-accent hover:text-accent-hover"
+                        className="text-sm sm:text-base text-accent hover:text-accent-hover py-2 px-3 min-h-[44px] flex items-center"
                     >
                         Clear all
                     </button>

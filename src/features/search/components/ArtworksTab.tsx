@@ -1,15 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useArtworks } from "@/features/search/hooks/useArtworks";
 import { HomeModelsGrid } from "@/features/home/components/HomeModelsGrid";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import { useFilters } from "@/features/search-filters/hooks/useFilters";
 import { SearchNotFound } from "./SearchNotFound";
 
-export const ArtworksTab = ({ search }: { search: string }) => {
+export const ArtworksTab = ({ 
+    search, 
+    onResultsCount 
+}: { 
+    search: string;
+    onResultsCount?: (count: number) => void;
+}) => {
     const { filters } = useFilters();
-
     const { data, isLoading, error } = useArtworks(filters, search);
     const [loadIndex, setLoadIndex] = useState<number>(0);
+
+    const models = data?.pages.flatMap((p) => p.models) ?? [];
+
+    // Update results count when models change
+    useEffect(() => {
+        if (onResultsCount && !isLoading) {
+            onResultsCount(models.length);
+        }
+    }, [models.length, isLoading, onResultsCount]);
 
     const showSpinner = () => {
         return (
@@ -22,10 +36,8 @@ export const ArtworksTab = ({ search }: { search: string }) => {
     // Show error state
     if (error) return <p>Error loading artworks: {error.message}</p>;
 
-    const models = data?.pages.flatMap((p) => p.models) ?? [];
-
-    // Show no results message
-    if (models.length === 0) {
+    // Show no results message only when not loading and no models
+    if (!isLoading && models.length === 0) {
         const hasFilters =
             filters.categoryIds?.length || filters.hideAI || filters.sortBy;
         const message = search.trim()

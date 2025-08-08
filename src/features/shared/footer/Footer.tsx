@@ -44,25 +44,25 @@ export const Footer = () => {
                                 <div className="flex flex-col gap-1">
                                     <Link
                                         to={ROUTES.HOME}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         3D Models
                                     </Link>
                                     <Link
                                         to={ROUTES.ARTISTS_LIST}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Artists
                                     </Link>
                                     <Link
                                         to={ROUTES.COLLECTIONS}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Collections
                                     </Link>
                                     <Link
                                         to={ROUTES.SEARCH}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Search Models
                                     </Link>
@@ -77,25 +77,25 @@ export const Footer = () => {
                                 <div className="flex flex-col gap-1">
                                     <Link
                                         to={ROUTES.EVENTS}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Events
                                     </Link>
                                     <Link
                                         to={FORUM_HOME_PATH}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Forum
                                     </Link>
                                     <Link
                                         to={ROUTES.BLOG}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Blog
                                     </Link>
                                     <Link
                                         to="/forum/rules"
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Forum Rules
                                     </Link>
@@ -110,25 +110,25 @@ export const Footer = () => {
                                 <div className="flex flex-col gap-1">
                                     <Link
                                         to="/marketplace"
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         All Models
                                     </Link>
                                     <Link
                                         to={ROUTES.MARKETPLACE_FEATURED}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Featured
                                     </Link>
                                     <Link
                                         to={ROUTES.MARKETPLACE_NEW_ARRIVALS}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         New Arrivals
                                     </Link>
                                     <Link
                                         to={ROUTES.MARKETPLACE_BEST_SELLERS}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Best Sellers
                                     </Link>
@@ -143,25 +143,25 @@ export const Footer = () => {
                                 <div className="flex flex-col gap-1">
                                     <Link
                                         to={ROUTES.BUSINESS_BULK_ORDERS}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Bulk Orders
                                     </Link>
                                     <Link
                                         to={ROUTES.BUSINESS_CUSTOM_SOLUTIONS}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Custom Solutions
                                     </Link>
                                     <Link
                                         to={ROUTES.BUSINESS_ENTERPRISE_SUITE}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Enterprise Suite
                                     </Link>
                                     <Link
                                         to={ROUTES.MODEL_UPLOAD}
-                                        className="text-xs hover:text-accent-hover transition-colors duration-300"
+                                        className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         Upload Models
                                     </Link>
@@ -220,34 +220,34 @@ export const Footer = () => {
                             </div>
 
                             {/* Policy Links */}
-                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4 text-xs">
+                            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4">
                                 <Link
                                     to={ROUTES.TERMS_OF_USE}
-                                    className="text-txt-secondary hover:text-primary transition-colors"
+                                    className="text-sm sm:text-base text-txt-secondary hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center"
                                 >
                                     Terms of use
                                 </Link>
                                 <Link
                                     to={ROUTES.REFUND_POLICY}
-                                    className="text-txt-secondary hover:text-primary transition-colors"
+                                    className="text-sm sm:text-base text-txt-secondary hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center"
                                 >
                                     Refund policy
                                 </Link>
                                 <Link
                                     to={ROUTES.PRIVACY_POLICY}
-                                    className="text-txt-secondary hover:text-primary transition-colors"
+                                    className="text-sm sm:text-base text-txt-secondary hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center"
                                 >
                                     Privacy policy
                                 </Link>
                                 <Link
                                     to={ROUTES.COOKIE_POLICY}
-                                    className="text-txt-secondary hover:text-primary transition-colors"
+                                    className="text-sm sm:text-base text-txt-secondary hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center"
                                 >
                                     Cookie policy
                                 </Link>
                                 <Link
                                     to="/sitemap"
-                                    className="text-txt-secondary hover:text-primary transition-colors"
+                                    className="text-sm sm:text-base text-txt-secondary hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center"
                                 >
                                     Sitemap
                                 </Link>

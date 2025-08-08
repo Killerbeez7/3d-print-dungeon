@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { FiltersProvider } from "@/features/search-filters/providers/filtersProvider";
 import { SearchResults } from "../components/SearchResults";
 import { SearchInput } from "../components/SearchInput";
@@ -20,6 +21,7 @@ const SearchPageContent = () => {
     } = useSearchPage();
 
     const { filters } = useFilters();
+    const [resultsCount, setResultsCount] = useState<number>(0);
 
     // Check if there are any active filters
     const hasActiveFilters =
@@ -50,7 +52,7 @@ const SearchPageContent = () => {
             {/* Filters and Results Section */}
             <div className="p-6">
                 {/* Filters */}
-                <div className="mb-8">
+                <div className="mb-14">
                     <SearchFilters />
                 </div>
 
@@ -62,10 +64,19 @@ const SearchPageContent = () => {
                         <Spinner size={24} />
                     </div>
                 ) : (
-                    <SearchResults
-                        search={debouncedQuery}
-                        activeTab={activeTab as "artworks" | "artists"}
-                    />
+                    <>
+                        {/* Results Count */}
+                        <div className="mb-4">
+                            <span className="text-sm text-txt-muted">
+                                {resultsCount.toLocaleString()} results found
+                            </span>
+                        </div>
+                        <SearchResults
+                            search={debouncedQuery}
+                            activeTab={activeTab as "artworks" | "artists"}
+                            onResultsCount={setResultsCount}
+                        />
+                    </>
                 )}
             </div>
         </div>

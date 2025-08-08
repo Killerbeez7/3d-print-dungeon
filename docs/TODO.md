@@ -12,9 +12,11 @@
 
 4.Home
 -add no models found fallback
+-on refresh scroll back to top
 
 5.ModelUpoad
 -make tab indicators gray before completed
 -change loading spinner while model is uploading
 -on succesfull upload show the new notifications(success)
 -add prop in each model notForSale that disables the selling mechanism
+

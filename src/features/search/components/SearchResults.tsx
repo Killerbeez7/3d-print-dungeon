@@ -1,19 +1,21 @@
 import { ArtworksTab } from "./ArtworksTab";
 import { ArtistsTab } from "./ArtistsTab";
 
-export const SearchResults = ({
-    search,
+export const SearchResults = ({ 
+    search, 
     activeTab,
-}: {
-    search: string;
+    onResultsCount
+}: { 
+    search: string; 
     activeTab: "artworks" | "artists";
+    onResultsCount?: (count: number) => void;
 }) => {
     return (
         <>
             {activeTab === "artworks" ? (
-                <ArtworksTab search={search} />
+                <ArtworksTab search={search} onResultsCount={onResultsCount} />
             ) : (
-                <ArtistsTab search={search} />
+                <ArtistsTab search={search} onResultsCount={onResultsCount} />
             )}
         </>
     );

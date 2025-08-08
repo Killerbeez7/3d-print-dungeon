@@ -1,9 +1,29 @@
+import { useState, useEffect } from "react";
+
 interface SpinnerProps {
     size?: number;
     className?: string;
+    delay?: number;
 }
 
-export function Spinner({ size = 24, className = "" }: SpinnerProps) {
+export function Spinner({ size = 24, className = "", delay = 300 }: SpinnerProps) {
+    const [shouldShow, setShouldShow] = useState(false);
+
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setShouldShow(true);
+        }, delay);
+
+        return () => {
+            clearTimeout(timeoutId);
+            setShouldShow(false);
+        };
+    }, [delay]);
+
+    if (!shouldShow) {
+        return null;
+    }
+
     const ring = `${size}px`;
     const thickness = size / 8;
 
