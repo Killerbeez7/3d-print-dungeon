@@ -5,8 +5,7 @@ import { db } from "@/config/firebaseConfig";
 import { LikeButton } from "../likeButton";
 import { FavoritesButton } from "../favoritesButton";
 import { PurchaseButton } from "@/features/payment/components/PurchaseButton";
-//contexts
-import { STATIC_ASSETS } from "@/config/assetsConfig";
+
 //types
 import type { CurrentUser } from "@/features/user/types/user";
 import type { ModelData } from "@/features/models/types/model";
@@ -99,7 +98,7 @@ export function ModelSidebar({
     return (
         <aside className="w-full lg:w-[400px] flex flex-col h-full rounded-lg overflow-y-auto">
             {/* Model Info Section */}
-            <div className="p-4 lg:p-6">
+            <div className="p-4 pt-0 lg:p-6">
                 {isEditing ? (
                     <>
                         <input
@@ -145,10 +144,12 @@ export function ModelSidebar({
                     </>
                 ) : (
                     <>
-                        <h1 className="text-lg lg:text-2xl font-bold text-txt-primary mb-3">
+                        <h4 className="text-base lg:text-lg font-bold text-txt-primary mb-3">
                             {formData.name}
-                        </h1>
-                        <p className="text-txt-secondary mb-4 text-sm lg:text-base leading-relaxed">{formData.description}</p>
+                        </h4>
+                        <p className="text-txt-secondary mb-4 text-sm lg:text-base leading-relaxed">
+                            {formData.description}
+                        </p>
                         {formData.tags && (
                             <div className="flex flex-wrap gap-1 lg:gap-2 mt-4">
                                 {formData.tags.split(",").map((tag, i) => (
@@ -171,7 +172,9 @@ export function ModelSidebar({
                     <div className="bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20 rounded-lg p-3 lg:p-4">
                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
                             <div>
-                                <p className="text-xs lg:text-sm text-txt-secondary">Price</p>
+                                <p className="text-xs lg:text-sm text-txt-secondary">
+                                    Price
+                                </p>
                                 <p className="text-xl lg:text-2xl font-bold text-accent">
                                     ${model.price}
                                 </p>
@@ -211,7 +214,11 @@ export function ModelSidebar({
                 {/* Purchase/Download Button */}
                 <div className="mb-4 lg:mb-6">
                     <PurchaseButton
-                        model={{ ...model, price: model.price ?? 0, uploaderId: model.uploaderId ?? "" }}
+                        model={{
+                            ...model,
+                            price: model.price ?? 0,
+                            uploaderId: model.uploaderId ?? "",
+                        }}
                         className="w-full py-3 lg:py-4 text-sm lg:text-base font-medium"
                     />
                 </div>
@@ -239,14 +246,18 @@ export function ModelSidebar({
             <div className="p-4 lg:p-6 divider-top">
                 <div className="flex items-center gap-3 lg:gap-4">
                     <img
-                        src={uploader?.photoURL || STATIC_ASSETS.DEFAULT_AVATAR}
+                        src={uploader?.photoURL || "/assets/images/user.png"}
                         alt={uploader?.displayName || "Unknown User"}
                         className="w-16 h-16 lg:w-[7em] lg:h-[7em] rounded-lg lg:rounded-[10px] object-cover border-2 border-br-primary"
+                        onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = "/assets/images/user.png";
+                        }}
                     />
                     <div className="flex-1 min-w-0">
-                        <h2 className="text-lg lg:text-xl font-semibold text-txt-primary truncate">
+                        <h5 className="text-lg lg:text-xl font-semibold text-txt-primary truncate">
                             {uploader?.displayName || "Anonymous"}
-                        </h2>
+                        </h5>
                         <p className="text-xs lg:text-sm text-txt-secondary mt-1">
                             Senior 3D Artist
                         </p>
@@ -261,8 +272,6 @@ export function ModelSidebar({
                     </div>
                 </div>
             </div>
-
-            {/* Comments Section */}
         </aside>
     );
 }

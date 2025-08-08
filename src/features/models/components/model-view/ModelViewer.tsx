@@ -282,7 +282,7 @@ export const ModelViewer = ({
     // Handle navigation away - cancel loading if user navigates
     useEffect(() => {
         return () => {
-            cancelModelLoading();
+                cancelModelLoading();
         };
     }, [cancelModelLoading]);
 
@@ -431,7 +431,7 @@ export const ModelViewer = ({
 
     return (
         <div
-            className={`flex-1 flex flex-col ${
+            className={`flex flex-col ${
                 isIOS && customFullscreen
                     ? "fixed inset-0 z-[9999] bg-gray-900 w-screen h-screen"
                     : isFullscreen

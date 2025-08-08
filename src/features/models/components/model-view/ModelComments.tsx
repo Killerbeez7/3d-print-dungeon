@@ -17,7 +17,8 @@ interface Comment {
 
 export const ModelComments = ({ openAuthModal }: ModelCommentsProps) => {
     const { currentUser } = useAuth();
-    const { comments, loading, submitComment, removeComment, updateComment } = useComments();
+    const { comments, loading, submitComment, removeComment, updateComment } =
+        useComments();
     const [newComment, setNewComment] = useState<string>("");
     const [error, setError] = useState<string>("");
     const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
@@ -80,7 +81,8 @@ export const ModelComments = ({ openAuthModal }: ModelCommentsProps) => {
     };
 
     return (
-        <div className="mt-8 border border-br-primary p-6 rounded-lg">
+        // <div className="mt-8 border border-br-secondary p-6 rounded-lg">
+        <div className="mt-8 p-6 pt-0">
             <h3 className="text-2xl font-bold mb-4 text-txt-primary">Comments</h3>
             {error && <p className="text-error text-sm mb-4">{error}</p>}
             {/* Always show the comment form */}
@@ -99,7 +101,9 @@ export const ModelComments = ({ openAuthModal }: ModelCommentsProps) => {
             {loading ? (
                 <p className="text-txt-secondary">Loading comments...</p>
             ) : comments.length === 0 ? (
-                <p className="text-txt-secondary">No comments yet. Be the first to comment!</p>
+                <p className="text-txt-secondary">
+                    No comments yet. Be the first to comment!
+                </p>
             ) : (
                 <ul className="space-y-6">
                     {comments.map((comment: Comment) => {
@@ -107,8 +111,13 @@ export const ModelComments = ({ openAuthModal }: ModelCommentsProps) => {
                         const isEditing = editingCommentId === comment.id;
                         if (isEditing) {
                             return (
-                                <li key={comment.id} className="border border-br-primary rounded-lg p-4 bg-bg-primary">
-                                    <div className="mb-2 text-sm font-semibold text-txt-primary">{comment.userName}</div>
+                                <li
+                                    key={comment.id}
+                                    className="border border-br-primary rounded-lg p-4 bg-bg-primary"
+                                >
+                                    <div className="mb-2 text-sm font-semibold text-txt-primary">
+                                        {comment.userName}
+                                    </div>
                                     <textarea
                                         value={editingText}
                                         onChange={(e) => setEditingText(e.target.value)}
@@ -133,16 +142,26 @@ export const ModelComments = ({ openAuthModal }: ModelCommentsProps) => {
                             );
                         }
                         return (
-                            <li key={comment.id} className="border border-br-primary rounded-lg p-4 bg-bg-primary">
+                            <li
+                                key={comment.id}
+                                className="border border-br-primary rounded-lg p-4 bg-bg-primary"
+                            >
                                 <div className="flex justify-between items-center mb-2">
-                                    <div className="text-sm font-semibold text-txt-primary">{comment.userName}</div>
+                                    <div className="text-sm font-semibold text-txt-primary">
+                                        {comment.userName}
+                                    </div>
                                     {comment.createdAt && (
                                         <div className="text-xs text-txt-secondary">
-                                            {formatDistanceToNow(comment.createdAt.toDate(), { addSuffix: true })}
+                                            {formatDistanceToNow(
+                                                comment.createdAt.toDate(),
+                                                { addSuffix: true }
+                                            )}
                                         </div>
                                     )}
                                 </div>
-                                <p className="text-sm text-txt-secondary whitespace-pre-line">{comment.text}</p>
+                                <p className="text-sm text-txt-secondary whitespace-pre-line">
+                                    {comment.text}
+                                </p>
                                 {isOwner && (
                                     <div className="flex justify-end gap-3 mt-2">
                                         <button
@@ -166,6 +185,4 @@ export const ModelComments = ({ openAuthModal }: ModelCommentsProps) => {
             )}
         </div>
     );
-}
-
-export default ModelComments;
+};

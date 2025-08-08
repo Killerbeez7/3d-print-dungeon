@@ -10,7 +10,7 @@ export const getContainerClasses = ({ isIOS, customFullscreen, isFullscreen }: G
     const heightClasses =
         (isIOS && customFullscreen) || isFullscreen
             ? "h-screen"
-            : "h-[40vh] lg:h-[calc(80vh-120px)]";
+            : "min-h-[300px] h-[40vh] lg:h-[calc(80vh-120px)]";
     const borderClasses =
         !customFullscreen && !isFullscreen
             ? "rounded-lg border border-gray-200 dark:border-gray-700"

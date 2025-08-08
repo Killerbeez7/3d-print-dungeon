@@ -15,7 +15,7 @@ export const ModelThumbnails = ({
 }: ModelThumbnailsProps) => {
     return (
         <div className="">
-            <div className="flex space-x-4 overflow-x-auto pb-2 -mx-2 px-2">
+            <div className="flex space-x-4 overflow-x-auto pb-5 -mx-2 px-2">
                 <div
                     onClick={() => setSelectedRenderIndex(-1)}
                     className={`flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 border-2 rounded-lg cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800 ${
