@@ -14,6 +14,81 @@ const registry = new Map<string, Entry>();
 const listeners = new Map<string, Set<() => void>>();
 const modelCache = new Map<string, Blob>();
 
+// Track currently downloading URLs (for debugging/cancellation only)
+const activeDownloads = new Set<string>();
+
+async function startDownload(url: string) {
+    const entry = getEntry(url);
+    if (entry.status !== "idle") return;
+
+    const controller = new AbortController();
+    entry.controller = controller;
+    entry.status = "loading";
+    entry.progress = 0;
+    activeDownloads.add(url);
+    notify(url);
+
+    try {
+        const res = await fetch(url, { signal: controller.signal });
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+
+        const reader = res.body?.getReader();
+        const contentLength = +(res.headers.get("Content-Length") || 0);
+        if (!reader) {
+            throw new Error("No response body reader available");
+        }
+
+        let receivedLength = 0;
+        const chunks: Uint8Array[] = [];
+        let lastReportedProgress = 0;
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (value) {
+                chunks.push(value);
+                receivedLength += value.length;
+
+                const progress = contentLength > 0
+                    ? receivedLength / contentLength
+                    : Math.min(receivedLength / 1000000, 0.95);
+
+                entry.progress = Math.min(progress, 0.99);
+                const currentPercent = Math.round(entry.progress * 100);
+                const lastPercent = Math.round(lastReportedProgress * 100);
+                if (currentPercent > lastPercent) {
+                    notify(url);
+                    lastReportedProgress = entry.progress;
+                }
+            }
+        }
+
+        const blob = new Blob(chunks);
+        entry.status = "loaded";
+        entry.progress = 1;
+        entry.blob = blob;
+        modelCache.set(url, blob);
+        notify(url);
+    } catch (err) {
+        if (controller.signal.aborted) {
+            // console.log(`❌ Loading aborted for ${url}`);
+            // Leave status as idle on abort
+            entry.status = "idle";
+            entry.progress = 0;
+        } else {
+            console.error(`❌ Error loading ${url}`, err);
+            entry.status = "error";
+            entry.progress = 0;
+        }
+        notify(url);
+    } finally {
+        activeDownloads.delete(url);
+        delete entry.controller;
+    }
+}
+
 
 
 function getEntry(url: string): Entry {
@@ -35,12 +110,12 @@ function getEntry(url: string): Entry {
 function notify(url: string) {
     const set = listeners.get(url);
     if (set) {
-        console.log(`🔔 Notifying ${set.size} listeners for ${url}`);
-        const entry = getEntry(url);
-        console.log(`🔍 Current entry state:`, { status: entry.status, progress: entry.progress });
+        // console.log(`🔔 Notifying ${set.size} listeners for ${url}`);
+        // const entry = getEntry(url);
+        // console.log(`🔍 Current entry state:`, { status: entry.status, progress: entry.progress });
         set.forEach((cb) => cb());
     } else {
-        console.log(`⚠️ No listeners found for ${url}`);
+        // console.log(`⚠️ No listeners found for ${url}`);
     }
 }
 
@@ -64,10 +139,16 @@ export function useModelLoader(url: string) {
         return () => set.delete(cb);
     };
 
+    // Cache snapshot to avoid returning new reference when data hasn't changed
+    let lastSnap: { status: ModelStatus; progress: number } | null = null;
     const snapshot = () => {
         const entry = getEntry(url);
-        console.log("📸 Snapshot called, returning:", { status: entry.status, progress: entry.progress });
-        return entry;
+        const rounded = Math.round(entry.progress * 100) / 100; // 2-dec precision
+        if (lastSnap && lastSnap.status === entry.status && lastSnap.progress === rounded) {
+            return lastSnap; // same object -> no update
+        }
+        lastSnap = { status: entry.status, progress: rounded } as const;
+        return lastSnap;
     };
     const { status, progress } = useSyncExternalStore(subscribe, snapshot, snapshot);
 
@@ -79,17 +160,14 @@ export function useModelLoader(url: string) {
         };
     }, [url]);
 
-    const markLoading = useCallback(async () => {
-        console.log("🔄 markLoading called for:", url);
+    const markLoading = useCallback(() => {
         const entry = getEntry(url);
         if (entry.status !== "idle") {
-            console.log("⏭️ Model not idle, current status:", entry.status);
             return;
         }
 
-        // Check if model is already cached
+        // If cached, mark as loaded instantly
         if (modelCache.has(url)) {
-            console.log("💾 Model found in cache, marking as loaded");
             entry.status = "loaded";
             entry.progress = 1;
             entry.blob = modelCache.get(url);
@@ -97,89 +175,21 @@ export function useModelLoader(url: string) {
             return;
         }
 
-        console.log("📥 Starting fresh model download");
-        const controller = new AbortController();
-        entry.status = "loading";
-        entry.progress = 0;
-        entry.controller = controller;
-        notify(url);
-
-        try {
-            const res = await fetch(url, { signal: controller.signal });
-
-            if (!res.ok) {
-                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-            }
-
-            const reader = res.body?.getReader();
-            const contentLength = +res.headers.get("Content-Length")!;
-
-            if (!reader) {
-                throw new Error("No response body reader available");
-            }
-
-            let receivedLength = 0;
-            const chunks: Uint8Array[] = [];
-
-            let lastReportedProgress = 0; // Track last reported progress
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-                if (value) {
-                    chunks.push(value);
-                    receivedLength += value.length;
-
-                    // Calculate progress with fallback for unknown content length
-                    const progress = contentLength > 0
-                        ? receivedLength / contentLength
-                        : Math.min(receivedLength / 1000000, 0.95); // Estimate for unknown size
-
-                    entry.progress = Math.min(progress, 0.99); // Cap at 99% until fully loaded
-                    const currentPercent = Math.round(entry.progress * 100); // Round to whole percent
-                    const lastPercent = Math.round(lastReportedProgress * 100);
-
-                    // Only notify and log when progress changes by at least 1%
-                    if (currentPercent > lastPercent) {
-                        console.log("📊 Download progress:", `${currentPercent}%`);
-                        console.log("🔍 Entry progress before notify:", entry.progress);
-                        notify(url);
-                        console.log("🔍 Entry progress after notify:", entry.progress);
-                        lastReportedProgress = entry.progress;
-                    }
-                }
-            }
-
-            const blob = new Blob(chunks);
-            entry.status = "loaded";
-            entry.progress = 1;
-            entry.blob = blob;
-            modelCache.set(url, blob);
-            notify(url);
-
-            console.log(`✅ Model loaded and cached: ${url}`);
-        } catch (err) {
-            if (controller.signal.aborted) {
-                console.log(`❌ Loading aborted for ${url}`);
-                // Don't set error status for aborted requests
-                return;
-            } else {
-                console.error(`❌ Error loading ${url}`, err);
-                entry.status = "error";
-                entry.progress = 0;
-                notify(url);
-            }
-        }
+        // Start download
+        void startDownload(url);
     }, [url]);
+
+
 
     const cancelLoading = useCallback(() => {
         const entry = getEntry(url);
         if (entry.controller) {
             entry.controller.abort();
+            activeDownloads.delete(url);
             entry.status = "idle";
             entry.progress = 0;
             delete entry.controller;
             notify(url);
-            console.log(`🛑 Loading cancelled for ${url}`);
         }
     }, [url]);
 
@@ -201,19 +211,23 @@ export function useModelLoader(url: string) {
 
     const updateProgress = useCallback((value: number) => {
         const entry = getEntry(url);
-        if (entry.status === "loading") {
-            entry.progress = Math.max(0, Math.min(1, value));
-            notify(url);
-        }
+        if (entry.status !== "loading") return;
+
+        const clamped = Math.max(0, Math.min(1, value));
+        // Only update when progress changes by at least 1% (to avoid excessive renders)
+        const prevPercent = Math.round(entry.progress * 100);
+        const nextPercent = Math.round(clamped * 100);
+        if (nextPercent === prevPercent) return;
+
+        entry.progress = clamped;
+        notify(url);
     }, [url]);
 
     const markLoaded = useCallback(() => {
-        console.log("✅ markLoaded called for:", url);
         const entry = getEntry(url);
         entry.status = "loaded";
         entry.progress = 1;
         notify(url);
-        console.log("✅ Model marked as loaded, status updated");
     }, [url]);
 
     const isCached = modelCache.has(url);
@@ -234,7 +248,6 @@ export function useModelLoader(url: string) {
 // Utility function to clear cache (useful for memory management)
 export function clearModelCache() {
     modelCache.clear();
-    console.log("🧹 Model cache cleared");
 }
 
 // Utility function to get cache stats
@@ -243,24 +256,4 @@ export function getCacheStats() {
         cachedModels: modelCache.size,
         totalRegistryEntries: registry.size
     };
-}
-
-// Debug function to log current state
-export function debugModelLoader(url?: string) {
-    if (url) {
-        const entry = registry.get(url);
-        const isCached = modelCache.has(url);
-
-        console.log(`�� Model Debug for ${url}:`, {
-            status: entry?.status,
-            progress: entry?.progress,
-            isCached,
-            lastAccessed: entry?.lastAccessed
-        });
-    } else {
-        console.log("🔍 Model Loader Debug:", {
-            registry: Object.fromEntries(registry),
-            cache: Array.from(modelCache.keys())
-        });
-    }
 }
