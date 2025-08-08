@@ -141,7 +141,7 @@ dist
 .firebase/
 firebase-debug.log
 firebase-debug.*.log
-hosting.*
+
 
 # Build files
 dist/
