@@ -137,6 +137,12 @@ dist
 *service-key*.json
 *firebase-key*.json
 
+# Firebase hosting
+.firebase/
+firebase-debug.log
+firebase-debug.*.log
+hosting.*
+
 # Build files
 dist/
 build/
