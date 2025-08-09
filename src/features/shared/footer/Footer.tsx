@@ -191,7 +191,7 @@ export const Footer = () => {
                                     />
                                     <button
                                         type="submit"
-                                        className="px-4 py-2 bg-primary text-white rounded font-bold text-xs hover:bg-primary/90 transition-colors"
+                                        className="cta-button px-4 py-2 rounded font-bold text-xs"
                                     >
                                         SUBSCRIBE
                                     </button>
@@ -211,7 +211,7 @@ export const Footer = () => {
                                     <img
                                         src="/assets/images/logo.png"
                                         alt="Site Logo"
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover logo-accent"
                                     />
                                 </div>
                                 <span className="text-xs text-txt-secondary text-center sm:text-left">

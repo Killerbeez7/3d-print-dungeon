@@ -69,12 +69,12 @@ export const ImageCropModal: FC<ImageCropModalProps> = ({ isOpen, imageUrl, aspe
         <div className="fixed inset-0 z-[11000] flex items-center justify-center animate-fade-in">
             <div className="absolute inset-0 bg-black/60" onClick={onClose} />
             <FocusLock returnFocus>
-                <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 w-[90vw] max-w-5xl h-[90vh] max-h-[90vh] mx-4 flex flex-col">
+                <div className="relative bg-bg-secondary rounded-2xl shadow-xl border border-br-secondary w-[90vw] max-w-5xl h-[90vh] max-h-[90vh] mx-4 flex flex-col">
                     {/* Header */}
-                    <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Adjust Image</h2>
+                    <div className="flex items-center justify-between p-4 border-b border-br-secondary">
+                        <h2 className="text-xl font-bold text-txt-primary">Adjust Image</h2>
                         <button
-                            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-600 dark:text-gray-300"
+                            className="p-2 rounded-full hover:bg-bg-surface transition-colors text-txt-secondary"
                             onClick={onClose}
                             aria-label="Close"
                         >
@@ -83,7 +83,7 @@ export const ImageCropModal: FC<ImageCropModalProps> = ({ isOpen, imageUrl, aspe
                     </div>
 
                     {/* Cropper */}
-                    <div className="relative flex-grow min-h-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800 overflow-hidden p-6">
+                    <div className="relative flex-grow min-h-0 flex items-center justify-center bg-bg-primary overflow-hidden p-6">
                         <Cropper
                             image={imageUrl}
                             crop={crop}
@@ -101,7 +101,7 @@ export const ImageCropModal: FC<ImageCropModalProps> = ({ isOpen, imageUrl, aspe
                     </div>
 
                     {/* Controls */}
-                    <div className="p-4 space-y-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="p-4 space-y-4 border-t border-br-secondary">
                         {/* Aspect Ratio */}
                         <div className="flex justify-center items-center gap-2">
                             {aspectRatios.map(({ label, value }) => (
@@ -110,8 +110,8 @@ export const ImageCropModal: FC<ImageCropModalProps> = ({ isOpen, imageUrl, aspe
                                     onClick={() => setAspect(value)}
                                     className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
                                         aspect === value
-                                            ? "bg-gradient-to-r from-accent to-purple-500 text-white shadow-lg hover:shadow-xl hover:scale-105 transform transition-transform duration-150"
-                                            : "bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 text-gray-700 dark:text-gray-300 hover:from-gray-200 hover:to-gray-300 dark:hover:from-gray-700 dark:hover:to-gray-600 shadow hover:shadow-lg hover:scale-105 transform transition-transform duration-150"
+                                            ? "cta-button shadow-lg hover:shadow-xl hover:scale-105 transform transition-transform duration-150"
+                                            : "secondary-button shadow hover:shadow-lg hover:scale-105 transform transition-transform duration-150"
                                     }`}
                                 >
                                     {label}
@@ -121,22 +121,22 @@ export const ImageCropModal: FC<ImageCropModalProps> = ({ isOpen, imageUrl, aspe
                     </div>
 
                     {/* Footer */}
-                    <div className="flex justify-between items-center gap-3 p-4 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 rounded-b-2xl">
+                    <div className="flex justify-between items-center gap-3 p-4 bg-bg-surface border-t border-br-secondary rounded-b-2xl">
                         <button
-                            className="px-4 py-2 rounded-lg bg-gradient-to-r from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-700 text-gray-800 dark:text-gray-200 hover:from-gray-300 hover:to-gray-200 dark:hover:from-gray-700 dark:hover:to-gray-600 flex items-center gap-2 shadow-md hover:shadow-lg hover:scale-105 transform transition-transform duration-150 transition-colors"
+                            className="secondary-button px-4 py-2 rounded-lg flex items-center gap-2 shadow-md hover:shadow-lg hover:scale-105 transform transition-transform duration-150 transition-colors"
                             onClick={handleReset}
                         >
                             <FontAwesomeIcon icon={faUndo} /> Reset
                         </button>
                         <div className="flex gap-3">
                             <button
-                                className="px-4 py-2 rounded-lg bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700 shadow hover:shadow-lg hover:scale-105 transform transition-transform duration-150 transition-colors"
+                                className="secondary-button px-4 py-2 rounded-lg shadow hover:shadow-lg hover:scale-105 transform transition-transform duration-150 transition-colors"
                                 onClick={onClose}
                             >
                                 Cancel
                             </button>
                             <button
-                                className="px-4 py-2 rounded-lg bg-gradient-to-r from-accent to-purple-500 hover:from-accent-hover hover:to-purple-600 text-white flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 transform transition-transform duration-150 transition-colors disabled:opacity-50"
+                                className="cta-button px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 transform transition-transform duration-150 transition-colors disabled:opacity-50"
                                 onClick={handleApply}
                                 disabled={!croppedAreaPixels}
                             >

@@ -89,17 +89,17 @@ const ModelCarouselCard = ({
 
                 {/* Enhanced overlay with slide-up animation */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent flex items-end opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out transform translate-y-4 group-hover:translate-y-0 rounded-lg pointer-events-none">
-                    <div className="text-white p-3 w-full">
+                    <div className="text-bg-reverse p-3 w-full">
                         <div className="mb-1.5">
-                            <h6 className="font-bold text-xs leading-tight mb-0.5 truncate text-white drop-shadow-lg">
+                            <h6 className="font-bold text-xs leading-tight mb-0.5 truncate text-bg-reverse drop-shadow-lg">
                                 {model.name}
                             </h6>
                             <div className="flex items-center gap-1.5">
-                                <span className="text-[11px] text-gray-300 font-medium truncate">
+                                <span className="text-[11px] text-txt-muted font-medium truncate">
                                     by {model.uploaderDisplayName || "Unknown"}
                                 </span>
-                                <div className="w-0.5 h-0.5 bg-white/60 rounded-full"></div>
-                                <span className="text-[9px] text-gray-400">3D Model</span>
+                                <div className="w-0.5 h-0.5 bg-txt-muted rounded-full"></div>
+                                <span className="text-[9px] text-txt-muted">3D Model</span>
                             </div>
                         </div>
 
@@ -109,26 +109,26 @@ const ModelCarouselCard = ({
                                 <div className="flex items-center gap-1">
                                     <FontAwesomeIcon
                                         icon={faHeart}
-                                        className="w-2.5 h-2.5 text-white/90"
+                                        className="w-2.5 h-2.5 text-bg-reverse"
                                     />
-                                    <span className="text-[10px] text-white/90 font-medium">
+                                    <span className="text-[10px] text-bg-reverse font-medium">
                                         {model.likes || 0}
                                     </span>
                                 </div>
                                 <div className="flex items-center gap-1">
                                     <FontAwesomeIcon
                                         icon={faEye}
-                                        className="w-2.5 h-2.5 text-white/90"
+                                        className="w-2.5 h-2.5 text-bg-reverse"
                                     />
-                                    <span className="text-[10px] text-white/90 font-medium">
+                                    <span className="text-[10px] text-bg-reverse font-medium">
                                         {model.views || 0}
                                     </span>
                                 </div>
                             </div>
-                            <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+                            <div className="w-5 h-5 bg-txt-muted bg-opacity-20 rounded-full flex items-center justify-center">
                                 <FontAwesomeIcon
                                     icon={faChevronRight}
-                                    className="w-2.5 h-2.5 text-white"
+                                    className="w-2.5 h-2.5 text-bg-reverse"
                                 />
                             </div>
                         </div>
@@ -136,7 +136,7 @@ const ModelCarouselCard = ({
                 </div>
 
                 {/* Subtle border glow on hover */}
-                <div className="absolute inset-0 rounded-lg border-2 border-transparent group-hover:border-white/20 transition-colors duration-300 pointer-events-none"></div>
+                <div className="absolute inset-0 rounded-lg border-2 border-transparent group-hover:border-accent transition-colors duration-300 pointer-events-none"></div>
             </article>
         </div>
     );

@@ -179,7 +179,7 @@ export const PurchaseButton = ({ model, className = "" }: PurchaseButtonProps) =
         <>
             <button
                 onClick={handlePurchaseClick}
-                className={`flex items-center justify-center px-6 py-3 bg-accent text-white rounded-md hover:bg-accent-hover transition-colors ${className}`}
+                className={`contrast-button flex items-center justify-center px-6 py-3 rounded-md ${className}`}
             >
                 <svg
                     className="w-5 h-5 mr-2"

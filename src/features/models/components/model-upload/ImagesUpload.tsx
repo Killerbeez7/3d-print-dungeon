@@ -163,7 +163,7 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
     }, []);
 
     return (
-        <div className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm space-y-6">
+        <div className="bg-bg-secondary border border-br-secondary rounded-xl p-6 shadow-sm space-y-6">
             <input 
                 type="file" 
                 ref={fileInputRef} 
@@ -173,8 +173,8 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
             />
 
             <div>
-                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Primary Render</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">This is the main image for your model.</p>
+                <h3 className="text-xl font-bold text-txt-primary mb-1">Primary Render</h3>
+                <p className="text-sm text-txt-secondary">This is the main image for your model.</p>
             </div>
             
             <PrimaryPreview
@@ -187,8 +187,8 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
 
             {renders.length > 0 && (
                  <div>
-                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-1">All Renders</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Click to set a primary render. Drag to reorder.</p>
+                    <h3 className="text-xl font-bold text-txt-primary mb-1">All Renders</h3>
+                    <p className="text-sm text-txt-secondary">Click to set a primary render. Drag to reorder.</p>
                 </div>
             )}
             
@@ -203,7 +203,7 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
             {renders.length > 0 && renders.length < 16 && (
                 <button 
                     onClick={handleFileSelect}
-                    className="w-full py-2 px-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:border-accent hover:text-accent transition-colors"
+                    className="w-full py-2 px-4 border-2 border-dashed border-br-secondary rounded-lg text-txt-secondary hover:border-accent hover:text-accent transition-colors"
                 >
                     Add More Renders
                 </button>

@@ -54,7 +54,7 @@ export function ConsentRequiredFeature({
                 {showSettingsButton && (
                     <button
                         onClick={() => setShowSettings(true)}
-                        className="px-4 py-2 bg-primary text-white hover:bg-primary/90 transition-colors rounded-lg"
+                        className="contrast-button px-4 py-2 rounded-lg"
                     >
                         Manage Cookie Settings
                     </button>

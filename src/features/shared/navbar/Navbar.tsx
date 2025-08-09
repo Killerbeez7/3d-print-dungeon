@@ -145,7 +145,7 @@ export const Navbar = (): React.ReactNode => {
                                     <img
                                         src={STATIC_ASSETS.LOGO}
                                         alt="Site Logo"
-                                        className="h-9 w-auto"
+                                        className="h-9 w-auto logo-accent"
                                     />
                                 </Link>
                             </div>
@@ -160,7 +160,7 @@ export const Navbar = (): React.ReactNode => {
                                     <img
                                         src={STATIC_ASSETS.LOGO}
                                         alt="Site Logo"
-                                        className="h-9 w-auto hover:h-10 transition-all duration-300"
+                                        className="h-9 w-auto hover:h-10 transition-all duration-300 logo-accent"
                                     />
                                 </Link>
                             </div>
@@ -344,7 +344,7 @@ export const Navbar = (): React.ReactNode => {
                     {/* ---------- Search overlay (mobile) ---------- */}
                     <div
                         ref={searchOverlayRef}
-                        className={`fixed inset-0 bg-black bg-opacity-50 transition-opacity duration-200 ${
+                        className={`fixed inset-0 bg-bg-reverse bg-opacity-50 transition-opacity duration-200 ${
                             isSearchVisible
                                 ? "opacity-100 pointer-events-auto"
                                 : "opacity-0 pointer-events-none"

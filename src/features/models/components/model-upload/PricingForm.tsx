@@ -134,7 +134,7 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
                                         />
                                     </div>
                                     {priceError && (
-                                        <p className="mt-1 text-sm text-red-600">
+                                        <p className="mt-1 text-sm text-error">
                                             {priceError}
                                         </p>
                                     )}

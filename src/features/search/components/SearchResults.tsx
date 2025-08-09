@@ -15,7 +15,7 @@ export const SearchResults = ({
             {activeTab === "artworks" ? (
                 <ArtworksTab search={search} onResultsCount={onResultsCount} />
             ) : (
-                <ArtistsTab search={search} onResultsCount={onResultsCount} />
+                <ArtistsTab search={search} />
             )}
         </>
     );

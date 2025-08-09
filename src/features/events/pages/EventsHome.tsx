@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { mockEvents } from "../mock/mockEvents";
 import { EventCreateForm } from "../components/EventCreateForm";
+import { EventCard } from "../components/EventCard";
 import type { Event, EventType } from "@/features/events/types/event";
 
 const typeLabels: Record<EventType | "all", string> = {
@@ -26,7 +26,7 @@ export const EventsHome = () => {
     return (
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* title */}
-            <h1 className="text-[var(--txt-primary)] text-2xl sm:text-xl lg:text-4xl font-bold mb-8 text-center">
+            <h1 className="text-txt-primary text-2xl sm:text-xl lg:text-4xl font-bold mb-8 text-center">
                 Events & Competitions
             </h1>
 
@@ -41,8 +41,8 @@ export const EventsHome = () => {
                             className={`flex-1 px-4 py-2 rounded font-semibold transition text-center
                     ${
                         type === key
-                            ? "bg-[var(--accent)] text-[var(--txt-highlight)]"
-                            : "bg-[var(--bg-surface)] text-[var(--txt-primary)] hover:bg-[var(--bg-tertiary)]"
+                            ? "bg-accent text-txt-highlight"
+                            : "bg-bg-surface text-txt-primary hover:bg-bg-tertiary"
                     }`}
                         >
                             {label}
@@ -53,7 +53,7 @@ export const EventsHome = () => {
                 <div className="flex mt-2">
                     <button
                         onClick={() => setShowCreate(true)}
-                        className="flex-1 bg-green-600 text-white px-4 py-2 rounded font-semibold text-center"
+                        className="flex-1 btn-base btn-action-success text-center"
                     >
                         + Create Event
                     </button>
@@ -62,11 +62,11 @@ export const EventsHome = () => {
 
             {/* Create Event Form Modal/Inline */}
             {showCreate && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-                    <div className="bg-white dark:bg-[var(--bg-surface)] rounded-lg shadow-lg p-6 max-w-lg w-full relative">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-bg-reverse bg-opacity-40">
+                    <div className="bg-bg-primary rounded-lg shadow-lg p-6 max-w-lg w-full relative">
                         <button
                             onClick={() => setShowCreate(false)}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 dark:hover:text-white text-2xl font-bold"
+                            className="absolute top-2 right-2 text-txt-muted hover:text-txt-primary text-2xl font-bold"
                             aria-label="Close"
                         >
                             &times;
@@ -79,52 +79,7 @@ export const EventsHome = () => {
             {/* cards */}
             <div className="w-full grid gap-6 sm:gap-8 grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
                 {filtered.map((event) => (
-                    <article
-                        key={event.id}
-                        className="bg-[var(--bg-surface)] rounded-lg shadow hover:shadow-lg transition flex flex-col overflow-hidden"
-                    >
-                        {/* keep 16:9 aspect ratio; shrinks nicely on phones */}
-                        <div className="relative w-full aspect-[16/9]">
-                            <img
-                                src={event.bannerUrl}
-                                alt={event.title}
-                                className="absolute inset-0 w-full h-full object-cover"
-                                loading="lazy"
-                            />
-                        </div>
-
-                        <div className="p-4 flex-1 flex flex-col gap-2">
-                            <h2 className="text-lg sm:text-xl font-bold text-[var(--txt-primary)] line-clamp-2">
-                                {event.title}
-                            </h2>
-
-                            <p className="text-sm text-[var(--txt-secondary)] line-clamp-3">
-                                {event.description}
-                            </p>
-
-                            <p className="text-xs text-[var(--txt-muted)]">
-                                {event.startDate} – {event.endDate}
-                            </p>
-
-                            {event.type === "competition" && event.prizes && (
-                                <p className="text-xs text-[var(--txt-highlight)]">
-                                    Prizes: {event.prizes}
-                                </p>
-                            )}
-                            {event.type !== "competition" && event.location && (
-                                <p className="text-xs text-[var(--txt-highlight)]">
-                                    Location: {event.location}
-                                </p>
-                            )}
-
-                            <Link
-                                to={`/events/${event.id}`}
-                                className="mt-auto inline-block text-center px-4 py-2 rounded bg-[var(--accent)] text-[var(--txt-highlight)] font-semibold hover:bg-[var(--accent-hover)] transition-colors"
-                            >
-                                View&nbsp;Details
-                            </Link>
-                        </div>
-                    </article>
+                    <EventCard key={event.id} event={event} />
                 ))}
             </div>
         </div>

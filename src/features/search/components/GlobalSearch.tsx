@@ -191,7 +191,7 @@ export function GlobalSearch() {
                 <button
                     type="button"
                     onClick={handleClearSearch}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-muted hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-muted hover:text-txt-secondary"
                 >
                     <FontAwesomeIcon icon={faTimes} />
                 </button>
@@ -208,12 +208,12 @@ export function GlobalSearch() {
                                         className="px-3 py-2 hover:--btn-secondary-hover cursor-pointer"
                                     >
                                         <div className="font-medium">{a.displayName}</div>
-                                        <div className="text-xs text-gray-500">
+                                        <div className="text-xs text-txt-muted">
                                             Artist
                                         </div>
                                     </li>
                                 ))}
-                                <hr className="my-2 border-gray-200" />
+                                <hr className="my-2 border-br-secondary" />
                             </>
                         )}
                         {/* Preset links */}

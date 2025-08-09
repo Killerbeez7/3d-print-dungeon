@@ -19,4 +19,7 @@
 -change loading spinner while model is uploading
 -on succesfull upload show the new notifications(success)
 -add prop in each model notForSale that disables the selling mechanism
+-remove mouse disable icon from add detais button
 
+6.Styles
+-eventualy move to tokenized css with moduls for best performance (as Spotify, Github, etc..)

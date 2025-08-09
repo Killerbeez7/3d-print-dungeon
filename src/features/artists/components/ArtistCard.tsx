@@ -9,24 +9,43 @@ export function ArtistCard({ displayName, username, photoURL, bio }: ArtistCardP
     return (
         <Link
             to={`/${urlSafeUsername}`}
-            className="block bg-bg-surface rounded-lg p-4 hover:shadow-md transition-shadow"
+            className="group block h-full cursor-pointer"
         >
-            <article className="relative bg-bg-surface border border-br-primary rounded-md overflow-hidden shadow-sm transition-transform duration-300 ease-[cubic-bezier(.4,0,.2,1)] group-hover:shadow-xl group-hover:scale-[1.035] group-focus:shadow-xl group-focus:scale-[1.035]">
-                <img
-                    src={photoURL || "/user.png"}
-                    alt={name}
-                    className="w-full h-48 object-cover bg-bg-secondary"
-                    onError={(e) => {
-                        (e.target as HTMLImageElement).src = "/user.png";
-                    }}
-                />
-                <section className="p-3">
-                    <h4 className="text-lg font-semibold mb-1 truncate" title={name}>
+            <article className="bg-bg-secondary border border-br-secondary rounded-token-xl overflow-hidden shadow-token-sm hover:shadow-token-lg hover:-translate-y-1 hover:border-br-primary transition-all duration-token-200 h-full flex flex-col">
+                {/* Artist Image - Fixed Height */}
+                <div className="relative overflow-hidden">
+                    <img
+                        src={photoURL || "/user.png"}
+                        alt={name}
+                        className="w-full h-48 object-cover bg-bg-surface transition-all duration-token-200 group-hover:brightness-105"
+                        onError={(e) => {
+                            (e.target as HTMLImageElement).src = "/user.png";
+                        }}
+                    />
+                    {/* Subtle hover indicator */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-bg-reverse/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-token-200"></div>
+                </div>
+
+                {/* Artist Info - Flexible with fixed structure */}
+                <section className="p-token-4 flex-1 flex flex-col">
+                    {/* Artist Name - Fixed Height */}
+                    <h4 className="text-token-lg font-semibold text-txt-primary mb-token-2 truncate min-h-[1.75rem]" title={name}>
                         {name}
                     </h4>
-                    <p className="text-txt-secondary text-sm mb-2 line-clamp-2">
-                        {bio || "No bio available"}
-                    </p>
+                    
+                    {/* Bio - Fixed Height Container */}
+                    <div className="flex-1 mb-token-3 min-h-[2.5rem]">
+                        <p className="text-txt-secondary text-token-sm line-clamp-2 leading-token-relaxed">
+                            {bio || "Artist exploring the world of 3D design and creativity."}
+                        </p>
+                    </div>
+
+                    {/* Bottom Section - Fixed Height */}
+                    <div className="flex justify-center items-center min-h-[1.5rem]">
+                        <span className="text-token-xs text-txt-muted">
+                            @{username || 'artist'}
+                        </span>
+                    </div>
                 </section>
             </article>
         </Link>

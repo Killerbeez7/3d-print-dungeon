@@ -148,13 +148,13 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
                                 modelData.tags.map((tag: string) => (
                                     <div
                                         key={tag}
-                                        className="flex items-center bg-accent text-white px-3 py-1 rounded-full"
+                                        className="cta-button flex items-center px-3 py-1 rounded-full"
                                     >
                                         <span>{tag}</span>
                                         <button
                                             type="button"
                                             onClick={() => handleTagRemove(tag)}
-                                            className="ml-2 text-white"
+                                            className="ml-2 text-bg-reverse"
                                         >
                                             <TiDelete size={18} />
                                         </button>

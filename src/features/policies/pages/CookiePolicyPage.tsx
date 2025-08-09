@@ -168,8 +168,8 @@ export function CookiePolicyPage() {
                                 {/* Marketing Cookies */}
                                 <div className="border border-br-secondary rounded-lg p-6 hover:border-primary/50 transition-colors">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="p-2 bg-purple-500/10 rounded-lg">
-                                            <FaAd className="text-purple-500 text-lg" />
+                                        <div className="p-2 bg-accent/10 rounded-lg">
+                                            <FaAd className="text-accent text-lg" />
                                         </div>
                                         <h3 className="text-xl font-semibold text-txt-primary">
                                             Marketing Cookies
@@ -182,19 +182,19 @@ export function CookiePolicyPage() {
                                         <h4 className="font-medium text-txt-primary mb-3">Examples:</h4>
                                         <div className="space-y-2 text-sm text-txt-secondary">
                                             <div className="flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                                <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
                                                 <span>Facebook Pixel</span>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                                <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
                                                 <span>Google Ads</span>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                                <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
                                                 <span>Social media sharing buttons</span>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                                <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
                                                 <span>Retargeting campaigns</span>
                                             </div>
                                         </div>

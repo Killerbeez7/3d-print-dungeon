@@ -10,7 +10,7 @@ const ALL_ROLES = ["admin", "moderator", "contributor", "premium"] as const;
 export type Role = (typeof ALL_ROLES)[number];
 
 // Extend RawUserData for admin table rows
-export interface UserRow extends RawUserData {
+export interface UserRow extends Omit<RawUserData, 'roles'> {
     id: string;
     roles?: Role[];
 }

@@ -95,7 +95,7 @@ export const NotificationTestDropdown = () => {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
                         <button
                             onClick={() => handleTest("success")}
-                            className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+                            className="px-3 py-2 bg-success text-bg-reverse rounded-lg hover:bg-success/90 transition-colors text-sm"
                         >
                             Success
                         </button>
@@ -113,7 +113,7 @@ export const NotificationTestDropdown = () => {
                         </button>
                         <button
                             onClick={() => handleTest("info")}
-                            className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                            className="cta-button px-3 py-2 rounded-lg text-sm"
                         >
                             Info
                         </button>
@@ -123,20 +123,20 @@ export const NotificationTestDropdown = () => {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                         <button
                             onClick={handleTestAll}
-                            className="flex items-center justify-center px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                            className="cta-button flex items-center justify-center px-3 py-2 rounded-lg text-sm"
                         >
                             <MessageSquare className="w-4 h-4 mr-1" />
                             Test All Types
                         </button>
                         <button
                             onClick={handleTestPersistent}
-                            className="px-3 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm"
+                            className="secondary-button px-3 py-2 rounded-lg text-sm"
                         >
                             Persistent
                         </button>
                         <button
                             onClick={handleTestLong}
-                            className="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm"
+                            className="cta-button px-3 py-2 rounded-lg text-sm"
                         >
                             Long Message
                         </button>

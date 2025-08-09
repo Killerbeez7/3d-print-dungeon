@@ -1,0 +1,187 @@
+/* ===========================================
+   UTILITY CLASSES
+   =========================================== */
+
+/* Logo Accent Color */
+.logo-accent {
+    filter: brightness(0) saturate(100%) invert(39%) sepia(95%) saturate(1347%)
+        hue-rotate(154deg) brightness(91%) contrast(101%);
+}
+
+[data-theme="dark"] .logo-accent {
+    filter: brightness(0) saturate(100%) invert(63%) sepia(88%) saturate(2134%)
+        hue-rotate(154deg) brightness(85%) contrast(90%);
+}
+
+/* Line clamp utilities if not included in Tailwind */
+.line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+}
+
+.line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+
+.line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+}
+
+/* ===========================================
+   SPACING UTILITIES
+   Using design tokens
+   =========================================== */
+
+/* Padding utilities */
+.p-token-1 { padding: var(--space-1); }
+.p-token-2 { padding: var(--space-2); }
+.p-token-3 { padding: var(--space-3); }
+.p-token-4 { padding: var(--space-4); }
+.p-token-6 { padding: var(--space-6); }
+.p-token-8 { padding: var(--space-8); }
+.p-token-12 { padding: var(--space-12); }
+.p-token-16 { padding: var(--space-16); }
+
+/* Margin utilities */
+.m-token-1 { margin: var(--space-1); }
+.m-token-2 { margin: var(--space-2); }
+.m-token-3 { margin: var(--space-3); }
+.m-token-4 { margin: var(--space-4); }
+.m-token-6 { margin: var(--space-6); }
+.m-token-8 { margin: var(--space-8); }
+.m-token-12 { margin: var(--space-12); }
+.m-token-16 { margin: var(--space-16); }
+
+/* Gap utilities */
+.gap-token-1 { gap: var(--space-1); }
+.gap-token-2 { gap: var(--space-2); }
+.gap-token-3 { gap: var(--space-3); }
+.gap-token-4 { gap: var(--space-4); }
+.gap-token-6 { gap: var(--space-6); }
+.gap-token-8 { gap: var(--space-8); }
+
+/* ===========================================
+   SIZE UTILITIES
+   Using design tokens
+   =========================================== */
+
+/* Icon sizes */
+.icon-xs { width: var(--size-icon-xs); height: var(--size-icon-xs); }
+.icon-sm { width: var(--size-icon-sm); height: var(--size-icon-sm); }
+.icon-md { width: var(--size-icon-md); height: var(--size-icon-md); }
+.icon-lg { width: var(--size-icon-lg); height: var(--size-icon-lg); }
+.icon-xl { width: var(--size-icon-xl); height: var(--size-icon-xl); }
+
+/* Avatar sizes */
+.avatar-xs { width: var(--size-avatar-xs); height: var(--size-avatar-xs); }
+.avatar-sm { width: var(--size-avatar-sm); height: var(--size-avatar-sm); }
+.avatar-md { width: var(--size-avatar-md); height: var(--size-avatar-md); }
+.avatar-lg { width: var(--size-avatar-lg); height: var(--size-avatar-lg); }
+.avatar-xl { width: var(--size-avatar-xl); height: var(--size-avatar-xl); }
+
+/* Button heights */
+.btn-height-xs { height: var(--size-btn-xs); }
+.btn-height-sm { height: var(--size-btn-sm); }
+.btn-height-md { height: var(--size-btn-md); }
+.btn-height-lg { height: var(--size-btn-lg); }
+.btn-height-xl { height: var(--size-btn-xl); }
+
+/* ===========================================
+   BORDER UTILITIES
+   Using design tokens
+   =========================================== */
+
+/* Border radius */
+.rounded-token-sm { border-radius: var(--radius-sm); }
+.rounded-token-md { border-radius: var(--radius-md); }
+.rounded-token-lg { border-radius: var(--radius-lg); }
+.rounded-token-xl { border-radius: var(--radius-xl); }
+.rounded-token-2xl { border-radius: var(--radius-2xl); }
+.rounded-token-3xl { border-radius: var(--radius-3xl); }
+.rounded-token-full { border-radius: var(--radius-full); }
+
+/* Border width */
+.border-token-1 { border-width: var(--border-1); }
+.border-token-2 { border-width: var(--border-2); }
+.border-token-4 { border-width: var(--border-4); }
+
+/* ===========================================
+   SHADOW UTILITIES
+   Using design tokens
+   =========================================== */
+
+.shadow-token-xs { box-shadow: var(--shadow-xs); }
+.shadow-token-sm { box-shadow: var(--shadow-sm); }
+.shadow-token-md { box-shadow: var(--shadow-md); }
+.shadow-token-lg { box-shadow: var(--shadow-lg); }
+.shadow-token-xl { box-shadow: var(--shadow-xl); }
+.shadow-token-2xl { box-shadow: var(--shadow-2xl); }
+.shadow-token-inner { box-shadow: var(--shadow-inner); }
+
+/* Accent shadows */
+.shadow-accent-sm { box-shadow: var(--shadow-accent-sm); }
+.shadow-accent-md { box-shadow: var(--shadow-accent-md); }
+.shadow-accent-lg { box-shadow: var(--shadow-accent-lg); }
+
+/* ===========================================
+   Z-INDEX UTILITIES
+   Using design tokens
+   =========================================== */
+
+.z-hide { z-index: var(--z-hide); }
+.z-base { z-index: var(--z-base); }
+.z-docked { z-index: var(--z-docked); }
+.z-dropdown { z-index: var(--z-dropdown); }
+.z-sticky { z-index: var(--z-sticky); }
+.z-modal { z-index: var(--z-modal); }
+.z-popover { z-index: var(--z-popover); }
+.z-toast { z-index: var(--z-toast); }
+.z-tooltip { z-index: var(--z-tooltip); }
+
+/* ===========================================
+   TYPOGRAPHY UTILITIES
+   Using design tokens
+   =========================================== */
+
+.text-token-xs { font-size: var(--text-xs); }
+.text-token-sm { font-size: var(--text-sm); }
+.text-token-base { font-size: var(--text-base); }
+.text-token-lg { font-size: var(--text-lg); }
+.text-token-xl { font-size: var(--text-xl); }
+.text-token-2xl { font-size: var(--text-2xl); }
+.text-token-3xl { font-size: var(--text-3xl); }
+.text-token-4xl { font-size: var(--text-4xl); }
+
+/* Line heights */
+.leading-token-none { line-height: var(--leading-none); }
+.leading-token-tight { line-height: var(--leading-tight); }
+.leading-token-normal { line-height: var(--leading-normal); }
+.leading-token-relaxed { line-height: var(--leading-relaxed); }
+
+/* ===========================================
+   ANIMATION UTILITIES
+   Using design tokens
+   =========================================== */
+
+.duration-token-75 { transition-duration: var(--duration-75); }
+.duration-token-150 { transition-duration: var(--duration-150); }
+.duration-token-200 { transition-duration: var(--duration-200); }
+.duration-token-300 { transition-duration: var(--duration-300); }
+.duration-token-500 { transition-duration: var(--duration-500); }
+
+.ease-token-linear { transition-timing-function: var(--ease-linear); }
+.ease-token-in { transition-timing-function: var(--ease-in); }
+.ease-token-out { transition-timing-function: var(--ease-out); }
+.ease-token-in-out { transition-timing-function: var(--ease-in-out); }
+.ease-token-bounce { transition-timing-function: var(--ease-bounce); }

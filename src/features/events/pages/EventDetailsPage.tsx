@@ -14,7 +14,7 @@ export const EventDetailsPage = () => {
         return (
             <div className="max-w-2xl mx-auto py-8 text-center">
                 <h2 className="text-2xl font-bold mb-4">Event Not Found</h2>
-                <Link to="/events" className="text-[var(--accent)] hover:underline">
+                <Link to="/events" className="text-accent hover:underline">
                     Back to Events
                 </Link>
             </div>
@@ -43,7 +43,7 @@ export const EventDetailsPage = () => {
     return (
         <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-10">
             <div className="mb-6 rounded-lg overflow-hidden shadow">
-                <div className="relative w-full aspect-[16/7] bg-gray-200">
+                <div className="relative w-full aspect-[16/7] bg-bg-surface">
                     <img
                         src={currentEvent.bannerUrl}
                         alt={currentEvent.title}
@@ -51,30 +51,49 @@ export const EventDetailsPage = () => {
                     />
                 </div>
             </div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-[var(--txt-primary)] text-center break-words">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2 text-txt-primary text-center break-words">
                 {currentEvent.title}
             </h1>
-            <div className="mb-2 text-sm sm:text-base text-[var(--txt-secondary)] text-center">
+            <div className="mb-2 text-sm sm:text-base text-txt-secondary text-center">
                 {currentEvent.startDate} - {currentEvent.endDate}
             </div>
-            <div className="mb-4 text-xs sm:text-sm text-[var(--txt-muted)] text-center">
+            <div className="mb-4 text-xs sm:text-sm text-txt-muted text-center">
                 Status: <span className="font-semibold">{currentEvent.status}</span>
             </div>
-            <div className="mb-4 text-base sm:text-lg text-[var(--txt-primary)] text-center">
+            <div className="mb-4 text-base sm:text-lg text-txt-primary text-center">
                 {currentEvent.description}
             </div>
-            {currentEvent.type === "competition" && currentEvent.prizes && (
-                <div className="mb-4">
-                    <h2 className="font-semibold mb-1 text-sm sm:text-base">Prizes</h2>
-                    <div className="text-[var(--txt-highlight)] text-xs sm:text-sm">
-                        {currentEvent.prizes}
-                    </div>
+            {/* Competition-specific sections */}
+            {currentEvent.type === "competition" && (
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                    {currentEvent.prizes && (
+                        <div className="bg-bg-surface rounded-lg p-4 border border-br-secondary">
+                            <h2 className="font-semibold mb-2 text-lg text-txt-primary flex items-center">
+                                🏆 Prizes
+                            </h2>
+                            <div className="text-txt-highlight text-sm font-medium bg-accent/10 p-3 rounded">
+                                {currentEvent.prizes}
+                            </div>
+                        </div>
+                    )}
+                    {currentEvent.rules && (
+                        <div className="bg-bg-surface rounded-lg p-4 border border-br-secondary">
+                            <h2 className="font-semibold mb-2 text-lg text-txt-primary flex items-center">
+                                📋 Rules
+                            </h2>
+                            <div className="text-txt-secondary whitespace-pre-line text-sm">
+                                {currentEvent.rules}
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
-            {currentEvent.rules && (
-                <div className="mb-4">
-                    <h2 className="font-semibold mb-1 text-sm sm:text-base">Rules</h2>
-                    <div className="text-[var(--txt-secondary)] whitespace-pre-line text-xs sm:text-sm">
+            
+            {/* Non-competition rules */}
+            {currentEvent.type !== "competition" && currentEvent.rules && (
+                <div className="mb-6 bg-bg-surface rounded-lg p-4 border border-br-secondary">
+                    <h2 className="font-semibold mb-2 text-lg text-txt-primary">Event Details</h2>
+                    <div className="text-txt-secondary whitespace-pre-line text-sm">
                         {currentEvent.rules}
                     </div>
                 </div>
@@ -87,25 +106,37 @@ export const EventDetailsPage = () => {
             {(currentEvent.type === "meetup" || currentEvent.type === "webinar") &&
                 currentEvent.status === "upcoming" && (
                     <div className="mb-8 text-center">
-                        <button className="inline-block px-6 py-2 rounded bg-[var(--accent)] text-[var(--txt-highlight)] font-semibold hover:bg-[var(--accent-hover)] transition-colors">
+                        <button className="cta-button px-6 py-2 rounded font-semibold transition-colors">
                             RSVP
                         </button>
                     </div>
                 )}
             {currentEvent.type === "competition" && (
-                <div className="mb-4">
-                    <h2 className="font-semibold mb-3 text-center text-base sm:text-lg">
-                        Entries Gallery
-                    </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-                        {(currentEvent.entries || []).map((entry) => (
-                            <EventEntryCard key={entry.id} entry={entry} />
-                        ))}
+                <div className="mb-6">
+                    <div className="bg-bg-surface rounded-lg p-6 border border-br-secondary">
+                        <h2 className="font-bold mb-4 text-center text-xl text-txt-primary flex items-center justify-center gap-2">
+                            🎨 Competition Entries
+                            <span className="text-sm font-normal text-txt-muted">
+                                ({(currentEvent.entries || []).length} submissions)
+                            </span>
+                        </h2>
+                        {(currentEvent.entries || []).length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                {(currentEvent.entries || []).map((entry) => (
+                                    <EventEntryCard key={entry.id} entry={entry} />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 text-txt-muted">
+                                <div className="text-4xl mb-2">🎯</div>
+                                <p>No entries yet. Be the first to submit!</p>
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
             <div className="mt-8 text-center">
-                <Link to="/events" className="text-[var(--accent)] hover:underline">
+                <Link to="/events" className="text-accent hover:underline">
                     &larr; Back to Events
                 </Link>
             </div>

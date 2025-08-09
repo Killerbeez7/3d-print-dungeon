@@ -4,6 +4,9 @@ interface UserData extends UserProfileValues {
     bio?: string;
     location?: string;
     website?: string;
+    joinDate?: string;
+    lastActive?: string;
+    badges?: string[];
     socialLinks?: {
         twitter?: string;
         instagram?: string;
@@ -136,7 +139,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
             {hasAnySocialLinks && (
                 <div className="bg-bg-secondary rounded-lg p-6">
                     <div className="flex items-center gap-3 mb-4">
-                        <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+                        <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
                             <i className="fas fa-share-alt text-white text-sm"></i>
                         </div>
                         <h3 className="text-xl font-semibold text-txt-primary">

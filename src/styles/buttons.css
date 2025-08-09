@@ -1,0 +1,120 @@
+/* ===========================================
+   UNIFIED BUTTON SYSTEM
+   =========================================== */
+
+/* Base Button Style - Can be used standalone or with modifiers */
+.btn-base {
+    @apply inline-block px-4 py-2 rounded-lg font-semibold text-center no-underline transition-all duration-200 cursor-pointer border-0 text-sm;
+}
+
+/* ===========================================
+   ACTION BUTTONS - For primary interactions
+   =========================================== */
+
+/* Primary Action - Main CTAs (Join, Register, Purchase) */
+.btn-action-primary {
+    @apply inline-block px-4 py-2 rounded-lg font-semibold text-center no-underline transition-all duration-200 cursor-pointer border-0 text-sm text-bg-reverse;
+    background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 100%);
+}
+
+.btn-action-primary:hover {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    @apply -translate-y-0.5 shadow-lg;
+}
+
+/* Success Action - Positive actions (RSVP, Submit, Save) */
+.btn-action-success {
+    @apply inline-block px-4 py-2 rounded-lg font-semibold text-center no-underline transition-all duration-200 cursor-pointer border-0 text-sm text-bg-reverse;
+    background: linear-gradient(135deg, var(--success) 0%, #10b981 100%);
+}
+
+.btn-action-success:hover {
+    background: linear-gradient(135deg, #10b981 0%, var(--success) 100%);
+    @apply -translate-y-0.5 shadow-lg;
+}
+
+/* Urgent Action - Time-sensitive actions (Join Now, Live) */
+.btn-action-urgent {
+    @apply inline-block px-4 py-2 rounded-lg font-semibold text-center no-underline transition-all duration-200 cursor-pointer border-0 text-sm bg-gradient-to-br from-red-600 to-red-500 text-white;
+}
+
+.btn-action-urgent:hover {
+    @apply from-red-500 to-red-400 -translate-y-0.5 shadow-lg;
+}
+
+/* Warning Action - Important actions (Delete, Remove) */
+.btn-action-warning {
+    @apply inline-block px-4 py-2 rounded-lg font-semibold text-center no-underline transition-all duration-200 cursor-pointer border-0 text-sm text-bg-reverse;
+    background: linear-gradient(135deg, var(--contrast) 0%, var(--contrast-hover) 100%);
+}
+
+.btn-action-warning:hover {
+    background: linear-gradient(135deg, var(--contrast-hover) 0%, var(--contrast) 100%);
+    @apply -translate-y-0.5 shadow-lg;
+}
+
+/* ===========================================
+   VIEW BUTTONS - For navigation and viewing
+   =========================================== */
+
+/* Primary View - Main navigation (View Details, Learn More) */
+.btn-view-primary {
+    @apply inline-block px-4 py-2 rounded-lg font-semibold text-center no-underline transition-all duration-200 cursor-pointer border-0 text-sm text-txt-primary;
+    background: linear-gradient(135deg, var(--btn-main) 0%, var(--btn-secondary) 100%);
+}
+
+.btn-view-primary:hover {
+    background: linear-gradient(135deg, var(--btn-secondary) 0%, var(--btn-hover) 100%);
+    @apply text-bg-reverse -translate-y-0.5 shadow-md;
+}
+
+/* Secondary View - Less important navigation (Back, Cancel) */
+.btn-view-secondary {
+    @apply inline-block px-4 py-2 rounded-lg font-semibold text-center no-underline transition-all duration-200 cursor-pointer border-0 text-sm bg-transparent text-txt-secondary border border-br-secondary;
+}
+
+.btn-view-secondary:hover {
+    @apply bg-bg-surface text-txt-primary border-br-primary;
+}
+
+/* Minimal View - Subtle links (Archive, Past Events) */
+.btn-view-minimal {
+    @apply bg-transparent text-txt-muted px-2 py-1 text-sm font-medium transition-colors duration-200;
+}
+
+.btn-view-minimal:hover {
+    @apply text-txt-primary underline;
+}
+
+/* ===========================================
+   LEGACY BUTTON ALIASES (for backward compatibility)
+   =========================================== */
+.cta-button {
+    @apply inline-block px-4 py-2 rounded-lg font-semibold text-center no-underline transition-all duration-200 cursor-pointer border-0 text-sm text-bg-reverse;
+    background: linear-gradient(135deg, var(--accent-dark) 0%, var(--accent) 100%);
+}
+
+.cta-button:hover {
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    @apply -translate-y-0.5 shadow-lg;
+}
+
+.secondary-button {
+    @apply inline-block px-4 py-2 rounded-lg font-semibold text-center no-underline transition-all duration-200 cursor-pointer border-0 text-sm text-txt-primary;
+    background: linear-gradient(135deg, var(--btn-main) 0%, var(--btn-secondary) 100%);
+}
+
+.secondary-button:hover {
+    background: linear-gradient(135deg, var(--btn-secondary) 0%, var(--btn-hover) 100%);
+    @apply text-bg-reverse -translate-y-0.5 shadow-md;
+}
+
+.contrast-button {
+    @apply inline-block px-4 py-2 rounded-lg font-semibold text-center no-underline transition-all duration-200 cursor-pointer border-0 text-sm text-bg-reverse;
+    background: linear-gradient(135deg, var(--contrast) 0%, var(--contrast-hover) 100%);
+}
+
+.contrast-button:hover {
+    background: linear-gradient(135deg, var(--contrast-hover) 0%, var(--contrast) 100%);
+    @apply -translate-y-0.5 shadow-lg;
+}

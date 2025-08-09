@@ -6,7 +6,6 @@ export { UserPortfolio } from "./components/UserPortfolio";
 // Pages
 export { PublicProfilePage } from "./pages/PublicProfilePage";
 export { SettingsPage } from "../settings/pages/SettingsPage";
-export { MyProfilePage } from "./pages/MyProfilePage";
 
 // Hooks
 export { useProfile } from "./hooks/useProfile";

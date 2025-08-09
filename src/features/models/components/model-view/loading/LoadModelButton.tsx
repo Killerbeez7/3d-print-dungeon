@@ -12,7 +12,7 @@ export const LoadModelButton = ({ handleLoadModel }: LoadModelButtonProps) => {
                 {/* Load Model Button */}
                 <button
                     onClick={handleLoadModel}
-                    className="group px-8 py-4 bg-gradient-to-r from-fuchsia-600 to-purple-600 hover:from-fuchsia-700 hover:to-purple-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-out"
+                    className="cta-button group px-8 py-4 font-semibold rounded-lg shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 ease-out"
                 >
                     <div className="flex items-center gap-3">
                         <svg
