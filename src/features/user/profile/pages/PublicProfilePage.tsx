@@ -1,9 +1,3 @@
-/**
- * @file UserProfilePage.tsx
- * @description Displays the profile for a user
- * @usedIn userService.ts, userRoutes.ts, index.tsx
- */
-
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 // hooks & services
@@ -13,16 +7,21 @@ import { getUserByUsername } from "@/features/user/services/userService";
 import { UserHeader } from "../components/UserHeader";
 import { UserPortfolio } from "../components/UserPortfolio";
 import { UserStats } from "../components/UserStats";
+import { ProfileSettingsPanel } from "../components/ProfileSettingsPanel";
+import { PrivateStats } from "../components/PrivateStats";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 // types
 import type { RawUserData } from "@/features/user/types/user";
+import type { UserProfileValues } from "../types/profile";
 
 export const PublicProfilePage = (): React.ReactNode => {
     const { username } = useParams<{ username: string }>();
     const { currentUser } = useAuth();
-    const [artist, setArtist] = useState<RawUserData | null>(null);
+    const [artist, setArtist] = useState<UserProfileValues | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+
+    console.log('PublicProfilePage rendered with:', { username, currentUser: !!currentUser });
 
     useEffect(() => {
         if (!username) {
@@ -36,10 +35,12 @@ export const PublicProfilePage = (): React.ReactNode => {
                 setLoading(true);
                 setError(null);
 
+                console.log('Fetching user data for username:', username);
                 const userData = await getUserByUsername(username);
+                console.log('Received user data:', userData);
 
                 if (userData) {
-                    setArtist(userData);
+                    setArtist(userData as unknown as UserProfileValues);
                 } else {
                     setError("User not found");
                     setArtist(null);
@@ -79,22 +80,46 @@ export const PublicProfilePage = (): React.ReactNode => {
         );
     }
 
-    const isOwnProfile = currentUser?.uid === artist.uid;
+    const isOwner = currentUser?.email === artist.email;
+
+    // Debug logging
+    console.log('PublicProfilePage Debug:', {
+        currentUserUid: currentUser?.uid,
+        currentUserEmail: currentUser?.email,
+        artistUid: artist.uid,
+        artistKeys: Object.keys(artist),
+        artistEmail: artist.email,
+        isOwner,
+        artistUsername: artist.username,
+        currentUserUsername: currentUser?.displayName,
+        artistDisplayName: artist.displayName
+    });
 
     return (
-        <div className="container mx-auto px-4 py-4">
-            <div className="max-w-6xl mx-auto">
-                {/* User Header */}
-                <UserHeader user={artist} isOwnProfile={isOwnProfile} />
+        <div className="min-h-screen bg-bg-primary">
+            <div className="max-w-7xl mx-auto px-4 py-8">
+                {/* Shared Profile Header */}
+                <UserHeader user={artist} />
 
-                {/* User Portfolio */}
+                {/* Owner-only Settings Panel */}
+                {isOwner && (
+                    <div className="mt-6">
+                        <ProfileSettingsPanel user={artist} />
+                    </div>
+                )}
+
+                {/* Shared User Portfolio */}
                 <div className="mt-8">
                     <UserPortfolio user={artist} />
                 </div>
 
-                {/* User Stats */}
+                {/* Conditional Stats - Private for owner, Public for others */}
                 <div className="mt-8">
-                    <UserStats user={artist} />
+                    {isOwner ? (
+                        <PrivateStats user={artist} />
+                    ) : (
+                        <UserStats user={artist as unknown as RawUserData} />
+                    )}
                 </div>
             </div>
         </div>

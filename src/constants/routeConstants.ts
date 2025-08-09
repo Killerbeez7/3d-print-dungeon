@@ -37,6 +37,7 @@ export const ROUTES = {
     /* User */
     USER_SETTINGS: "/settings",
     USER_PROFILE: "/:username",
+    USER_PROFILE_REDIRECT: "/profile",
 
     /* Admin */
     ADMIN_DASHBOARD: "/admin-dashboard",

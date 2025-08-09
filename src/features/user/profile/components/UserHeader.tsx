@@ -1,15 +1,12 @@
-import { Link } from "react-router-dom";
 import { getAvatarUrl } from "@/utils/avatar";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
+
 import type { UserProfileValues } from "../types/profile";
 
 interface UserProfileProps {
     user: UserProfileValues;
-    isOwnProfile: boolean;
 }
 
-export const UserHeader = ({ user, isOwnProfile }: UserProfileProps): React.ReactNode => {
+export const UserHeader = ({ user }: UserProfileProps): React.ReactNode => {
     return (
         <div className="bg-bg-secondary rounded-lg p-6 shadow-md">
             <div className="flex items-start space-x-6">
@@ -37,16 +34,6 @@ export const UserHeader = ({ user, isOwnProfile }: UserProfileProps): React.Reac
                                 </p>
                             )}
                         </div>
-
-                        {isOwnProfile && (
-                            <Link
-                                to="/me/profile/edit"
-                                className="flex items-center space-x-2 px-4 py-2 bg-bg-primary text-txt-primary rounded-md hover:bg-bg-surface transition-colors"
-                            >
-                                <FontAwesomeIcon icon={faEdit} />
-                                <span>Edit Profile</span>
-                            </Link>
-                        )}
                     </div>
 
                     {/* User Stats */}

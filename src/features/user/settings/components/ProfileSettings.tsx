@@ -143,7 +143,7 @@ export const ProfileSettings = () => {
                                 id="displayName"
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
-                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                                className="mt-1 block w-full rounded-md spellcheck-disabled border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                                 required
                             />
                         </div>
@@ -154,7 +154,7 @@ export const ProfileSettings = () => {
                                 id="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                                className="mt-1 block w-full rounded-md spellcheck-disabled border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                                 required
                             />
                             <div className="mt-2 flex items-center">
@@ -163,7 +163,7 @@ export const ProfileSettings = () => {
                                     id="isEmailPublic"
                                     checked={isEmailPublic}
                                     onChange={(e) => setIsEmailPublic(e.target.checked)}
-                                    className="h-4 w-4 rounded border-br-primary text-accent focus:ring-accent"
+                                    className="h-4 w-4 rounded spellcheck-disabled border-br-primary text-accent focus:ring-accent"
                                 />
                                 <label htmlFor="isEmailPublic" className="ml-2 block text-sm text-txt-secondary">Public Email</label>
                             </div>
@@ -176,7 +176,7 @@ export const ProfileSettings = () => {
                             value={bio}
                             onChange={(e) => setBio(e.target.value)}
                             rows={3}
-                            className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                            className="mt-1 block w-full rounded-md spellcheck-disabled border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             placeholder="A quick glimpse of who you are and what you do...."
                         />
                     </div>
@@ -192,7 +192,7 @@ export const ProfileSettings = () => {
                                 id="facebook"
                                 value={facebook}
                                 onChange={(e) => setFacebook(e.target.value)}
-                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                                className="mt-1 block w-full rounded-md spellcheck-disabled border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             />
                         </div>
                         <div>
@@ -202,7 +202,7 @@ export const ProfileSettings = () => {
                                 id="twitter"
                                 value={twitter}
                                 onChange={(e) => setTwitter(e.target.value)}
-                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                                className="mt-1 block w-full rounded-md spellcheck-disabled border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             />
                         </div>
                         <div>
@@ -212,7 +212,7 @@ export const ProfileSettings = () => {
                                 id="instagram"
                                 value={instagram}
                                 onChange={(e) => setInstagram(e.target.value)}
-                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                                className="mt-1 block w-full rounded-md spellcheck-disabled border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             />
                         </div>
                         <div>
@@ -222,7 +222,7 @@ export const ProfileSettings = () => {
                                 id="linkedin"
                                 value={linkedin}
                                 onChange={(e) => setLinkedin(e.target.value)}
-                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                                className="mt-1 block w-full rounded-md border spellcheck-disabled border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             />
                         </div>
                     </div>
@@ -238,7 +238,7 @@ export const ProfileSettings = () => {
                                 id="city"
                                 value={city}
                                 onChange={(e) => setCity(e.target.value)}
-                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                                className="mt-1 block w-full rounded-md border spellcheck-disabled border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             />
                         </div>
                         <div>
@@ -247,7 +247,7 @@ export const ProfileSettings = () => {
                                 id="country"
                                 value={country}
                                 onChange={(e) => setCountry(e.target.value)}
-                                className="mt-1 block w-full rounded-md border border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                                className="mt-1 block w-full rounded-md border spellcheck-disabled border-br-primary bg-bg-secondary px-3 py-2 text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                             >
                                 <option value="">Select a country</option>
                                 {countries.map((countryName) => (
@@ -278,7 +278,7 @@ export const ProfileSettings = () => {
                                     type="file"
                                     accept="image/*"
                                     onChange={handleProfilePictureChange}
-                                    className="block w-full text-sm text-txt-secondary file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-accent/90"
+                                    className="block w-full text-sm spellcheck-disabled text-txt-secondary file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-accent/90"
                                 />
                             </div>
                         </div>
@@ -303,7 +303,7 @@ export const ProfileSettings = () => {
                                     type="file"
                                     accept="image/*"
                                     onChange={handleCoverPhotoChange}
-                                    className="block w-full text-sm text-txt-secondary file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-accent/90"
+                                    className="block w-full text-sm spellcheck-disabled text-txt-secondary file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-accent/90"
                                 />
                             </div>
                         </div>

@@ -285,6 +285,7 @@ export interface FetchModelsOptions {
     categoryIds?: string[]; // array of category document ids
     search?: string;
     hideAI?: boolean;
+    uploaderId?: string; // filter by uploader uid
 }
 // Fetch models with pagination + optional filters
 export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
@@ -297,6 +298,7 @@ export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
         search,
         hideAI,
         categoryIds,
+        uploaderId,
     } = opts;
 
     let q = query(collection(db, "models"), orderBy("createdAt", "desc"));
@@ -312,6 +314,11 @@ export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
     // Apply AI filter if provided
     if (hideAI) {
         q = query(q, where("isAI", "==", false));
+    }
+
+    // Apply uploader filter if provided
+    if (uploaderId) {
+        q = query(q, where("uploaderId", "==", uploaderId));
     }
 
     // Handle search query

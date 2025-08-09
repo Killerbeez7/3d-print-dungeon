@@ -9,6 +9,12 @@ const PublicProfilePage = lazy(() =>
     }))
 );
 
+const ProfileRedirect = lazy(() =>
+    import("../profile/pages/ProfileRedirect").then((module) => ({
+        default: module.ProfileRedirect,
+    }))
+);
+
 const SettingsPage = lazy(() =>
     import("@/features/user/settings/pages/SettingsPage").then((m) => ({
         default: m.SettingsPage,
@@ -23,6 +29,14 @@ const SettingsPageSkeleton = lazy(() =>
 
 export const userRoutes: RouteObject[] = [
     {
+        path: ROUTES.USER_PROFILE_REDIRECT,
+        element: withProtectedMaintenance(
+            <Suspense>
+                <ProfileRedirect />
+            </Suspense>
+        ),
+    },
+    {
         path: ROUTES.USER_PROFILE,
         element: withMaintenance(
             <Suspense>
@@ -30,6 +44,7 @@ export const userRoutes: RouteObject[] = [
             </Suspense>
         ),
     },
+
     {
         path: ROUTES.USER_SETTINGS,
         element: withProtectedMaintenance(

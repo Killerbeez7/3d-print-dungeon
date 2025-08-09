@@ -5,6 +5,42 @@ export interface Tab {
     count?: number;
 }
 
+export interface UserProfileValues {
+    uid: string;
+    displayName: string;
+    username: string;
+    email: string;
+    photoURL?: string;
+    bio?: string;
+    location?: string;
+    website?: string;
+    socialLinks?: {
+        twitter?: string;
+        instagram?: string;
+        facebook?: string;
+        linkedin?: string;
+        youtube?: string;
+    };
+    stats: {
+        uploadsCount: number;
+        followers: number;
+        following: number;
+        likesCount: number;
+        viewsCount: number;
+        collectionsCount: number;
+    };
+    createdAt: Date;
+    updatedAt: Date;
+    isVerified: boolean;
+    isPremium: boolean;
+    preferences: {
+        emailNotifications: boolean;
+        pushNotifications: boolean;
+        publicProfile: boolean;
+        showEmail: boolean;
+    };
+}
+
 export interface UploadedArtwork {
     id: string;
     name?: string;
