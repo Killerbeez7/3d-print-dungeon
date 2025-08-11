@@ -8,10 +8,10 @@
         hue-rotate(154deg) brightness(91%) contrast(101%);
 }
 
-[data-theme="dark"] .logo-accent {
-    /* filter: brightness(0) saturate(100%) invert(63%) sepia(88%) saturate(2134%)
-        hue-rotate(154deg) brightness(85%) contrast(90%); */
-}
+/* [data-theme="dark"] .logo-accent {
+    filter: brightness(0) saturate(100%) invert(63%) sepia(88%) saturate(2134%)
+        hue-rotate(154deg) brightness(85%) contrast(90%);
+} */
 
 /* Line clamp utilities if not included in Tailwind */
 .line-clamp-1 {

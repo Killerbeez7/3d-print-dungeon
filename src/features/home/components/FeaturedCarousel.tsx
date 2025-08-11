@@ -1,7 +1,7 @@
 import { ReusableCarousel } from "@/features/shared/reusable/carousel/ReusableCarousel";
 import { CarouselCard } from "./CarouselCard";
-import { featuredCarouselSettings } from "@/features/shared/reusable/carousel/carouselSettings";
 import type { CarouselItem } from "../types/carousel";
+import { defaultCarouselSettings } from "@/features/shared/reusable/carousel/carouselSettings";
 
 interface FeaturedCarouselProps {
     items: CarouselItem[];
@@ -20,9 +20,7 @@ export const FeaturedCarousel = ({
         <section className={`py-8 ${className}`}>
             {title && (
                 <div className="px-4 mb-6">
-                    <h2 className="text-2xl font-bold text-txt-primary">
-                        {title}
-                    </h2>
+                    <h2 className="text-2xl font-bold text-txt-primary">{title}</h2>
                 </div>
             )}
 
@@ -31,11 +29,11 @@ export const FeaturedCarousel = ({
                 renderItem={(item, index) => (
                     <CarouselCard
                         item={item}
-                        priority={index < featuredCarouselSettings.slidesToShow}
+                        priority={index < defaultCarouselSettings.slidesToShow}
                         showDescription={false}
                     />
                 )}
-                {...featuredCarouselSettings}
+                {...defaultCarouselSettings}
                 className="carousel-section"
                 itemClassName="carousel-item"
             />

@@ -45,12 +45,12 @@ export const STATIC_ASSETS: StaticAssets = {
 
     // Carousel images
     CAROUSEL: {
-        SPRING_SALE: "/assets/carousel-images/SpringSale.png",
-        SCHEDULED_PROJECTS: "/assets/carousel-images/ScheduledProjects.png",
-        TRENDING_PROJECTS: "/assets/carousel-images/TrendingProjects.png",
-        NEW_ARRIVALS: "/assets/carousel-images/NewArrivals.png",
-        STORE_3D: "/assets/carousel-images/3d-store.png",
-        PROJECT_IDEAS: "/assets/carousel-images/ProjectIdeas.png",
+        SPRING_SALE: "/assets/animated_covers/SpringSale.png",
+        SCHEDULED_PROJECTS: "/assets/animated_covers/ScheduledProjects.png",
+        TRENDING_PROJECTS: "/assets/animated_covers/TrendingProjects.png",
+        NEW_ARRIVALS: "/assets/animated_covers/NewArrivals.png",
+        STORE_3D: "/assets/animated_covers/3d-store.png",
+        PROJECT_IDEAS: "/assets/animated_covers/ProjectIdeas.png",
 
         MINIATURES_COMPETITION: "/assets/carousel-images/MiniaturesCompetition_270.webp",
         SCHEDULED_MODELS: "/assets/carousel-images/ScheduledModels_270.webp",
@@ -58,7 +58,7 @@ export const STATIC_ASSETS: StaticAssets = {
         UPCOMING_MODELS: "/assets/carousel-images/UpcomingModels_270.webp",
 
         ARENA_MODELS: "/assets/carousel-images/ArenaModels_270.webp",
-        DUNGEON_MODELS: "/assets/carousel-images/DungeonModels.jpg",
+        DUNGEON_MODELS: "/assets/carousel-images/BattleModels_270.webp",
         BATTLE_MODELS: "/assets/carousel-images/BattleModels_270.webp",
     },
 
