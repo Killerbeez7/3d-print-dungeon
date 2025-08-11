@@ -35,7 +35,7 @@ export interface StaticAssets {
 }
 
 export const STATIC_ASSETS: StaticAssets = {
-    LOGO: "/assets/images/logo.png",
+    LOGO: "/assets/images/logo.svg",
     USER_DEFAULT: "/assets/images/user.png",
     DEFAULT_AVATAR: "/assets/images/user.png",
     PLACEHOLDER_IMAGE: "/assets/images/image.png",
