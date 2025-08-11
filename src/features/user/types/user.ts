@@ -6,6 +6,7 @@ import type { Timestamp } from "firebase/firestore";
 export interface BaseUser {
     id: string;
     email: string;
+    username: string;
     displayName: string;
     photoURL?: string;
     createdAt: Date;

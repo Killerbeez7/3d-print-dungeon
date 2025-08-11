@@ -15,7 +15,7 @@ import { ConsentProtectedRoute } from "../policies/components/ConsentProtectedRo
 const AppLayout = () => {
     const { isFooterHidden } = useLayout();
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="layout flex flex-col min-h-screen">
             <Navbar />
             <main className="flex-1 min-h-screen">
                 <Suspense

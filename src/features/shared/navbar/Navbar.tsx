@@ -261,7 +261,7 @@ export const Navbar = (): React.ReactNode => {
                                         <button
                                             id="profile-button"
                                             onClick={() => toggleDropdown("profile")}
-                                            className="flex items-center text-txt-secondary hover:text-txt-primary cursor-pointer"
+                                            className="flex items-center text-txt-secondary hover:text-txt-primary cursor-pointer transition-colors duration-200 p-1 rounded-lg hover:bg-bg-surface"
                                             aria-label="Profile menu"
                                         >
                                             <MdAccountCircle className="h-7 w-7" />
@@ -269,69 +269,78 @@ export const Navbar = (): React.ReactNode => {
 
                                         {/*Profile Dropdown Options*/}
                                         <div
-                                            className={`absolute right-0 mt-2 w-52 rounded-md shadow-md bg-bg-secondary border border-br-secondary transition-all duration-200 p-2 z-60 ${
+                                            className={`absolute right-0 mt-3 w-64 rounded-xl shadow-2xl bg-bg-secondary border border-br-secondary transition-all duration-300 transform origin-top-right ${
                                                 activeDropdown === "profile"
-                                                    ? "opacity-100 visible"
-                                                    : "opacity-0 invisible"
+                                                    ? "opacity-100 visible scale-100"
+                                                    : "opacity-0 invisible scale-95"
                                             }`}
+                                            style={{ zIndex: 1000 }}
                                         >
-                                            <h6 className="px-2 py-2 text-txt-muted">
-                                                {currentUser?.displayName || "Username"}
-                                            </h6>
-                                            {isAdmin && (
-                                                <Link
-                                                    to={`/admin-dashboard`}
-                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary divider-top hover:rounded-sm hover:border-br-primary hover:font-semibold"
-                                                    onClick={() =>
-                                                        setActiveDropdown(null)
-                                                    }
-                                                >
-                                                    <FontAwesomeIcon
-                                                        icon={faUser}
-                                                        className="mr-2"
-                                                    />
-                                                    Admin Dashboard
-                                                </Link>
-                                            )}
-                                            <div className="divider-top">
+                                            {/* Header with user info */}
+                                            <div className="px-4 py-3 border-b border-br-secondary bg-gradient-to-r from-bg-primary to-bg-secondary rounded-t-xl">
+                                                <h6 className="text-sm font-semibold text-txt-primary mb-1">
+                                                    {currentUser?.displayName || "Username"}
+                                                </h6>
+                                                <p className="text-xs text-txt-secondary">
+                                                    {currentUser?.email || "user@example.com"}
+                                                </p>
+                                            </div>
+
+                                            {/* Menu items */}
+                                            <div className="p-2">
+                                                {isAdmin && (
+                                                    <Link
+                                                        to={`/admin-dashboard`}
+                                                        className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
+                                                        onClick={() => setActiveDropdown(null)}
+                                                    >
+                                                        <FontAwesomeIcon
+                                                            icon={faUser}
+                                                            className="mr-3 text-txt-secondary group-hover:text-txt-primary transition-colors"
+                                                        />
+                                                        <span className="font-medium">Admin Dashboard</span>
+                                                    </Link>
+                                                )}
+                                                
                                                 <Link
                                                     to={`/${urlSafeUsername}`}
-                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
-                                                    onClick={() =>
-                                                        setActiveDropdown(null)
-                                                    }
+                                                    className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
+                                                    onClick={() => setActiveDropdown(null)}
                                                 >
                                                     <FontAwesomeIcon
                                                         icon={faUser}
-                                                        className="mr-2"
+                                                        className="mr-3 text-txt-secondary group-hover:text-txt-primary transition-colors"
                                                     />
-                                                    Profile
+                                                    <span className="font-medium">Profile</span>
                                                 </Link>
+                                                
                                                 <Link
                                                     to="/settings"
-                                                    className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
-                                                    onClick={() =>
-                                                        setActiveDropdown(null)
-                                                    }
+                                                    className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
+                                                    onClick={() => setActiveDropdown(null)}
                                                 >
                                                     <FontAwesomeIcon
                                                         icon={faCog}
-                                                        className="mr-2"
+                                                        className="mr-3 text-txt-secondary group-hover:text-txt-primary transition-colors"
                                                     />
-                                                    Settings
+                                                    <span className="font-medium">Settings</span>
                                                 </Link>
+                                                
+                                                {/* Divider */}
+                                                <div className="my-2 border-t border-br-secondary"></div>
+                                                
                                                 <button
                                                     onClick={() => {
                                                         setActiveDropdown(null);
                                                         handleLogout();
                                                     }}
-                                                    className="w-full text-left px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:border-br-primary hover:font-semibold"
+                                                    className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
                                                 >
                                                     <FontAwesomeIcon
                                                         icon={faSignOutAlt}
-                                                        className="mr-2"
+                                                        className="mr-3 text-txt-secondary group-hover:text-white transition-colors"
                                                     />
-                                                    Sign Out
+                                                    <span className="font-medium">Sign Out</span>
                                                 </button>
                                             </div>
                                         </div>
