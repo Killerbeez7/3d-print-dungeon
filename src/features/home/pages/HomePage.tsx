@@ -1,5 +1,5 @@
 import { FeaturedCarousel } from "../components/FeaturedCarousel";
-import { featuredMockData } from "../components/featuredMockData";
+import { featuredCarouselItems } from "../mock/carouselData";
 
 import { InfiniteScrollList } from "@/features/shared/InfiniteScrollList";
 import { useFetchModels } from "@/features/models/hooks/useFetchModels";
@@ -53,9 +53,7 @@ export const HomePage = (): React.ReactNode => {
     return (
         <div className="text-txt-primary min-h-screen">
             <FeaturedCarousel
-                items={featuredMockData}
-                itemHeight={180}
-                slidesToShow={5}
+                items={featuredCarouselItems}
             />
             <section className="p-4 md:p-8">
                 <h2 className="text-2xl font-bold mb-6">All Models</h2>

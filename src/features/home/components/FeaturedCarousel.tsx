@@ -1,102 +1,44 @@
-import { Link } from "react-router-dom";
 import { ReusableCarousel } from "@/features/shared/reusable/carousel/ReusableCarousel";
-import type { FC } from "react";
-import { useRef, useEffect, useState } from "react";
+import { CarouselCard } from "./CarouselCard";
+import { featuredCarouselSettings } from "@/features/shared/reusable/carousel/carouselSettings";
+import type { CarouselItem } from "../types/carousel";
 
-export interface FeaturedCarouselItem {
-    id: string;
-    title: string;
-    subtitle?: string;
-    badge?: string;
-    image: string;
-    link: string;
+interface FeaturedCarouselProps {
+    items: CarouselItem[];
+    title?: string;
+    className?: string;
 }
 
-export interface FeaturedCarouselProps {
-    items: FeaturedCarouselItem[];
-    itemHeight?: number;
-    slidesToShow?: number;
-}
-
-interface FeaturedCarouselSlideProps {
-    item: FeaturedCarouselItem;
-    itemHeight: number;
-    priority?: boolean; // mark first visible slide for high fetch priority
-}
-
-const FeaturedCarouselSlide: FC<FeaturedCarouselSlideProps> = ({ item, itemHeight, priority = false }) => {
-    const linkRef = useRef<HTMLAnchorElement>(null);
-    const [isHidden, setIsHidden] = useState<boolean>(false);
-
-    useEffect(() => {
-        if (linkRef.current) {
-            const slide = linkRef.current.closest("[aria-hidden]");
-            if (slide) {
-                setIsHidden(slide.getAttribute("aria-hidden") === "true");
-            }
-        }
-    }, [linkRef]);
+export const FeaturedCarousel = ({
+    items = [],
+    title,
+    className = "",
+}: FeaturedCarouselProps) => {
+    if (items.length === 0) return null;
 
     return (
-        <Link
-            to={item.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            ref={linkRef}
-            tabIndex={isHidden ? -1 : undefined}
-            aria-hidden={isHidden ? "true" : undefined}
-        >
-            <div className="relative overflow-hidden rounded-xl group">
-                <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full object-cover rounded-xl"
-                    style={{ height: itemHeight }}
-                    loading={priority ? "eager" : "lazy"}
-                    fetchPriority={priority ? "high" : undefined}
-                    decoding="async"
-                    width="100%"
-                    height={itemHeight}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                    <div className="text-center">
-                        <h3 className="text-white text-xl font-bold mb-1">
-                            {item.title}
-                        </h3>
-                        {item.subtitle && (
-                            <p className="text-white text-xs mb-2">{item.subtitle}</p>
-                        )}
-                        {item.badge && (
-                            <div className="inline-block bg-white text-black text-xs font-semibold px-2 py-1 rounded-full">
-                                {item.badge}
-                            </div>
-                        )}
-                    </div>
+        <section className={`py-8 ${className}`}>
+            {title && (
+                <div className="px-4 mb-6">
+                    <h2 className="text-2xl font-bold text-txt-primary">
+                        {title}
+                    </h2>
                 </div>
-            </div>
-        </Link>
-    );
-};
-
-export const FeaturedCarousel: FC<FeaturedCarouselProps> = ({
-    items,
-    itemHeight = 250,
-    slidesToShow = 4,
-}) => {
-    return (
-        <ReusableCarousel<FeaturedCarouselItem>
-            items={items}
-            renderItem={(item, idx) => (
-                <FeaturedCarouselSlide
-                    item={item}
-                    itemHeight={itemHeight}
-                    priority={idx < slidesToShow}
-                />
             )}
-            slidesToShow={slidesToShow}
-            slidesToScroll={slidesToShow}
-            infinite={false}
-            speed={500}
-        />
+
+            <ReusableCarousel
+                items={items}
+                renderItem={(item, index) => (
+                    <CarouselCard
+                        item={item}
+                        priority={index < featuredCarouselSettings.slidesToShow}
+                        showDescription={false}
+                    />
+                )}
+                {...featuredCarouselSettings}
+                className="carousel-section"
+                itemClassName="carousel-item"
+            />
+        </section>
     );
 };

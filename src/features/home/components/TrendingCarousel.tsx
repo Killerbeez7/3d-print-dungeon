@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ReusableCarousel } from "@/features/shared/reusable/carousel/ReusableCarousel";
+import { trendingCarouselSettings } from "@/features/shared/reusable/carousel/carouselSettings";
 import type { FC } from "react";
 
 export interface TrendingCarouselItem {
@@ -18,9 +19,15 @@ export interface TrendingCarouselItem {
 
 export interface TrendingCarouselProps {
     items: TrendingCarouselItem[];
+    enableSnapToNearest?: boolean;
+    enableDrag?: boolean;
 }
 
-export const TrendingCarousel: FC<TrendingCarouselProps> = ({ items }) => {
+export const TrendingCarousel: FC<TrendingCarouselProps> = ({ 
+    items, 
+    enableSnapToNearest = true,
+    enableDrag = true
+}) => {
     const renderItem = (item: TrendingCarouselItem) => (
         <Link to={item.link} target="_blank" rel="noopener noreferrer">
             <div className="relative overflow-hidden rounded-xl group h-[80px] w-[120px]">
@@ -97,24 +104,9 @@ export const TrendingCarousel: FC<TrendingCarouselProps> = ({ items }) => {
             <ReusableCarousel<TrendingCarouselItem>
                 items={items}
                 renderItem={renderItem}
-                slidesToShow={8}
-                slidesToScroll={8}
-                infinite={false}
-                speed={500}
-                responsive={[
-                    {
-                        breakpoint: 1536,
-                        settings: { slidesToShow: 4, slidesToScroll: 4 },
-                    },
-                    {
-                        breakpoint: 1280,
-                        settings: { slidesToShow: 3, slidesToScroll: 3 },
-                    },
-                    {
-                        breakpoint: 768,
-                        settings: { slidesToShow: 2, slidesToScroll: 2 },
-                    },
-                ]}
+                {...trendingCarouselSettings}
+                enableSnapToNearest={enableSnapToNearest}
+                enableDrag={enableDrag}
             />
         </div>
     );
