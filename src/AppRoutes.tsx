@@ -18,6 +18,8 @@ import { forumRoutes } from "./features/forum/routes/forumRoutes";
 import { modelsRoutes } from "./features/models/routes/modelsRoutes";
 import { policiesRoutes } from "./features/policies/routes/policiesRoutes";
 import { userRoutes } from "./features/user/routes/userRoutes";
+import { HeadingTestPage } from "./pages/HeadingTestPage";
+import { HeadingApproachesDemo } from "./pages/HeadingApproachesDemo";
 
 import Layout from "./features/shared/Layout";
 
@@ -38,6 +40,8 @@ export const AppRoutes: React.FC = () => {
         ...adminRoutes,
         ...forumRoutes,
         ...policiesRoutes,
+        { path: "/test-headings", element: <HeadingTestPage /> },
+        { path: "/heading-approaches", element: <HeadingApproachesDemo /> },
         { path: "*", element: <Navigate to={ROUTES.HOME} replace /> },
     ];
 

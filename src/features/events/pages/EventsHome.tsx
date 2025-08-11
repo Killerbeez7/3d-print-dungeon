@@ -11,6 +11,14 @@ const typeLabels: Record<EventType | "all", string> = {
     webinar: "Webinars",
 };
 
+// Shorter labels for mobile devices
+const mobileTypeLabels: Record<EventType | "all", string> = {
+    all: "All",
+    competition: "Comps",
+    meetup: "Meets",
+    webinar: "Web",
+};
+
 export const EventsHome = () => {
     const [type, setType] = useState<EventType | "all">("all");
     const [showCreate, setShowCreate] = useState(false);
@@ -26,26 +34,27 @@ export const EventsHome = () => {
     return (
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* title */}
-            <h1 className="text-txt-primary text-2xl sm:text-xl lg:text-4xl font-bold mb-8 text-center">
+            <h1 className="text-txt-primary font-bold mb-4 sm:mb-6 text-center">
                 Events & Competitions
             </h1>
 
             {/* filter chips – responsive grid for all devices */}
             <div className="mb-8 w-full max-w-md mx-auto">
                 {/* Tabs row */}
-                <div className="flex flex-row gap-2">
+                <div className="flex flex-row gap-1 sm:gap-2">
                     {Object.entries(typeLabels).map(([key, label]) => (
                         <button
                             key={key}
                             onClick={() => setType(key as EventType | "all")}
-                            className={`flex-1 px-4 py-2 rounded font-semibold transition text-center
+                            className={`flex-1 px-2 sm:px-4 py-2 rounded font-semibold transition text-center text-sm sm:text-base
                     ${
                         type === key
                             ? "bg-accent text-txt-highlight"
                             : "bg-bg-surface text-txt-primary hover:bg-bg-tertiary"
                     }`}
                         >
-                            {label}
+                            <span className="hidden sm:inline">{label}</span>
+                            <span className="sm:hidden">{mobileTypeLabels[key as EventType | "all"]}</span>
                         </button>
                     ))}
                 </div>

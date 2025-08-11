@@ -27,27 +27,86 @@ h6 {
     font-family: "Michroma", sans-serif;
 }
 
+/* Responsive heading sizes using CSS Custom Properties */
 h1 {
-    font-size: 2.5rem;
+    font-size: var(--heading-h1-mobile, 1.125rem);
 }
+
 h2 {
-    font-size: 2rem;
+    font-size: var(--heading-h2-mobile, 1rem);
 }
+
 h3 {
-    font-size: 1.75rem;
+    font-size: var(--heading-h3-mobile, 0.875rem);
 }
+
 h4 {
-    font-size: 1.5rem;
+    font-size: var(--heading-h4-mobile, 0.75rem);
 }
+
 h5 {
-    font-size: 1.25rem;
+    font-size: var(--heading-h5-mobile, 0.75rem);
 }
+
 h6 {
-    font-size: 1rem;
+    font-size: var(--heading-h6-mobile, 0.75rem);
 }
 
-/* Tailwind CSS */
+/* Responsive breakpoints for headings */
+@media (min-width: 640px) {
+    h1 { font-size: var(--heading-h1-sm, 1.25rem); }
+    h2 { font-size: var(--heading-h2-sm, 1.125rem); }
+    h3 { font-size: var(--heading-h3-sm, 1rem); }
+    h4 { font-size: var(--heading-h4-sm, 0.875rem); }
+    h5 { font-size: var(--heading-h5-sm, 0.875rem); }
+    h6 { font-size: var(--heading-h6-sm, 0.875rem); }
+}
 
+@media (min-width: 768px) {
+    h1 { font-size: var(--heading-h1-md, 1.5rem); }
+    h2 { font-size: var(--heading-h2-md, 1.25rem); }
+    h3 { font-size: var(--heading-h3-md, 1.125rem); }
+    h4 { font-size: var(--heading-h4-md, 1rem); }
+    h5 { font-size: var(--heading-h5-md, 1rem); }
+    h6 { font-size: var(--heading-h6-md, 1rem); }
+}
+
+@media (min-width: 1024px) {
+    h1 { font-size: var(--heading-h1-lg, 1.875rem); }
+    h2 { font-size: var(--heading-h2-lg, 1.5rem); }
+    h3 { font-size: var(--heading-h3-lg, 1.25rem); }
+    h4 { font-size: var(--heading-h4-lg, 1.125rem); }
+    h5 { font-size: var(--heading-h5-lg, 1.125rem); }
+    h6 { font-size: var(--heading-h6-lg, 1.125rem); }
+}
+
+@media (min-width: 1280px) {
+    h1 { font-size: var(--heading-h1-xl, 2.25rem); }
+    h2 { font-size: var(--heading-h2-xl, 1.875rem); }
+    h3 { font-size: var(--heading-h3-xl, 1.5rem); }
+    h4 { font-size: var(--heading-h4-xl, 1.25rem); }
+    h5 { font-size: var(--heading-h5-xl, 1.25rem); }
+    h6 { font-size: var(--heading-h6-xl, 1.25rem); }
+}
+
+@media (min-width: 1536px) {
+    h1 { font-size: var(--heading-h1-2xl, 2.25rem); }
+    h2 { font-size: var(--heading-h2-2xl, 2rem); }
+    h3 { font-size: var(--heading-h3-2xl, 1.75rem); }
+    h4 { font-size: var(--heading-h4-2xl, 1.5rem); }
+    h5 { font-size: var(--heading-h5-2xl, 1.5rem); }
+    h6 { font-size: var(--heading-h6-2xl, 1.5rem); }
+}
+
+/* ===========================================
+   IMPORT MODULAR STYLES
+   =========================================== */
+@import "./styles/tokens.css";
+@import "./styles/layout.css";
+@import "./styles/buttons.css";
+@import "./styles/utilities.css";
+
+/* Tailwind CSS - Import last to ensure it can override custom styles */
 @import "tailwindcss";
 
 :root {
@@ -68,6 +127,7 @@ h6 {
     --accent-dark: #007a78; /* deep teal */
     --accent: #00b3b0; /* bright, modern teal */
     --accent-hover: #33c5c3; /* lighter hover tone */
+    --accent-rgb: 0, 179, 176; /* RGB values for shadows */
 
     --btn-main: #d7e4e6;
     --btn-secondary: #b7c9cb;
@@ -147,14 +207,6 @@ h6 {
     --color-success: var(--success);
     --color-error: var(--error);
 }
-
-/* ===========================================
-   IMPORT MODULAR STYLES
-   =========================================== */
-@import "./styles/tokens.css";
-@import "./styles/layout.css";
-@import "./styles/buttons.css";
-@import "./styles/utilities.css";
 
 /* Custom Divider */
 .divider-top {
