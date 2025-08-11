@@ -4,11 +4,11 @@ import { SequentialImage } from "@/features/shared/reusable/SequentialImage";
 
 export const HomeModelsGrid = ({models, loadIndex, bumpIndex}: {models: ModelData[], loadIndex: number, bumpIndex: () => void}) => {
     return (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1 select-none">
             {models.map((m, idx) => (
                 <Link key={m.id} to={`/model/${m.id}`} className="group">
                     <article
-                        className="relative bg-bg-surface rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ease-out w-full cursor-pointer"
+                        className="relative bg-bg-surface rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ease-out w-full cursor-pointer select-none"
                         style={{
                             opacity: 0,
                             animation: "fadeIn 0.5s ease-out forwards",
@@ -16,7 +16,7 @@ export const HomeModelsGrid = ({models, loadIndex, bumpIndex}: {models: ModelDat
                         }}
                     >
                         {/* Image container with zoom effect */}
-                        <div className="aspect-square min-h-[1px] overflow-hidden">
+                        <div className="aspect-square min-h-[1px] overflow-hidden pointer-events-none">
                             <div className="w-full h-full transform transition-transform duration-500 ease-out group-hover:scale-110">
                                 <SequentialImage
                                     index={idx}

@@ -269,7 +269,7 @@ export const ProfileSettings = () => {
                             <div className="flex flex-col space-y-4">
                                 <div className="h-32 w-32 rounded-full overflow-hidden bg-bg-secondary">
                                     <img
-                                        src={currentUser?.photoURL || "/user.png"}
+                                        src={currentUser?.photoURL || "/assets/images/user.png"}
                                         alt="Profile"
                                         className="h-full w-full object-cover"
                                     />

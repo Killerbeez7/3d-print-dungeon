@@ -51,11 +51,12 @@ export const SequentialImage = memo(function SequentialImage({
         >
             {shouldLoad && (
                 <img
-                    className={`${className} absolute inset-0 w-full h-full object-cover aspect-ratio: 1 / 1`}
+                    className={`${className} absolute inset-0 w-full h-full object-cover aspect-ratio: 1 / 1 select-none`}
                     src={src}
                     alt={alt}
                     width={width}
                     height={height}
+                    draggable={false}
                     onLoad={() => {
                         if (index === loadIndex && onLoad) onLoad();
                     }}

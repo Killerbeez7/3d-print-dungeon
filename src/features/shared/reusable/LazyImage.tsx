@@ -47,7 +47,7 @@ export const LazyImage = ({
     };
 
     return (
-        <div ref={imgRef} className={`relative overflow-hidden ${wrapperClassName}`}>
+        <div ref={imgRef} className={`relative overflow-hidden select-none ${wrapperClassName}`}>
             {!loaded && (
                 <div
                     className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse"
@@ -58,6 +58,7 @@ export const LazyImage = ({
             {inView && (
                 <img
                     {...imgProps}
+                    draggable={false}
                     onLoad={handleLoad}
                     className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${
                         loaded ? "opacity-100" : "opacity-0"

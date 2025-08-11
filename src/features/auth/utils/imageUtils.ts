@@ -5,5 +5,5 @@ export const getHighResPhotoURL = (photoURL?: string | null): string => {
     if (photoURL && photoURL.includes("facebook.com")) {
         return photoURL.replace(/&type=normal/, "&type=large");
     }
-    return photoURL || "/user.png";
+    return photoURL || "/assets/images/user.png";
 };

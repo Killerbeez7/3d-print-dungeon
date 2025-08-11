@@ -26,7 +26,7 @@ export const SettingsPage = () => {
             <aside className="md:w-1/4 p-4 bg-bg-surface shadow-md rounded-lg">
                 <div className="flex md:flex-col flex-row md:gap-1 gap-5 justify-center items-center text-center">
                     <img
-                        src={currentUser?.photoURL || "/user.png"}
+                        src={currentUser?.photoURL || "/assets/images/user.png"}
                         alt="User Avatar"
                         className="w-24 h-24 rounded-full border-2 border-br-primary"
                     />
