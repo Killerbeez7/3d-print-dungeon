@@ -6,6 +6,7 @@
 
 import type { UserProfileValues } from "../types/profile";
 import { mockData } from "../mocks/mockData";
+import { H2, H3, H4, StatValueSecondary, Badge } from "@/components/index";
 
 interface UserPortfolioProps {
     user: UserProfileValues;
@@ -14,14 +15,14 @@ interface UserPortfolioProps {
 export const UserPortfolio = ({}: UserPortfolioProps): React.ReactNode => {
     return (
         <div className="bg-bg-secondary rounded-lg p-6 shadow-md">
-            <h2 className="text-2xl font-bold text-txt-primary mb-6">Portfolio</h2>
+            <H2 size="2xl" className="text-txt-primary mb-6">Portfolio</H2>
 
             {/* Featured Works */}
             {mockData.portfolio.featuredWorks.length > 0 && (
                 <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-txt-primary mb-4">
+                    <H3 size="lg" className="text-txt-primary mb-4">
                         Featured Works
-                    </h3>
+                    </H3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {mockData.portfolio.featuredWorks.map((workId, index) => (
                             <div
@@ -45,17 +46,18 @@ export const UserPortfolio = ({}: UserPortfolioProps): React.ReactNode => {
             {/* Categories */}
             {mockData.portfolio.categories.length > 0 && (
                 <div className="mb-8">
-                    <h3 className="text-lg font-semibold text-txt-primary mb-4">
+                    <H3 size="lg" className="text-txt-primary mb-4">
                         Categories
-                    </h3>
+                    </H3>
                     <div className="flex flex-wrap gap-2">
                         {mockData.portfolio.categories.map((category) => (
-                            <span
+                            <Badge
                                 key={category}
-                                className="px-3 py-1 bg-bg-primary text-txt-primary rounded-full text-sm"
+                                as="span"
+                                className="px-3 py-1 bg-bg-primary rounded-full"
                             >
                                 {category}
-                            </span>
+                            </Badge>
                         ))}
                     </div>
                 </div>
@@ -64,29 +66,29 @@ export const UserPortfolio = ({}: UserPortfolioProps): React.ReactNode => {
             {/* Commission Rates */}
             {mockData.portfolio.commissionRates && (
                 <div>
-                    <h3 className="text-lg font-semibold text-txt-primary mb-4">
+                    <H3 size="lg" className="text-txt-primary mb-4">
                         Commission Rates
-                    </h3>
+                    </H3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="bg-bg-surface rounded-lg p-4 text-center">
-                            <h4 className="font-semibold text-txt-primary mb-2">Small</h4>
-                            <p className="text-2xl font-bold text-txt-highlighted">
+                            <H4 size="base" className="text-txt-primary mb-2">Small</H4>
+                            <StatValueSecondary as="p">
                                 ${mockData.portfolio.commissionRates.small}
-                            </p>
+                            </StatValueSecondary>
                         </div>
                         <div className="bg-bg-surface rounded-lg p-4 text-center">
-                            <h4 className="font-semibold text-txt-primary mb-2">
+                            <H4 size="base" className="text-txt-primary mb-2">
                                 Medium
-                            </h4>
-                            <p className="text-2xl font-bold text-txt-highlighted">
+                            </H4>
+                            <StatValueSecondary as="p">
                                 ${mockData.portfolio.commissionRates.medium}
-                            </p>
+                            </StatValueSecondary>
                         </div>
                         <div className="bg-bg-surface rounded-lg p-4 text-center">
-                            <h4 className="font-semibold text-txt-primary mb-2">Large</h4>
-                            <p className="text-2xl font-bold text-txt-highlighted">
+                            <H4 size="base" className="text-txt-primary mb-2">Large</H4>
+                            <StatValueSecondary as="p">
                                 ${mockData.portfolio.commissionRates.large}
-                            </p>
+                            </StatValueSecondary>
                         </div>
                     </div>
                 </div>

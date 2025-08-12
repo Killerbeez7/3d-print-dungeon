@@ -1,4 +1,5 @@
 import type { UserProfileValues } from "../types/profile";
+import { H2, H3, StatValue, StatValueSecondary, Label, Metadata, HelpText } from "@/components/index";
 
 interface PrivateStatsProps {
     user: UserProfileValues;
@@ -6,77 +7,77 @@ interface PrivateStatsProps {
 
 export const PrivateStats = ({ user }: PrivateStatsProps): React.ReactNode => {
     return (
-        <div className="bg-bg-secondary rounded-lg p-6 shadow-md">
-            <h2 className="text-2xl font-bold text-txt-primary mb-6">Private Statistics</h2>
+        <div className="bg-bg-secondary rounded-lg p-4 sm:p-6 shadow-md">
+            <H2 size="2xl" className="text-txt-primary mb-4 sm:mb-6">Private Statistics</H2>
 
             {/* Enhanced Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
                 <div className="text-center">
-                    <div className="text-3xl font-bold text-txt-highlighted mb-2">
+                    <StatValue as="div" className="mb-1 sm:mb-2">
                         {user.stats.uploadsCount}
-                    </div>
-                    <div className="text-sm text-txt-secondary">Total Uploads</div>
+                    </StatValue>
+                    <Label as="div" className="text-xs sm:text-sm">Total Uploads</Label>
                 </div>
 
                 <div className="text-center">
-                    <div className="text-3xl font-bold text-txt-highlighted mb-2">
+                    <StatValue as="div" className="mb-1 sm:mb-2">
                         {user.stats.likesCount}
-                    </div>
-                    <div className="text-sm text-txt-secondary">Total Likes</div>
+                    </StatValue>
+                    <Label as="div" className="text-xs sm:text-sm">Total Likes</Label>
                 </div>
 
                 <div className="text-center">
-                    <div className="text-3xl font-bold text-txt-highlighted mb-2">
+                    <StatValue as="div" className="mb-1 sm:mb-2">
                         {user.stats.viewsCount}
-                    </div>
-                    <div className="text-sm text-txt-secondary">Total Views</div>
+                    </StatValue>
+                    <Label as="div" className="text-xs sm:text-sm">Total Views</Label>
                 </div>
 
                 <div className="text-center">
-                    <div className="text-3xl font-bold text-txt-highlighted mb-2">
+                    <StatValue as="div" className="mb-1 sm:mb-2">
                         {user.stats.followers}
-                    </div>
-                    <div className="text-sm text-txt-secondary">Followers</div>
+                    </StatValue>
+                    <Label as="div" className="text-xs sm:text-sm">Followers</Label>
                 </div>
             </div>
 
             {/* Additional Private Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
                 <div className="text-center">
-                    <div className="text-2xl font-bold text-txt-primary mb-2">
+                    <StatValueSecondary as="div" className="mb-1 sm:mb-2">
                         {user.stats.following}
-                    </div>
-                    <div className="text-sm text-txt-secondary">Following</div>
+                    </StatValueSecondary>
+                    <Label as="div" className="text-xs sm:text-sm">Following</Label>
                 </div>
 
                 <div className="text-center">
-                    <div className="text-2xl font-bold text-txt-primary mb-2">
+                    <StatValueSecondary as="div" className="mb-1 sm:mb-2">
                         {user.stats.collectionsCount}
-                    </div>
-                    <div className="text-sm text-txt-secondary">Collections</div>
+                    </StatValueSecondary>
+                    <Label as="div" className="text-xs sm:text-sm">Collections</Label>
                 </div>
 
                 <div className="text-center">
-                    <div className="text-2xl font-bold text-txt-primary mb-2">
+                    <StatValueSecondary as="div" className="mb-1 sm:mb-2">
                         {user.isPremium ? "Premium" : "Free"}
-                    </div>
-                    <div className="text-sm text-txt-secondary">Account Type</div>
+                    </StatValueSecondary>
+                    <Label as="div" className="text-xs sm:text-sm">Account Type</Label>
                 </div>
 
                 <div className="text-center">
-                    <div className="text-2xl font-bold text-txt-primary mb-2">
+                    <StatValueSecondary as="div" className="mb-1 sm:mb-2">
                         {user.isVerified ? "✓" : "—"}
-                    </div>
-                    <div className="text-sm text-txt-secondary">Verified</div>
+                    </StatValueSecondary>
+                    <Label as="div" className="text-xs sm:text-sm">Verified</Label>
                 </div>
             </div>
 
             {/* Account Information */}
-            <div className="mt-8 pt-6 border-t border-br-secondary">
-                <h3 className="text-lg font-semibold text-txt-primary mb-4">Account Information</h3>
+            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-br-secondary">
+                <H3 size="lg" className="text-txt-primary mb-4">Account Information</H3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-bg-surface rounded-lg p-4">
-                        <div className="text-sm text-txt-secondary mb-1">Member Since</div>
+                        <Metadata as="div" className="mb-1">Member Since</Metadata>
                         <div className="text-txt-primary font-medium">
                             {user.createdAt instanceof Date 
                                 ? user.createdAt.toLocaleDateString()
@@ -85,7 +86,7 @@ export const PrivateStats = ({ user }: PrivateStatsProps): React.ReactNode => {
                         </div>
                     </div>
                     <div className="bg-bg-surface rounded-lg p-4">
-                        <div className="text-sm text-txt-secondary mb-1">Last Updated</div>
+                        <Metadata as="div" className="mb-1">Last Updated</Metadata>
                         <div className="text-txt-primary font-medium">
                             {user.updatedAt instanceof Date 
                                 ? user.updatedAt.toLocaleDateString()
@@ -95,13 +96,13 @@ export const PrivateStats = ({ user }: PrivateStatsProps): React.ReactNode => {
                     </div>
                     {user.location && (
                         <div className="bg-bg-surface rounded-lg p-4">
-                            <div className="text-sm text-txt-secondary mb-1">Location</div>
+                            <Metadata as="div" className="mb-1">Location</Metadata>
                             <div className="text-txt-primary font-medium">{user.location}</div>
                         </div>
                     )}
                     {user.website && (
                         <div className="bg-bg-surface rounded-lg p-4">
-                            <div className="text-sm text-txt-secondary mb-1">Website</div>
+                            <Metadata as="div" className="mb-1">Website</Metadata>
                             <div className="text-txt-primary font-medium">
                                 <a 
                                     href={user.website} 
@@ -118,14 +119,14 @@ export const PrivateStats = ({ user }: PrivateStatsProps): React.ReactNode => {
             </div>
 
             {/* Preferences Summary */}
-            <div className="mt-8 pt-6 border-t border-br-secondary">
+            <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-br-secondary">
                 <h3 className="text-lg font-semibold text-txt-primary mb-4">Privacy Settings</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-bg-surface rounded-lg p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <div className="text-sm text-txt-secondary mb-1">Public Profile</div>
-                                <div className="text-xs text-txt-secondary">Allow others to view your profile</div>
+                                <Metadata as="div" className="mb-1">Public Profile</Metadata>
+                                <HelpText as="div">Allow others to view your profile</HelpText>
                             </div>
                             <div className={`w-4 h-4 rounded-full ${user.preferences.publicProfile ? 'bg-green-500' : 'bg-red-500'}`}></div>
                         </div>
@@ -133,8 +134,8 @@ export const PrivateStats = ({ user }: PrivateStatsProps): React.ReactNode => {
                     <div className="bg-bg-surface rounded-lg p-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <div className="text-sm text-txt-secondary mb-1">Email Notifications</div>
-                                <div className="text-xs text-txt-secondary">Receive email updates</div>
+                                <Metadata as="div" className="mb-1">Email Notifications</Metadata>
+                                <HelpText as="div">Receive email updates</HelpText>
                             </div>
                             <div className={`w-4 h-4 rounded-full ${user.preferences.emailNotifications ? 'bg-green-500' : 'bg-red-500'}`}></div>
                         </div>

@@ -10,6 +10,7 @@ import { UserStats } from "../components/UserStats";
 import { ProfileSettingsPanel } from "../components/ProfileSettingsPanel";
 import { PrivateStats } from "../components/PrivateStats";
 import { Spinner } from "@/features/shared/reusable/Spinner";
+import { H1 } from "@/components/ResponsiveHeading";
 // types
 import type { RawUserData } from "@/features/user/types/user";
 import type { UserProfileValues } from "../types/profile";
@@ -69,9 +70,9 @@ export const PublicProfilePage = (): React.ReactNode => {
         return (
             <div className="flex justify-center items-center min-h-screen">
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold text-txt-primary mb-4">
+                    <H1 size="2xl" className="text-txt-primary mb-4">
                         User Not Found
-                    </h1>
+                    </H1>
                     <p className="text-txt-secondary">
                         {error || "The user you're looking for doesn't exist."}
                     </p>

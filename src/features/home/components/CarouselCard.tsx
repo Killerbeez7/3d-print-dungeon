@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { getBadgeColorClass } from "../getBadgeColorClass";
+import { getBadgeColorClass } from "../utils/getBadgeColorClass";
 import type { CarouselItem } from "../types/carousel";
 
 interface CarouselCardProps {

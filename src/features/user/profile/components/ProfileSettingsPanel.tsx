@@ -23,6 +23,7 @@ import { ROUTES } from "@/constants/routeConstants";
 import type { UserProfileValues, Tab } from "../types/profile";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import type { ModelData } from "@/features/models/types/model";
+import { H2, H3 } from "@/components/ResponsiveHeading";
 
 // Model card component for the carousel (smaller version)
 const ModelCarouselCard = ({
@@ -199,9 +200,9 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
                 return (
                     <div className="bg-bg-surface rounded-lg p-6">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-semibold text-txt-primary">
+                            <H3 size="lg" className="text-txt-primary">
                                 My Uploads ({user.stats.uploadsCount})
-                            </h3>
+                            </H3>
                             <Link
                                 to="/upload"
                                 className="text-sm bg-accent hover:bg-accent-hover text-white px-3 py-1 rounded-md transition-colors"
@@ -284,9 +285,9 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
             case "likes":
                 return (
                     <div className="bg-bg-surface rounded-lg p-6">
-                        <h3 className="text-xl font-semibold text-txt-primary mb-4">
+                        <H3 size="lg" className="text-txt-primary mb-4">
                             Liked Models ({user.stats.likesCount})
-                        </h3>
+                        </H3>
                         <p className="text-txt-secondary mb-6">
                             Your liked models. Organize them into collections or remove
                             likes you no longer want.
@@ -464,9 +465,9 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
             {/* Settings Header */}
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h2 className="text-2xl font-bold text-txt-primary">
+                    <H2 size="2xl" className="text-txt-primary">
                         Profile Management
-                    </h2>
+                    </H2>
                     <p className="text-sm text-txt-secondary">
                         Welcome back, {user.displayName}!
                     </p>

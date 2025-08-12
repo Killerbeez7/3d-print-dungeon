@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchCategories, type Category } from "@/features/search-filters/services/categoryService";
 import { TiDelete } from "react-icons/ti";
 import { ImagesUpload } from "./ImagesUpload";
+import { FormLabel, H3 } from "@/components/index";
 import type { ModelData } from "@/features/models/types/model";
 
 interface InfoFormProps {
@@ -63,9 +64,9 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
 
                 <form className="space-y-4">
                     <div>
-                        <label className="block text-txt-secondary font-semibold">
+                        <FormLabel as="div" className="block mb-1">
                             Model Name <span className="text-error">*</span>
-                        </label>
+                        </FormLabel>
                         <input
                             type="text"
                             name="name"
@@ -73,7 +74,7 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
                                 typeof modelData.name === "string" ? modelData.name : ""
                             }
                             onChange={handleModelDataChange}
-                            className="w-full p-2 border rounded-md bg-bg-surface"
+                            className="w-full p-3 border border-br-secondary rounded-md bg-bg-surface text-txt-primary placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
                             placeholder="Enter model name"
                             required
                         />
@@ -81,9 +82,9 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
 
                     {/* Category multi-select */}
                     <div>
-                        <label className="block text-txt-secondary font-semibold mb-1">
+                        <FormLabel as="div" className="block mb-1">
                             Categories <span className="text-error">*</span>
-                        </label>
+                        </FormLabel>
                         <select
                             multiple
                             value={modelData.categoryIds ?? []}
@@ -91,7 +92,7 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
                                 const vals = Array.from(e.target.selectedOptions).map((o) => o.value);
                                 setModelData((prev) => ({ ...prev, categoryIds: vals }));
                             }}
-                            className="w-full p-2 border rounded-md bg-bg-surface h-40"
+                            className="w-full p-3 border border-br-secondary rounded-md bg-bg-surface h-40 text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
                         >
                             {categories?.map((c) => (
                                 <option key={c.id} value={c.id}>
@@ -102,9 +103,9 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
                     </div>
 
                     <div>
-                        <label className="block text-txt-secondary font-semibold">
+                        <FormLabel as="div" className="block mb-1">
                             Description <span className="text-error">*</span>
-                        </label>
+                        </FormLabel>
                         <textarea
                             name="description"
                             value={
@@ -113,7 +114,7 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
                                     : ""
                             }
                             onChange={handleModelDataChange}
-                            className="w-full p-2 border rounded-md bg-bg-surface"
+                            className="w-full p-3 border border-br-secondary rounded-md bg-bg-surface text-txt-primary placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
                             placeholder="Enter model description"
                             required
                         />
@@ -129,32 +130,32 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
                             }
                             className="accent-accent h-4 w-4"
                         />
-                        <label className="text-txt-secondary">Model is AI-generated</label>
+                        <FormLabel as="div">Model is AI-generated</FormLabel>
                     </div>
 
                     {/* Tags Section */}
-                    <div className="border rounded p-4">
-                        <h4 className="font-semibold mb-2 text-txt-primary">Add Tags</h4>
+                    <div className="border border-br-secondary rounded-lg p-4 bg-bg-secondary">
+                        <H3 size="base" className="mb-3">Add Tags</H3>
                         <input
                             type="text"
                             value={newTag}
                             onChange={handleTagInputChange}
                             onKeyDown={handleTagAdd}
                             placeholder="Press enter to add tags"
-                            className="w-full px-4 py-2 text-sm border rounded mb-2 bg-bg-surface"
+                            className="w-full px-4 py-2 text-sm border border-br-secondary rounded-md mb-3 bg-bg-surface text-txt-primary placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
                         />
                         <div className="flex flex-wrap gap-2">
                             {Array.isArray(modelData.tags) &&
                                 modelData.tags.map((tag: string) => (
                                     <div
                                         key={tag}
-                                        className="cta-button flex items-center px-3 py-1 rounded-full"
+                                        className="bg-accent text-white flex items-center px-3 py-1 rounded-full"
                                     >
-                                        <span>{tag}</span>
+                                        <span className="text-sm">{tag}</span>
                                         <button
                                             type="button"
                                             onClick={() => handleTagRemove(tag)}
-                                            className="ml-2 text-bg-reverse"
+                                            className="ml-2 text-white hover:text-red-200 transition-colors"
                                         >
                                             <TiDelete size={18} />
                                         </button>

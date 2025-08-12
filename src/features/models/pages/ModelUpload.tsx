@@ -1,5 +1,7 @@
 import { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useNotification } from "@/features/notifications";
 import { createAdvancedModel } from "@/features/models/services/modelsService";
 import { finalConvertFileToGLB } from "@/features/models/utils/converter";
 import { useModelViewer } from "@/features/models/hooks/useModelViewer";
@@ -8,8 +10,8 @@ import { useModelViewer } from "@/features/models/hooks/useModelViewer";
 import { FilesUpload } from "../components/model-upload/FilesUpload";
 import { InfoForm } from "../components/model-upload/InfoForm";
 import { PricingForm } from "../components/model-upload/PricingForm";
-import { AlertModal } from "@/features/shared/AlertModal";
 import { SellerVerification } from "@/features/payment/components/SellerVerification";
+import { H1 } from "@/components/index";
 
 import type { ModelData } from "@/features/models/types/model";
 
@@ -17,6 +19,8 @@ const UPLOAD_STATE_KEY = "pendingUploadState";
 
 export function ModelUpload() {
     const { currentUser, userData } = useAuth();
+    const navigate = useNavigate();
+    const notification = useNotification();
 
     const [step, setStep] = useState(1);
     const [error, setError] = useState("");
@@ -49,8 +53,65 @@ export function ModelUpload() {
         uploaderDisplayName: "",
         isAI: false,
     });
+
     // @ts-expect-error FIX later
     const modelViewerRef = useRef();
+
+    // Function to reset all form fields
+    const resetAllFields = () => {
+        setStep(1);
+        setError("");
+        setIsUploading(false);
+        setUploadProgress(0);
+        setFiles([]);
+        setPosterDataUrl(null);
+        setConvertedBlob(null);
+        setShowSuccessModal(false);
+        setShowSellerVerification(false);
+        
+        setModelData({
+            id: "",
+            name: "",
+            description: "",
+            categoryIds: [],
+            tags: [],
+            renderFiles: [],
+            renderPreviewUrls: [],
+            selectedRenderIndex: 0,
+            price: 0,
+            isPaid: false,
+            uploaderId: "",
+            convertedFileUrl: "",
+            originalFileUrl: "",
+            renderExtraUrls: [],
+            posterUrl: "",
+            renderPrimaryUrl: "",
+            uploaderDisplayName: "",
+            isAI: false,
+        });
+    };
+
+    // Function to handle successful upload
+    const handleUploadSuccess = () => {
+        // Show green success notification
+        notification.success(
+            "Upload Successful! 🎉",
+            `Your model "${modelData.name}" has been successfully uploaded${
+                modelData.isPaid
+                    ? " and is now available for purchase"
+                    : " and is now available for download"
+            }!`,
+            5000 // Show for 5 seconds
+        );
+
+        // Reset all fields
+        resetAllFields();
+
+        // Navigate to home page after a short delay
+        setTimeout(() => {
+            navigate("/");
+        }, 1000);
+    };
 
     useEffect(() => {
         const savedStateJSON = sessionStorage.getItem(UPLOAD_STATE_KEY);
@@ -231,7 +292,7 @@ export function ModelUpload() {
                 isAI: modelData.isAI,
             });
 
-            setShowSuccessModal(true);
+            handleUploadSuccess();
         } catch (err) {
             console.error("Upload error:", err);
             setError((err as Error).message || "Upload failed. Please try again.");
@@ -263,10 +324,10 @@ export function ModelUpload() {
     return (
         <div className="max-w-4xl mx-auto py-8 px-4">
             <div className="mb-8">
-                <h1 className="text-3xl font-bold text-txt-primary mb-4">
+                <H1 size="3xl" className="mb-4">
                     Upload Your 3D Model
-                </h1>
-                <div className="flex items-center space-x-8 mb-8">
+                </H1>
+                <div className="flex items-center space-x-4 sm:space-x-6 md:space-x-8 mb-8">
                     <StepIndicator stepNumber={1} label="Files" currentStep={step} />
                     <StepIndicator stepNumber={2} label="Details" currentStep={step} />
                     <StepIndicator stepNumber={3} label="Pricing" currentStep={step} />
@@ -274,12 +335,12 @@ export function ModelUpload() {
             </div>
 
             {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-                    <p className="text-red-800">{error}</p>
+                <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-md">
+                    <p className="text-error">{error}</p>
                 </div>
             )}
 
-            <div className="bg-bg-surface rounded-lg p-6 shadow-sm">
+            <div className="bg-bg-secondary rounded-lg p-4 sm:p-6 shadow-md">
                 {step === 1 && (
                     <div>
                         <FilesUpload step={step} files={files} setFiles={setFiles} />
@@ -287,7 +348,7 @@ export function ModelUpload() {
                             <button
                                 onClick={nextStep}
                                 disabled={!canProceedToStep2}
-                                className="px-6 py-2 bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="px-6 py-2 bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50 transition-colors font-medium"
                             >
                                 Next: Add Details
                             </button>
@@ -301,14 +362,14 @@ export function ModelUpload() {
                         <div className="flex justify-between mt-6">
                             <button
                                 onClick={prevStep}
-                                className="px-6 py-2 border border-br-secondary rounded-md text-txt-secondary hover:bg-bg-hover transition-colors"
+                                className="px-6 py-2 border border-br-secondary rounded-md text-txt-secondary hover:bg-bg-tertiary transition-colors font-medium"
                             >
                                 Back
                             </button>
                             <button
                                 onClick={nextStep}
                                 disabled={!canProceedToStep3}
-                                className="px-6 py-2 bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="px-6 py-2 bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                             >
                                 Next: Set Pricing
                             </button>
@@ -322,14 +383,14 @@ export function ModelUpload() {
                         <div className="flex justify-between mt-6">
                             <button
                                 onClick={prevStep}
-                                className="px-6 py-2 border border-br-secondary rounded-md text-txt-secondary hover:bg-bg-hover transition-colors"
+                                className="px-6 py-2 border border-br-secondary rounded-md text-txt-secondary hover:bg-bg-tertiary transition-colors font-medium"
                             >
                                 Back
                             </button>
                             <button
                                 type="submit"
                                 disabled={isUploading}
-                                className="px-6 py-2 bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="px-6 py-2 bg-accent text-white rounded-md hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
                             >
                                 {isUploading ? (
                                     <div className="flex items-center">
@@ -366,16 +427,7 @@ export function ModelUpload() {
                 environment-image="neutral"
             />
 
-            <AlertModal
-                isOpen={showSuccessModal}
-                onClose={() => setShowSuccessModal(false)}
-                title="Upload Successful!"
-                message={`Your model has been successfully uploaded${
-                    modelData.isPaid
-                        ? " and is now available for purchase"
-                        : " and is now available for download"
-                }!`}
-            />
+
 
             <SellerVerification
                 isOpen={showSellerVerification}
@@ -402,7 +454,7 @@ function StepIndicator({ stepNumber, label, currentStep }: StepIndicatorProps) {
                 isActive
                     ? "text-accent"
                     : isCompleted
-                    ? "text-green-600"
+                    ? "text-success"
                     : "text-txt-secondary"
             }`}
         >
@@ -411,7 +463,7 @@ function StepIndicator({ stepNumber, label, currentStep }: StepIndicatorProps) {
                     isActive
                         ? "bg-accent shadow-lg shadow-accent/20"
                         : isCompleted
-                        ? "bg-green-600"
+                        ? "bg-success"
                         : "bg-bg-surface"
                 } text-white font-bold`}
             >

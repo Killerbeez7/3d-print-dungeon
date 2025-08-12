@@ -51,7 +51,7 @@ export const HomeModelsGrid = ({models, loadIndex, bumpIndex}: {models: ModelDat
                                 {/* Action indicator */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-1">
-                                        <div className="w-1.5 h-1.5 bg-white/80 rounded-full animate-pulse"></div>
+                                        <div className="w-1.5 h-1.5 bg-success rounded-full animate-pulse"></div>
                                         <span className="text-[10px] text-white/90 font-medium">View</span>
                                     </div>
                                     <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">

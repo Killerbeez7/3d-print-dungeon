@@ -6,6 +6,7 @@ import { useFetchModels } from "@/features/models/hooks/useFetchModels";
 
 import { HomeModelsGrid } from "../components/HomeModelsGrid";
 import { Spinner } from "@/features/shared/reusable/Spinner";
+import { H2 } from "@/components/ResponsiveHeading";
 
 import { useState, useCallback, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -56,7 +57,7 @@ export const HomePage = (): React.ReactNode => {
                 items={featuredCarouselItems}
             />
             <section className="p-4 md:p-8">
-                <h2 className="text-2xl font-bold mb-6">All Models</h2>
+                <H2 size="2xl" className="mb-6">All Models</H2>
                 <InfiniteScrollList
                     items={models}
                     hasMore={hasNextPage}

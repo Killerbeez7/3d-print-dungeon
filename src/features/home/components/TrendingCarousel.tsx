@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ReusableCarousel } from "@/features/shared/reusable/carousel/ReusableCarousel";
-import { trendingCarouselSettings } from "@/features/shared/reusable/carousel/carouselSettings";
+import { defaultCarouselSettings } from "@/features/shared/reusable/carousel/carouselSettings";
+import { Badge, H3 } from "@/components/index";
 import type { FC } from "react";
 
 export interface TrendingCarouselItem {
@@ -19,14 +20,10 @@ export interface TrendingCarouselItem {
 
 export interface TrendingCarouselProps {
     items: TrendingCarouselItem[];
-    enableSnapToNearest?: boolean;
-    enableDrag?: boolean;
 }
 
 export const TrendingCarousel: FC<TrendingCarouselProps> = ({ 
-    items, 
-    enableSnapToNearest = true,
-    enableDrag = true
+    items
 }) => {
     const renderItem = (item: TrendingCarouselItem) => (
         <Link to={item.link} target="_blank" rel="noopener noreferrer">
@@ -44,16 +41,16 @@ export const TrendingCarousel: FC<TrendingCarouselProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                     {/* Top Content - Mature Badge */}
                     {item.mature && (
-                        <div className="bg-red-600 text-white text-xs px-2 py-1 rounded self-start">
+                        <Badge as="div" className="bg-red-600 text-white px-2 py-1 rounded self-start">
                             MATURE CONTENT
-                        </div>
+                        </Badge>
                     )}
 
                     {/* Bottom Content */}
                     <div className="text-white">
-                        <h3 className="text-lg font-bold mb-1 line-clamp-2">
+                        <H3 size="lg" className="mb-1 line-clamp-2">
                             {item.title}
-                        </h3>
+                        </H3>
 
                         {/* Rating and Reviews */}
                         <div className="flex items-center gap-2 mb-2">
@@ -104,9 +101,7 @@ export const TrendingCarousel: FC<TrendingCarouselProps> = ({
             <ReusableCarousel<TrendingCarouselItem>
                 items={items}
                 renderItem={renderItem}
-                {...trendingCarouselSettings}
-                enableSnapToNearest={enableSnapToNearest}
-                enableDrag={enableDrag}
+                {...defaultCarouselSettings}
             />
         </div>
     );

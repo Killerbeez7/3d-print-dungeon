@@ -1,4 +1,5 @@
 import { getAvatarUrl } from "@/utils/avatar";
+import { H1, Description, Label, StatValueSecondary } from "@/components/index";
 
 import type { UserProfileValues } from "../types/profile";
 
@@ -8,7 +9,7 @@ interface UserProfileProps {
 
 export const UserHeader = ({ user }: UserProfileProps): React.ReactNode => {
     return (
-        <div className="bg-bg-secondary rounded-lg p-6 shadow-md">
+        <div className="bg-bg-secondary rounded-lg p-4 sm:p-6 shadow-md">
             <div className="flex items-start space-x-6">
                 {/* User Avatar */}
                 <div className="flex-shrink-0">
@@ -25,36 +26,36 @@ export const UserHeader = ({ user }: UserProfileProps): React.ReactNode => {
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h1 className="text-3xl font-bold text-txt-primary mb-2">
+                            <H1 size="3xl" className="mb-2">
                                 {user.displayName}
-                            </h1>
+                            </H1>
                             {user.bio && (
-                                <p className="text-txt-secondary text-lg mb-4">
+                                <Description className="mb-4">
                                     {user.bio}
-                                </p>
+                                </Description>
                             )}
                         </div>
                     </div>
 
                     {/* User Stats */}
-                    <div className="flex space-x-8 mt-4">
+                    <div className="flex space-x-4 sm:space-x-6 md:space-x-8 mt-4">
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-txt-primary">
-                                {user.stats.uploadsCount}
-                            </div>
-                            <div className="text-sm text-txt-secondary">Uploads</div>
+                                                    <StatValueSecondary as="div" className="mb-1">
+                            {user.stats.uploadsCount}
+                        </StatValueSecondary>
+                        <Label as="div" className="text-xs sm:text-sm">Uploads</Label>
                         </div>
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-txt-primary">
-                                {user.stats.followers}
-                            </div>
-                            <div className="text-sm text-txt-secondary">Followers</div>
+                                                    <StatValueSecondary as="div" className="mb-1">
+                            {user.stats.followers}
+                        </StatValueSecondary>
+                        <Label as="div" className="text-xs sm:text-sm">Followers</Label>
                         </div>
                         <div className="text-center">
-                            <div className="text-2xl font-bold text-txt-primary">
-                                {user.stats.likesCount}
-                            </div>
-                            <div className="text-sm text-txt-secondary">Likes</div>
+                                                    <StatValueSecondary as="div" className="mb-1">
+                            {user.stats.likesCount}
+                        </StatValueSecondary>
+                        <Label as="div" className="text-xs sm:text-sm">Likes</Label>
                         </div>
                     </div>
 

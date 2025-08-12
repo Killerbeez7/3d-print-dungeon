@@ -2,6 +2,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCloudArrowUp, faFile, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import { H2, Label, Metadata } from "@/components/index";
 
 import { ALLOWED_EXTENSIONS } from "../../constants/ALLOWED_EXTENSIONS";
 import type { FC, Dispatch, SetStateAction } from "react";
@@ -57,13 +58,13 @@ export const FilesUpload: FC<FilesUploadProps> = ({ step, files, setFiles }) => 
                         icon={faCloudArrowUp}
                         className="text-5xl text-accent transition-transform duration-200 group-hover:scale-105"
                     />
-                    <p className="font-semibold text-txt-primary">
+                    <H2 size="lg" className="text-center">
                         Drag & Drop your files
-                    </p>
-                    <p className="text-sm text-txt-secondary">or click to browse</p>
-                    <p className="text-xs text-txt-muted max-w-lg">
+                    </H2>
+                    <Label as="p" className="text-center">or click to browse</Label>
+                    <Metadata as="p" className="text-center max-w-lg">
                         Supported: {ALLOWED_EXTENSIONS.join(", ")}
-                    </p>
+                    </Metadata>
                 </div>
             )}
 
@@ -85,12 +86,12 @@ interface UploadedFilesListProps {
 
 const UploadedFilesList: FC<UploadedFilesListProps> = ({ files, removeFile }) => {
     return (
-        <div className="border-2 border-br-secondary rounded-md p-4 mt-4">
+        <div className="border-2 border-br-secondary rounded-md p-4 mt-4 bg-bg-surface">
             <ul className="flex flex-col gap-2">
                 {files.map((file) => (
                     <li
                         key={file.name}
-                        className="flex items-center justify-between bg-bg-surface hover:bg-bg-tertiary/60 p-3 rounded-lg transition-colors"
+                        className="flex items-center justify-between  hover:bg-bg-tertiary p-3 rounded-lg transition-colors"
                     >
                         <div className="flex items-center gap-2">
                             <FontAwesomeIcon icon={faFile} className="text-accent" />

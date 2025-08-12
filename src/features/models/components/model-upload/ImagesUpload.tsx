@@ -174,7 +174,7 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
 
             <div>
                 <h3 className="text-xl font-bold text-txt-primary mb-1">Primary Render</h3>
-                <p className="text-sm text-txt-secondary">This is the main image for your model.</p>
+                <p className="text-sm text-txt-secondary">This is the main image that will be displayed as the primary preview for your model.</p>
             </div>
             
             <PrimaryPreview
@@ -188,7 +188,7 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
             {renders.length > 0 && (
                  <div>
                     <h3 className="text-xl font-bold text-txt-primary mb-1">All Renders</h3>
-                    <p className="text-sm text-txt-secondary">Click to set a primary render. Drag to reorder.</p>
+                    <p className="text-sm text-txt-secondary">Click on any image to set it as the primary render. Drag to reorder the display sequence.</p>
                 </div>
             )}
             
@@ -203,9 +203,9 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
             {renders.length > 0 && renders.length < 16 && (
                 <button 
                     onClick={handleFileSelect}
-                    className="w-full py-2 px-4 border-2 border-dashed border-br-secondary rounded-lg text-txt-secondary hover:border-accent hover:text-accent transition-colors"
+                    className="w-full py-3 px-4 border-2 border-dashed border-br-secondary rounded-lg text-txt-secondary hover:border-accent hover:text-accent transition-colors font-medium"
                 >
-                    Add More Renders
+                    + Add More Renders
                 </button>
             )}
 

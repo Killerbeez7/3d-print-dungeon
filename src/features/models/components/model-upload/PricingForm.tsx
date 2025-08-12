@@ -1,6 +1,7 @@
 import { useState, ChangeEvent, FC } from "react";
 import { paymentService } from "@/features/payment/services/paymentService";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { H3, FormLabel, Description, Metadata } from "@/components/index";
 import type { ModelData } from "@/features/models/types/model";
 
 export interface PricingFormProps {
@@ -56,13 +57,13 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
     return (
         <div className="space-y-6">
             <div>
-                <h3 className="text-lg font-semibold text-txt-primary mb-4">
+                <H3 size="lg" className="mb-4">
                     Pricing Options
-                </h3>
-                <p className="text-sm text-txt-secondary mb-6">
+                </H3>
+                <Description className="mb-6">
                     Choose whether to offer your model for free or set a price. You can
                     always change this later.
-                </p>
+                </Description>
             </div>
 
             <div className="space-y-4">
@@ -106,12 +107,9 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
                         {Boolean(modelData.isPaid) && (
                             <div className="space-y-3">
                                 <div>
-                                    <label
-                                        htmlFor="price"
-                                        className="block text-sm font-medium text-txt-primary mb-1"
-                                    >
+                                    <FormLabel as="div" className="block mb-1">
                                         Price (USD)
-                                    </label>
+                                    </FormLabel>
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <span className="text-txt-secondary">$</span>
@@ -140,7 +138,7 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
                                     )}
                                 </div>
 
-                                <div className="bg-bg-surface p-3 rounded-md border border-br-secondary">
+                                <div className="bg-bg-secondary p-4 rounded-lg border border-br-secondary">
                                     <div className="text-sm space-y-1">
                                         <div className="flex justify-between">
                                             <span className="text-txt-secondary">
@@ -182,15 +180,10 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
                                     </div>
                                 </div>
 
-                                <div className="text-xs text-txt-muted">
-                                    <p>• Minimum price is $0.50</p>
-                                    <p>
-                                        • Payments are processed securely through Stripe
-                                    </p>
-                                    <p>
-                                        • You&quot;ll need to set up a seller account to
-                                        receive payments
-                                    </p>
+                                <div className="text-xs text-txt-muted space-y-1">
+                                    <Metadata as="p">• Minimum price is $0.50</Metadata>
+                                    <Metadata as="p">• Payments are processed securely through Stripe</Metadata>
+                                    <Metadata as="p">• You'll need to set up a seller account to receive payments</Metadata>
                                 </div>
                             </div>
                         )}
@@ -199,7 +192,7 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
             </div>
 
             {Boolean(modelData.isPaid) && !isVerifiedSeller && (
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4">
+                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4 rounded-r-md">
                     <div className="flex">
                         <div className="flex-shrink-0">
                             <svg
@@ -219,7 +212,7 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
                                 <strong>Action Required:</strong> To sell models, you must
                                 complete a one-time seller verification. You will be
                                 redirected to Stripe to complete this securely after
-                                clicking the final &quot;Upload Model&quot; button.
+                                clicking the final "Upload Model" button.
                             </p>
                         </div>
                     </div>
