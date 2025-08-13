@@ -399,16 +399,26 @@ export const ensureUserDocument = onCall(async ({ auth }) => {
         privateRef.get(),
     ]);
 
-    // If new docs already exist, just touch timestamps
+    // If new docs already exist, just touch timestamps and ensure username registry exists
     if (publicSnap.exists && privateSnap.exists) {
         const nowField = admin.firestore.FieldValue.serverTimestamp();
-        await Promise.all([
+        const tasks = [
             privateRef.set(
                 { lastLoginAt: nowField, updatedAt: nowField },
                 { merge: true }
             ),
             publicRef.set({ lastActiveAt: nowField }, { merge: true }),
-        ]);
+        ];
+
+        // Ensure usernames registry entry exists
+        const publicData = publicSnap.data() || {};
+        const existingUsername = (publicData.username || "").toString();
+        if (existingUsername) {
+            const regRef = db.doc(`usernames/${existingUsername.toLowerCase()}`);
+            tasks.push(regRef.set({ uid, touchedAt: nowField }, { merge: true }));
+        }
+
+        await Promise.all(tasks);
         return { created: false };
     }
 
@@ -512,6 +522,8 @@ export const ensureUserDocument = onCall(async ({ auth }) => {
                 loginNotifications: true,
             },
         }),
+        // Username registry reservation
+        db.doc(`usernames/${username.toLowerCase()}`).set({ uid, createdAt: nowField }, { merge: true }),
     ]);
 
     return { created: true, username };
