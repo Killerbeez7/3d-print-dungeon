@@ -11,6 +11,19 @@ service cloud.firestore {
     function isSuperAdmin() { return request.auth.token.super  == true; }
     function rolesUnchanged() { return !("roles" in request.writeFields); }
 
+    // -------------- Collection-group allowances --------------
+    // Allow read access to any subcollection named "public" (e.g., users/{uid}/public/*)
+    match /{path=**}/public/{docId} {
+      allow read: if true;
+    }
+
+    // -------------- Username registry --------------
+    // Public read for mapping username -> uid; writes only via backend (Admin SDK)
+    match /usernames/{key} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // -------------- Admins List--------------
     match /admins/{uid} {
     allow read : if isAdmin();
@@ -18,17 +31,42 @@ service cloud.firestore {
     }
     
 
-    // -------------- Users (Private Data) --------------
+    // -------------- Users --------------
     match /users/{userId} {
       allow read: if true;
-      allow create: if isSignedIn() && request.auth.uid == userId;
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update, delete: if isAdmin();
 
-      allow update: 
-                if isOwner(userId)
-                && rolesUnchanged()
-                || isAdmin(); 
+      // Public profile - readable by anyone
+      match /public/{docId} {
+        allow read: if true;
+        allow write: if isSignedIn() && isOwner(userId);
+      }
 
-      allow delete: if isOwner(userId) || isAdmin();
+      // Private profile - only owner or admins
+      match /private/{docId} {
+        allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
+      }
+
+      // Settings - only owner or admins
+      match /settings/{docId} {
+        allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
+      }
+
+      // Artist profile - private by default
+      match /artist/{docId} {
+        allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
+      }
+
+      // Purchases (private)
+      match /purchases/{purchaseId} {
+        allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
+      }
+
+      // Uploads (private metadata per user)
+      match /uploads/{modelId} {
+        allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
+      }
     }
 
     // -------------- Artists (Public Profiles) --------------

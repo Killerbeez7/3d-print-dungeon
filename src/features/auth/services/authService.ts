@@ -1,4 +1,4 @@
-import { doc, setDoc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "@/config/firebaseConfig";
 import { isUsernameAvailableInDB } from "../utils/authUtils";
 import {
@@ -16,7 +16,7 @@ import {
     reauthenticateWithCredential,
     EmailAuthProvider,
 } from "firebase/auth";
-import type { RawUserData } from "@/features/user/types/user";
+import type { PublicProfile } from "@/features/user/types/user";
 import { handleAuthError } from "../utils/errorHandling";
 
 import { httpsCallable } from "firebase/functions";
@@ -35,20 +35,20 @@ const ensureUserDoc = async () => {
 
 export const getUserFromDatabase = (
     uid: string,
-    callback: (user: RawUserData | null) => void
+    callback: (user: PublicProfile | null) => void
 ): (() => void) => {
     if (!uid) {
         console.error("No uid provided to getUserFromDatabase");
         callback(null);
         return () => { };
     }
-    const userDocRef = doc(db, "users", uid);
+    const userDocRef = doc(db, `users/${uid}/public/data`);
     const unsubscribe = onSnapshot(
         userDocRef,
         (snapshot) => {
             if (snapshot.exists()) {
                 const raw = snapshot.data();
-                callback(raw as RawUserData);
+                callback(raw as PublicProfile);
             } else {
                 callback(null);
             }
@@ -194,13 +194,9 @@ export const updateUserUsername = async (uid: string, newUsername: string): Prom
         if (!isAvailable) {
             throw new Error("Username is already taken");
         }
-
-        const userDocRef = doc(db, "users", uid);
-        await setDoc(
-            userDocRef,
-            { username: newUsername },
-            { merge: true }
-        );
+        // Use backend callable to update registry + public profile atomically
+        const updateUsername = httpsCallable(functions, "updateUsername");
+        await updateUsername({ username: newUsername });
     } catch (error) {
         console.error("Error updating username:", error);
         throw error;

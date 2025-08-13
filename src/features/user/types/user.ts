@@ -26,7 +26,7 @@ export interface PublicProfile {
     username: string;
     displayName: string;
     photoURL?: string;
-    
+
     /* Profile */
     bio?: string;
     location?: string;
@@ -38,7 +38,7 @@ export interface PublicProfile {
         linkedin?: string;
         youtube?: string;
     };
-    
+
     /* Stats (aggregated for performance) */
     stats: {
         followersCount: number;
@@ -48,7 +48,7 @@ export interface PublicProfile {
         viewsCount: number;
         uploadsCount: number;
     };
-    
+
     /* Artist-specific public data */
     isArtist?: boolean;
     isVerified?: boolean;
@@ -61,11 +61,14 @@ export interface PublicProfile {
         medium: number;
         large: number;
     };
-    
+
     /* Timestamps */
     joinedAt: Timestamp | Date;
     lastActiveAt: Timestamp | Date;
 }
+
+// View types for frontend consumption without mapping
+export type PublicProfileView = PublicProfile & { uid: string };
 
 // ===== PRIVATE PROFILE (User only) =====
 export interface PrivateProfile {
@@ -73,30 +76,30 @@ export interface PrivateProfile {
     uid: string;
     email: string | null;
     authProvider: string; // "password", "google.com", etc.
-    
+
     /* Authentication metadata */
     emailVerified: boolean;
     phoneNumber?: string;
     dateOfBirth?: Date;
-    
+
     /* Access control */
     roles: Role[];
     permissions: Permission[];
-    
+
     /* Account status */
     profileComplete: boolean;
     accountStatus: "active" | "suspended" | "deleted";
     suspensionReason?: string;
-    
+
     /* Timestamps */
     createdAt: Timestamp | Date;
     updatedAt: Timestamp | Date;
     lastLoginAt: Timestamp | Date;
     lastPasswordChange?: Timestamp | Date;
-    
+
     /* Stripe customer (buyer side). Seller Stripe Connect is stored in ArtistPrivateProfile */
     stripeCustomerId?: string;
-    
+
     /* Internal tracking */
     loginCount: number;
 }
@@ -113,12 +116,12 @@ export interface UserSettings {
         newComments: boolean;
         modelUpdates: boolean;
     };
-    
+
     /* Appearance */
     theme: "light" | "dark" | "auto";
     language: string;
     timezone: string;
-    
+
     /* Privacy */
     privacy: {
         profileVisibility: "public" | "private" | "friends";
@@ -127,14 +130,14 @@ export interface UserSettings {
         showLastActive: boolean;
         allowMessages: "everyone" | "followers" | "none";
     };
-    
+
     /* Security */
     security: {
         twoFactorEnabled: boolean;
         sessionTimeout: number; // minutes
         loginNotifications: boolean;
     };
-    
+
     /* Artist settings */
     artistSettings?: {
         autoApproveComments: boolean;

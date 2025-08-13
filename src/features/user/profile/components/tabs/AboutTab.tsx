@@ -1,6 +1,6 @@
-import type { UserProfileValues } from "../../types/profile";
+import type { PublicProfileView } from "@/features/user/types/user";
 
-interface UserData extends UserProfileValues {
+interface UserData extends PublicProfileView {
     bio?: string;
     location?: string;
     website?: string;

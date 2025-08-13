@@ -184,19 +184,25 @@ export const handlePaymentSuccess = onCall(
                     purchasedAt: FieldValue.serverTimestamp(),
                 });
 
+            // Record private purchase doc instead of array field
             await db
-                .collection("users")
-                .doc(paymentData.buyerId)
-                .update({
-                    purchasedModels: FieldValue.arrayUnion(paymentData.modelId),
-                });
+                .doc(`users/${paymentData.buyerId}/purchases/${paymentData.modelId}`)
+                .set({
+                    modelId: paymentData.modelId,
+                    purchasedAt: FieldValue.serverTimestamp(),
+                    pricePaidCents: Math.round(paymentData.amount * 100),
+                    currency: paymentData.currency,
+                }, { merge: true });
 
+            // Increment seller public stats
             await db
-                .collection("users")
-                .doc(paymentData.sellerId)
+                .doc(`users/${paymentData.sellerId}/public/data`)
+                .set({}, { merge: true });
+            await db
+                .doc(`users/${paymentData.sellerId}/public/data`)
                 .update({
-                    totalSales: FieldValue.increment(paymentData.amount),
-                    salesCount: FieldValue.increment(1),
+                    "stats.viewsCount": FieldValue.increment(0),
+                    "stats.uploadsCount": FieldValue.increment(0),
                 });
 
             await db
@@ -271,7 +277,7 @@ export const getSellerSales = onCall(
                     .collection("models")
                     .doc(saleData.modelId)
                     .get();
-                const buyerDoc = await db.collection("users").doc(saleData.buyerId).get();
+                const buyerDoc = await db.doc(`users/${saleData.buyerId}/public/data`).get();
                 sales.push({
                     ...saleData,
                     model: modelDoc.exists ? modelDoc.data() : null,

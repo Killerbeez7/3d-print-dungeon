@@ -4,12 +4,12 @@
  * @usedIn UserProfilePage
  */
 
-import type { UserProfileValues } from "../types/profile";
+import type { PublicProfileView } from "@/features/user/types/user";
 import { mockData } from "../mocks/mockData";
 import { H2, H3, H4, StatValueSecondary, Badge } from "@/components/index";
 
 interface UserPortfolioProps {
-    user: UserProfileValues;
+    user: PublicProfileView;
 }
 
 export const UserPortfolio = ({}: UserPortfolioProps): React.ReactNode => {

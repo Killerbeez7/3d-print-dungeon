@@ -1,10 +1,10 @@
 import { getAvatarUrl } from "@/utils/avatar";
 import { H1, Description, Label, StatValueSecondary } from "@/components/index";
 
-import type { UserProfileValues } from "../types/profile";
+import type { PublicProfileView } from "@/features/user/types/user";
 
 interface UserProfileProps {
-    user: UserProfileValues;
+    user: PublicProfileView;
 }
 
 export const UserHeader = ({ user }: UserProfileProps): React.ReactNode => {
@@ -47,7 +47,7 @@ export const UserHeader = ({ user }: UserProfileProps): React.ReactNode => {
                         </div>
                         <div className="text-center">
                                                     <StatValueSecondary as="div" className="mb-1">
-                            {user.stats.followers}
+                            {user.stats.followersCount}
                         </StatValueSecondary>
                         <Label as="div" className="text-xs sm:text-sm">Followers</Label>
                         </div>

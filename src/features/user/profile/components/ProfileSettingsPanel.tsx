@@ -20,7 +20,8 @@ import { getThumbnailUrl } from "@/utils/imageUtils";
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 import { useFetchUserModels } from "@/features/models/hooks/useFetchUserModels";
 import { ROUTES } from "@/constants/routeConstants";
-import type { UserProfileValues, Tab } from "../types/profile";
+import type { Tab } from "../types/profile";
+import type { PublicProfileView } from "@/features/user/types/user";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import type { ModelData } from "@/features/models/types/model";
 import { H2, H3 } from "@/components/ResponsiveHeading";
@@ -144,21 +145,16 @@ const ModelCarouselCard = ({
 };
 
 // Dynamic tabs based on user data
-const getTabs = (user: UserProfileValues): Tab[] => [
+const getTabs = (user: PublicProfileView): Tab[] => [
     { id: "uploads", label: "Uploads", icon: "faImages", count: user.stats.uploadsCount },
     { id: "likes", label: "Likes", icon: "faHeart", count: user.stats.likesCount },
     { id: "stats", label: "Stats", icon: "faChartLine" },
-    {
-        id: "collections",
-        label: "Collections",
-        icon: "faBookmark",
-        count: user.stats.collectionsCount,
-    },
+    { id: "collections", label: "Collections", icon: "faBookmark" },
     { id: "achievements", label: "Achievements", icon: "faTrophy" },
 ];
 
 interface ProfileSettingsPanelProps {
-    user: UserProfileValues;
+    user: PublicProfileView;
 }
 
 export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
@@ -324,7 +320,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
                             </div>
                             <div className="text-center p-3 bg-bg-secondary rounded">
                                 <div className="text-lg font-bold text-txt-primary">
-                                    {user.stats.followers}
+                                    {user.stats.followersCount}
                                 </div>
                                 <div className="text-xs text-txt-secondary">
                                     Followers
@@ -332,7 +328,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
                             </div>
                             <div className="text-center p-3 bg-bg-secondary rounded">
                                 <div className="text-lg font-bold text-txt-primary">
-                                    {user.stats.following}
+                                    {user.stats.followingCount}
                                 </div>
                                 <div className="text-xs text-txt-secondary">
                                     Following
@@ -355,12 +351,9 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
                 return (
                     <div className="bg-bg-surface rounded-lg p-6">
                         <h3 className="text-xl font-semibold text-txt-primary mb-4">
-                            Collections ({user.stats.collectionsCount})
+                            Collections
                         </h3>
-                        <p className="text-txt-secondary">
-                            Manage your {user.stats.collectionsCount} collections. Create
-                            new collections, organize models, and set privacy settings.
-                        </p>
+                        <p className="text-txt-secondary">Manage your collections. Create new collections, organize models, and set privacy settings.</p>
                     </div>
                 );
             case "achievements":

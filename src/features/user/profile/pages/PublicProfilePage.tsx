@@ -12,13 +12,12 @@ import { PrivateStats } from "../components/PrivateStats";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import { H1 } from "@/components/ResponsiveHeading";
 // types
-import type { RawUserData } from "@/features/user/types/user";
-import type { UserProfileValues } from "../types/profile";
+import type { PublicProfileView } from "@/features/user/types/user";
 
 export const PublicProfilePage = (): React.ReactNode => {
     const { username } = useParams<{ username: string }>();
     const { currentUser } = useAuth();
-    const [artist, setArtist] = useState<UserProfileValues | null>(null);
+    const [artist, setArtist] = useState<PublicProfileView | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -41,7 +40,7 @@ export const PublicProfilePage = (): React.ReactNode => {
                 console.log('Received user data:', userData);
 
                 if (userData) {
-                    setArtist(userData as unknown as UserProfileValues);
+                    setArtist(userData);
                 } else {
                     setError("User not found");
                     setArtist(null);
@@ -81,7 +80,7 @@ export const PublicProfilePage = (): React.ReactNode => {
         );
     }
 
-    const isOwner = currentUser?.email === artist.email;
+    const isOwner = currentUser?.uid === artist.uid;
 
     // Debug logging
     console.log('PublicProfilePage Debug:', {
@@ -89,7 +88,7 @@ export const PublicProfilePage = (): React.ReactNode => {
         currentUserEmail: currentUser?.email,
         artistUid: artist.uid,
         artistKeys: Object.keys(artist),
-        artistEmail: artist.email,
+        // no email in public view
         isOwner,
         artistUsername: artist.username,
         currentUserUsername: currentUser?.displayName,
@@ -119,7 +118,7 @@ export const PublicProfilePage = (): React.ReactNode => {
                     {isOwner ? (
                         <PrivateStats user={artist} />
                     ) : (
-                        <UserStats user={artist as unknown as RawUserData} />
+                        <UserStats user={artist} />
                     )}
                 </div>
             </div>

@@ -26,22 +26,22 @@ const getStripe = () => {
 
 // Helper -> fetch (or create) Stripe customer for a Firebase UID
 const getOrCreateStripeCustomerId = async (uid, token) => {
-    const userRef = db.collection("users").doc(uid);
-    const userDoc = await userRef.get();
-    const userData = userDoc.data() || {};
+    const privateRef = db.doc(`users/${uid}/private/data`);
+    const privateDoc = await privateRef.get();
+    const privateData = privateDoc.data() || {};
 
-    if (userData.stripeCustomerId) {
-        return userData.stripeCustomerId;
+    if (privateData.stripeCustomerId) {
+        return privateData.stripeCustomerId;
     }
 
     const stripe = getStripe();
     const customer = await stripe.customers.create({
         email: token?.email ?? undefined,
-        name: userData.displayName || token?.name || undefined,
+        name: privateData.displayName || token?.name || undefined,
         metadata: { firebaseUID: uid },
     });
 
-    await userRef.set(
+    await privateRef.set(
         {
             stripeCustomerId: customer.id,
             updatedAt: FieldValue.serverTimestamp(),

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
-import type { UserProfileValues } from "../../types/profile";
+import type { PublicProfileView } from "@/features/user/types/user";
 
 interface StatsTabProps {
-    userData: UserProfileValues;
+    userData: PublicProfileView;
 }
 
 interface ChartData {
@@ -100,14 +100,14 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
         },
         {
             title: "Followers",
-            value: userData.stats?.followers || 0,
+            value: userData.stats?.followersCount || 0,
             icon: "fas fa-users",
             color: "text-accent",
             bgColor: "bg-accent/10",
         },
         {
             title: "Following",
-            value: userData.stats?.following || 0,
+            value: userData.stats?.followingCount,
             icon: "fas fa-user-plus",
             color: "text-orange-500",
             bgColor: "bg-orange-50",

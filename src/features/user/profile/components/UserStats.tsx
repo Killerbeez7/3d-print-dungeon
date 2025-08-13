@@ -1,9 +1,9 @@
-import type { RawUserData } from "@/features/user/types/user";
 import type { Timestamp } from "firebase/firestore";
+import type { PublicProfileView } from "@/features/user/types/user";
 import { H2, StatValue, StatValueSecondary, Label } from "@/components/index";
 
 interface UserStatsProps {
-    user: RawUserData;
+    user: PublicProfileView;
 }
 
 export const UserStats = ({ user }: UserStatsProps): React.ReactNode => {
@@ -35,7 +35,7 @@ export const UserStats = ({ user }: UserStatsProps): React.ReactNode => {
 
                 <div className="text-center">
                     <StatValue as="div" className="mb-1 sm:mb-2">
-                        {user.stats.followers}
+                        {user.stats.followersCount}
                     </StatValue>
                     <Label as="div" className="text-xs sm:text-sm">Followers</Label>
                 </div>
@@ -45,32 +45,32 @@ export const UserStats = ({ user }: UserStatsProps): React.ReactNode => {
                 <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
                     <div className="text-center">
                         <StatValueSecondary as="div" className="mb-1 sm:mb-2">
-                            {user.stats.following}
+                            {user.stats.followingCount}
                         </StatValueSecondary>
                         <Label as="div" className="text-xs sm:text-sm">Following</Label>
                     </div>
 
                     <div className="text-center">
                         <StatValueSecondary as="div" className="mb-1 sm:mb-2">
-                            {user.portfolio?.categories?.length ?? 0}
+                            {0}
                         </StatValueSecondary>
-                        <Label as="div" className="text-xs sm:text-sm">Categories</Label>
+                        <Label as="div" className="text-xs sm:text-sm">Collections</Label>
                     </div>
 
                     <div className="text-center">
                         <StatValueSecondary as="div" className="mb-1 sm:mb-2">
-                            {user.portfolio?.featuredWorks?.length ?? 0}
+                            {user.isPremium ? 1 : 0}
                         </StatValueSecondary>
-                        <Label as="div" className="text-xs sm:text-sm">Featured Works</Label>
+                        <Label as="div" className="text-xs sm:text-sm">Premium</Label>
                     </div>
 
                     <div className="text-center">
                         <StatValueSecondary as="div" className="mb-1 sm:mb-2">
-                            {user.createdAt
+                            {user.joinedAt
                                 ? new Date(
-                                    (user.createdAt as Timestamp).toDate 
-                                        ? (user.createdAt as Timestamp).toDate() 
-                                        : (user.createdAt as Date)
+                                    (user.joinedAt as Timestamp).toDate 
+                                        ? (user.joinedAt as Timestamp).toDate() 
+                                        : (user.joinedAt as Date)
                                   ).getFullYear()
                                 : "N/A"}
                         </StatValueSecondary>
