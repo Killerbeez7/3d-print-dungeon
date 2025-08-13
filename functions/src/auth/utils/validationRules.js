@@ -26,6 +26,6 @@ export const VALIDATION_RULES = {
         requireSpecial: false,
     },
     email: {
-        pattern: /^[^@]+@[^@]+\.[^@]+$/,
+        pattern: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
     },
 };

@@ -27,6 +27,8 @@ export const mapFirebaseError = (error: unknown): AuthError => {
     switch (code) {
         case "auth/user-not-found":
         case "auth/wrong-password":
+        case "auth/invalid-credential":
+        case "auth/invalid-login-credentials":
             return {
                 type: AuthErrorType.INVALID_CREDENTIALS,
                 message: "Invalid email or password",
@@ -105,7 +107,10 @@ export const mapFirebaseError = (error: unknown): AuthError => {
 
 // handles authentication errors with consistent formatting
 export const handleAuthError = (error: unknown, context: string = "authentication"): AuthError => {
-    console.error(`${context} error:`, error);
+    // Avoid noisy console errors in production; keep lightweight trace in dev
+    if ((import.meta as { env: { DEV: boolean } })?.env?.DEV) {
+        console.debug(`${context} error:`, error);
+    }
 
     // If it's already an AuthError, return it
     if (error && typeof error === "object" && "type" in error) {

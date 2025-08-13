@@ -9,7 +9,7 @@ export const ProfileRedirect = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Wait until we know if user is logged in and have userData loaded
+        // Wait until auth state and user data are known
         if (currentUser === undefined || userData === undefined) return;
 
         if (!currentUser) {
@@ -17,10 +17,12 @@ export const ProfileRedirect = () => {
             return;
         }
 
-        const username = userData?.username || currentUser.uid;
-        const safeUsername = toUrlSafeUsername(username);
-
-        navigate(`/${safeUsername}`, { replace: true });
+        // Only redirect once a proper username is available
+        if (userData?.username) {
+            const safeUsername = toUrlSafeUsername(userData.username);
+            navigate(`/${safeUsername}`, { replace: true });
+        }
+        // Otherwise, keep spinner until ensureUserDocument populates username
     }, [currentUser, userData, navigate]);
 
     return (

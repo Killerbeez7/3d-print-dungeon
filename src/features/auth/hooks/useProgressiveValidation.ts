@@ -100,21 +100,16 @@ export const useProgressiveValidation = ({
                         onValidationChange?.(fieldName, finalResult);
                         return finalResult;
                     } else {
-                        // Email is not registered - bad for sign-in
-                        const errorMsg = "Email not found. Please check your email or sign up.";
-                        const finalResult = { isValid: false, error: errorMsg };
-                        
-                        // Cache the result
-                        setCheckedEmails(prev => new Map(prev).set(trimmedEmail, { isValid: false, error: errorMsg }));
-                        
+                        // Sign-in UX: do not surface "email not found" during form validation
+                        const finalResult = { isValid: true };
+                        setCheckedEmails(prev => new Map(prev).set(trimmedEmail, { isValid: true }));
                         updateField(fieldName, {
                             value,
-                            hasError: true,
-                            error: errorMsg,
-                            isValid: false,
+                            hasError: false,
+                            error: null,
+                            isValid: true,
                             isChecking: false
                         });
-                        
                         onValidationChange?.(fieldName, finalResult);
                         return finalResult;
                     }

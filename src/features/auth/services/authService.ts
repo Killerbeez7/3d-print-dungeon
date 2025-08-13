@@ -88,9 +88,7 @@ export const signUpWithEmail = async (
         await ensureUserDoc();
         return userCredential.user;
     } catch (error: unknown) {
-        console.error("❌ Error in signUpWithEmail:", error);
         const authError = handleAuthError(error, "Email Sign-up");
-        console.error("Error signing up with email:", error);
         throw authError;
     }
 };
@@ -105,7 +103,6 @@ export const signInWithEmail = async (
         return userCredential.user;
     } catch (error: unknown) {
         const authError = handleAuthError(error, "Email Sign-in");
-        console.error("Error signing in with email:", error);
         throw authError;
     }
 };
@@ -121,7 +118,6 @@ export const signInWithGoogle = async (): Promise<FirebaseUser> => {
         return user;
     } catch (error: unknown) {
         const authError = handleAuthError(error, "Google Sign-in");
-        console.error("Error with Google Sign-In:", error);
         throw authError;
     }
 };
@@ -137,7 +133,6 @@ export const signInWithFacebook = async (): Promise<FirebaseUser> => {
         return user;
     } catch (error: unknown) {
         const authError = handleAuthError(error, "Facebook Sign-in");
-        console.error("Error with Facebook Sign-In:", error);
         throw authError;
     }
 };
@@ -153,7 +148,6 @@ export const signInWithTwitter = async (): Promise<FirebaseUser> => {
         return user;
     } catch (error: unknown) {
         const authError = handleAuthError(error, "Twitter Sign-in");
-        console.error("Error with Twitter Sign-in:", error);
         throw authError;
     }
 };
@@ -172,7 +166,6 @@ export const changePassword = async (
         await updatePassword(currentUser, newPassword);
     } catch (error: unknown) {
         const authError = handleAuthError(error, "Password Change");
-        console.error("Error updating password:", error);
         throw authError;
     }
 };
@@ -182,7 +175,6 @@ export const signOutUser = async (): Promise<void> => {
         await signOut(auth);
     } catch (error: unknown) {
         const authError = handleAuthError(error, "Sign-out");
-        console.error("Error signing out:", error);
         throw authError;
     }
 };
