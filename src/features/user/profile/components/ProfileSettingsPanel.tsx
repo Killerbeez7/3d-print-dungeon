@@ -18,7 +18,7 @@ import { ReusableCarousel } from "@/features/shared/reusable/carousel/ReusableCa
 import { ProgressiveImage } from "@/features/shared/reusable/ProgressiveImage";
 import { getThumbnailUrl } from "@/utils/imageUtils";
 import { STATIC_ASSETS } from "@/config/assetsConfig";
-import { useFetchModels } from "@/features/models/hooks/useFetchModels";
+import { useFetchUserModels } from "@/features/models/hooks/useFetchUserModels";
 import { ROUTES } from "@/constants/routeConstants";
 import type { UserProfileValues, Tab } from "../types/profile";
 import type { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -165,14 +165,8 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
     const [activeTab, setActiveTab] = useState<string>("uploads");
     const [loading, setLoading] = useState(false);
 
-    // Fetch user's models using the real API
-    const { data: modelsData, isLoading: modelsLoading } = useFetchModels({
-        uploaderId: user.uid, // Filter by user's models
-        limit: 12, // Limit for carousel
-    });
-
-    // Get real models from the query result
-    const userModels = modelsData?.pages.flatMap((page) => page.models) ?? [];
+    // Fetch user's models using the simplified hook
+    const { models: userModels, isLoading: modelsLoading } = useFetchUserModels(user.uid);
 
     // Get tabs with real user data
     const tabs = getTabs(user);

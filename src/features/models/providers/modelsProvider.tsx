@@ -49,7 +49,7 @@ export function ModelsProvider({ children }: { children: ReactNode }) {
         setLoading(true);
         const q = query(
             collection(db, "models"),
-            where("userId", "==", userId),
+            where("uploaderId", "==", userId),
             orderBy("createdAt", "desc")
         );
         const unsubscribe = onSnapshot(

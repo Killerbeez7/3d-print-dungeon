@@ -1,22 +1,36 @@
 import { useState, useEffect } from "react";
-import { collection, query, where, getDocs, orderBy } from "firebase/firestore";
-import { db } from "@/config/firebaseConfig";
 import { getThumbnailUrl } from "@/utils/imageUtils";
 import { LazyImage } from "@/features/shared/reusable/LazyImage";
-import type { UploadedArtwork, SortOption } from "../../types/profile";
+import { useFetchUserModels } from "@/features/models/hooks/useFetchUserModels";
+import type { SortOption } from "../../types/profile";
+import type { ModelData } from "@/features/models/types/model";
 
 interface UploadsTabProps {
     userId: string;
+    userStats?: {
+        uploadsCount: number;
+    };
 }
 
 export const UploadsTab = ({ userId }: UploadsTabProps) => {
-    const [artworks, setArtworks] = useState<UploadedArtwork[]>([]);
-    const [filteredArtworks, setFilteredArtworks] = useState<UploadedArtwork[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { models: userModels, isLoading: modelsLoading } = useFetchUserModels(userId);
+    const [filteredArtworks, setFilteredArtworks] = useState<ModelData[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>("all");
     const [sortBy, setSortBy] = useState<SortOption>("newest");
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+    // Helper function to convert Firestore timestamp to Date
+    const getDateFromTimestamp = (timestamp: unknown): Date => {
+        if (!timestamp) return new Date(0);
+        if (typeof timestamp === 'object' && timestamp && 'toDate' in timestamp && typeof timestamp.toDate === 'function') {
+            return timestamp.toDate();
+        }
+        if (typeof timestamp === 'object' && timestamp && 'seconds' in timestamp && typeof timestamp.seconds === 'number') {
+            return new Date(timestamp.seconds * 1000);
+        }
+        return new Date(timestamp as string | number);
+    };
 
     const categories = [
         { id: "all", name: "All Categories" },
@@ -39,63 +53,37 @@ export const UploadsTab = ({ userId }: UploadsTabProps) => {
     ];
 
     useEffect(() => {
-        const fetchUploads = async () => {
-            if (!userId) return;
-
-            try {
-                setLoading(true);
-                const modelsRef = collection(db, "models");
-                const uploadsQuery = query(
-                    modelsRef, 
-                    where("uploaderId", "==", userId),
-                    orderBy("createdAt", "desc")
-                );
-                const querySnapshot = await getDocs(uploadsQuery);
-
-                const uploads: UploadedArtwork[] = querySnapshot.docs.map((doc) => ({
-                    id: doc.id,
-                    ...doc.data(),
-                    createdAt: doc.data().createdAt?.toDate() || new Date(),
-                }));
-
-                setArtworks(uploads);
-                setFilteredArtworks(uploads);
-            } catch (error) {
-                console.error("Error fetching uploads:", error);
-                setArtworks([]);
-                setFilteredArtworks([]);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchUploads();
-    }, [userId]);
+        if (userModels.length > 0) {
+            setFilteredArtworks(userModels);
+        }
+    }, [userModels]);
 
     useEffect(() => {
-        let filtered = [...artworks];
+        let filtered = [...userModels];
 
         // Apply search filter
         if (searchTerm) {
-            filtered = filtered.filter(art => 
-                art.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                art.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                art.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+            filtered = filtered.filter(model => 
+                model.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                model.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                model.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
             );
         }
 
         // Apply category filter
         if (selectedCategory !== "all") {
-            filtered = filtered.filter(art => art.category === selectedCategory);
+            filtered = filtered.filter(model => 
+                model.categoryIds?.some(catId => catId === selectedCategory)
+            );
         }
 
         // Apply sorting
         filtered.sort((a, b) => {
             switch (sortBy) {
                 case "newest":
-                    return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+                    return getDateFromTimestamp(b.createdAt).getTime() - getDateFromTimestamp(a.createdAt).getTime();
                 case "oldest":
-                    return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+                    return getDateFromTimestamp(a.createdAt).getTime() - getDateFromTimestamp(b.createdAt).getTime();
                 case "mostLiked":
                     return (b.likes || 0) - (a.likes || 0);
                 case "mostViewed":
@@ -108,14 +96,14 @@ export const UploadsTab = ({ userId }: UploadsTabProps) => {
         });
 
         setFilteredArtworks(filtered);
-    }, [artworks, searchTerm, selectedCategory, sortBy]);
+    }, [userModels, searchTerm, selectedCategory, sortBy]);
 
     const handleArtworkClick = (artworkId: string) => {
         // Navigate to artwork detail page
         window.open(`/models/${artworkId}`, "_blank");
     };
 
-    if (loading) {
+    if (modelsLoading) {
         return (
             <div className="text-center p-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent mx-auto mb-4"></div>
@@ -131,7 +119,7 @@ export const UploadsTab = ({ userId }: UploadsTabProps) => {
                 <div>
                     <h3 className="text-xl font-semibold text-txt-primary">Uploads</h3>
                     <p className="text-txt-secondary">
-                        {filteredArtworks.length} of {artworks.length} models
+                        {filteredArtworks.length} of {userModels.length} models
                     </p>
                 </div>
                 
@@ -237,10 +225,10 @@ export const UploadsTab = ({ userId }: UploadsTabProps) => {
                     ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
                     : "space-y-4"
                 }>
-                    {filteredArtworks.map((art) => (
+                    {filteredArtworks.map((model) => (
                         <article
-                            key={art.id}
-                            onClick={() => handleArtworkClick(art.id)}
+                            key={model.id}
+                            onClick={() => handleArtworkClick(model.id)}
                             className={`bg-bg-secondary border border-br-primary rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer ${
                                 viewMode === "list" ? "flex" : ""
                             }`}
@@ -249,17 +237,17 @@ export const UploadsTab = ({ userId }: UploadsTabProps) => {
                                 <LazyImage
                                     src={
                                         getThumbnailUrl(
-                                            art.renderPrimaryUrl ?? null,
+                                            model.renderPrimaryUrl ?? null,
                                             "MEDIUM"
                                         ) || "/default-image.jpg"
                                     }
-                                    alt={art.name || "Untitled"}
+                                    alt={model.name || "Untitled"}
                                     className="w-full h-full object-cover"
                                 />
-                                {art.category && (
+                                {model.categoryIds && model.categoryIds.length > 0 && (
                                     <div className="absolute top-2 left-2">
                                         <span className="px-2 py-1 bg-black bg-opacity-75 text-white text-xs rounded-full">
-                                            {art.category}
+                                            {model.categoryIds[0]}
                                         </span>
                                     </div>
                                 )}
@@ -267,12 +255,12 @@ export const UploadsTab = ({ userId }: UploadsTabProps) => {
                             
                             <div className={`p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
                                 <h3 className="font-semibold text-txt-primary mb-2 line-clamp-2">
-                                    {art.name || "Untitled"}
+                                    {model.name || "Untitled"}
                                 </h3>
                                 
-                                {art.description && viewMode === "list" && (
+                                {model.description && viewMode === "list" && (
                                     <p className="text-sm text-txt-secondary mb-3 line-clamp-2">
-                                        {art.description}
+                                        {model.description}
                                     </p>
                                 )}
                                 
@@ -280,24 +268,24 @@ export const UploadsTab = ({ userId }: UploadsTabProps) => {
                                     <div className="flex items-center gap-4">
                                         <span className="text-txt-secondary flex items-center gap-1">
                                             <i className="fas fa-heart text-error"></i>
-                                            {art.likes || 0}
+                                            {model.likes || 0}
                                         </span>
                                         <span className="text-txt-secondary flex items-center gap-1">
                                             <i className="fas fa-eye text-txt-highlight"></i>
-                                            {art.views || 0}
+                                            {model.views || 0}
                                         </span>
                                     </div>
                                     
-                                    {art.createdAt && (
+                                    {model.createdAt && (
                                         <span className="text-xs text-txt-secondary">
-                                            {new Date(art.createdAt).toLocaleDateString()}
+                                            {getDateFromTimestamp(model.createdAt).toLocaleDateString()}
                                         </span>
                                     )}
                                 </div>
                                 
-                                {art.tags && art.tags.length > 0 && viewMode === "list" && (
+                                {model.tags && model.tags.length > 0 && viewMode === "list" && (
                                     <div className="flex flex-wrap gap-1 mt-3">
-                                        {art.tags.slice(0, 3).map((tag, index) => (
+                                        {model.tags.slice(0, 3).map((tag, index) => (
                                             <span
                                                 key={index}
                                                 className="px-2 py-1 bg-accent bg-opacity-20 text-accent text-xs rounded-full"
@@ -305,9 +293,9 @@ export const UploadsTab = ({ userId }: UploadsTabProps) => {
                                                 {tag}
                                             </span>
                                         ))}
-                                        {art.tags.length > 3 && (
+                                        {model.tags.length > 3 && (
                                             <span className="px-2 py-1 bg-bg-primary text-txt-secondary text-xs rounded-full">
-                                                +{art.tags.length - 3}
+                                                +{model.tags.length - 3}
                                             </span>
                                         )}
                                     </div>

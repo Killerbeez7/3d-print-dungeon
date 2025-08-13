@@ -4,9 +4,7 @@ import {
     addDoc,
     serverTimestamp,
     doc,
-    
     updateDoc,
-    arrayUnion,
     increment,
     query,
     orderBy,
@@ -16,9 +14,9 @@ import {
     QueryDocumentSnapshot,
     DocumentData,
     where,
+    runTransaction,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { setDoc } from "firebase/firestore";
 import { finalConvertFileToGLB } from "../utils/converter";
 import { STORAGE_PATHS } from '../../../constants/storagePaths';
 import type { ModelData } from "../types/model";
@@ -222,21 +220,36 @@ export async function createAdvancedModel({
     if (uploaderId) {
         const userRef = doc(db, "users", uploaderId);
         try {
-            // 1. create/merge base doc (no transforms)
-            await setDoc(
-                userRef,
-                {
-                    uploads: [],
-                    isArtist: true,
-                    stats: { uploadsCount: 0 },
-                },
-                { merge: true }
-            );
-
-            // 2. atomic increment + arrayUnion (requires existing doc)
-            await updateDoc(userRef, {
-                uploads: arrayUnion(modelDoc.id),
-                "stats.uploadsCount": increment(1),
+            // Use a transaction to ensure atomic updates
+            await runTransaction(db, async (transaction) => {
+                const userDoc = await transaction.get(userRef);
+                
+                if (!userDoc.exists()) {
+                    // Create new user document with proper stats structure
+                    transaction.set(userRef, {
+                        uploads: [modelDoc.id],
+                        isArtist: true,
+                        stats: {
+                            uploadsCount: 1,
+                            likesCount: 0,
+                            viewsCount: 0,
+                            followers: 0,
+                            following: 0,
+                            loginCount: 0,
+                        },
+                    });
+                } else {
+                    // Update existing user document
+                    const currentData = userDoc.data();
+                    const currentUploads = currentData.uploads || [];
+                    const currentStats = currentData.stats || {};
+                    
+                    transaction.update(userRef, {
+                        uploads: [...currentUploads, modelDoc.id],
+                        isArtist: true,
+                        "stats.uploadsCount": (currentStats.uploadsCount || 0) + 1,
+                    });
+                }
             });
         } catch (err) {
             console.warn("User stats update failed:", err);
@@ -404,6 +417,32 @@ export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
         nextCursor:
             snap.docs.length === lim ? snap.docs[snap.docs.length - 1] : undefined,
     };
+}
+
+
+// Utility function to recalculate user upload count
+export async function recalculateUserUploadCount(userId: string): Promise<number> {
+    try {
+        // Get all models uploaded by this user
+        const modelsQuery = query(
+            collection(db, "models"),
+            where("uploaderId", "==", userId)
+        );
+        const modelsSnapshot = await getDocs(modelsQuery);
+        const actualCount = modelsSnapshot.size;
+
+        // Update user's upload count
+        const userRef = doc(db, "users", userId);
+        await updateDoc(userRef, {
+            "stats.uploadsCount": actualCount,
+        });
+
+        console.log(`Recalculated upload count for user ${userId}: ${actualCount}`);
+        return actualCount;
+    } catch (error) {
+        console.error("Error recalculating user upload count:", error);
+        throw error;
+    }
 }
 
 
