@@ -2,6 +2,7 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import admin from "firebase-admin";
 import {
     requireAdmin,
+    generateUsername,
     generateRandomUsername,
     generateUUIDUsername,
     validateRequiredFields,
@@ -271,7 +272,7 @@ export const createValidatedUser = onCall(async (request) => {
         const nowField = admin.firestore.FieldValue.serverTimestamp();
 
         const result = await db.runTransaction(async (tx) => {
-            // Reserve a unique username via registry doc
+            // Start with a random human-friendly username for email sign-ups
             let username = generateRandomUsername();
             let attempts = 0;
             while (attempts < 10) {
@@ -424,18 +425,16 @@ export const ensureUserDocument = onCall(async ({ auth }) => {
 
     // ----- create new documents -----
     const displayName = (token && token.name) || "Anonymous";
-    let username = generateRandomUsername();
+    let username = generateUsername(displayName) || generateRandomUsername();
 
     // ensure unique username; fall back to UUID if 10 random attempts fail
     let attempts = 0;
     try {
         while (attempts < 10) {
-            const q = await db
-                .collectionGroup("public")
-                .where("username", "==", username)
-                .limit(1)
-                .get();
-            if (q.empty) break;
+            const key = username.toLowerCase();
+            const regRef = db.doc(`usernames/${key}`);
+            const regSnap = await regRef.get();
+            if (!regSnap.exists) break;
             username = generateRandomUsername();
             attempts++;
         }

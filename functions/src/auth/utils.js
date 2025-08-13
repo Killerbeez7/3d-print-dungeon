@@ -1,4 +1,5 @@
 import {
+    generateUsername,
     generateRandomUsername,
     generateUUIDUsername,
 } from "./utils/generateUsername.js";
@@ -13,6 +14,7 @@ import { requireAdmin, requireAuth } from "./utils/checkPermisions.js";
 // Auth-specific exports
 export {
     // Username generation (for auto-generated usernames)
+    generateUsername,
     generateRandomUsername,
     generateUUIDUsername,
     
