@@ -7,6 +7,7 @@ import {
     validateRequiredFields,
     validateEmail,
     validatePassword,
+    handleError,
 } from "./utils.js";
 
 // Set user role claims (admin only)
@@ -43,9 +44,9 @@ export const setUserRole = onCall(async (request) => {
 
         await admin.auth().setCustomUserClaims(uid, claims);
 
-        // Mirror roles to firestore (for display/search)
+        // Mirror roles to users/{uid}/privateProfile/profile (for display/search in admin)
         const enabledRoles = Object.keys(claims).filter((k) => claims[k] === true);
-        const ref = admin.firestore().doc(`users/${uid}`);
+        const ref = admin.firestore().doc(`users/${uid}/private/data`);
         await ref.set(
             {
                 roles: enabledRoles,
@@ -63,7 +64,65 @@ export const setUserRole = onCall(async (request) => {
     }
 });
 
-// Check if username is available
+// Update username with registry transaction
+export const updateUsername = onCall(async (request) => {
+    try {
+        const { auth, data } = request;
+        if (!auth) throw new HttpsError("unauthenticated", "Login required");
+        validateRequiredFields(data || {}, ["username"]);
+        const newUsernameRaw = String(data.username || "");
+        const newUsername = newUsernameRaw.trim();
+
+        // Basic validation
+        const { validateUsername } = await import("./utils/validateFields.js");
+        const usernameValidation = validateUsername(newUsername);
+        if (!usernameValidation.isValid) {
+            throw new HttpsError("invalid-argument", usernameValidation.error);
+        }
+
+        const db = admin.firestore();
+        const uid = auth.uid;
+        const now = admin.firestore.FieldValue.serverTimestamp();
+
+        await db.runTransaction(async (tx) => {
+            const publicRef = db.doc(`users/${uid}/public/data`);
+            const publicSnap = await tx.get(publicRef);
+            if (!publicSnap.exists) {
+                throw new HttpsError("failed-precondition", "Public profile not found");
+            }
+            const publicData = publicSnap.data() || {};
+            const oldUsername = (publicData.username || "").toString();
+
+            const newKey = newUsername.toLowerCase();
+            const newRegRef = db.doc(`usernames/${newKey}`);
+            const newRegSnap = await tx.get(newRegRef);
+            if (newRegSnap.exists && newRegSnap.data()?.uid !== uid) {
+                throw new HttpsError("already-exists", "Username is already taken");
+            }
+
+            // Reserve/assign new
+            tx.set(newRegRef, { uid, updatedAt: now }, { merge: true });
+            // Update public profile
+            tx.set(publicRef, { username: newUsername, lastActiveAt: now }, { merge: true });
+
+            // Cleanup old registry if changed
+            const oldKey = oldUsername.toLowerCase();
+            if (oldKey && oldKey !== newKey) {
+                const oldRef = db.doc(`usernames/${oldKey}`);
+                const oldSnap = await tx.get(oldRef);
+                if (oldSnap.exists && oldSnap.data()?.uid === uid) {
+                    tx.delete(oldRef);
+                }
+            }
+        });
+
+        return { success: true, username: newUsername };
+    } catch (err) {
+        handleError(err, "Update Username");
+    }
+});
+
+// Check if username is available (checks usernames registry and public profiles)
 export const checkUsernameAvailability = onCall(async (request) => {
     try {
         const { data } = request;
@@ -84,20 +143,25 @@ export const checkUsernameAvailability = onCall(async (request) => {
             throw new HttpsError("invalid-argument", "data must be { username: string }");
         }
 
-        // Only check availability - let UI handle input validation
-        // Check if username exists in Firestore
-        const usersRef = admin.firestore().collection("users");
-        const usernameQuery = usersRef.where("username", "==", username).limit(1);
-        const snapshot = await usernameQuery.get();
-
+        const db = admin.firestore();
+        const key = username.toLowerCase();
+        const regSnap = await db.doc(`usernames/${key}`).get();
+        let isTaken = regSnap.exists;
+        // Backward safety: also check existing public profiles
+        if (!isTaken) {
+            const cg = db
+                .collectionGroup("public")
+                .where("username", "==", username)
+                .limit(1);
+            const snap = await cg.get();
+            isTaken = !snap.empty;
+        }
         console.log(
-            `Username "${username}" availability: ${
-                snapshot.empty ? "AVAILABLE" : "TAKEN"
-            }`
+            `Username "${username}" availability: ${isTaken ? "TAKEN" : "AVAILABLE"}`
         );
 
         return {
-            available: snapshot.empty,
+            available: !isTaken,
             username: username,
         };
     } catch (err) {
@@ -203,69 +267,109 @@ export const createValidatedUser = onCall(async (request) => {
             displayName: "Anonymous",
         });
 
-        // Atomic transaction: Create user document with auto-generated username
         const db = admin.firestore();
-        const result = await db.runTransaction(async (transaction) => {
-            // Generate unique username
+        const nowField = admin.firestore.FieldValue.serverTimestamp();
+
+        const result = await db.runTransaction(async (tx) => {
+            // Reserve a unique username via registry doc
             let username = generateRandomUsername();
             let attempts = 0;
-            const maxAttempts = 10;
-
-            // Ensure username uniqueness
-            while (attempts < maxAttempts) {
-                const usernameQuery = db
-                    .collection("users")
-                    .where("username", "==", username)
-                    .limit(1);
-                const snapshot = await usernameQuery.get();
-
-                if (snapshot.empty) {
-                    break; // Username is unique
+            while (attempts < 10) {
+                const key = username.toLowerCase();
+                const regRef = db.doc(`usernames/${key}`);
+                const regSnap = await tx.get(regRef);
+                if (!regSnap.exists) {
+                    // Reserve
+                    tx.set(regRef, { uid: userRecord.uid, createdAt: nowField });
+                    break;
                 }
-
                 username = generateRandomUsername();
                 attempts++;
             }
-
-            if (attempts >= maxAttempts) {
-                // Add more randomness to ensure uniqueness
-                console.log("Initial attempts failed, using UUID fallback...");
-
-                // Final fallback with UUID-like approach
-                username = generateUUIDUsername();
-                console.log("UUID-based username generated as fallback:", username);
+            if (attempts >= 10) {
+                const fallback = generateUUIDUsername();
+                const regRef = db.doc(`usernames/${fallback.toLowerCase()}`);
+                tx.set(regRef, { uid: userRecord.uid, createdAt: nowField }, { merge: true });
+                username = fallback;
             }
 
-            // Create user document
-            const userRef = db.collection("users").doc(userRecord.uid);
-            const now = admin.firestore.Timestamp.now();
-            transaction.set(userRef, {
-                email: userRecord.email,
+            // Create user docs atomically
+            const rootRef = db.doc(`users/${userRecord.uid}`);
+            const publicRef = db.doc(`users/${userRecord.uid}/public/data`);
+            const privateRef = db.doc(`users/${userRecord.uid}/private/data`);
+            const settingsRef = db.doc(`users/${userRecord.uid}/settings/app`);
+
+            tx.set(rootRef, { uid: userRecord.uid, createdAt: nowField }, { merge: true });
+            tx.set(publicRef, {
                 username,
                 displayName: "Anonymous",
                 photoURL: null,
-                authProvider: "password",
-                createdAt: now,
-                updatedAt: now,
-                roles: [],
-                profileComplete: false,
-                preferences: { emailNotifications: true, theme: "auto" },
+                bio: null,
+                location: null,
+                website: null,
+                socialLinks: {},
                 stats: {
-                    loginCount: 1,
-                    lastLoginAt: now,
-                    uploadsCount: 0,
+                    followersCount: 0,
+                    followingCount: 0,
+                    postsCount: 0,
                     likesCount: 0,
                     viewsCount: 0,
-                    followers: 0,
-                    following: 0,
+                    uploadsCount: 0,
                 },
                 isArtist: false,
+                isVerified: false,
+                isPremium: false,
+                artistCategories: [],
+                featuredWorks: [],
+                joinedAt: nowField,
+                lastActiveAt: nowField,
+            });
+            tx.set(privateRef, {
+                uid: userRecord.uid,
+                email: userRecord.email ?? null,
+                authProvider: "password",
+                emailVerified: false,
+                roles: ["user"],
+                permissions: [],
+                profileComplete: false,
+                accountStatus: "active",
+                createdAt: nowField,
+                updatedAt: nowField,
+                lastLoginAt: nowField,
+                loginCount: 1,
+                stripeCustomerId: null,
+            });
+            tx.set(settingsRef, {
+                notifications: {
+                    email: true,
+                    push: true,
+                    marketing: false,
+                    newFollowers: true,
+                    newLikes: true,
+                    newComments: true,
+                    modelUpdates: true,
+                },
+                theme: "auto",
+                language: "en",
+                timezone: "UTC",
+                privacy: {
+                    profileVisibility: "public",
+                    showEmail: false,
+                    showLocation: true,
+                    showLastActive: true,
+                    allowMessages: "everyone",
+                },
+                security: {
+                    twoFactorEnabled: false,
+                    sessionTimeout: 60,
+                    loginNotifications: true,
+                },
             });
 
             return {
                 success: true,
                 uid: userRecord.uid,
-                username: username,
+                username,
                 message: "User created successfully",
             };
         });
@@ -286,33 +390,48 @@ export const ensureUserDocument = onCall(async ({ auth }) => {
 
     const { uid, token } = auth; // token has email, name, picture, provider_id
     const db = admin.firestore();
-    const userRef = db.collection("users").doc(uid);
-    const userSnap = await userRef.get();
+    const publicRef = db.doc(`users/${uid}/public/data`);
+    const privateRef = db.doc(`users/${uid}/private/data`);
+    const settingsRef = db.doc(`users/${uid}/settings/app`);
 
-    // If user doc already exists just touch the “lastLoginAt” field
-    if (userSnap.exists) {
-        await userRef.set(
-            { lastLoginAt: admin.firestore.FieldValue.serverTimestamp() },
-            { merge: true }
-        );
+    const [publicSnap, privateSnap] = await Promise.all([
+        publicRef.get(),
+        privateRef.get(),
+    ]);
+
+    // If new docs already exist, just touch timestamps
+    if (publicSnap.exists && privateSnap.exists) {
+        const nowField = admin.firestore.FieldValue.serverTimestamp();
+        await Promise.all([
+            privateRef.set(
+                { lastLoginAt: nowField, updatedAt: nowField },
+                { merge: true }
+            ),
+            publicRef.set({ lastActiveAt: nowField }, { merge: true }),
+        ]);
         return { created: false };
     }
 
-    // ----- create new document -----
-    const displayName = token.name || "Anonymous";
+    // ----- create new documents -----
+    const displayName = (token && token.name) || "Anonymous";
     let username = generateRandomUsername();
 
     // ensure unique username; fall back to UUID if 10 random attempts fail
     let attempts = 0;
-    while (attempts < 10) {
-        const q = await db
-            .collection("users")
-            .where("username", "==", username)
-            .limit(1)
-            .get();
-        if (q.empty) break;
-        username = generateRandomUsername();
-        attempts++;
+    try {
+        while (attempts < 10) {
+            const q = await db
+                .collectionGroup("public")
+                .where("username", "==", username)
+                .limit(1)
+                .get();
+            if (q.empty) break;
+            username = generateRandomUsername();
+            attempts++;
+        }
+    } catch (e) {
+        console.warn("ensureUserDocument: username check failed, using fallback", e);
+        attempts = 10; // force fallback below
     }
 
     if (attempts >= 10) {
@@ -320,30 +439,80 @@ export const ensureUserDocument = onCall(async ({ auth }) => {
         username = generateUUIDUsername();
     }
 
-    // ----- create user document -----
-    const now = admin.firestore.FieldValue.serverTimestamp();
-    await userRef.set({
-        email: token.email ?? null,
-        username,
-        displayName,
-        photoURL: token.picture ?? null,
-        authProvider: token.firebase.sign_in_provider,
-        createdAt: now,
-        updatedAt: now,
-        roles: [],
-        profileComplete: false,
-        preferences: { emailNotifications: true, theme: "auto" },
-        stats: {
+    // ----- create user documents (new only) -----
+    const nowField = admin.firestore.FieldValue.serverTimestamp();
+    await Promise.all([
+        // Minimal root doc
+        db.doc(`users/${uid}`).set({ uid, createdAt: nowField }, { merge: true }),
+        // New public profile
+        publicRef.set({
+            username,
+            displayName,
+            photoURL: (token && token.picture) ?? null,
+            bio: null,
+            location: null,
+            website: null,
+            socialLinks: {},
+            stats: {
+                followersCount: 0,
+                followingCount: 0,
+                postsCount: 0,
+                likesCount: 0,
+                viewsCount: 0,
+                uploadsCount: 0,
+            },
+            isArtist: false,
+            isVerified: false,
+            isPremium: false,
+            artistCategories: [],
+            featuredWorks: [],
+            joinedAt: nowField,
+            lastActiveAt: nowField,
+        }),
+        // New private profile
+        privateRef.set({
+            uid,
+            email: (token && token.email) ?? null,
+            authProvider: (token && token.firebase && token.firebase.sign_in_provider) || "password",
+            emailVerified: !!(token && token.email_verified),
+            roles: ["user"],
+            permissions: [],
+            profileComplete: false,
+            accountStatus: "active",
+            createdAt: nowField,
+            updatedAt: nowField,
+            lastLoginAt: nowField,
             loginCount: 1,
-            lastLoginAt: now,
-            uploadsCount: 0,
-            likesCount: 0,
-            viewsCount: 0,
-            followers: 0,
-            following: 0,
-        },
-        isArtist: false,
-    });
+            stripeCustomerId: null,
+        }),
+        // New default settings
+        settingsRef.set({
+            notifications: {
+                email: true,
+                push: true,
+                marketing: false,
+                newFollowers: true,
+                newLikes: true,
+                newComments: true,
+                modelUpdates: true,
+            },
+            theme: "auto",
+            language: "en",
+            timezone: "UTC",
+            privacy: {
+                profileVisibility: "public",
+                showEmail: false,
+                showLocation: true,
+                showLastActive: true,
+                allowMessages: "everyone",
+            },
+            security: {
+                twoFactorEnabled: false,
+                sessionTimeout: 60,
+                loginNotifications: true,
+            },
+        }),
+    ]);
 
     return { created: true, username };
 });
