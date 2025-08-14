@@ -289,9 +289,7 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
             <div className="mt-6">
                 <div className="flex items-center mb-4">
                     <hr className="flex-grow border-br-secondary" />
-                    <span className="mx-4 text-sm font-medium">
-                        Or continue with
-                    </span>
+                    <span className="mx-4 text-sm font-medium">Or continue with</span>
                     <hr className="flex-grow border-br-secondary" />
                 </div>
 
@@ -299,10 +297,14 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
                     <button
                         onClick={() => handleOAuthSignIn("google")}
                         disabled={loading}
-                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface shadow-token-sm hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface  hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Google"
                     >
-                        <FontAwesomeIcon icon={faGoogle} size="lg" style={{ color: "#EA4335" }} />
+                        <FontAwesomeIcon
+                            icon={faGoogle}
+                            size="lg"
+                            style={{ color: "#EA4335" }}
+                        />
                         <span className="font-medium hidden xl:inline">
                             Continue with Google
                         </span>
@@ -311,10 +313,14 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
                     <button
                         onClick={() => handleOAuthSignIn("facebook")}
                         disabled={loading}
-                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface shadow-token-sm hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Facebook"
                     >
-                        <FontAwesomeIcon icon={faFacebook} size="lg" style={{ color: "#1877F2" }} />
+                        <FontAwesomeIcon
+                            icon={faFacebook}
+                            size="lg"
+                            style={{ color: "#1877F2" }}
+                        />
                         <span className="font-medium hidden xl:inline">
                             Continue with Facebook
                         </span>
@@ -323,10 +329,14 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
                     <button
                         onClick={() => handleOAuthSignIn("twitter")}
                         disabled={loading}
-                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface shadow-token-sm hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Twitter"
                     >
-                        <FontAwesomeIcon icon={faTwitter} size="xl" style={{ color: "#1DA1F2" }} />
+                        <FontAwesomeIcon
+                            icon={faTwitter}
+                            size="xl"
+                            style={{ color: "#1DA1F2" }}
+                        />
                         <span className="font-medium hidden xl:inline">
                             Continue with Twitter
                         </span>

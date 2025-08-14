@@ -241,7 +241,7 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                     <button
                         onClick={() => handleOAuthSignIn("google")}
                         disabled={loading}
-                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface dark:hover:bg-red-900/20 shadow-token-sm hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Google"
                     >
                         <FontAwesomeIcon
@@ -257,7 +257,7 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                     <button
                         onClick={() => handleOAuthSignIn("facebook")}
                         disabled={loading}
-                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface shadow-token-sm hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Facebook"
                     >
                         <FontAwesomeIcon
@@ -273,7 +273,7 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                     <button
                         onClick={() => handleOAuthSignIn("twitter")}
                         disabled={loading}
-                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface shadow-token-sm hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Twitter"
                     >
                         <FontAwesomeIcon
