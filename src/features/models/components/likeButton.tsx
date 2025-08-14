@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { toggleLike, isLiked } from "../services/likesService";
+import { toggleLike, isLiked, getLikesCount } from "../services/likesService";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart as solidHeart } from "@fortawesome/free-solid-svg-icons";
 import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons";
@@ -22,7 +22,14 @@ export const LikeButton = ({ modelId, initialLikes = 0, currentUser, openAuthMod
     const [likesCount, setLikesCount] = useState(initialLikes);
 
     useEffect(() => {
-        const checkLikeStatus = async () => {
+        const load = async () => {
+            try {
+                const count = await getLikesCount(modelId);
+                setLikesCount(count);
+            } catch {
+                // ignore count errors
+            }
+
             if (currentUser) {
                 try {
                     const status = await isLiked(modelId, currentUser.uid);
@@ -34,7 +41,7 @@ export const LikeButton = ({ modelId, initialLikes = 0, currentUser, openAuthMod
                 setLiked(false);
             }
         };
-        checkLikeStatus();
+        load();
     }, [modelId, currentUser]);
 
     const handleToggle = async () => {

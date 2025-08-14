@@ -6,7 +6,7 @@ export const toggleFavorite = async (userId: string, modelId: string): Promise<b
     if (!userId || !modelId) throw new Error("Missing userId or modelId.");
 
     return runTransaction(db, async (transaction) => {
-        const userRef = doc(db, "users", userId);
+        const userRef = doc(db, "users", userId, "private", "data");
         const userSnap = await transaction.get(userRef);
 
         if (!userSnap.exists()) {
@@ -30,7 +30,7 @@ export const toggleFavorite = async (userId: string, modelId: string): Promise<b
 
 export const getFavoritesForUser = async (userId: string): Promise<string[]> => {
     if (!userId) throw new Error("Missing userId.");
-    const userRef = doc(db, "users", userId);
+    const userRef = doc(db, "users", userId, "private", "data");
     const userSnap = await getDoc(userRef);
     return userSnap.exists() ? (userSnap.data().favorites || []) : [];
 };

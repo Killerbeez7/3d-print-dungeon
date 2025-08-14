@@ -141,6 +141,8 @@ h6 {
 
     --success: #28c76f;
     --error: #f44336;
+
+    --model-viewer-background: #9b9b9b;
 }
 
 [data-theme="dark"] {
@@ -174,6 +176,8 @@ h6 {
 
     --success: #34d399;
     --error: #f87171;
+
+    --model-viewer-background: #222628;
 }
 
 @theme {
@@ -206,6 +210,8 @@ h6 {
     --color-focus: var(--accent-hover);
     --color-success: var(--success);
     --color-error: var(--error);
+
+    --color-model-viewer-background: var(--model-viewer-background);
 }
 
 /* Custom Divider */

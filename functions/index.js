@@ -34,11 +34,7 @@ export const {
     cleanupViewBuffer,
 } = analytics;
 
-export const {
-    createArtistProfile,
-    updateArtistProfile,
-    deleteArtistProfile,
-} = user
+export const { createArtistProfile, updateArtistProfile, deleteArtistProfile } = user;
 
-// Models functions (placeholder for now)
-export const { placeholder } = models;
+// Models functions
+export const { onLikeCreated, onLikeDeleted } = models;

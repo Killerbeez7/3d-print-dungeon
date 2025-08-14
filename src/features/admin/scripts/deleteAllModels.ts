@@ -58,7 +58,7 @@ export async function deleteAllModelsAndRelated(onProgress?: (progress: number) 
     for (const user of users) {
       const batch = writeBatch(db);
       if (Array.isArray(user.favorites) && user.favorites.includes(modelId)) {
-        batch.update(doc(db, "users", user.id), { favorites: arrayRemove(modelId) });
+        batch.update(doc(db, "users", user.id, "private", "data"), { favorites: arrayRemove(modelId) });
       }
       if (Array.isArray(user.uploads) && user.uploads.includes(modelId)) {
         batch.update(doc(db, "users", user.id), { uploads: arrayRemove(modelId) });
@@ -129,7 +129,7 @@ export async function deleteModelAndRelated(modelId: string): Promise<void> {
   for (const user of users) {
     const batch = writeBatch(db);
     if (Array.isArray(user.favorites) && user.favorites.includes(modelId)) {
-      batch.update(doc(db, "users", user.id), { favorites: arrayRemove(modelId) });
+      batch.update(doc(db, "users", user.id, "private", "data"), { favorites: arrayRemove(modelId) });
     }
     if (Array.isArray(user.uploads) && user.uploads.includes(modelId)) {
       batch.update(doc(db, "users", user.id), { uploads: arrayRemove(modelId) });

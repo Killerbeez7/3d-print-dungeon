@@ -5,6 +5,7 @@ import { db } from "@/config/firebaseConfig";
 import { LikeButton } from "../likeButton";
 import { FavoritesButton } from "../favoritesButton";
 import { PurchaseButton } from "@/features/payment/components/PurchaseButton";
+import { H4, H5 } from "@/components/ResponsiveHeading";
 
 //types
 import type { CurrentUser } from "@/features/user/types/user";
@@ -144,9 +145,9 @@ export function ModelSidebar({
                     </>
                 ) : (
                     <>
-                        <h4 className="text-base lg:text-lg font-bold text-txt-primary mb-3">
+                        <H4 className="text-base lg:text-lg font-bold text-txt-primary mb-3">
                             {formData.name}
-                        </h4>
+                        </H4>
                         <p className="text-txt-secondary mb-4 text-sm lg:text-base leading-relaxed">
                             {formData.description}
                         </p>
@@ -225,20 +226,24 @@ export function ModelSidebar({
 
                 {/* Edit Button for Owner */}
                 {currentUser && currentUser.uid === model.uploaderId && !isEditing && (
-                    <button
-                        onClick={handleEdit}
-                        className="flex items-center justify-center gap-2 w-full mt-3 py-2 lg:py-2.5 px-4 transition-colors secondary-button text-sm lg:text-base"
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="h-4 w-4 lg:h-5 lg:w-5"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
+                    <div className="mb-4 lg:mb-6">
+                        <button
+                            onClick={handleEdit}
+                            className="secondary-button w-full py-3 lg:py-4 text-sm lg:text-base font-medium"
                         >
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                        </svg>
-                        Edit Model
-                    </button>
+                            <span className="inline-flex items-center justify-center gap-2">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4 lg:h-5 lg:w-5"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                >
+                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                                </svg>
+                                <span>Edit Model</span>
+                            </span>
+                        </button>
+                    </div>
                 )}
             </div>
 
@@ -248,16 +253,18 @@ export function ModelSidebar({
                     <img
                         src={uploader?.photoURL || "/assets/images/user.png"}
                         alt={uploader?.displayName || "Unknown User"}
-                        className="w-16 h-16 lg:w-[7em] lg:h-[7em] rounded-lg lg:rounded-[10px] object-cover border-2 border-br-primary"
+                        className="w-14 h-14 lg:w-20 lg:h-20 rounded-lg lg:rounded-[10px] object-cover border-2 border-br-primary"
                         onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.src = "/assets/images/user.png";
                         }}
                     />
                     <div className="flex-1 min-w-0">
-                        <h5 className="text-lg lg:text-xl font-semibold text-txt-primary truncate">
-                            {uploader?.displayName || "Anonymous"}
-                        </h5>
+                        <H5 className="text-base lg:text-lg font-semibold text-txt-primary">
+                            <span className="block truncate" title={uploader?.displayName || "Anonymous"}>
+                                {uploader?.displayName || "Anonymous"}
+                            </span>
+                        </H5>
                         <p className="text-xs lg:text-sm text-txt-secondary mt-1">
                             Senior 3D Artist
                         </p>

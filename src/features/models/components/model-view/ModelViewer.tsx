@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { fullscreenConfig } from "@/config/fullscreenConfig";
-import { LazyImage } from "@/features/shared/reusable/LazyImage";
+// import { LazyImage } from "@/features/shared/reusable/LazyImage";
 import { useModelLoader } from "@/features/models/hooks/useModelLoader";
 //components
 import { NavigationArrow, NavigationDots, ModelControls } from "./controls";
 import { LoadModelButton, LoadingOverlay } from "./loading";
 //utils
 import { getContainerClasses } from "@/features/models/utils/getContainerClasses";
+import { getResponsiveThumbnails } from "@/utils/imageUtils";
 import { getDeviceType } from "@/features/models/utils/getDeviceType";
 //types
 import type { ModelViewerElement } from "@google/model-viewer";
@@ -87,11 +88,17 @@ export const ModelViewer = ({
 
     //////////////////////////////////////////////      Navigation Handlers    ///////////////////////////////////////////////////////
     const handlePrevious = () => {
-        const newIndex = selectedRenderIndex <= -1 ? renderExtraUrls.length - 1 : selectedRenderIndex - 1;
+        const newIndex =
+            selectedRenderIndex <= -1
+                ? renderExtraUrls.length - 1
+                : selectedRenderIndex - 1;
         setSelectedRenderIndex(newIndex);
     };
     const handleNext = () => {
-        const newIndex = selectedRenderIndex >= renderExtraUrls.length - 1 ? -1 : selectedRenderIndex + 1;
+        const newIndex =
+            selectedRenderIndex >= renderExtraUrls.length - 1
+                ? -1
+                : selectedRenderIndex + 1;
         setSelectedRenderIndex(newIndex);
     };
     //////////////////////////////////////////////      Menu Handlers         ///////////////////////////////////////////////////////
@@ -282,7 +289,7 @@ export const ModelViewer = ({
     // Handle navigation away - cancel loading if user navigates
     useEffect(() => {
         return () => {
-                cancelModelLoading();
+            cancelModelLoading();
         };
     }, [cancelModelLoading]);
 
@@ -349,30 +356,21 @@ export const ModelViewer = ({
         selectedRenderIndex === -1 ? (
             modelUrl ? (
                 !isLoadButtonClicked ? (
-                    <div
-                        className={getContainerClasses({
-                            isIOS,
-                            customFullscreen,
-                            isFullscreen,
-                        })}
-                    >
+                    <>
                         {posterUrl && (
                             <img
                                 src={posterUrl}
                                 alt="Preview"
                                 className="absolute inset-0 w-full h-full object-contain"
+                                style={{
+                                    filter: "blur(2px)",
+                                }}
                             />
                         )}
                         <LoadModelButton handleLoadModel={handleLoadModel} />
-                    </div>
+                    </>
                 ) : (
-                    <div
-                        className={getContainerClasses({
-                            isIOS,
-                            customFullscreen,
-                            isFullscreen,
-                        })}
-                    >
+                    <>
                         {/* @ts-expect-error - model-viewer is not a valid HTML element */}
                         <model-viewer
                             ref={modelViewerRef}
@@ -385,7 +383,7 @@ export const ModelViewer = ({
                             environment-image="neutral"
                             auto-rotate={autoRotate}
                             className="w-full h-full"
-                            style={{ backgroundColor: "#616161", borderRadius: "0.5rem" }}
+                            style={{ borderRadius: "0.5rem" }}
                         />
 
                         <LoadingOverlay
@@ -411,7 +409,7 @@ export const ModelViewer = ({
                             onMouseEnter={() => setIsHovering(true)}
                             onMouseLeave={() => setIsHovering(false)}
                         />
-                    </div>
+                    </>
                 )
             ) : (
                 <div className="flex items-center justify-center w-full h-[40vh] bg-gray-200 rounded-md">
@@ -419,14 +417,32 @@ export const ModelViewer = ({
                 </div>
             )
         ) : (
-            <LazyImage
-                wrapperClassName="w-full h-full"
-                src={renderExtraUrls[selectedRenderIndex]}
-                sizes="(max-width: 1024px) 100vw, 80vw"
-                alt={`Render ${selectedRenderIndex + 1}`}
-                loading="lazy"
-                className="w-full h-full object-contain rounded-md shadow-lg"
-            />
+            (() => {
+                const original = renderExtraUrls[selectedRenderIndex];
+                const responsive = getResponsiveThumbnails(original);
+                const src = responsive.large || responsive.medium || original;
+                const srcSet = [
+                    responsive.small ? `${responsive.small} 320w` : null,
+                    responsive.medium ? `${responsive.medium} 640w` : null,
+                    responsive.large ? `${responsive.large} 1024w` : null,
+                    responsive.xlarge ? `${responsive.xlarge} 1600w` : null,
+                ]
+                    .filter(Boolean)
+                    .join(", ");
+                return (
+                    <img
+                        src={src || original}
+                        srcSet={srcSet || undefined}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 80vw"
+                        alt={`Render ${selectedRenderIndex + 1}`}
+                        loading="eager"
+                        fetchPriority="high"
+                        decoding="async"
+                        className="absolute inset-0 w-full h-full object-contain rounded-md shadow-lg"
+                        draggable={false}
+                    />
+                );
+            })()
         );
 
     return (

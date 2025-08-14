@@ -84,7 +84,7 @@ export function ModelPage() {
 
     return (
         <div>
-            <div className="text-txt-primary flex flex-col lg:flex-row gap-4 p-4 lg:p-6">
+            <div className="text-txt-primary flex flex-col lg:flex-row gap-4 p-4 lg:p-6 lg:pl-7 lg:pr-2">
                 {/* VIEWER  --------------------------------------------------- */}
                 <div className="flex-1 flex flex-col gap-4">
                     <Suspense fallback={<div />}>
