@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faTimes, faX } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 
 interface ValidityIndicatorProps {
@@ -46,14 +46,7 @@ export function ValidityIndicator({
             );
 
         case "invalid":
-            return (
-                <div className={baseClasses}>
-                    <FontAwesomeIcon
-                        icon={faTimes}
-                        className={`${sizeClasses[size]} text-red-500`}
-                    />
-                </div>
-            );
+            return null;
 
         case "error":
             if (showClearButton && onClear) {
@@ -63,18 +56,11 @@ export function ValidityIndicator({
                         onClick={onClear}
                         className={`${baseClasses} text-red-500 hover:text-red-600 transition-colors`}
                     >
-                        <FontAwesomeIcon icon={faX} className={sizeClasses[size]} />
+                        <FontAwesomeIcon icon={faTimes} className={sizeClasses[size]} />
                     </button>
                 );
             }
-            return (
-                <div className={baseClasses}>
-                    <FontAwesomeIcon
-                        icon={faTimes}
-                        className={`${sizeClasses[size]} text-red-500`}
-                    />
-                </div>
-            );
+            return null;
 
         default:
             return null;

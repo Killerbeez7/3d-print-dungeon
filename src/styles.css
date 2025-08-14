@@ -212,6 +212,11 @@ h6 {
     --color-error: var(--error);
 
     --color-model-viewer-background: var(--model-viewer-background);
+
+    --color-auth-modal-error: #f44336;
+    --color-auth-modal-error-text: #808080;
+    --color-auth-modal-text-primary: #808080;
+    --color-auth-modal-text-secondary: #87989b;
 }
 
 /* Custom Divider */
