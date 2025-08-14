@@ -50,12 +50,7 @@ export const UserStats = ({ user }: UserStatsProps): React.ReactNode => {
                         <Label as="div" className="text-xs sm:text-sm">Following</Label>
                     </div>
 
-                    <div className="text-center">
-                        <StatValueSecondary as="div" className="mb-1 sm:mb-2">
-                            {0}
-                        </StatValueSecondary>
-                        <Label as="div" className="text-xs sm:text-sm">Collections</Label>
-                    </div>
+                    {/* Collections intentionally omitted in new schema */}
 
                     <div className="text-center">
                         <StatValueSecondary as="div" className="mb-1 sm:mb-2">

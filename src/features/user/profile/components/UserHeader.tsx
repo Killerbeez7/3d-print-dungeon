@@ -26,9 +26,8 @@ export const UserHeader = ({ user }: UserProfileProps): React.ReactNode => {
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
                         <div>
-                            <H1 size="3xl" className="mb-2">
-                                {user.displayName}
-                            </H1>
+                            <H1 size="3xl" className="mb-2">{user.displayName}</H1>
+                            <div className="text-txt-secondary text-sm">@{user.username}</div>
                             {user.bio && (
                                 <Description className="mb-4">
                                     {user.bio}

@@ -12,7 +12,6 @@ export { useProfile } from "./hooks/useProfile";
 
 // Types
 export type {
-    UserProfileValues,
     Tab,
     UploadedArtwork,
     LikedArtwork,

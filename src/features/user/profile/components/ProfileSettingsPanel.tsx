@@ -149,7 +149,6 @@ const getTabs = (user: PublicProfileView): Tab[] => [
     { id: "uploads", label: "Uploads", icon: "faImages", count: user.stats.uploadsCount },
     { id: "likes", label: "Likes", icon: "faHeart", count: user.stats.likesCount },
     { id: "stats", label: "Stats", icon: "faChartLine" },
-    { id: "collections", label: "Collections", icon: "faBookmark" },
     { id: "achievements", label: "Achievements", icon: "faTrophy" },
 ];
 
@@ -347,15 +346,6 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
                         </p>
                     </div>
                 );
-            case "collections":
-                return (
-                    <div className="bg-bg-surface rounded-lg p-6">
-                        <h3 className="text-xl font-semibold text-txt-primary mb-4">
-                            Collections
-                        </h3>
-                        <p className="text-txt-secondary">Manage your collections. Create new collections, organize models, and set privacy settings.</p>
-                    </div>
-                );
             case "achievements":
                 return (
                     <div className="bg-bg-surface rounded-lg p-6">
@@ -486,7 +476,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
                                 className="w-4 h-4"
                             />
                             <span>{tab.label}</span>
-                            {tab.count && (
+                            {typeof tab.count === "number" && (
                                 <span className="bg-bg-surface text-txt-secondary text-xs px-2 py-1 rounded-full">
                                     {tab.count}
                                 </span>

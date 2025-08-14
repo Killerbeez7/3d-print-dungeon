@@ -7,12 +7,21 @@ import {
     Metadata,
 } from "@/components/index";
 import type { PublicProfileView } from "@/features/user/types/user";
+import type { Timestamp } from "firebase/firestore";
 
 interface PrivateStatsProps {
     user: PublicProfileView; // For now we show only public-based stats
 }
 
 export const PrivateStats = ({ user }: PrivateStatsProps): React.ReactNode => {
+    const formatDate = (value: Timestamp | Date | undefined): string => {
+        if (!value) return "—";
+        // Firestore Timestamp has toDate()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const asAny: any = value as any;
+        const date: Date = typeof asAny?.toDate === "function" ? asAny.toDate() : (value as Date);
+        return date.toLocaleDateString();
+    };
     return (
         <div className="bg-bg-secondary rounded-lg p-4 sm:p-6 shadow-md">
             <H2 size="2xl" className="text-txt-primary mb-4 sm:mb-6">
@@ -107,25 +116,13 @@ export const PrivateStats = ({ user }: PrivateStatsProps): React.ReactNode => {
                         <Metadata as="div" className="mb-1">
                             Member Since
                         </Metadata>
-                        <div className="text-txt-primary font-medium">
-                            {user.joinedAt instanceof Date
-                                ? user.joinedAt.toLocaleDateString()
-                                : new Date(
-                                      user.joinedAt as unknown as string
-                                  ).toLocaleDateString()}
-                        </div>
+                        <div className="text-txt-primary font-medium">{formatDate(user.joinedAt)}</div>
                     </div>
                     <div className="bg-bg-surface rounded-lg p-4">
                         <Metadata as="div" className="mb-1">
                             Last Active
                         </Metadata>
-                        <div className="text-txt-primary font-medium">
-                            {user.lastActiveAt instanceof Date
-                                ? user.lastActiveAt.toLocaleDateString()
-                                : new Date(
-                                      user.lastActiveAt as unknown as string
-                                  ).toLocaleDateString()}
-                        </div>
+                        <div className="text-txt-primary font-medium">{formatDate(user.lastActiveAt)}</div>
                     </div>
                     {user.location && (
                         <div className="bg-bg-surface rounded-lg p-4">

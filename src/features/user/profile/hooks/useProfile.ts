@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { getUserById } from "@/features/user/services/userService";
-import type { UserProfileValues } from "../types/profile";
+import type { PublicProfileView } from "@/features/user/types/user";
 
 export const useProfile = (userId: string | undefined) => {
-    const [userData, setUserData] = useState<UserProfileValues | null>(null);
+    const [userData, setUserData] = useState<PublicProfileView | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +29,9 @@ export const useProfile = (userId: string | undefined) => {
                     setUserData(null);
                 }
             } catch (error) {
-                console.error("Error fetching user profile:", error);
+                if (process.env.NODE_ENV !== "production") {
+                    console.debug("Error fetching user profile:", error);
+                }
                 setError("Failed to load user profile");
                 setUserData(null);
             } finally {

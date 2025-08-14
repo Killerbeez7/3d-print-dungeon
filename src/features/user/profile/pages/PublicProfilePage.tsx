@@ -21,7 +21,9 @@ export const PublicProfilePage = (): React.ReactNode => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    console.log('PublicProfilePage rendered with:', { username, currentUser: !!currentUser });
+    if (process.env.NODE_ENV !== "production") {
+        console.debug('PublicProfilePage rendered with:', { username, currentUser: !!currentUser });
+    }
 
     useEffect(() => {
         if (!username) {
@@ -35,9 +37,13 @@ export const PublicProfilePage = (): React.ReactNode => {
                 setLoading(true);
                 setError(null);
 
-                console.log('Fetching user data for username:', username);
+                if (process.env.NODE_ENV !== "production") {
+                    console.debug('Fetching user data for username:', username);
+                }
                 const userData = await getUserByUsername(username);
-                console.log('Received user data:', userData);
+                if (process.env.NODE_ENV !== "production") {
+                    console.debug('Received user data:', userData);
+                }
 
                 if (userData) {
                     setArtist(userData);
@@ -46,7 +52,9 @@ export const PublicProfilePage = (): React.ReactNode => {
                     setArtist(null);
                 }
             } catch (error) {
-                console.error("Failed to load user:", error);
+                if (process.env.NODE_ENV !== "production") {
+                    console.debug("Failed to load user:", error);
+                }
                 setError("Failed to load user profile");
                 setArtist(null);
             } finally {
@@ -83,17 +91,18 @@ export const PublicProfilePage = (): React.ReactNode => {
     const isOwner = currentUser?.uid === artist.uid;
 
     // Debug logging
-    console.log('PublicProfilePage Debug:', {
-        currentUserUid: currentUser?.uid,
-        currentUserEmail: currentUser?.email,
-        artistUid: artist.uid,
-        artistKeys: Object.keys(artist),
-        // no email in public view
-        isOwner,
-        artistUsername: artist.username,
-        currentUserUsername: currentUser?.displayName,
-        artistDisplayName: artist.displayName
-    });
+    if (process.env.NODE_ENV !== "production") {
+        console.debug('PublicProfilePage Debug:', {
+            currentUserUid: currentUser?.uid,
+            currentUserEmail: currentUser?.email,
+            artistUid: artist.uid,
+            artistKeys: Object.keys(artist),
+            isOwner,
+            artistUsername: artist.username,
+            currentUserUsername: currentUser?.displayName,
+            artistDisplayName: artist.displayName
+        });
+    }
 
     return (
         <div className="min-h-screen bg-bg-primary">
