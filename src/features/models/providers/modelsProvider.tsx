@@ -1,22 +1,15 @@
 import { useState, useEffect, useCallback, ReactNode } from "react";
 import { db } from "@/config/firebaseConfig";
-import {
-    collection,
-    query,
-    onSnapshot,
-    orderBy,
-    where,
-    doc,
-    getDoc,
-} from "firebase/firestore";
+import { collection, query, onSnapshot, orderBy, where, doc, getDoc } from "firebase/firestore";
 import { ModelsContext } from "@/features/models/context/modelsContext";
 import type { ModelData } from "@/features/models/types/model";
+import type { PublicProfileView } from "@/features/user/types/user";
 
 export function ModelsProvider({ children }: { children: ReactNode }) {
     const [models, setModels] = useState<ModelData[]>([]);
     const [userModels, setUserModels] = useState<ModelData[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
-    const [uploader, setUploader] = useState<Record<string, unknown> | null>(null);
+    const [uploader, setUploader] = useState<PublicProfileView | null>(null);
     const [selectedRenderIndex, setSelectedRenderIndex] = useState<number>(-1);
 
     // listener to fetch all models
@@ -76,13 +69,18 @@ export function ModelsProvider({ children }: { children: ReactNode }) {
 
     const fetchUploader = useCallback(async (uploaderId: string) => {
         try {
-            const userDocRef = doc(db, "users", uploaderId);
-            const userDoc = await getDoc(userDocRef);
-            if (userDoc.exists()) {
-                setUploader(userDoc.data() as Record<string, unknown>);
+            // Read public profile at users/{uid}/public/data and attach uid for PublicProfileView
+            const publicDocRef = doc(collection(doc(db, "users", uploaderId), "public"), "data");
+            const publicSnap = await getDoc(publicDocRef);
+            if (publicSnap.exists()) {
+                const data = publicSnap.data() as Omit<PublicProfileView, "uid">;
+                setUploader({ ...data, uid: uploaderId });
+            } else {
+                setUploader(null);
             }
         } catch (err) {
             console.error("Error fetching uploader data:", err);
+            setUploader(null);
         }
     }, []);
 
