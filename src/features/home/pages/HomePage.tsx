@@ -2,7 +2,7 @@ import { FeaturedCarousel } from "../components/FeaturedCarousel";
 import { featuredCarouselItems } from "../mock/carouselData";
 
 import { InfiniteScrollList } from "@/features/shared/InfiniteScrollList";
-import { useFetchModels } from "@/features/models/hooks/useFetchModels";
+import { useFetchModels } from "@/features/models/hooks/index";
 
 import { HomeModelsGrid } from "../components/HomeModelsGrid";
 import { Spinner } from "@/features/shared/reusable/Spinner";

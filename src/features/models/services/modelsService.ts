@@ -5,20 +5,13 @@ import {
     serverTimestamp,
     doc,
     updateDoc,
-    increment,
-    query,
-    orderBy,
-    limit,
-    getDocs,
-    startAfter,
-    QueryDocumentSnapshot,
-    DocumentData,
-    where,
     runTransaction,
 } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { finalConvertFileToGLB } from "../utils/converter";
 import { STORAGE_PATHS } from '../../../constants/storagePaths';
+import { httpsCallable } from "firebase/functions";
+import { functions } from "../../../config/firebaseConfig";
 import type { ModelData } from "../types/model";
 
 export interface CreateModelParams {
@@ -277,172 +270,32 @@ export async function createAdvancedModel({
 }
 
 
-// Increment the view count for a model.
-export const incrementModelViews = async (modelId: string): Promise<void> => {
+// Update model information
+export async function updateModel(
+    modelId: string, 
+    updates: Partial<Pick<ModelData, 'name' | 'description' | 'tags' | 'categoryIds' | 'price' | 'isPaid'>>
+): Promise<void> {
     try {
         const modelRef = doc(db, "models", modelId);
         await updateDoc(modelRef, {
-            views: increment(1),
-            lastViewed: serverTimestamp(),
+            ...updates,
+            updatedAt: serverTimestamp(),
         });
     } catch (error) {
-        console.error("Error incrementing views:", error);
-    }
-};
-
-
-export const PAGE_SIZE = 32;
-export interface FetchModelsOptions {
-    cursor?: QueryDocumentSnapshot<DocumentData>;
-    limit?: number;
-    categoryIds?: string[]; // array of category document ids
-    search?: string;
-    hideAI?: boolean;
-    uploaderId?: string; // filter by uploader uid
-}
-// Fetch models with pagination + optional filters
-export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
-    models: ModelData[];
-    nextCursor?: QueryDocumentSnapshot<DocumentData>;
-}> {
-    const {
-        cursor,
-        limit: lim = PAGE_SIZE,
-        search,
-        hideAI,
-        categoryIds,
-        uploaderId,
-    } = opts;
-
-    let q = query(collection(db, "models"), orderBy("createdAt", "desc"));
-
-    // Apply category filter if provided
-    if (categoryIds?.length) {
-        q = query(
-            q,
-            where("categoryIds", "array-contains-any", categoryIds.slice(0, 10))
-        );
-    }
-
-    // Apply AI filter if provided
-    if (hideAI) {
-        q = query(q, where("isAI", "==", false));
-    }
-
-    // Apply uploader filter if provided
-    if (uploaderId) {
-        q = query(q, where("uploaderId", "==", uploaderId));
-    }
-
-    // Handle search query
-    if (search && search.trim()) {
-        // First try to find by name prefix (most efficient)
-        const nameQuery = query(
-            collection(db, "models"),
-            where("name", ">=", search),
-            where("name", "<=", search + "\uf8ff"),
-            orderBy("createdAt", "desc"),
-            limit(lim)
-        );
-
-        const nameSnap = await getDocs(nameQuery);
-        const nameMatches = nameSnap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id }));
-
-        // Apply additional filters to name matches
-        let filteredMatches = nameMatches;
-
-        if (categoryIds?.length) {
-            filteredMatches = filteredMatches.filter(model =>
-                model.categoryIds?.some(catId => categoryIds.includes(catId))
-            );
-        }
-
-        if (hideAI) {
-            filteredMatches = filteredMatches.filter(model => !model.isAI);
-        }
-
-        // If we have enough results after filtering, return them
-        if (filteredMatches.length >= lim) {
-            return {
-                models: filteredMatches.slice(0, lim),
-                nextCursor: filteredMatches.length === lim ? nameSnap.docs[nameSnap.docs.length - 1] : undefined,
-            };
-        }
-
-        // Otherwise, fetch more and filter client-side
-        const allQuery = query(
-            collection(db, "models"),
-            orderBy("createdAt", "desc"),
-            limit(100) // Fetch more to filter from
-        );
-
-        const allSnap = await getDocs(allQuery);
-        const allModels = allSnap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id }));
-
-        // Filter by search term across multiple fields (name, description, tags only)
-        const searchFiltered = allModels.filter((model) => {
-            const searchLower = search.toLowerCase();
-            return (
-                model.name?.toLowerCase().includes(searchLower) ||
-                model.description?.toLowerCase().includes(searchLower) ||
-                model.tags?.some(tag => tag.toLowerCase().includes(searchLower))
-            );
-        });
-
-        // Apply additional filters
-        let finalFiltered = searchFiltered;
-
-        if (categoryIds?.length) {
-            finalFiltered = finalFiltered.filter(model =>
-                model.categoryIds?.some(catId => categoryIds.includes(catId))
-            );
-        }
-
-        if (hideAI) {
-            finalFiltered = finalFiltered.filter(model => !model.isAI);
-        }
-
-        return {
-            models: finalFiltered.slice(0, lim),
-            nextCursor: finalFiltered.length > lim ? allSnap.docs[allSnap.docs.length - 1] : undefined,
-        };
-    }
-
-    // No search query - show all models with filters applied
-    q = cursor ? query(q, startAfter(cursor), limit(lim)) : query(q, limit(lim));
-
-    const snap = await getDocs(q);
-    return {
-        models: snap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id })),
-        nextCursor:
-            snap.docs.length === lim ? snap.docs[snap.docs.length - 1] : undefined,
-    };
-}
-
-
-// Utility function to recalculate user upload count
-export async function recalculateUserUploadCount(userId: string): Promise<number> {
-    try {
-        // Get all models uploaded by this user
-        const modelsQuery = query(
-            collection(db, "models"),
-            where("uploaderId", "==", userId)
-        );
-        const modelsSnapshot = await getDocs(modelsQuery);
-        const actualCount = modelsSnapshot.size;
-
-        // Update user's upload count
-        const userRef = doc(db, "users", userId);
-        await updateDoc(userRef, {
-            "stats.uploadsCount": actualCount,
-        });
-
-        console.log(`Recalculated upload count for user ${userId}: ${actualCount}`);
-        return actualCount;
-    } catch (error) {
-        console.error("Error recalculating user upload count:", error);
+        console.error("Error updating model:", error);
         throw error;
     }
 }
 
-
+// Delete model using Cloud Function
+export const deleteModel = async (modelId: string): Promise<void> => {
+    const deleteModelFunction = httpsCallable(functions, 'deleteModel');
+    
+    try {
+        const result = await deleteModelFunction({ modelId });
+        console.log('Model deleted successfully:', result);
+    } catch (error) {
+        console.error('Error deleting model:', error);
+        throw error;
+    }
+};

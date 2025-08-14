@@ -1,6 +1,9 @@
 import { useEffect, useState, ChangeEvent } from "react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useNotification } from "@/features/notifications/hooks/useNotification";
 //components
 import { LikeButton } from "../likeButton";
 import { FavoritesButton } from "../favoritesButton";
@@ -34,6 +37,9 @@ export function ModelSidebar({
     currentUser,
     openAuthModal,
 }: ModelSidebarProps) {
+    const navigate = useNavigate();
+    const { isAdmin } = useAuth();
+    const notification = useNotification();
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [formData, setFormData] = useState({
         name: model.name || "",
@@ -41,7 +47,9 @@ export function ModelSidebar({
         tags: model.tags ? model.tags.join(", ") : "",
     });
     const [isUpdating, setIsUpdating] = useState<boolean>(false);
+    const [isDeleting, setIsDeleting] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState<boolean>(false);
 
     // Keep formData in sync if model changes (e.g. after update)
     useEffect(() => {
@@ -94,6 +102,27 @@ export function ModelSidebar({
             setError("Failed to update model.");
         }
         setIsUpdating(false);
+    };
+
+    // Delete model using Cloud Function
+    const handleDelete = async () => {
+        setIsDeleting(true);
+        setError("");
+        try {
+            // Import the delete function from the service
+            const { deleteModel } = await import("../../services/modelsService");
+            await deleteModel(model.id);
+            
+            // Show success notification
+            notification.success("Model Deleted", "The model has been successfully deleted.");
+            
+            // Navigate to home page after successful deletion
+            navigate("/");
+        } catch (err) {
+            console.error(err);
+            setError("Failed to delete model.");
+            setIsDeleting(false);
+        }
     };
 
     return (
@@ -224,12 +253,12 @@ export function ModelSidebar({
                     />
                 </div>
 
-                {/* Edit Button for Owner */}
-                {currentUser && currentUser.uid === model.uploaderId && !isEditing && (
-                    <div className="mb-4 lg:mb-6">
+                {/* Edit and Delete Buttons for Owner or Admin */}
+                {currentUser && (currentUser.uid === model.uploaderId || isAdmin) && !isEditing && (
+                    <div className="mb-4 lg:mb-6 space-y-3">
                         <button
                             onClick={handleEdit}
-                            className="secondary-button w-full py-3 lg:py-4 text-sm lg:text-base font-medium"
+                            className="bg-gray-600 hover:bg-gray-700 text-white w-full py-3 lg:py-4 text-sm lg:text-base font-medium transition-colors rounded-lg shadow-sm hover:shadow-md"
                         >
                             <span className="inline-flex items-center justify-center gap-2">
                                 <svg
@@ -243,6 +272,49 @@ export function ModelSidebar({
                                 <span>Edit Model</span>
                             </span>
                         </button>
+                        
+                        {showDeleteConfirm ? (
+                            <div className="space-y-2">
+                                <p className="text-sm text-red-600 text-center">Are you sure? This action cannot be undone.</p>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={handleDelete}
+                                        disabled={isDeleting}
+                                        className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white py-2 px-4 rounded text-sm lg:text-base font-medium flex-1 transition-colors"
+                                    >
+                                        {isDeleting ? "Deleting..." : "Delete"}
+                                    </button>
+                                    <button
+                                        onClick={() => setShowDeleteConfirm(false)}
+                                        disabled={isDeleting}
+                                        className="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 text-white py-2 px-4 rounded text-sm lg:text-base font-medium flex-1 transition-colors"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                                                         <button
+                                 onClick={() => setShowDeleteConfirm(true)}
+                                 className="bg-red-600 hover:bg-red-700 text-white w-full py-3 lg:py-4 text-sm lg:text-base font-medium transition-colors rounded-lg shadow-sm hover:shadow-md"
+                             >
+                                <span className="inline-flex items-center justify-center gap-2">
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        className="h-4 w-4 lg:h-5 lg:w-5"
+                                        viewBox="0 0 20 20"
+                                        fill="currentColor"
+                                    >
+                                        <path
+                                            fillRule="evenodd"
+                                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                                            clipRule="evenodd"
+                                        />
+                                    </svg>
+                                    <span>Delete Model</span>
+                                </span>
+                            </button>
+                        )}
                     </div>
                 )}
             </div>

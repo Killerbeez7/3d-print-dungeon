@@ -1,5 +1,5 @@
 import { useInfiniteQuery, InfiniteData } from "@tanstack/react-query";
-import { fetchModels, FetchModelsOptions } from "../services/modelsService";
+import { fetchModels, FetchModelsOptions } from "../services/index";
 import type { ModelData } from "../types/model";
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 

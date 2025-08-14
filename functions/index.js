@@ -37,4 +37,4 @@ export const {
 export const { createArtistProfile, updateArtistProfile, deleteArtistProfile } = user;
 
 // Models functions
-export const { onLikeCreated, onLikeDeleted } = models;
+export const { onLikeCreated, onLikeDeleted, deleteModel } = models;

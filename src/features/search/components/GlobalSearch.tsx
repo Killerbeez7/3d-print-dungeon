@@ -10,14 +10,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearch } from "@/features/search/hooks/useSearch";
-import {
-    getFirestore,
-    collection,
-    query as firestoreQuery,
-    orderBy,
-    limit,
-    getDocs,
-} from "firebase/firestore";
+import { searchArtists } from "@/features/search/services/searchService";
 import type { ArtistData } from "@/features/artists/types/artists";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
 
@@ -34,7 +27,6 @@ export function GlobalSearch() {
     const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
     const containerRef = useRef<HTMLFormElement>(null);
     const navigate = useNavigate();
-    const db = getFirestore();
 
     // Check for mobile screen size
     useEffect(() => {
@@ -63,33 +55,17 @@ export function GlobalSearch() {
         }
         const timer = setTimeout(async () => {
             try {
-                const colRef = collection(db, "users");
-                const q = firestoreQuery(colRef, orderBy("username"), limit(50));
-                const snap = await getDocs(q);
-                const allArtists: ArtistData[] = snap.docs.map((doc) => {
-                    const data = doc.data();
-                    return {
-                        uid: doc.id,
-                        email: data.email ?? null,
-                        displayName: data.displayName ?? null,
-                        username: data.username ?? null,
-                        photoURL: data.photoURL ?? null,
-                        ...data,
-                    } as ArtistData;
-                });
-                const filteredArtists = allArtists.filter(
-                    (a) =>
-                        a.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                        a.displayName?.toLowerCase().includes(searchTerm.toLowerCase())
-                );
-                setArtistResults(filteredArtists.slice(0, 5));
+                console.log("Searching for artists with term:", searchTerm);
+                const artists = await searchArtists(searchTerm, 5);
+                console.log("Found artists:", artists);
+                setArtistResults(artists);
             } catch (err) {
                 console.error("Error fetching artists:", err);
                 setArtistResults([]);
             }
         }, 300);
         return () => clearTimeout(timer);
-    }, [showDropdown, searchTerm, db]);
+    }, [showDropdown, searchTerm]);
 
     // On submit, update URL (static query) and clear the global input.
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {

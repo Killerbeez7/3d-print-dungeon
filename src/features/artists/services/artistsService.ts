@@ -1,19 +1,6 @@
-import {
-    collection,
-    query,
-    where,
-    orderBy,
-    startAfter,
-    startAt,
-    endAt,
-    limit as fsLimit,
-    getDocs,
-    type QueryDocumentSnapshot,
-    type DocumentData,
-} from "firebase/firestore";
-import { db } from "@/config/firebaseConfig";
+import { fetchArtistsForSearch } from "@/features/search/services/searchService";
 import type { ArtistData } from "../types/artists";
-import { getHighResPhotoURL } from "@/features/auth/utils/imageUtils";
+import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 
 const PAGE_SIZE = 32;
 
@@ -23,7 +10,6 @@ export interface FetchArtistsOptions {
     search?: string;
 }
 
-
 export async function fetchArtists(
     opts: FetchArtistsOptions = {}
 ): Promise<{
@@ -31,46 +17,17 @@ export async function fetchArtists(
     nextCursor?: QueryDocumentSnapshot<DocumentData>;
 }> {
     const {
-        cursor,
         limit: pageSize = PAGE_SIZE,
         search,
     } = opts;
 
-    let q = query(
-        collection(db, "users"),
-        where("isArtist", "==", true),
-        orderBy("username")
-    );
-
-    if (search?.trim()) {
-        const lower = search.toLowerCase();
-        q = query(q, startAt(lower), endAt(`${lower}\uf8ff`));
-    }
-
-    if (cursor) {
-        q = query(q, startAfter(cursor));
-    }
-
-    q = query(q, fsLimit(pageSize));
-
-    const snap = await getDocs(q);
-
-    const artists: ArtistData[] = snap.docs.map((doc) => {
-        const data = doc.data() as ArtistData;
-        return {
-            ...data,
-            id: doc.id,
-            uid: data.uid ?? doc.id,
-            email: data.email ?? null,
-            displayName: data.displayName ?? null,
-            photoURL: getHighResPhotoURL(data.photoURL),
-            bio: data.bio,
-        };
-    });
+    // Use the new search service that works with the new user schema
+    const artists = await fetchArtistsForSearch(search, pageSize);
 
     return {
         artists,
-        nextCursor:
-            snap.docs.length === pageSize ? snap.docs[snap.docs.length - 1] : undefined,
+        // Note: Pagination cursor is not implemented in the new service yet
+        // This would need to be added if pagination is required
+        nextCursor: undefined,
     };
 }

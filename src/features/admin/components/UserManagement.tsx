@@ -1,17 +1,15 @@
 import { useState, useEffect } from "react";
-import { collection, query, getDocs } from "firebase/firestore";
-import { db } from "@/config/firebaseConfig";
 import { grantRole, revokeRole } from "@/features/admin/services/adminService";
+import { fetchAllUsersForAdmin } from "@/features/admin/services/userManagementService";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import { MdEdit, MdCheck, MdClose } from "react-icons/md";
-import type { RawUserData } from "@/features/user/types/user";
+import type { AdminUserRow } from "@/features/admin/services/userManagementService";
 
 const ALL_ROLES = ["admin", "moderator", "contributor", "premium"] as const;
 export type Role = (typeof ALL_ROLES)[number];
 
-// Extend RawUserData for admin table rows
-export interface UserRow extends Omit<RawUserData, 'roles'> {
-    id: string;
+// Use AdminUserRow instead of the old UserRow
+export interface UserRow extends AdminUserRow {
     roles?: Role[];
 }
 
@@ -29,19 +27,16 @@ export const UserManagement = () => {
     useEffect(() => {
         (async () => {
             try {
-                const q = query(collection(db, "users"));
-                const docs = await getDocs(q);
-                const result: UserRow[] = docs.docs.map((d) => {
-                    const data = d.data() as RawUserData;
+                const adminUsers = await fetchAllUsersForAdmin();
+                const result: UserRow[] = adminUsers.map((user) => {
                     // Map roles to Role[] if present
-                    const roles = Array.isArray(data.roles)
-                        ? data.roles.filter((r): r is Role =>
+                    const roles = Array.isArray(user.roles)
+                        ? user.roles.filter((r): r is Role =>
                               ALL_ROLES.includes(r as Role)
                           )
                         : undefined;
                     return {
-                        id: d.id,
-                        ...data,
+                        ...user,
                         roles,
                     };
                 });

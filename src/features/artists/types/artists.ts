@@ -1,12 +1,12 @@
-import type { RawUserData } from "@/features/user/types/user";
+import type { PublicProfileView } from "@/features/user/types/user";
 
-export interface ArtistData extends RawUserData {
-    uid: string;
+export interface ArtistData extends PublicProfileView {
     bio?: string;
+    // These fields are already in PublicProfileView, but keeping for backward compatibility
     displayName: string;
-    photoURL: string;
+    photoURL?: string;
     username: string;
-    email: string;
+    // Note: email is not available in public profile for privacy
 }
 
 export interface ArtistListGridProps {
