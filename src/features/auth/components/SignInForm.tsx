@@ -126,7 +126,8 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                             required
                             spellCheck="false"
                             autoComplete="email"
-                            className="w-full pl-10 pr-4 py-3 border border-br-secondary rounded-xl bg-white placeholder-gray-500 shadow-token-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:border-[var(--color-focus)] transition-all duration-200"
+                            className="w-full pl-10 pr-4 py-3 border border-br-secondary rounded-xl bg-white placeholder-gray-500 shadow-token-inner 
+                            focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:border-[var(--color-focus)] transition-all duration-200"
                             placeholder="Enter your email"
                         />
                         <ValidityIndicator
@@ -216,7 +217,8 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                 <button
                     type="submit"
                     disabled={!isFormValid() || loading}
-                    className="btn-action-primary w-full py-3 px-4 disabled:opacity-60 focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:ring-offset-2"
+                    className="btn-action-primary w-full py-3 px-4 disabled:opacity-60 
+                    focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:ring-offset-2"
                 >
                     {loading ? (
                         <div className="flex items-center justify-center">
@@ -241,7 +243,10 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                     <button
                         onClick={() => handleOAuthSignIn("google")}
                         disabled={loading}
-                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 
+                        border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface 
+                        hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 
+                        disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Google"
                     >
                         <FontAwesomeIcon
@@ -257,7 +262,10 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                     <button
                         onClick={() => handleOAuthSignIn("facebook")}
                         disabled={loading}
-                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 
+                        border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface 
+                        hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 
+                        disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Facebook"
                     >
                         <FontAwesomeIcon
