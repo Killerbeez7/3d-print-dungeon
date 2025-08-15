@@ -5,6 +5,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import type { ForumThread, ForumReply } from "@/features/forum/types/forum";
 import type { FC } from "react";
+import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
 
 export const ForumDashboard: FC = () => {
     const { currentUser } = useAuth();
@@ -12,6 +13,8 @@ export const ForumDashboard: FC = () => {
     const [userThreads, setUserThreads] = useState<ForumThread[]>([]);
     const [userReplies, setUserReplies] = useState<ForumReply[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+
+    const avatarUrl = getAvatarUrlWithCacheBust(currentUser?.photoURL);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -36,13 +39,11 @@ export const ForumDashboard: FC = () => {
         <div className=" text-[var(--txt-primary)] rounded-lg shadow p-6">
             {/* Welcome/User Info */}
             <div className="mb-6 flex items-center gap-4">
-                {currentUser?.photoURL && (
-                    <img
-                        src={currentUser.photoURL}
-                        alt="avatar"
-                        className="w-16 h-16 rounded-full"
-                    />
-                )}
+                <img
+                    src={avatarUrl}
+                    alt="avatar"
+                    className="w-16 h-16 rounded-full"
+                />
                 <div>
                     <h1 className="text-2xl font-bold">
                         Welcome, {currentUser?.displayName || "User"}!
