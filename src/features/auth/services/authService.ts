@@ -16,7 +16,7 @@ import {
     reauthenticateWithCredential,
     EmailAuthProvider,
 } from "firebase/auth";
-import type { PublicProfile } from "@/features/user/types/user";
+import type { PublicProfile, PrivateProfile } from "@/features/user/types/user";
 import { handleAuthError } from "../utils/errorHandling";
 
 import { httpsCallable } from "firebase/functions";
@@ -33,7 +33,7 @@ const ensureUserDoc = async () => {
 };
 
 
-export const getUserFromDatabase = (
+export const fetchPublicProfile = (
     uid: string,
     callback: (user: PublicProfile | null) => void
 ): (() => void) => {
@@ -47,8 +47,7 @@ export const getUserFromDatabase = (
         userDocRef,
         (snapshot) => {
             if (snapshot.exists()) {
-                const raw = snapshot.data();
-                callback(raw as PublicProfile);
+                callback(snapshot.data() as PublicProfile);
             } else {
                 callback(null);
             }
@@ -193,6 +192,50 @@ export const updateUserUsername = async (uid: string, newUsername: string): Prom
         console.error("Error updating username:", error);
         throw error;
     }
+};
+
+export const fetchPrivateProfile = (
+    uid: string,
+    callback: (profile: PrivateProfile | null) => void
+): (() => void) => {
+    if (!uid) {
+        console.error("No uid provided to fetchPrivateProfile");
+        callback(null);
+        return () => { };
+    }
+    const privateDocRef = doc(db, `users/${uid}/private/data`);
+    const unsubscribe = onSnapshot(
+        privateDocRef,
+        (snapshot) => {
+            if (snapshot.exists()) {
+                const raw = snapshot.data();
+                // Transform null values to undefined to match frontend types
+                const transformedData = {
+                    ...raw,
+                    email: raw.email === null ? null : raw.email, // Keep email as null if it's null
+                    phoneNumber: raw.phoneNumber === null ? undefined : raw.phoneNumber,
+                    dateOfBirth: raw.dateOfBirth === null ? undefined : raw.dateOfBirth,
+                    suspensionReason: raw.suspensionReason === null ? undefined : raw.suspensionReason,
+                    lastPasswordChange: raw.lastPasswordChange === null ? undefined : raw.lastPasswordChange,
+                    stripeCustomerId: raw.stripeCustomerId === null ? undefined : raw.stripeCustomerId,
+                };
+                callback(transformedData as PrivateProfile);
+            } else {
+                callback(null);
+            }
+        },
+        (error) => {
+            // Handle permission denied errors gracefully during sign out
+            if (error.code === "permission-denied") {
+                // Silent handling for expected sign-out behavior
+                callback(null);
+            } else {
+                console.error("Error reading private profile:", error);
+                callback(null);
+            }
+        }
+    );
+    return unsubscribe;
 };
 
 

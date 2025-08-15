@@ -10,7 +10,7 @@ import {
     signInWithGoogle,
     signOutUser as signOut,
     changePassword as changeUserPassword,
-    getUserFromDatabase,
+    fetchPublicProfile,
     fetchPrivateProfile,
 } from "@/features/auth/services/authService";
 import {
@@ -107,7 +107,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     setClaims(claims as CustomClaims);
 
                     // Fetch both public and private profiles
-                    const publicUnsubscribe = getUserFromDatabase(user.uid, (publicData: PublicProfile | null) => {
+                    const publicUnsubscribe = fetchPublicProfile(user.uid, (publicData: PublicProfile | null) => {
                         if (publicData) {
                             setPublicProfile(publicData);
                         } else {
