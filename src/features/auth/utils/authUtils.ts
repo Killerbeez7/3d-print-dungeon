@@ -1,6 +1,6 @@
 import { refreshIdToken } from "./refreshIdToken";
 
-import { getHighResPhotoURL } from "./imageUtils";
+import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
 
 import {
     validateUsername,
@@ -46,7 +46,7 @@ export {
     refreshIdToken,
 
     // Image utilities
-    getHighResPhotoURL,
+    getAvatarUrlWithCacheBust,
 
     // Types
     type ValidationResult,
