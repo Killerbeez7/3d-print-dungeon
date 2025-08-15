@@ -16,7 +16,7 @@ export const adminRoutes: RouteObject[] = [
             </Suspense>,
             {
                 allowedRoles: ["admin"],
-                authRedirect: "/login",
+                authRedirect: "/",
                 maintenanceRedirect: "/maintenance",
                 fallback: null,
             }

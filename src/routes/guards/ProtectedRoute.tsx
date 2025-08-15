@@ -14,7 +14,7 @@ export function ProtectedRoute({
     children,
     requireAdmin = false,
     allowedRoles = [],
-    redirectTo = "/login",
+    redirectTo = "/",
 }: ProtectedRouteProps): React.ReactNode | null {
     const { currentUser, roles = [], isAdmin, loading } = useContext(AuthContext);
     const location = useLocation();
