@@ -1,11 +1,12 @@
 import { useContext, ReactNode } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AuthContext } from "@/features/auth/context/authContext";
+import type { Role } from "@/features/user/types/user";
 
 interface ProtectedRouteProps {
     children: ReactNode;
     requireAdmin?: boolean;
-    allowedRoles?: string[];
+    allowedRoles?: Role[];
     redirectTo?: string;
 }
 
@@ -32,7 +33,7 @@ export function ProtectedRoute({
     }
 
     // Role-based check
-    if (allowedRoles.length > 0 && !allowedRoles.some((r) => roles.includes(r))) {
+    if (allowedRoles.length > 0 && !allowedRoles.some((r: Role) => roles.includes(r))) {
         return <Navigate to="/" replace />;
     }
 

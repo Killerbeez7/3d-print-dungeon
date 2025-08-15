@@ -25,18 +25,18 @@ export interface PublicProfile {
     /* Identity */
     username: string;
     displayName: string;
-    photoURL?: string;
+    photoURL?: string | null;
 
     /* Profile */
-    bio?: string;
-    location?: string;
-    website?: string;
+    bio?: string | null;
+    location?: string | null;
+    website?: string | null;
     socialLinks?: {
-        twitter?: string;
-        instagram?: string;
-        facebook?: string;
-        linkedin?: string;
-        youtube?: string;
+        twitter?: string | null;
+        instagram?: string | null;
+        facebook?: string | null;
+        linkedin?: string | null;
+        youtube?: string | null;
     };
 
     /* Stats (aggregated for performance) */

@@ -1,4 +1,4 @@
-import { RawUserData } from "@/features/user/types/user";
+import type { PublicProfileView } from "@/features/user/types/user";
 import type { IconType } from "react-icons";
 
 
@@ -105,7 +105,7 @@ export interface ForumReply {
     parentReplyId?: string; // For nested replies
 }
 
-export interface ForumUser extends RawUserData {
+export interface ForumUser extends PublicProfileView {
     threadCount?: number;
     replyCount?: number;
     lastActivity?: Date;

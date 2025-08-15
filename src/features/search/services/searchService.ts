@@ -82,10 +82,10 @@ export async function searchArtists(searchTerm: string, limitCount: number = 5):
         // Convert to ArtistData format and limit results
         const artistResults: ArtistData[] = filteredArtists.slice(0, limitCount).map(artist => ({
             ...artist,
-            bio: artist.bio,
-            displayName: artist.displayName,
-            photoURL: artist.photoURL,
             username: artist.username,
+            displayName: artist.displayName,
+            bio: artist.bio ?? undefined,
+            photoURL: artist.photoURL ?? undefined,
         }));
 
         console.log("Search service - Final results:", artistResults.length);
@@ -160,9 +160,9 @@ export async function fetchArtistsForSearch(
         // Convert to ArtistData format and limit results
         const artistResults: ArtistData[] = filteredArtists.slice(0, limitCount).map(artist => ({
             ...artist,
-            bio: artist.bio,
+            bio: artist.bio ?? undefined,
             displayName: artist.displayName,
-            photoURL: artist.photoURL,
+            photoURL: artist.photoURL ?? undefined,
             username: artist.username,
         }));
 

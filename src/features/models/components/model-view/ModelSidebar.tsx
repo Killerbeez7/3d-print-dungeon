@@ -15,9 +15,9 @@ import type { CurrentUser } from "@/features/user/types/user";
 import type { ModelData } from "@/features/models/types/model";
 
 interface Uploader {
-    photoURL?: string;
-    displayName?: string;
     username?: string;
+    displayName?: string;
+    photoURL?: string | null;
 }
 
 interface ModelSidebarProps {

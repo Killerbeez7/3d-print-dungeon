@@ -5,12 +5,12 @@ import { Spinner } from "@/features/shared/reusable/Spinner";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
 
 export const ProfileRedirect = () => {
-    const { currentUser, userData } = useAuth();
+    const { currentUser, publicProfile } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
-        // Wait until auth state and user data are known
-        if (currentUser === undefined || userData === undefined) return;
+        // Wait until auth state and public profile are known
+        if (currentUser === undefined || publicProfile === undefined) return;
 
         if (!currentUser) {
             navigate("/", { replace: true });
@@ -18,12 +18,12 @@ export const ProfileRedirect = () => {
         }
 
         // Only redirect once a proper username is available
-        if (userData?.username) {
-            const safeUsername = toUrlSafeUsername(userData.username);
+        if (publicProfile?.username) {
+            const safeUsername = toUrlSafeUsername(publicProfile.username);
             navigate(`/${safeUsername}`, { replace: true });
         }
         // Otherwise, keep spinner until ensureUserDocument populates username
-    }, [currentUser, userData, navigate]);
+    }, [currentUser, publicProfile, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center">

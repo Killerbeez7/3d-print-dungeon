@@ -1,6 +1,5 @@
 import { useState, ChangeEvent, FC } from "react";
 import { paymentService } from "@/features/payment/services/paymentService";
-import { useAuth } from "@/features/auth/hooks/useAuth";
 import { H3, FormLabel, Description, Metadata } from "@/components/index";
 import type { ModelData } from "@/features/models/types/model";
 
@@ -10,15 +9,10 @@ export interface PricingFormProps {
 }
 
 export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) => {
-    const { userData } = useAuth();
     const [priceError, setPriceError] = useState<string>("");
 
-    const isVerifiedSeller = Boolean(
-        userData &&
-            typeof userData === "object" &&
-            "stripeConnectId" in userData &&
-            (userData as { stripeConnectId?: string }).stripeConnectId
-    );
+    // TODO: Replace with real seller verification check from private profile when available
+    const isVerifiedSeller = false;
 
     const handlePriceChange = (e: ChangeEvent<HTMLInputElement>): void => {
         const value = e.target.value;

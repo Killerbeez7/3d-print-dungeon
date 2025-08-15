@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { MaintenanceRoute } from "../routes/guards/MaintenanceRoute";
 import { ProtectedRoute } from "../routes/guards/ProtectedRoute";
+import type { Role } from "@/features/user/types/user";
 
 export interface MaintenanceOptions {
     fallback?: ReactNode;
@@ -10,14 +11,14 @@ export interface MaintenanceOptions {
 export interface ProtectedOptions {
     requireAdmin?: boolean;
     redirectTo?: string;
-    allowedRoles?: string[];
+    allowedRoles?: Role[];
 }
 
 export interface ProtectedMaintenanceOptions {
     fallback?: ReactNode;
     maintenanceRedirect?: string;
     requireAdmin?: boolean;
-    allowedRoles?: string[];
+    allowedRoles?: Role[];
     authRedirect?: string;
 }
 

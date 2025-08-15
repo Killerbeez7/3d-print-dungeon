@@ -33,7 +33,7 @@ import { toUrlSafeUsername } from "@/utils/stringUtils";
 
 export const Navbar = (): React.ReactNode => {
     const { isAdmin } = useUserRole();
-    const { currentUser, userData, handleSignOut, loading } = useAuth();
+    const { currentUser, publicProfile, handleSignOut, loading } = useAuth();
     const { setShowDropdown } = useSearch();
     const { open } = useModal("auth");
 
@@ -115,7 +115,7 @@ export const Navbar = (): React.ReactNode => {
         closeAll();
     }, [location.pathname]);
 
-    const urlSafeUsername = toUrlSafeUsername(userData?.username);
+    const urlSafeUsername = toUrlSafeUsername(publicProfile?.username);
 
     return (
         <div className="sticky top-0 left-0 right-0 z-50">
