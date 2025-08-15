@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/config/firebaseConfig";
 // services, context, utils
@@ -11,6 +11,7 @@ import {
     signOutUser as signOut,
     changePassword as changeUserPassword,
     getUserFromDatabase,
+    fetchPrivateProfile,
 } from "@/features/auth/services/authService";
 import {
     checkMaintenanceStatus,
@@ -18,13 +19,15 @@ import {
 } from "@/features/maintenance/services/maintenanceService";
 // types
 import type { MaintenanceStatus, UserId } from "@/features/maintenance/types/maintenance";
-import type { RawUserData } from "@/features/user/types/user";
-import type { CustomClaims } from "@/features/auth/types/auth";
+import type { PrivateProfile, PublicProfile, Role, Permission } from "@/features/user/types/user";
+import type { CustomClaims, AuthUser } from "@/features/auth/types/auth";
 import { handleAuthError } from "@/features/auth/utils/errorHandling";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const [userData, setUserData] = useState<RawUserData | null>(null);
+    const [authUser, setAuthUser] = useState<AuthUser | null>(null);
+    const [privateProfile, setPrivateProfile] = useState<PrivateProfile | null>(null);
+    const [publicProfile, setPublicProfile] = useState<PublicProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [authError, setAuthError] = useState<string | null>(null);
     const [claims, setClaims] = useState<CustomClaims | null>(null);
@@ -84,7 +87,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         try {
             // Clear user data before signing out to avoid permission errors
             setCurrentUser(null);
-            setUserData(null);
+            setPrivateProfile(null);
+            setPublicProfile(null);
             setClaims(null);
             await signOut();
         } catch (error) {
@@ -102,24 +106,82 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
                     const claims = await refreshIdToken();
                     setClaims(claims as CustomClaims);
 
-                    getUserFromDatabase(user.uid, (data: RawUserData | null) => {
-                        setUserData({
-                            ...(data || {}),
-                            roles: data?.roles || [],
-                        } as RawUserData);
+                    // Fetch both public and private profiles
+                    const publicUnsubscribe = getUserFromDatabase(user.uid, (publicData: PublicProfile | null) => {
+                        if (publicData) {
+                            setPublicProfile(publicData);
+                        } else {
+                            // Create basic public profile if none exists (fallback)
+                            const basicPublicProfile: PublicProfile = {
+                                username: user.displayName?.toLowerCase().replace(/\s+/g, '') || `user${user.uid.slice(0, 8)}`,
+                                displayName: user.displayName || "Anonymous",
+                                photoURL: user.photoURL || undefined,
+                                bio: "",
+                                location: "",
+                                website: "",
+                                socialLinks: {},
+                                stats: {
+                                    followersCount: 0,
+                                    followingCount: 0,
+                                    postsCount: 0,
+                                    likesCount: 0,
+                                    viewsCount: 0,
+                                    uploadsCount: 0,
+                                },
+                                isArtist: false,
+                                isVerified: false,
+                                isPremium: false,
+                                artistCategories: [],
+                                featuredWorks: [],
+                                joinedAt: new Date(),
+                                lastActiveAt: new Date(),
+                            };
+                            setPublicProfile(basicPublicProfile);
+                        }
+                    });
+                    
+                    const privateUnsubscribe = fetchPrivateProfile(user.uid, (privateData: PrivateProfile | null) => {
+                        if (privateData) {
+                            setPrivateProfile(privateData);
+                        } else {
+                            // Create basic private profile if none exists
+                            const basicPrivateProfile: PrivateProfile = {
+                                uid: user.uid,
+                                email: user.email,
+                                authProvider: user.providerData[0]?.providerId || "password",
+                                emailVerified: user.emailVerified,
+                                roles: ["user"], // Default role
+                                permissions: [], // Default empty permissions
+                                profileComplete: false, // Will need to be determined based on profile completion
+                                accountStatus: "active",
+                                createdAt: new Date(),
+                                updatedAt: new Date(),
+                                lastLoginAt: new Date(),
+                                loginCount: 1,
+                            };
+                            setPrivateProfile(basicPrivateProfile);
+                        }
                         setLoading(false);
                     });
+                    
+                    // Clean up subscriptions when component unmounts
+                    return () => {
+                        publicUnsubscribe();
+                        privateUnsubscribe();
+                    };
                 } catch (error) {
                     console.error("Failed to fetch user data on auth change", error);
                     // Don't call signOut here as it creates a loop
                     setCurrentUser(null);
-                    setUserData(null);
+                    setPrivateProfile(null);
+                    setPublicProfile(null);
                     setClaims(null);
                     setLoading(false);
                 }
             } else {
                 setCurrentUser(null);
-                setUserData(null);
+                setPrivateProfile(null);
+                setPublicProfile(null);
                 setClaims(null);
                 setLoading(false);
             }
@@ -151,17 +213,40 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return () => unsubscribe();
     }, [currentUser?.uid]);
 
-    const claimRoles = claims
-        ? Object.entries(claims)
-              .filter(
-                  ([k, v]) =>
-                      v === true &&
-                      ["super", "admin", "moderator", "contributor", "premium"].includes(
-                          k
-                      )
-              )
-              .map(([k]) => k)
-        : [];
+    // Extract roles from claims and private profile
+    const claimRoles: Role[] = (() => {
+        if (!claims) return [];
+        const valid: Array<keyof CustomClaims> = [
+            "super",
+            "admin",
+            "moderator",
+            "contributor",
+            "premium",
+        ];
+        const roles: Role[] = [];
+        for (const key of valid) {
+            if (claims[key] === true) {
+                // Map known claim keys to Role union
+                if (key === "super") roles.push("superadmin");
+                else if (key === "admin") roles.push("admin");
+                else if (key === "moderator") roles.push("moderator");
+                // contributor/premium are not Roles; ignore for role checks
+            }
+        }
+        return roles;
+    })();
+    
+    const allRoles: Role[] = useMemo(() => {
+        const pr: Role[] = privateProfile?.roles || [];
+        return Array.from(new Set<Role>([...claimRoles, ...pr]));
+    }, [claimRoles, privateProfile?.roles]);
+    
+    const permissions: Permission[] = privateProfile?.permissions || [];
+    
+    const isAdmin = allRoles.includes("admin") || allRoles.includes("superadmin");
+    const isSuper = allRoles.includes("superadmin");
+    const isArtist = allRoles.includes("artist") || publicProfile?.isArtist === true;
+    const isModerator = allRoles.includes("moderator");
 
     const handleFacebookSignIn = async () => {
         throw new Error("Facebook sign-in not implemented");
@@ -170,12 +255,54 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw new Error("Twitter sign-in not implemented");
     };
 
+    // Derive consolidated auth user once inputs are ready
+    useEffect(() => {
+        if (!currentUser || !publicProfile || !privateProfile) {
+            setAuthUser(null);
+            return;
+        }
+        // Build roles from claims + private profile
+        const claimRolesLocal: Role[] = (() => {
+            if (!claims) return [];
+            const roles: Role[] = [];
+            if (claims.super === true) roles.push("superadmin");
+            if (claims.admin === true) roles.push("admin");
+            if (claims.moderator === true) roles.push("moderator");
+            return roles;
+        })();
+
+        const combinedRoles: Role[] = Array.from(
+            new Set<Role>([...claimRolesLocal, ...(privateProfile.roles || [])])
+        );
+
+        const computed: AuthUser = {
+            uid: currentUser.uid,
+            email: privateProfile.email,
+            displayName: publicProfile.displayName || currentUser.displayName || "Anonymous",
+            username: publicProfile.username,
+            photoURL: publicProfile.photoURL ?? currentUser.photoURL ?? null,
+            roles: combinedRoles,
+            permissions: privateProfile?.permissions || [],
+            provider: privateProfile?.authProvider || (currentUser.providerData[0]?.providerId ?? "password"),
+            isAdmin: combinedRoles.includes("admin") || combinedRoles.includes("superadmin"),
+            isSuper: combinedRoles.includes("superadmin"),
+            isArtist: combinedRoles.includes("artist") || publicProfile?.isArtist === true,
+            isModerator: combinedRoles.includes("moderator"),
+        };
+        setAuthUser(computed);
+    }, [currentUser, publicProfile, privateProfile, claims]);
+
     const value = {
+        authUser,
         currentUser,
-        userData,
-        roles: claimRoles,
-        isAdmin: claims?.admin === true,
-        isSuper: claims?.super === true,
+        privateProfile,
+        publicProfile,
+        roles: allRoles,
+        permissions,
+        isAdmin,
+        isSuper,
+        isArtist,
+        isModerator,
         claims,
         authError,
         maintenanceMode,
