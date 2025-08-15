@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArtistCardProps } from "../types/artists";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
-import { getHighResPhotoURL } from "@/features/auth/utils/imageUtils";
+import { getAvatarUrl } from "@/utils/avatarUtils";
 
 export function ArtistCard({ displayName, username, photoURL, bio }: ArtistCardProps) {
     const name = displayName || "Anonymous";
@@ -13,15 +13,11 @@ export function ArtistCard({ displayName, username, photoURL, bio }: ArtistCardP
                 {/* Artist Image - High Quality */}
                 <div className="relative overflow-hidden bg-bg-surface">
                     <img
-                        src={getHighResPhotoURL(photoURL)}
+                        src={getAvatarUrl(photoURL)}
                         alt={name}
                         className="w-full h-56 object-cover transition-all duration-token-200 group-hover:brightness-105 group-hover:scale-105"
                         loading="lazy"
                         decoding="async"
-                        onError={(e) => {
-                            (e.target as HTMLImageElement).src =
-                                "/assets/images/user.png";
-                        }}
                     />
                     {/* Subtle hover indicator */}
                     <div className="absolute inset-0 bg-gradient-to-t from-bg-reverse/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-token-200"></div>

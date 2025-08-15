@@ -8,7 +8,7 @@ import {
     MdThumbUp,
     MdDelete,
 } from "react-icons/md";
-import { getThumbnailUrl } from "../../../utils/imageUtils";
+import { getThumbnailUrl } from "@/utils/imageUtils";
 import type { AdminModel, AdminUser } from "@/features/admin/types/admin";
 
 // Cache duration in milliseconds (5 minutes)

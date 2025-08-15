@@ -1,4 +1,4 @@
-import { getAvatarUrl } from "@/utils/avatar";
+import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
 import { H1, Description, Label, StatValueSecondary } from "@/components/index";
 
 import type { PublicProfileView } from "@/features/user/types/user";
@@ -8,6 +8,8 @@ interface UserProfileProps {
 }
 
 export const UserHeader = ({ user }: UserProfileProps): React.ReactNode => {
+    const avatarUrl = getAvatarUrlWithCacheBust(user.photoURL);
+    
     return (
         <div className="bg-bg-secondary rounded-lg p-4 sm:p-6 shadow-md">
             <div className="flex items-start space-x-6">
@@ -15,7 +17,7 @@ export const UserHeader = ({ user }: UserProfileProps): React.ReactNode => {
                 <div className="flex-shrink-0">
                     <div className="w-24 h-24 rounded-full overflow-hidden bg-bg-surface">
                         <img
-                            src={getAvatarUrl(user.photoURL)}
+                            src={avatarUrl}
                             alt={user.displayName || "User Avatar"}
                             className="w-full h-full object-cover"
                         />
