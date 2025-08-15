@@ -202,7 +202,7 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
 
                 {/* Error message */}
                 {error && (
-                    <div className="flex items-center p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                    <div className="flex items-center p-3 bg-red-50 border border-red-200 rounded-xl">
                         <FontAwesomeIcon
                             icon={faExclamationTriangle}
                             className="text-red-500 mr-2"
@@ -244,7 +244,7 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                         onClick={() => handleOAuthSignIn("google")}
                         disabled={loading}
                         className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 
-                        border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface 
+                        border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white 
                         hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 
                         disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Google"
@@ -263,7 +263,7 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                         onClick={() => handleOAuthSignIn("facebook")}
                         disabled={loading}
                         className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 
-                        border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface 
+                        border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white 
                         hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 
                         disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Facebook"
@@ -281,7 +281,9 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                     <button
                         onClick={() => handleOAuthSignIn("twitter")}
                         disabled={loading}
-                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white dark:bg-bg-surface hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary 
+                        rounded-lg lg:rounded-xl text-gray-700 bg-white hover:shadow-token-md hover:scale-[1.02] 
+                        transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Twitter"
                     >
                         <FontAwesomeIcon
@@ -298,12 +300,12 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
 
             {/* Switch to Sign Up */}
             <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-gray-600">
                     Don&apos;t have an account?{" "}
                     <button
                         type="button"
                         onClick={onSwitchToSignUp}
-                        className="text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 font-semibold transition-all duration-200 hover:scale-105 hover:underline"
+                        className="text-slate-700 hover:text-blue-600 font-semibold transition-all duration-200 hover:scale-105 hover:underline"
                     >
                         Sign Up
                     </button>
