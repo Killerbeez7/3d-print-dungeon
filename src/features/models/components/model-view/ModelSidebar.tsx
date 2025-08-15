@@ -8,6 +8,7 @@ import { useNotification } from "@/features/notifications/hooks/useNotification"
 import { LikeButton } from "../likeButton";
 import { FavoritesButton } from "../favoritesButton";
 import { PurchaseButton } from "@/features/payment/components/PurchaseButton";
+import { FollowButton } from "@/features/user/components/FollowButton";
 import { H4, H5 } from "@/components/ResponsiveHeading";
 
 //types
@@ -341,9 +342,15 @@ export function ModelSidebar({
                             Senior 3D Artist
                         </p>
                         <div className="flex items-center gap-2 lg:gap-3 mt-2">
-                            <button className="bg-accent hover:bg-accent-hover text-white px-3 lg:px-4 py-1 lg:py-1.5 rounded-full text-xs lg:text-sm font-medium transition-colors">
-                                Follow
-                            </button>
+                            {model.uploaderId && (
+                                <FollowButton
+                                    targetUserId={model.uploaderId}
+                                    targetUserName={uploader?.displayName || undefined}
+                                    size="sm"
+                                    variant="primary"
+                                    openAuthModal={openAuthModal}
+                                />
+                            )}
                             <span className="text-xs lg:text-sm text-txt-secondary">
                                 {viewCountLoading ? "Loading..." : `${viewCount} views`}
                             </span>

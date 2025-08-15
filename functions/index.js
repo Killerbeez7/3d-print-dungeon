@@ -38,6 +38,7 @@ export const {
 } = analytics;
 
 export const { createArtistProfile, updateArtistProfile, deleteArtistProfile } = user;
+export const { toggleFollow, getFollowStatus } = user;
 
 // Models functions
 export const { onLikeCreated, onLikeDeleted, deleteModel } = models;

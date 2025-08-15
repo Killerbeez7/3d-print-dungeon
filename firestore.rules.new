@@ -11,19 +11,6 @@ service cloud.firestore {
     function isSuperAdmin() { return request.auth.token.super  == true; }
     function rolesUnchanged() { return !("roles" in request.writeFields); }
 
-    // -------------- Collection-group allowances --------------
-    // Allow read access to any subcollection named "public" (e.g., users/{uid}/public/*)
-    match /{path=**}/public/{docId} {
-      allow read: if true;
-    }
-
-    // -------------- Username registry --------------
-    // Public read for mapping username -> uid; writes only via backend (Admin SDK)
-    match /usernames/{key} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
-
     // -------------- Admins List--------------
     match /admins/{uid} {
     allow read : if isAdmin();
@@ -31,42 +18,45 @@ service cloud.firestore {
     }
     
 
-    // -------------- Users --------------
+    // -------------- Users (Private Data) --------------
     match /users/{userId} {
       allow read: if true;
-      allow create: if isSignedIn() && isOwner(userId);
-      allow update, delete: if isAdmin();
+      allow create: if isSignedIn() && request.auth.uid == userId;
 
-      // Public profile - readable by anyone
-      match /public/{docId} {
-        allow read: if true;
-        allow write: if isSignedIn() && isOwner(userId);
-      }
+      allow update: 
+                if isOwner(userId)
+                && rolesUnchanged()
+                || isAdmin();
 
-      // Private profile - only owner or admins
-      match /private/{docId} {
-        allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
-      }
+      allow delete: if isOwner(userId) || isAdmin();
+    }
 
-      // Settings - only owner or admins
-      match /settings/{docId} {
-        allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
-      }
+    // -------------- User Public Data (Stats, etc.) --------------
+    match /users/{userId}/public/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == userId || isAdmin();
+    }
 
-      // Artist profile - private by default
-      match /artist/{docId} {
-        allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
-      }
+    // -------------- User Public Profile --------------
+    match /users/{userId}/public/profile {
+      allow read: if true;
+      allow write: if isSignedIn() && request.auth.uid == userId || isAdmin();
+    }
 
-      // Purchases (private)
-      match /purchases/{purchaseId} {
-        allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
-      }
-
-      // Uploads (private metadata per user)
-      match /uploads/{modelId} {
-        allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
-      }
+    // -------------- User Stats (for like/follow operations) --------------
+    match /users/{userId}/public/stats {
+      allow read: if true;
+      // Allow users to create and update their own stats
+      allow create, update: if isSignedIn() && (
+        request.auth.uid == userId || 
+        isAdmin() ||
+        // Allow increment/decrement operations for likes/follows
+        // Only allow specific fields to be incremented/decremented
+        (request.writeFields.hasOnly(['likesCount']) || 
+         request.writeFields.hasOnly(['followers']) || 
+         request.writeFields.hasOnly(['following']) ||
+         request.writeFields.hasOnly(['likesCount', 'followers', 'following']))
+      );
     }
 
     // -------------- Artists (Public Profiles) --------------
@@ -84,7 +74,8 @@ service cloud.firestore {
       allow read:   if true;
       allow create: if isSignedIn();
       allow update, delete: if isSignedIn()
-        && (resource.data.uploaderId == request.auth.uid || isAdmin());
+        && (resource.data.uploaderId == request.auth.uid || isAdmin())
+        || (isSignedIn() && request.writeFields.hasOnly(['likes']));
     }
     
     // -------------- Likes --------------
@@ -94,11 +85,9 @@ service cloud.firestore {
     }
 
     // -------------- Follows --------------
-    // Expose follow relationship documents for read so the client can resolve isFollowing
-    // Writes are restricted to backend (Admin SDK via Cloud Functions)
     match /follows/{followId} {
-      allow read: if isSignedIn();
-      allow write: if false;
+      allow read: if true;
+      allow write: if isSignedIn();
     }
 
     // -------------- Comments --------------
