@@ -1,5 +1,5 @@
 import { ModelCardSkeleton } from "./ModelCardSkeleton";
-import { PAGE_SIZE } from "@/features/models/services/modelsService";
+import { PAGE_SIZE } from "@/features/models/services/modelsFetchService";
 
 export const ModelGridSkeleton = () => {
     return (
