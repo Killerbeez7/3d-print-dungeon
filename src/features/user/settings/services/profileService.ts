@@ -1,7 +1,8 @@
 import { storage } from "@/config/firebaseConfig";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { updateProfile, User } from "firebase/auth";
-import { doc, updateDoc, getDoc, getFirestore } from "firebase/firestore";
+import { doc, updateDoc, getDoc, getFirestore, Timestamp, serverTimestamp } from "firebase/firestore";
+import type { PublicProfile } from "@/features/user/types/user";
 
 const db = getFirestore();
 
@@ -22,11 +23,8 @@ interface ProfileData {
     socials: SocialAccounts;
 }
 
-interface UserProfile extends ProfileData {
-    photoURL?: string;
-    coverURL?: string;
-    updatedAt: string;
-}
+// Use the main PublicProfile interface instead of duplicating
+type PublicUserData = PublicProfile;
 
 export const profileService = {
 
@@ -38,7 +36,6 @@ export const profileService = {
         });
         return await getDownloadURL(snapshot.ref);
     },
-
 
     async updateProfile(
         user: User,
@@ -65,27 +62,35 @@ export const profileService = {
                 photoURL: photoURL || undefined,
             });
 
-            // Update Firestore user document
-            const userData: Partial<UserProfile> = {
-                displayName: profileData.displayName,
-                email: profileData.email,
-                isEmailPublic: profileData.isEmailPublic,
-                city: profileData.city,
-                country: profileData.country,
-                bio: profileData.bio,
-                socials: profileData.socials,
-                updatedAt: new Date().toISOString(),
+            // Update Firestore public data document (avoid undefined fields)
+            const computedLocation = profileData.city && profileData.country
+                ? `${profileData.city}, ${profileData.country}`
+                : (profileData.city || profileData.country || undefined);
+
+            // Normalize optional fields: always string or null (never undefined)
+            const normalizedFacebook = profileData.socials.facebook?.trim() || null;
+            const normalizedTwitter = profileData.socials.twitter?.trim() || null;
+            const normalizedInstagram = profileData.socials.instagram?.trim() || null;
+            const normalizedLinkedin = profileData.socials.linkedin?.trim() || null;
+
+            const socialLinks: NonNullable<PublicUserData["socialLinks"]> = {
+                facebook: normalizedFacebook,
+                twitter: normalizedTwitter,
+                instagram: normalizedInstagram,
+                linkedin: normalizedLinkedin,
             };
 
-            // Only include URLs if they exist
-            if (photoURL) {
-                userData.photoURL = photoURL;
-            }
-            if (coverURL) {
-                userData.coverURL = coverURL;
-            }
+            const publicData: Partial<PublicUserData> & { lastActiveAt: Timestamp } = {
+                displayName: profileData.displayName,
+                bio: profileData.bio?.trim() || null,
+                lastActiveAt: serverTimestamp() as Timestamp,
+            };
+            // Always include keys as string|null
+            publicData.location = (computedLocation && computedLocation.trim() !== "") ? computedLocation : null;
+            publicData.socialLinks = socialLinks;
+            publicData.photoURL = photoURL ?? null;
 
-            await updateDoc(doc(db, "users", user.uid), userData);
+            await updateDoc(doc(db, "users", user.uid, "public", "data"), publicData);
 
             return { photoURL, coverURL };
         } catch (error) {
@@ -94,17 +99,15 @@ export const profileService = {
         }
     },
 
-
-    async getProfileData(userId: string): Promise<UserProfile | null> {
+    async getProfileData(userId: string): Promise<{
+        publicData: PublicUserData | null;
+    }> {
         try {
-            const userDocRef = doc(db, "users", userId);
-            const userDoc = await getDoc(userDocRef);
+            const publicDoc = await getDoc(doc(db, "users", userId, "public", "data"));
+            
+            const publicData = publicDoc.exists() ? publicDoc.data() as PublicUserData : null;
 
-            if (!userDoc.exists()) {
-                return null;
-            }
-
-            return userDoc.data() as UserProfile;
+            return { publicData };
         } catch (error) {
             console.error("Error fetching profile data:", error);
             throw error;
