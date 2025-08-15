@@ -62,6 +62,35 @@ export class PaymentService {
         return result.url;
     }
 
+    async checkConnectStatus(): Promise<{
+        hasConnectAccount: boolean;
+        accountId: string | null;
+        isEnabledForCharges: boolean;
+        detailsSubmitted: boolean;
+        requirementsDue: string[];
+        isFullyActive: boolean;
+    }> {
+        console.log("🔍 [PaymentService] Checking Connect status...");
+        try {
+            const result = await this.withRetry(
+                () => this.callWithAuth<{
+                    hasConnectAccount: boolean;
+                    accountId: string | null;
+                    isEnabledForCharges: boolean;
+                    detailsSubmitted: boolean;
+                    requirementsDue: string[];
+                    isFullyActive: boolean;
+                }>("checkConnectStatus"),
+                "checkConnectStatus"
+            );
+            console.log("✅ [PaymentService] Connect status received:", result);
+            return result;
+        } catch (error) {
+            console.error("❌ [PaymentService] checkConnectStatus failed:", error);
+            throw error;
+        }
+    }
+
     async createPaymentIntent(modelId: string, amount: number, currency = "usd"): Promise<unknown> {
         return this.withRetry(async () => {
             const fn = httpsCallable<{ modelId: string; amount: number; currency: string }, unknown>(functions, "createPaymentIntent");
@@ -114,6 +143,67 @@ export class PaymentService {
 
     hasPurchased(modelId: string, purchases: Purchase[] = []): boolean {
         return purchases.some((item) => item.modelId === modelId);
+    }
+
+    // Helper method to check if user can sell models
+    async canSellModels(): Promise<boolean> {
+        try {
+            const status = await this.checkConnectStatus();
+            return status.isFullyActive;
+        } catch (error) {
+            console.error("Failed to check if user can sell models:", error);
+            return false;
+        }
+    }
+
+    // ============ DEBUGGING - helper methods for stripe connect status checks ==============================
+    async getDetailedConnectStatus(): Promise<{
+        canSell: boolean;
+        status: {
+            hasConnectAccount: boolean;
+            accountId: string | null;
+            isEnabledForCharges: boolean;
+            detailsSubmitted: boolean;
+            requirementsDue: string[];
+            isFullyActive: boolean;
+        };
+        nextSteps?: string[];
+    }> {
+        try {
+            const status = await this.checkConnectStatus();
+            const canSell = status.isFullyActive;
+
+            let nextSteps: string[] = [];
+            if (!status.hasConnectAccount) {
+                nextSteps.push("Create a Stripe Connect account");
+            } else if (!status.isEnabledForCharges) {
+                nextSteps.push("Complete account verification to enable charges");
+            } else if (!status.detailsSubmitted) {
+                nextSteps.push("Submit required business details");
+            } else if (status.requirementsDue.length > 0) {
+                nextSteps.push(`Complete requirements: ${status.requirementsDue.join(", ")}`);
+            }
+
+            return {
+                canSell,
+                status,
+                nextSteps: nextSteps.length > 0 ? nextSteps : undefined,
+            };
+        } catch (error) {
+            console.error("Failed to get detailed Connect status:", error);
+            return {
+                canSell: false,
+                status: {
+                    hasConnectAccount: false,
+                    accountId: null,
+                    isEnabledForCharges: false,
+                    detailsSubmitted: false,
+                    requirementsDue: [],
+                    isFullyActive: false,
+                },
+                nextSteps: ["Check your internet connection and try again"],
+            };
+        }
     }
 }
 

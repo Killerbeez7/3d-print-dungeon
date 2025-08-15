@@ -10,7 +10,9 @@ const db = getFirestore(app);
 
 // Define secrets
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
+const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
 console.log("✅ defineSecret works:", stripeSecretKey.name);
+console.log("✅ defineSecret works:", stripeWebhookSecret.name);
 
 // Stripe setup
 const getStripe = () => {
@@ -52,4 +54,4 @@ const getOrCreateStripeCustomerId = async (uid, token) => {
     return customer.id;
 };
 
-export { app, db, stripeSecretKey, getStripe, getOrCreateStripeCustomerId };
+export { app, db, stripeSecretKey, stripeWebhookSecret, getStripe, getOrCreateStripeCustomerId };

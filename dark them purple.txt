@@ -1,0 +1,42 @@
+[data-theme="dark"] {
+    --background-main-rgb: 11, 14, 18;
+    --background-second-rgb: 18, 23, 33;
+
+    /* Dark surfaces (cool blue/graphite) */
+    --bg-primary: #0b0e12;
+    --bg-secondary: #121721;
+    --bg-surface: #161c27;
+    --bg-tertiary: #1d2430;
+    --bg-reverse: #ffffff;
+
+    /* Typography */
+    --txt-primary: #e6edf3;
+    --txt-secondary: #9fb1c1;
+    --txt-highlight: #ffffff;
+    --txt-muted: #7a8b9a;
+
+    /* Accent (soft blue) */
+    --accent-dark: #5a7dff;
+    --accent: #7aa2ff;
+    --accent-hover: #9ab6ff;
+    --accent-rgb: 122, 162, 255;
+
+    /* Buttons */
+    --btn-main: #222a36;
+    --btn-secondary: #2b3442;
+    --btn-hover: #334054;
+
+    /* Contrast CTA (amber) */
+    --contrast: #f59e0b;
+    --contrast-hover: #fbbf24;
+
+    /* Borders */
+    --br-primary: #2f3a4a;
+    --br-secondary: #232c3a;
+
+    /* Status */
+    --success: #34d399;
+    --error: #f87171;
+
+    --model-viewer-background: #161c27;
+}

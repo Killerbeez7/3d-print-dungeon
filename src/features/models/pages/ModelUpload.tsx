@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useNotification } from "@/features/notifications";
 import { createAdvancedModel } from "@/features/models/services/modelsService";
@@ -11,6 +11,7 @@ import { FilesUpload } from "../components/model-upload/FilesUpload";
 import { InfoForm } from "../components/model-upload/InfoForm";
 import { PricingForm } from "../components/model-upload/PricingForm";
 import { SellerVerification } from "@/features/payment/components/SellerVerification";
+import { paymentService } from "@/features/payment/services/paymentService";
 import { H1 } from "@/components/index";
 
 import type { ModelData } from "@/features/models/types/model";
@@ -18,8 +19,9 @@ import type { ModelData } from "@/features/models/types/model";
 const UPLOAD_STATE_KEY = "pendingUploadState";
 
 export function ModelUpload() {
-    const { currentUser, userData } = useAuth();
+    const { currentUser, privateProfile } = useAuth();
     const navigate = useNavigate();
+    const location = useLocation();
     const notification = useNotification();
 
     const [step, setStep] = useState(1);
@@ -29,9 +31,126 @@ export function ModelUpload() {
     const [files, setFiles] = useState<File[]>([]);
     const [posterDataUrl, setPosterDataUrl] = useState<string | null>(null);
     const [convertedBlob, setConvertedBlob] = useState<Blob | null>(null);
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showSellerVerification, setShowSellerVerification] = useState(false);
     const modelViewerLoaded = useModelViewer("timeout");
+    const [isPollingConnectStatus, setIsPollingConnectStatus] = useState(false);
+
+    // Gentle prompt banner: show if no connect id or cached status is not fully active
+    const needsSellerVerification = Boolean(
+        privateProfile &&
+            (!privateProfile.stripeConnectId ||
+                privateProfile.stripeConnectStatus?.isFullyActive === false)
+    );
+
+    // Check if user has a pending verification (account exists but not fully active)
+    const hasPendingVerification = Boolean(
+        privateProfile?.stripeConnectId &&
+            !privateProfile.stripeConnectStatus?.isFullyActive
+    );
+
+    // Polling for Connect status updates when user is in verification process
+    useEffect(() => {
+        if (!isPollingConnectStatus || !currentUser) return;
+
+        let attempts = 0;
+        const maxAttempts = 30; // Reduced to 2.5 minutes max (30 * 5 seconds)
+        const intervalId = setInterval(async () => {
+            attempts++;
+            console.log(
+                `🔄 [Polling] Attempt ${attempts}/${maxAttempts} - Checking Connect status...`
+            );
+
+            try {
+                const status = await paymentService.checkConnectStatus();
+                console.log("🔄 [Polling] Status received:", status);
+
+                if (status?.isFullyActive) {
+                    setIsPollingConnectStatus(false);
+                    clearInterval(intervalId);
+                    console.log("✅ [Polling] Connect account is now fully active!");
+
+                    // Show success notification
+                    notification.success(
+                        "Seller Verification Complete! 🎉",
+                        "Your account is now ready to sell models. You can continue with your upload.",
+                        5000
+                    );
+                } else if (status?.hasConnectAccount) {
+                    console.log("🔄 [Polling] Account exists but not fully active yet:", {
+                        chargesEnabled: status.isEnabledForCharges,
+                        detailsSubmitted: status.detailsSubmitted,
+                        requirementsDue: status.requirementsDue,
+                    });
+                }
+            } catch (error) {
+                console.warn("⚠️ [Polling] checkConnectStatus failed:", error);
+                // Don't stop polling on transient errors, only on auth/permission errors
+                const errorCode = (error as { code?: string })?.code;
+                if (
+                    errorCode === "unauthenticated" ||
+                    errorCode === "permission-denied"
+                ) {
+                    setIsPollingConnectStatus(false);
+                    clearInterval(intervalId);
+                    console.log("❌ [Polling] Stopped due to auth error");
+                }
+            }
+
+            if (attempts >= maxAttempts) {
+                setIsPollingConnectStatus(false);
+                clearInterval(intervalId);
+                console.log("⏰ [Polling] Stopped after max attempts");
+
+                // Show timeout notification
+                notification.warning(
+                    "Verification Timeout",
+                    "The verification process is taking longer than expected. Please check your email or try again later.",
+                    8000
+                );
+            }
+        }, 5000); // Check every 5 seconds
+
+        return () => {
+            clearInterval(intervalId);
+            console.log("🧹 [Polling] Cleanup - interval cleared");
+        };
+    }, [isPollingConnectStatus, currentUser, notification]);
+
+    // Start polling when user goes to verification
+    const handleStartVerification = () => {
+        setShowSellerVerification(true);
+        setIsPollingConnectStatus(true);
+    };
+
+    // Force refresh Connect status (for debugging webhook issues)
+    // const forceRefreshStatus = async () => {
+    //     try {
+    //         console.log("🔄 [Force Refresh] Manually refreshing Connect status...");
+    //         const status = await paymentService.checkConnectStatus();
+    //         console.log("✅ [Force Refresh] Status received:", status);
+
+    //         if (status.isFullyActive) {
+    //             notification.success(
+    //                 "Status Updated! 🎉",
+    //                 "Your Connect account is now fully active!",
+    //                 5000
+    //             );
+    //         } else {
+    //             notification.info(
+    //                 "Status Checked",
+    //                 `Account status: ${status.hasConnectAccount ? 'Exists' : 'None'}, Active: ${status.isFullyActive}`,
+    //                 3000
+    //             );
+    //         }
+    //     } catch (error) {
+    //         console.error("❌ [Force Refresh] Failed:", error);
+    //         notification.error(
+    //             "Status Check Failed",
+    //             "Unable to check Connect status. Please try again.",
+    //             3000
+    //         );
+    //     }
+    // };
 
     const [modelData, setModelData] = useState<ModelData>({
         id: "",
@@ -66,9 +185,8 @@ export function ModelUpload() {
         setFiles([]);
         setPosterDataUrl(null);
         setConvertedBlob(null);
-        setShowSuccessModal(false);
         setShowSellerVerification(false);
-        
+
         setModelData({
             id: "",
             name: "",
@@ -133,6 +251,47 @@ export function ModelUpload() {
             );
         }
     }, []);
+
+    // Re-evaluate Stripe Connect status on URL changes (returnUrl/refreshUrl outcomes)
+    useEffect(() => {
+        if (!currentUser) return;
+
+        // Check if user is returning from Stripe Connect onboarding
+        const urlParams = new URLSearchParams(location.search);
+        const isReturnFromStripe =
+            urlParams.get("stripe_connect") === "success" ||
+            urlParams.get("account_id") ||
+            location.pathname.includes("stripe");
+
+        if (isReturnFromStripe) {
+            console.log("🔄 [URL Change] Detected return from Stripe Connect onboarding");
+            // Clear any URL parameters to avoid re-triggering
+            window.history.replaceState({}, document.title, location.pathname);
+
+            // Only check status if returning from Stripe (not on every route change)
+            paymentService
+                .checkConnectStatus()
+                .then((status) => {
+                    if (status.isFullyActive) {
+                        console.log(
+                            "✅ [URL Change] Connect account is now active after return"
+                        );
+                        notification.success(
+                            "Welcome Back! 🎉",
+                            "Your seller verification is complete. You can now upload paid models.",
+                            5000
+                        );
+                    }
+                })
+                .catch((error) => {
+                    console.warn(
+                        "⚠️ [URL Change] Failed to check Connect status:",
+                        error
+                    );
+                    // ignore transient errors
+                });
+        }
+    }, [location.pathname, location.search, currentUser, notification]);
 
     useEffect(() => {
         if (!files || files.length === 0) return;
@@ -248,15 +407,89 @@ export function ModelUpload() {
 
         // Check if user needs seller verification for paid models
         if (modelData.isPaid && modelData.price && modelData.price > 0) {
-            // Check if user has completed seller verification.
-            // If they don't have a connect ID in their profile, prompt to create one.
-            if (!userData?.stripeConnectId) {
+            console.log("🔍 [Upload] Checking seller verification for paid model...");
+
+            // Fast path: no connect id at all
+            if (!privateProfile?.stripeConnectId) {
                 console.log(
-                    "Seller verification required. Saving upload state to sessionStorage."
+                    "❌ [Upload] No Connect account found - verification required"
                 );
                 sessionStorage.setItem(UPLOAD_STATE_KEY, JSON.stringify(modelData));
                 setShowSellerVerification(true);
                 return;
+            }
+
+            // Check if user has pending verification (account exists but not fully active)
+            if (hasPendingVerification) {
+                console.log(
+                    "❌ [Upload] User has pending verification - cannot upload paid models yet"
+                );
+                setError(
+                    "Your seller verification is still pending. Please complete the verification process before uploading paid models. You can check your email for verification instructions or contact support if you need help."
+                );
+                return;
+            }
+
+            // Check cached status first (faster, no API call)
+            if (privateProfile?.stripeConnectStatus?.isFullyActive) {
+                console.log(
+                    "✅ [Upload] Using cached status - Connect account is fully active"
+                );
+            } else {
+                // Has an account id but cached status shows incomplete, verify with API
+                try {
+                    const status = await paymentService.checkConnectStatus();
+                    console.log("🔍 [Upload] API status check:", status);
+
+                    if (!status.isFullyActive) {
+                        console.log(
+                            "❌ [Upload] Connect account not fully active - verification required"
+                        );
+
+                        // Show helpful message about what's needed
+                        if (status.requirementsDue.length > 0) {
+                            setError(
+                                `Seller verification incomplete: Complete requirements: ${status.requirementsDue.join(
+                                    ", "
+                                )}`
+                            );
+                        } else if (!status.isEnabledForCharges) {
+                            setError(
+                                "Seller verification incomplete: Complete account verification to enable charges"
+                            );
+                        } else if (!status.detailsSubmitted) {
+                            setError(
+                                "Seller verification incomplete: Submit required business details"
+                            );
+                        } else {
+                            setError(
+                                "Seller verification required to upload paid models."
+                            );
+                        }
+
+                        sessionStorage.setItem(
+                            UPLOAD_STATE_KEY,
+                            JSON.stringify(modelData)
+                        );
+                        setShowSellerVerification(true);
+                        return;
+                    }
+
+                    console.log(
+                        "✅ [Upload] Connect account is fully active - proceeding with upload"
+                    );
+                } catch (statusErr) {
+                    console.warn(
+                        "⚠️ [Upload] checkConnectStatus failed; deferring to verification modal.",
+                        statusErr
+                    );
+                    setError(
+                        "Unable to verify seller status. Please complete seller verification."
+                    );
+                    sessionStorage.setItem(UPLOAD_STATE_KEY, JSON.stringify(modelData));
+                    setShowSellerVerification(true);
+                    return;
+                }
             }
         }
 
@@ -282,7 +515,9 @@ export function ModelUpload() {
                 renderFiles: modelData.renderFiles ?? [],
                 selectedRenderIndex: modelData.selectedRenderIndex ?? 0,
                 uploaderId: currentUser?.uid ?? "",
-                uploaderUsername: userData?.username ?? "",
+                uploaderUsername:
+                    currentUser?.displayName?.toLowerCase().replace(/\s+/g, "") ||
+                    (currentUser?.uid ? `user${currentUser.uid.slice(0, 8)}` : ""),
                 uploaderDisplayName: currentUser?.displayName ?? "",
                 onProgress: setUploadProgress,
                 posterBlob: posterBlob ?? undefined,
@@ -337,6 +572,68 @@ export function ModelUpload() {
             {error && (
                 <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-md">
                     <p className="text-error">{error}</p>
+                </div>
+            )}
+
+            {needsSellerVerification && (
+                <div className="mb-6 p-4 bg-accent/5 border border-accent/20 rounded-lg backdrop-blur-sm">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center">
+                                <svg
+                                    className="w-4 h-4 text-accent"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth={2}
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+                                    />
+                                </svg>
+                            </div>
+                            <div>
+                                <p className="text-sm font-medium text-txt-primary">
+                                    {hasPendingVerification
+                                        ? "Pending verification"
+                                        : "Want to sell your models?"}
+                                </p>
+                                <p className="text-xs text-txt-secondary">
+                                    {hasPendingVerification
+                                        ? "Your account is being verified. Complete the process to enable paid model uploads."
+                                        : "Complete seller verification to enable paid model uploads"}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="flex space-x-2">
+                            {!hasPendingVerification ? (
+                                <button
+                                    onClick={handleStartVerification}
+                                    className="px-4 py-2 text-sm font-medium rounded-md transition-colors bg-accent text-white hover:bg-accent-hover"
+                                >
+                                    Verify Now
+                                </button>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={handleStartVerification}
+                                        className="px-4 py-2 text-sm font-medium rounded-md transition-colors bg-accent text-white hover:bg-accent-hover"
+                                    >
+                                        Continue verification
+                                    </button>
+                                    {/* <button
+                                        onClick={forceRefreshStatus}
+                                        className="px-3 py-2 text-xs font-medium rounded-md bg-gray-600 text-white hover:bg-gray-700 transition-colors"
+                                        title="Force refresh status (webhook debugging)"
+                                    >
+                                        🔄 Refresh
+                                    </button> */}
+                                </>
+                            )}
+                        </div>
+                    </div>
                 </div>
             )}
 
@@ -426,8 +723,6 @@ export function ModelUpload() {
                 camera-controls
                 environment-image="neutral"
             />
-
-
 
             <SellerVerification
                 isOpen={showSellerVerification}

@@ -24,6 +24,9 @@ export const {
     getSellerSales,
     createConnectAccount,
     createAccountLink,
+    checkConnectStatus,
+    stripeWebhook,
+    webhookHealthCheck,
 } = payments;
 
 // Analytics functions

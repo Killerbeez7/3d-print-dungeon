@@ -1,7 +1,8 @@
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { onCall, onRequest, HttpsError } from "firebase-functions/v2/https";
 import { FieldValue } from "firebase-admin/firestore";
 import {
     stripeSecretKey,
+    stripeWebhookSecret,
     getStripe,
     getOrCreateStripeCustomerId,
     db,
@@ -187,23 +188,24 @@ export const handlePaymentSuccess = onCall(
             // Record private purchase doc instead of array field
             await db
                 .doc(`users/${paymentData.buyerId}/purchases/${paymentData.modelId}`)
-                .set({
-                    modelId: paymentData.modelId,
-                    purchasedAt: FieldValue.serverTimestamp(),
-                    pricePaidCents: Math.round(paymentData.amount * 100),
-                    currency: paymentData.currency,
-                }, { merge: true });
+                .set(
+                    {
+                        modelId: paymentData.modelId,
+                        purchasedAt: FieldValue.serverTimestamp(),
+                        pricePaidCents: Math.round(paymentData.amount * 100),
+                        currency: paymentData.currency,
+                    },
+                    { merge: true }
+                );
 
             // Increment seller public stats
             await db
                 .doc(`users/${paymentData.sellerId}/public/data`)
                 .set({}, { merge: true });
-            await db
-                .doc(`users/${paymentData.sellerId}/public/data`)
-                .update({
-                    "stats.viewsCount": FieldValue.increment(0),
-                    "stats.uploadsCount": FieldValue.increment(0),
-                });
+            await db.doc(`users/${paymentData.sellerId}/public/data`).update({
+                "stats.viewsCount": FieldValue.increment(0),
+                "stats.uploadsCount": FieldValue.increment(0),
+            });
 
             await db
                 .collection("models")
@@ -277,7 +279,9 @@ export const getSellerSales = onCall(
                     .collection("models")
                     .doc(saleData.modelId)
                     .get();
-                const buyerDoc = await db.doc(`users/${saleData.buyerId}/public/data`).get();
+                const buyerDoc = await db
+                    .doc(`users/${saleData.buyerId}/public/data`)
+                    .get();
                 sales.push({
                     ...saleData,
                     model: modelDoc.exists ? modelDoc.data() : null,
@@ -292,58 +296,6 @@ export const getSellerSales = onCall(
             return { sales };
         } catch (error) {
             handleError(error, "getSellerSales");
-        }
-    }
-);
-
-// // Create Stripe Connect account
-export const createConnectAccount = onCall(
-    { secrets: [stripeSecretKey], invoker: "public" },
-    async (request) => {
-        console.log("⚡️ [createConnectAccount] Triggered");
-
-        try {
-            const { uid, token } = requireAuth(request);
-            console.log("✅ [createConnectAccount] Authenticated:", {
-                uid,
-                email: token.email,
-            });
-
-            const stripe = getStripe();
-            console.log("Stripe initialized successfully.");
-
-            const account = await stripe.accounts.create({
-                type: "express",
-                email: token.email,
-                capabilities: {
-                    card_payments: { requested: true },
-                    transfers: { requested: true },
-                },
-                metadata: {
-                    firebaseUID: uid,
-                },
-            });
-
-            console.log("✅ [createConnectAccount] Stripe account created:", {
-                accountId: account.id,
-            });
-
-            await db.collection("users").doc(uid).update({
-                stripeConnectId: account.id,
-                updatedAt: FieldValue.serverTimestamp(),
-            });
-
-            console.log("✅ [createConnectAccount] Firestore user updated");
-
-            return { accountId: account.id };
-        } catch (error) {
-            console.error("❌❌❌ FATAL [createConnectAccount] Error:", error);
-            if (error.type) {
-                console.error("Stripe Error Type:", error.type);
-            }
-            throw new HttpsError("internal", "Failed to create Connect account.", {
-                errorMessage: error.message,
-            });
         }
     }
 );
@@ -385,3 +337,392 @@ export const createAccountLink = onCall(
         }
     }
 );
+
+// // Create Stripe Connect account
+export const createConnectAccount = onCall(
+    { secrets: [stripeSecretKey], invoker: "public" },
+    async (request) => {
+        console.log("⚡️ [createConnectAccount] Triggered");
+
+        try {
+            const { uid, token } = requireAuth(request);
+            console.log("✅ [createConnectAccount] Authenticated:", {
+                uid,
+                email: token.email,
+            });
+
+            const stripe = getStripe();
+            console.log("Stripe initialized successfully.");
+
+            const account = await stripe.accounts.create({
+                type: "express",
+                email: token.email,
+                capabilities: {
+                    card_payments: { requested: true },
+                    transfers: { requested: true },
+                },
+                metadata: {
+                    firebaseUID: uid,
+                },
+            });
+
+            console.log("✅ [createConnectAccount] Stripe account created:", {
+                accountId: account.id,
+            });
+
+            await db.doc(`users/${uid}/private/data`).set(
+                {
+                    stripeConnectId: account.id,
+                    // Initialize status snapshot: account exists but not active yet
+                    stripeConnectStatus: {
+                        accountId: account.id,
+                        isEnabledForCharges: false,
+                        detailsSubmitted: false,
+                        requirementsDue: [],
+                        isFullyActive: false,
+                        updatedAt: FieldValue.serverTimestamp(),
+                    },
+                    updatedAt: FieldValue.serverTimestamp(),
+                },
+                { merge: true }
+            );
+
+            console.log("✅ [createConnectAccount] Firestore user updated");
+
+            return { accountId: account.id };
+        } catch (error) {
+            console.error("❌❌❌ FATAL [createConnectAccount] Error:", error);
+            if (error.type) {
+                console.error("Stripe Error Type:", error.type);
+            }
+            throw new HttpsError("internal", "Failed to create Connect account.", {
+                errorMessage: error.message,
+            });
+        }
+    }
+);
+
+// Check Stripe Connect account status
+export const checkConnectStatus = onCall(
+    { secrets: [stripeSecretKey], invoker: "public" },
+    async (request) => {
+        console.log("⚡️ [checkConnectStatus] Triggered");
+
+        try {
+            const { uid } = requireAuth(request);
+            console.log("✅ [checkConnectStatus] Authenticated:", { uid });
+
+            const userPrivateSnap = await db.doc(`users/${uid}/private/data`).get();
+            const userPrivate = userPrivateSnap.exists ? userPrivateSnap.data() : {};
+            const stripeConnectId = userPrivate?.stripeConnectId || null;
+
+            console.log("ℹ️ [checkConnectStatus] User data:", {
+                hasConnectId: !!stripeConnectId,
+                connectId: stripeConnectId,
+                cachedStatus: userPrivate?.stripeConnectStatus,
+            });
+
+            if (!stripeConnectId) {
+                console.log("ℹ️ [checkConnectStatus] No Connect account found");
+                return {
+                    hasConnectAccount: false,
+                    accountId: null,
+                    isEnabledForCharges: false,
+                    detailsSubmitted: false,
+                    requirementsDue: [],
+                    isFullyActive: false,
+                };
+            }
+
+            const stripe = getStripe();
+            console.log("✅ [checkConnectStatus] Stripe initialized");
+
+            const account = await stripe.accounts.retrieve(stripeConnectId);
+            console.log("✅ [checkConnectStatus] Account retrieved:", {
+                accountId: account.id,
+                chargesEnabled: account.charges_enabled,
+                detailsSubmitted: account.details_submitted,
+                requirementsDue: account.requirements?.currently_due,
+            });
+
+            const status = {
+                hasConnectAccount: true,
+                accountId: account.id,
+                isEnabledForCharges: Boolean(account.charges_enabled),
+                detailsSubmitted: Boolean(account.details_submitted),
+                requirementsDue: Array.isArray(account.requirements?.currently_due)
+                    ? account.requirements.currently_due
+                    : [],
+                // Only fully active when charges are enabled and details are submitted
+                isFullyActive: Boolean(
+                    account.charges_enabled &&
+                        account.details_submitted &&
+                        (!account.requirements?.currently_due ||
+                            account.requirements.currently_due.length === 0)
+                ),
+            };
+
+            console.log("✅ [checkConnectStatus] Status calculated:", status);
+
+            // Cache a lightweight status snapshot in private data for quick checks
+            await db.doc(`users/${uid}/private/data`).set(
+                {
+                    stripeConnectStatus: {
+                        accountId: status.accountId,
+                        isEnabledForCharges: status.isEnabledForCharges,
+                        detailsSubmitted: status.detailsSubmitted,
+                        requirementsDue: status.requirementsDue,
+                        isFullyActive: status.isFullyActive,
+                        updatedAt: FieldValue.serverTimestamp(),
+                    },
+                },
+                { merge: true }
+            );
+
+            console.log("✅ [checkConnectStatus] Status cached in Firestore");
+            return status;
+        } catch (error) {
+            console.error("❌ [checkConnectStatus] Error:", error);
+            handleError(error, "checkConnectStatus");
+        }
+    }
+);
+
+// Stripe webhook handler for account updates
+export const stripeWebhook = onRequest(
+    {
+        secrets: [stripeSecretKey, stripeWebhookSecret],
+        invoker: "public", // Allow unauthenticated invocations for Stripe webhooks
+    },
+    async (request, response) => {
+        console.log("🔄 [Webhook] ===== WEBHOOK REQUEST RECEIVED =====");
+        console.log("🔄 [Webhook] Timestamp:", new Date().toISOString());
+        console.log("🔄 [Webhook] Method:", request.method);
+        console.log("🔄 [Webhook] URL:", request.url);
+        console.log("🔄 [Webhook] Content-Type:", request.headers["content-type"]);
+        console.log(
+            "🔄 [Webhook] Stripe-Signature present:",
+            !!request.headers["stripe-signature"]
+        );
+        console.log(
+            "🔄 [Webhook] Raw body length:",
+            request.rawBody?.length || "undefined"
+        );
+
+        const sig = request.headers["stripe-signature"];
+        const endpointSecret = stripeWebhookSecret.value();
+
+        console.log("🔄 [Webhook] Stripe signature present:", !!sig);
+        console.log("🔄 [Webhook] Endpoint secret present:", !!endpointSecret);
+
+        let event;
+
+        try {
+            const stripe = getStripe();
+            console.log("🔄 [Webhook] Constructing event from raw body...");
+            event = stripe.webhooks.constructEvent(request.rawBody, sig, endpointSecret);
+            console.log("✅ [Webhook] Event constructed successfully:", {
+                type: event.type,
+                id: event.id,
+                created: event.created,
+                data: {
+                    object: event.data.object.id,
+                    objectType: event.data.object.object,
+                },
+            });
+        } catch (err) {
+            console.error("❌ [Webhook] Signature verification failed:", err.message);
+            console.error("❌ [Webhook] Error details:", err);
+            response.status(400).send(`Webhook Error: ${err.message}`);
+            return;
+        }
+
+        // Handle the event
+        console.log("🔄 [Webhook] Processing event type:", event.type);
+
+        switch (event.type) {
+            case "account.updated": {
+                const account = event.data.object;
+                console.log(
+                    "🔄 [Webhook] Account updated event received for account:",
+                    account.id
+                );
+                console.log("🔄 [Webhook] Account details:", {
+                    charges_enabled: account.charges_enabled,
+                    details_submitted: account.details_submitted,
+                    requirements: account.requirements,
+                    country: account.country,
+                    business_type: account.business_type,
+                });
+                // Prefer resolving the user via Stripe account metadata
+                const uidFromMetadata = account?.metadata?.firebaseUID;
+                if (uidFromMetadata) {
+                    const uid = uidFromMetadata;
+                    console.log("✅ [Webhook] Resolved UID from Stripe metadata:", uid);
+
+                    // Update the status snapshot
+                    console.log("🔄 [Webhook] Calculating new status...");
+                    const status = {
+                        hasConnectAccount: true,
+                        accountId: account.id,
+                        isEnabledForCharges: Boolean(account.charges_enabled),
+                        detailsSubmitted: Boolean(account.details_submitted),
+                        requirementsDue: Array.isArray(
+                            account.requirements?.currently_due
+                        )
+                            ? account.requirements.currently_due
+                            : [],
+                        isFullyActive: Boolean(
+                            account.charges_enabled &&
+                                account.details_submitted &&
+                                (!account.requirements?.currently_due ||
+                                    account.requirements.currently_due.length === 0)
+                        ),
+                    };
+
+                    console.log("🔄 [Webhook] Calculated status:", status);
+                    console.log("🔄 [Webhook] Updating Firestore for user:", uid);
+
+                    try {
+                        await db.doc(`users/${uid}/private/data`).set(
+                            {
+                                stripeConnectId: account.id,
+                                stripeConnectStatus: {
+                                    accountId: status.accountId,
+                                    isEnabledForCharges: status.isEnabledForCharges,
+                                    detailsSubmitted: status.detailsSubmitted,
+                                    requirementsDue: status.requirementsDue,
+                                    isFullyActive: status.isFullyActive,
+                                    updatedAt: FieldValue.serverTimestamp(),
+                                },
+                            },
+                            { merge: true }
+                        );
+
+                        console.log(
+                            "✅ [Webhook] Successfully updated Connect status for user",
+                            uid,
+                            ":",
+                            status
+                        );
+                    } catch (firestoreError) {
+                        console.error(
+                            "❌ [Webhook] Failed to update Firestore:",
+                            firestoreError
+                        );
+                        throw firestoreError;
+                    }
+                } else {
+                    console.log(
+                        "🔄 [Webhook] No UID in Stripe metadata; falling back to collectionGroup lookup by Connect ID..."
+                    );
+                    // Fallback: query the user's private subcollection where we store stripeConnectId
+                    const cgQuery = await db
+                        .collectionGroup("private")
+                        .where("stripeConnectId", "==", account.id)
+                        .limit(1)
+                        .get();
+
+                    console.log(
+                        "🔄 [Webhook] CollectionGroup query - empty:",
+                        cgQuery.empty
+                    );
+                    console.log(
+                        "🔄 [Webhook] CollectionGroup query - size:",
+                        cgQuery.size
+                    );
+
+                    if (!cgQuery.empty) {
+                        const dataDoc = cgQuery.docs[0];
+                        const userDocRef = dataDoc.ref.parent.parent; // users/{uid}
+                        const uid = userDocRef?.id;
+                        console.log(
+                            "✅ [Webhook] Found user via collectionGroup with UID:",
+                            uid
+                        );
+
+                        const status = {
+                            hasConnectAccount: true,
+                            accountId: account.id,
+                            isEnabledForCharges: Boolean(account.charges_enabled),
+                            detailsSubmitted: Boolean(account.details_submitted),
+                            requirementsDue: Array.isArray(
+                                account.requirements?.currently_due
+                            )
+                                ? account.requirements.currently_due
+                                : [],
+                            isFullyActive: Boolean(
+                                account.charges_enabled &&
+                                    account.details_submitted &&
+                                    (!account.requirements?.currently_due ||
+                                        account.requirements.currently_due.length === 0)
+                            ),
+                        };
+
+                        try {
+                            await db.doc(`users/${uid}/private/data`).set(
+                                {
+                                    stripeConnectStatus: {
+                                        accountId: status.accountId,
+                                        isEnabledForCharges: status.isEnabledForCharges,
+                                        detailsSubmitted: status.detailsSubmitted,
+                                        requirementsDue: status.requirementsDue,
+                                        isFullyActive: status.isFullyActive,
+                                        updatedAt: FieldValue.serverTimestamp(),
+                                    },
+                                },
+                                { merge: true }
+                            );
+
+                            console.log(
+                                "✅ [Webhook] Successfully updated Connect status for user",
+                                uid,
+                                ":",
+                                status
+                            );
+                        } catch (firestoreError) {
+                            console.error(
+                                "❌ [Webhook] Failed to update Firestore:",
+                                firestoreError
+                            );
+                            throw firestoreError;
+                        }
+                    } else {
+                        console.log(
+                            "⚠️ [Webhook] No user found for Connect account ID:",
+                            account.id
+                        );
+                        console.log(
+                            "⚠️ [Webhook] Ensure account.metadata.firebaseUID is set when creating accounts."
+                        );
+                    }
+                }
+                break;
+            }
+            default:
+                console.log("🔄 [Webhook] Unhandled event type:", event.type);
+                console.log(
+                    "🔄 [Webhook] Event data:",
+                    JSON.stringify(event.data, null, 2)
+                );
+        }
+
+        console.log("✅ [Webhook] Sending success response");
+        response.json({ received: true });
+        console.log("✅ [Webhook] Webhook processing completed successfully");
+    }
+);
+
+// Simple health check endpoint for webhook debugging
+export const webhookHealthCheck = onRequest(async (request, response) => {
+    console.log("🔄 [HealthCheck] Health check request received");
+    console.log("🔄 [HealthCheck] Method:", request.method);
+    console.log("🔄 [HealthCheck] URL:", request.url);
+    console.log("🔄 [HealthCheck] Headers:", JSON.stringify(request.headers, null, 2));
+
+    response.json({
+        status: "healthy",
+        timestamp: new Date().toISOString(),
+        message: "Webhook function is running and accessible",
+    });
+});

@@ -97,11 +97,24 @@ export interface PrivateProfile {
     lastLoginAt: Timestamp | Date;
     lastPasswordChange?: Timestamp | Date;
 
-    /* Stripe customer (buyer side). Seller Stripe Connect is stored in ArtistPrivateProfile */
-    stripeCustomerId?: string;
+    /* Stripe identifiers */
+    stripeCustomerId?: string; // buyer side
+    stripeConnectId?: string;  // seller side
+    stripeConnectStatus?: StripeConnectStatusSnapshot; // cached snapshot for quick checks
 
     /* Internal tracking */
     loginCount: number;
+}
+
+// Cached snapshot of Stripe Connect account status stored under users/{uid}/private/data
+export interface StripeConnectStatusSnapshot {
+    accountId: string | null;
+    isEnabledForCharges: boolean;
+    detailsSubmitted: boolean;
+    requirementsDue: string[];
+    isFullyActive: boolean;
+    createdAt?: Timestamp | Date;
+    updatedAt: Timestamp | Date;
 }
 
 // ===== USER SETTINGS (User only) =====
