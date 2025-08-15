@@ -104,7 +104,11 @@ export const updateUsername = onCall(async (request) => {
             // Reserve/assign new
             tx.set(newRegRef, { uid, updatedAt: now }, { merge: true });
             // Update public profile
-            tx.set(publicRef, { username: newUsername, lastActiveAt: now }, { merge: true });
+            tx.set(
+                publicRef,
+                { username: newUsername, lastActiveAt: now },
+                { merge: true }
+            );
 
             // Cleanup old registry if changed
             const oldKey = oldUsername.toLowerCase();
@@ -290,7 +294,11 @@ export const createValidatedUser = onCall(async (request) => {
             if (attempts >= 10) {
                 const fallback = generateUUIDUsername();
                 const regRef = db.doc(`usernames/${fallback.toLowerCase()}`);
-                tx.set(regRef, { uid: userRecord.uid, createdAt: nowField }, { merge: true });
+                tx.set(
+                    regRef,
+                    { uid: userRecord.uid, createdAt: nowField },
+                    { merge: true }
+                );
                 username = fallback;
             }
 
@@ -300,7 +308,11 @@ export const createValidatedUser = onCall(async (request) => {
             const privateRef = db.doc(`users/${userRecord.uid}/private/data`);
             const settingsRef = db.doc(`users/${userRecord.uid}/settings/app`);
 
-            tx.set(rootRef, { uid: userRecord.uid, createdAt: nowField }, { merge: true });
+            tx.set(
+                rootRef,
+                { uid: userRecord.uid, createdAt: nowField },
+                { merge: true }
+            );
             tx.set(publicRef, {
                 username,
                 displayName: "Anonymous",
@@ -400,6 +412,58 @@ export const ensureUserDocument = onCall(async ({ auth }) => {
         privateRef.get(),
     ]);
 
+    // Helper: Normalize provider-derived profile fields
+    const isNonEmptyString = (v) => typeof v === "string" && v.trim() !== "";
+    const safeUrl = (u) => {
+        try {
+            if (!isNonEmptyString(u)) return null;
+            // Basic URL validation
+            const parsed = new URL(u);
+            return parsed.toString();
+        } catch {
+            return null;
+        }
+    };
+    const deriveAuthProvider = (tkn, userRec) => {
+        const providerFromToken = tkn && tkn.firebase && tkn.firebase.sign_in_provider;
+        const providerFromRecord =
+            Array.isArray(userRec?.providerData) && userRec.providerData.length > 0
+                ? userRec.providerData[0].providerId
+                : undefined;
+        return providerFromToken || providerFromRecord || "password";
+    };
+    const deriveDisplayName = (tkn, userRec) => {
+        return (
+            (isNonEmptyString(tkn?.name) && tkn.name) ||
+            (isNonEmptyString(userRec?.displayName) && userRec.displayName) ||
+            "Anonymous"
+        );
+    };
+    const derivePhotoURL = (tkn, userRec) => {
+        const fromToken = safeUrl(tkn?.picture);
+        if (fromToken) return fromToken;
+        const fromProvider =
+            Array.isArray(userRec?.providerData) && userRec.providerData.length > 0
+                ? safeUrl(userRec.providerData[0].photoURL)
+                : null;
+        return fromProvider || null;
+    };
+
+    // Fetch user record only if we need extra data not present on token
+    const needUserRecord =
+        !isNonEmptyString(token?.name) ||
+        !isNonEmptyString(token?.picture) ||
+        !isNonEmptyString(token?.email);
+    const userRecord = needUserRecord
+        ? await admin
+              .auth()
+              .getUser(uid)
+              .catch(() => null)
+        : null;
+    const normalizedDisplayName = deriveDisplayName(token, userRecord);
+    const normalizedPhotoURL = derivePhotoURL(token, userRecord);
+    const normalizedAuthProvider = deriveAuthProvider(token, userRecord);
+
     // If new docs already exist, just touch timestamps and ensure username registry exists
     if (publicSnap.exists && privateSnap.exists) {
         const nowField = admin.firestore.FieldValue.serverTimestamp();
@@ -419,12 +483,56 @@ export const ensureUserDocument = onCall(async ({ auth }) => {
             tasks.push(regRef.set({ uid, touchedAt: nowField }, { merge: true }));
         }
 
+        // Idempotent upsert of missing provider-derived fields (do NOT override user edits)
+        const publicUpsert = {};
+        if (
+            !isNonEmptyString(publicData.displayName) &&
+            isNonEmptyString(normalizedDisplayName)
+        ) {
+            publicUpsert.displayName = normalizedDisplayName;
+        }
+        if (
+            !isNonEmptyString(publicData.photoURL) &&
+            isNonEmptyString(normalizedPhotoURL)
+        ) {
+            publicUpsert.photoURL = normalizedPhotoURL;
+        }
+        if (Object.keys(publicUpsert).length > 0) {
+            console.log("ensureUserDocument: filling missing public fields", {
+                uid,
+                ...publicUpsert,
+            });
+            tasks.push(publicRef.set(publicUpsert, { merge: true }));
+        }
+
+        const privateData = privateSnap.data() || {};
+        const privateUpsert = {};
+        if (
+            !isNonEmptyString(privateData.authProvider) &&
+            isNonEmptyString(normalizedAuthProvider)
+        ) {
+            privateUpsert.authProvider = normalizedAuthProvider;
+        }
+        if (
+            typeof privateData.emailVerified !== "boolean" &&
+            typeof token?.email_verified === "boolean"
+        ) {
+            privateUpsert.emailVerified = !!token.email_verified;
+        }
+        if (Object.keys(privateUpsert).length > 0) {
+            console.log("ensureUserDocument: filling missing private fields", {
+                uid,
+                ...privateUpsert,
+            });
+            tasks.push(privateRef.set(privateUpsert, { merge: true }));
+        }
+
         await Promise.all(tasks);
         return { created: false };
     }
 
     // ----- create new documents -----
-    const displayName = (token && token.name) || "Anonymous";
+    const displayName = normalizedDisplayName;
     let username = generateUsername(displayName) || generateRandomUsername();
 
     // ensure unique username; fall back to UUID if 10 random attempts fail
@@ -457,7 +565,7 @@ export const ensureUserDocument = onCall(async ({ auth }) => {
         publicRef.set({
             username,
             displayName,
-            photoURL: (token && token.picture) ?? null,
+            photoURL: normalizedPhotoURL ?? null,
             bio: null,
             location: null,
             website: null,
@@ -482,7 +590,7 @@ export const ensureUserDocument = onCall(async ({ auth }) => {
         privateRef.set({
             uid,
             email: (token && token.email) ?? null,
-            authProvider: (token && token.firebase && token.firebase.sign_in_provider) || "password",
+            authProvider: normalizedAuthProvider,
             emailVerified: !!(token && token.email_verified),
             roles: ["user"],
             permissions: [],
@@ -522,7 +630,9 @@ export const ensureUserDocument = onCall(async ({ auth }) => {
             },
         }),
         // Username registry reservation
-        db.doc(`usernames/${username.toLowerCase()}`).set({ uid, createdAt: nowField }, { merge: true }),
+        db
+            .doc(`usernames/${username.toLowerCase()}`)
+            .set({ uid, createdAt: nowField }, { merge: true }),
     ]);
 
     return { created: true, username };
