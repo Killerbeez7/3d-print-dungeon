@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArtistCardProps } from "../types/artists";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
-import { getAvatarUrl } from "@/utils/avatarUtils";
+import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
 
 export function ArtistCard({ displayName, username, photoURL, bio }: ArtistCardProps) {
     const name = displayName || "Anonymous";
@@ -13,7 +13,7 @@ export function ArtistCard({ displayName, username, photoURL, bio }: ArtistCardP
                 {/* Artist Image - High Quality */}
                 <div className="relative overflow-hidden bg-bg-surface">
                     <img
-                        src={getAvatarUrl(photoURL)}
+                        src={getAvatarUrlWithCacheBust(photoURL)}
                         alt={name}
                         className="w-full h-56 object-cover transition-all duration-token-200 group-hover:brightness-105 group-hover:scale-105"
                         loading="lazy"
