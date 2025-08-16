@@ -54,5 +54,8 @@ export const ROUTES = {
     TERMS_OF_USE: "/policies/terms",
     COOKIE_POLICY: "/policies/cookies",
     REFUND_POLICY: "/policies/refund",
+
+    /* Auth */
+    PASSWORD_RESET: "/reset-password",
 };
 

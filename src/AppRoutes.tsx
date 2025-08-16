@@ -1,6 +1,7 @@
 import React from "react";
 import { useRoutes, Navigate, RouteObject } from "react-router-dom";
 import { ROUTES } from "./constants/routeConstants";
+import { PasswordResetPage } from "./features/auth/components/PasswordResetPage";
 
 import { collectionsRoutes } from "./features/collections/routes/collectionsRoutes";
 import { artistsRoutes } from "./features/artists/routes/artistsRoutes";
@@ -38,6 +39,7 @@ export const AppRoutes: React.FC = () => {
         ...adminRoutes,
         ...forumRoutes,
         ...policiesRoutes,
+        { path: ROUTES.PASSWORD_RESET, element: <PasswordResetPage /> },
         { path: "*", element: <Navigate to={ROUTES.HOME} replace /> },
     ];
 

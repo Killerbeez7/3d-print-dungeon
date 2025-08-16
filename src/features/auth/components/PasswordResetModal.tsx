@@ -5,7 +5,7 @@ import { resetPassword } from "@/features/auth/services/authService";
 import { handleAuthError, formatErrorForDisplay } from "@/features/auth/utils/errorHandling";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark, faEnvelope, faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faEnvelope, faCheckCircle, faChevronDown, faChevronUp, faPhone, faComments, faShieldAlt } from "@fortawesome/free-solid-svg-icons";
 
 interface PasswordResetModalProps {
     isOpen: boolean;
@@ -17,6 +17,8 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<boolean>(false);
+    const [showAlternatives, setShowAlternatives] = useState<boolean>(false);
+    const [comingSoonMessage, setComingSoonMessage] = useState<string | null>(null);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
@@ -114,20 +116,98 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                     <p className="font-medium text-gray-900 break-all">{email}</p>
                                     <p className="text-sm text-gray-600">
                                         Click the link in your email to reset your password.
+                                        <br />
+                                        <span className="text-xs text-gray-500">
+                                            The link will take you to our secure password reset page.
+                                        </span>
                                     </p>
-                                    <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                                        <p className="text-sm text-gray-600">
-                                            <span className="text-gray-500">💡</span> <strong>Didn&apos;t receive the email?</strong> Check your spam or junk folder.
-                                        </p>
-                                    </div>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={handleClose}
-                                    className="w-full py-3 px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                                >
-                                    Got it
-                                </button>
+                                                                         <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                                         <p className="text-sm text-gray-600">
+                                             <span className="text-gray-500">💡</span> <strong>Didn&apos;t receive the email?</strong> Check your spam or junk folder.
+                                         </p>
+                                     </div>
+                                 </div>
+
+                                 {/* Try Another Method Section */}
+                                 <div className="mt-4">
+                                     <button
+                                         type="button"
+                                         onClick={() => setShowAlternatives(!showAlternatives)}
+                                         className="w-full flex items-center justify-between p-3 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+                                     >
+                                         <span className="font-medium">Try another method</span>
+                                         <FontAwesomeIcon 
+                                             icon={showAlternatives ? faChevronUp : faChevronDown} 
+                                             className="text-gray-400"
+                                         />
+                                     </button>
+                                     
+                                     {showAlternatives && (
+                                         <div className="mt-2 space-y-2">
+                                             <button
+                                                 type="button"
+                                                 onClick={() => {
+                                                     setComingSoonMessage("SMS Verification");
+                                                     setTimeout(() => setComingSoonMessage(null), 3000);
+                                                 }}
+                                                 className="w-full flex items-center p-3 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors duration-200 border border-gray-200"
+                                             >
+                                                 <FontAwesomeIcon icon={faPhone} className="mr-3 text-blue-500" />
+                                                 <div>
+                                                     <div className="font-medium">SMS Verification</div>
+                                                     <div className="text-xs text-gray-500">Receive a code via text message</div>
+                                                 </div>
+                                             </button>
+                                             
+                                             <button
+                                                 type="button"
+                                                 onClick={() => {
+                                                     setComingSoonMessage("Live Chat Support");
+                                                     setTimeout(() => setComingSoonMessage(null), 3000);
+                                                 }}
+                                                 className="w-full flex items-center p-3 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-lg transition-colors duration-200 border border-gray-200"
+                                             >
+                                                 <FontAwesomeIcon icon={faComments} className="mr-3 text-green-500" />
+                                                 <div>
+                                                     <div className="font-medium">Live Chat Support</div>
+                                                     <div className="text-xs text-gray-500">Get help from our support team</div>
+                                                 </div>
+                                             </button>
+                                             
+                                             <button
+                                                 type="button"
+                                                 onClick={() => {
+                                                     setComingSoonMessage("Security Questions");
+                                                     setTimeout(() => setComingSoonMessage(null), 3000);
+                                                 }}
+                                                 className="w-full flex items-center p-3 text-left text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors duration-200 border border-gray-200"
+                                             >
+                                                 <FontAwesomeIcon icon={faShieldAlt} className="mr-3 text-purple-500" />
+                                                 <div>
+                                                     <div className="font-medium">Security Questions</div>
+                                                     <div className="text-xs text-gray-500">Answer your security questions</div>
+                                                 </div>
+                                             </button>
+                                         </div>
+                                     )}
+                                 </div>
+
+                                 {/* Coming Soon Message */}
+                                 {comingSoonMessage && (
+                                     <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                         <p className="text-sm text-blue-700 text-center">
+                                             🚧 <strong>{comingSoonMessage}</strong> - Coming Soon!
+                                         </p>
+                                     </div>
+                                 )}
+
+                                 <button
+                                     type="button"
+                                     onClick={handleClose}
+                                     className="w-full py-3 px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                 >
+                                     Got it
+                                 </button>
                             </div>
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-4">
@@ -163,23 +243,96 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                     </div>
                                 )}
 
-                                {/* Submit button */}
-                                <button
-                                    type="submit"
-                                    disabled={loading || !email.trim()}
-                                    className="w-full py-3 px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                                >
-                                    {loading ? (
-                                        <div className="flex items-center justify-center">
-                                            <Spinner size={18} />
-                                            <span className="ml-2">Sending...</span>
-                                        </div>
-                                    ) : (
-                                        "Send Reset Link"
-                                    )}
-                                </button>
-                            </form>
-                        )}
+                                                                 {/* Submit button */}
+                                 <button
+                                     type="submit"
+                                     disabled={loading || !email.trim()}
+                                     className="w-full py-3 px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                 >
+                                     {loading ? (
+                                         <div className="flex items-center justify-center">
+                                             <Spinner size={18} />
+                                             <span className="ml-2">Sending...</span>
+                                         </div>
+                                     ) : (
+                                         "Send Reset Link"
+                                     )}
+                                 </button>
+
+                                 {/* Alternative Methods */}
+                                 <div className="mt-4">
+                                     <button
+                                         type="button"
+                                         onClick={() => setShowAlternatives(!showAlternatives)}
+                                         className="w-full flex items-center justify-between p-3 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+                                     >
+                                         <span className="font-medium">Need help? Try another method</span>
+                                         <FontAwesomeIcon 
+                                             icon={showAlternatives ? faChevronUp : faChevronDown} 
+                                             className="text-gray-400"
+                                         />
+                                     </button>
+                                     
+                                     {showAlternatives && (
+                                         <div className="mt-2 space-y-2">
+                                             <button
+                                                 type="button"
+                                                 onClick={() => {
+                                                     setComingSoonMessage("SMS Verification");
+                                                     setTimeout(() => setComingSoonMessage(null), 3000);
+                                                 }}
+                                                 className="w-full flex items-center p-3 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors duration-200 border border-gray-200"
+                                             >
+                                                 <FontAwesomeIcon icon={faPhone} className="mr-3 text-blue-500" />
+                                                 <div>
+                                                     <div className="font-medium">SMS Verification</div>
+                                                     <div className="text-xs text-gray-500">Receive a code via text message</div>
+                                                 </div>
+                                             </button>
+                                             
+                                             <button
+                                                 type="button"
+                                                 onClick={() => {
+                                                     setComingSoonMessage("Live Chat Support");
+                                                     setTimeout(() => setComingSoonMessage(null), 3000);
+                                                 }}
+                                                 className="w-full flex items-center p-3 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-lg transition-colors duration-200 border border-gray-200"
+                                             >
+                                                 <FontAwesomeIcon icon={faComments} className="mr-3 text-green-500" />
+                                                 <div>
+                                                     <div className="font-medium">Live Chat Support</div>
+                                                     <div className="text-xs text-gray-500">Get help from our support team</div>
+                                                 </div>
+                                             </button>
+                                             
+                                             <button
+                                                 type="button"
+                                                 onClick={() => {
+                                                     setComingSoonMessage("Security Questions");
+                                                     setTimeout(() => setComingSoonMessage(null), 3000);
+                                                 }}
+                                                 className="w-full flex items-center p-3 text-left text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors duration-200 border border-gray-200"
+                                             >
+                                                 <FontAwesomeIcon icon={faShieldAlt} className="mr-3 text-purple-500" />
+                                                 <div>
+                                                     <div className="font-medium">Security Questions</div>
+                                                     <div className="text-xs text-gray-500">Answer your security questions</div>
+                                                 </div>
+                                             </button>
+                                         </div>
+                                     )}
+                                 </div>
+
+                                 {/* Coming Soon Message */}
+                                 {comingSoonMessage && (
+                                     <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                                         <p className="text-sm text-blue-700 text-center">
+                                             🚧 <strong>{comingSoonMessage}</strong> - Coming Soon!
+                                         </p>
+                                     </div>
+                                 )}
+                             </form>
+                         )}
                     </div>
                 </div>
             </FocusLock>
