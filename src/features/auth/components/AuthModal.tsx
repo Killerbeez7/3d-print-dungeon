@@ -73,7 +73,7 @@ export const AuthModal = () => {
                     className={`
                         fixed z-[11001] w-full max-w-md
                         bg-white text-gray-900
-                        border border-gray-200 rounded-2xl shadow-2xl
+                        border border-gray-200 rounded-none md:rounded-2xl shadow-2xl
                         left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
                         transition-all duration-300 ease-out
                         ${isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"}

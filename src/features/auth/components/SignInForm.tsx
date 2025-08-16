@@ -200,6 +200,20 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                     )}
                 </div>
 
+                {/* Forgot Password Link */}
+                <div className="flex justify-end">
+                    <button
+                        type="button"
+                        className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200 hover:underline"
+                        onClick={() => {
+                            // TODO: Implement forgot password functionality
+                            console.log("Forgot password clicked");
+                        }}
+                    >
+                        Forgot Password?
+                    </button>
+                </div>
+
                 {/* Error message */}
                 {error && (
                     <div className="flex items-center p-3 bg-red-50 border border-red-200 rounded-xl">
