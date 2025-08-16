@@ -107,14 +107,19 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                         className="text-green-500 text-4xl"
                                     />
                                 </div>
-                                <div className="space-y-2">
+                                <div className="space-y-3">
                                     <p className="text-gray-700">
-                                        We've sent a password reset link to:
+                                        We&apos;ve sent a password reset link to:
                                     </p>
-                                    <p className="font-medium text-gray-900">{email}</p>
+                                    <p className="font-medium text-gray-900 break-all">{email}</p>
                                     <p className="text-sm text-gray-600">
                                         Click the link in your email to reset your password.
                                     </p>
+                                    <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                                        <p className="text-sm text-gray-600">
+                                            <span className="text-gray-500">💡</span> <strong>Didn&apos;t receive the email?</strong> Check your spam or junk folder.
+                                        </p>
+                                    </div>
                                 </div>
                                 <button
                                     type="button"
