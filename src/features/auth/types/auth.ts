@@ -34,6 +34,7 @@ export interface AuthContextValue {
     handleTwitterSignIn(): Promise<void>;
     handleSignOut(): Promise<void>;
     changePassword(currentPassword: string, newPassword: string): Promise<void>;
+    handlePasswordReset(email: string): Promise<void>;
     fetchUserData(): Promise<void>;
     handleAuthError(error: unknown, provider: string): never;
 }

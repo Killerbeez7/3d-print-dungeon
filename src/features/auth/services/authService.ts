@@ -15,6 +15,7 @@ import {
     updatePassword,
     reauthenticateWithCredential,
     EmailAuthProvider,
+    sendPasswordResetEmail,
 } from "firebase/auth";
 import type { PublicProfile, PrivateProfile } from "@/features/user/types/user";
 import { handleAuthError } from "../utils/errorHandling";
@@ -165,6 +166,15 @@ export const changePassword = async (
         await updatePassword(currentUser, newPassword);
     } catch (error: unknown) {
         const authError = handleAuthError(error, "Password Change");
+        throw authError;
+    }
+};
+
+export const resetPassword = async (email: string): Promise<void> => {
+    try {
+        await sendPasswordResetEmail(auth, email);
+    } catch (error: unknown) {
+        const authError = handleAuthError(error, "Password Reset");
         throw authError;
     }
 };

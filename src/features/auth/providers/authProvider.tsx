@@ -10,6 +10,7 @@ import {
     signInWithGoogle,
     signOutUser as signOut,
     changePassword as changeUserPassword,
+    resetPassword,
     fetchPublicProfile,
     fetchPrivateProfile,
 } from "@/features/auth/services/authService";
@@ -255,6 +256,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         throw new Error("Twitter sign-in not implemented");
     };
 
+    const handlePasswordReset = async (email: string) => {
+        setLoading(true);
+        try {
+            await resetPassword(email);
+            setLoading(false);
+        } catch (error) {
+            handleAuthErrorWrapper(error, "Password Reset");
+        }
+    };
+
     // Derive consolidated auth user once inputs are ready
     useEffect(() => {
         if (!currentUser || !publicProfile || !privateProfile) {
@@ -314,6 +325,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         handleGoogleSignIn,
         handleSignOut,
         changePassword,
+        handlePasswordReset,
         handleAuthError: handleAuthErrorWrapper,
         fetchUserData: () => Promise.resolve(), // placeholder if needed
         handleFacebookSignIn,

@@ -16,6 +16,7 @@ import {
     faLock,
     faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
+import { PasswordResetModal } from "./PasswordResetModal";
 
 interface SignInFormProps {
     onSwitchToSignUp: () => void;
@@ -41,6 +42,7 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [showPasswordReset, setShowPasswordReset] = useState<boolean>(false);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -204,11 +206,8 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                 <div className="flex justify-end">
                     <button
                         type="button"
-                        className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200 hover:underline"
-                        onClick={() => {
-                            // TODO: Implement forgot password functionality
-                            console.log("Forgot password clicked");
-                        }}
+                        className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 rounded"
+                        onClick={() => setShowPasswordReset(true)}
                     >
                         Forgot Password?
                     </button>
@@ -325,6 +324,12 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                     </button>
                 </p>
             </div>
+
+            {/* Password Reset Modal */}
+            <PasswordResetModal
+                isOpen={showPasswordReset}
+                onClose={() => setShowPasswordReset(false)}
+            />
         </div>
     );
 };

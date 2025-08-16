@@ -25,6 +25,7 @@ export const AuthContext = createContext<AuthContextValue>({
     handleTwitterSignIn: async () => {},
     handleSignOut: async () => {},
     changePassword: async () => {},
+    handlePasswordReset: async () => {},
     fetchUserData: async () => {},
     handleAuthError: () => {
         throw new Error("Not implemented");
