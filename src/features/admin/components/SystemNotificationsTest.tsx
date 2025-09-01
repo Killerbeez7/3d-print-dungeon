@@ -2,10 +2,10 @@ import { useState } from "react";
 import { ChevronDown, ChevronUp, Bell, MessageSquare } from "lucide-react";
 import { useNotificationTest } from "../scripts/testNotifications";
 
-export const NotificationTestDropdown = () => {
+export const SystemNotificationsTest = () => {
     const [isOpen, setIsOpen] = useState(false);
-    const [title, setTitle] = useState("Test Notification");
-    const [message, setMessage] = useState("This is a test notification message.");
+    const [title, setTitle] = useState("Test System Alert");
+    const [message, setMessage] = useState("This is a test system alert message.");
     const [duration, setDuration] = useState(5000);
 
     const { testNotification, testAllTypes, testPersistent, testLongMessage } =
@@ -36,7 +36,7 @@ export const NotificationTestDropdown = () => {
                 <div className="flex items-center">
                     <Bell className="w-5 h-5 mr-2 text-primary" />
                     <span className="font-semibold text-txt-primary">
-                        Notification Testing
+                        System Alerts Testing
                     </span>
                 </div>
                 {isOpen ? (
@@ -59,7 +59,7 @@ export const NotificationTestDropdown = () => {
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                                 className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-primary text-txt-primary focus:outline-none focus:ring-2 focus:ring-primary"
-                                placeholder="Notification title"
+                                placeholder="Alert title"
                             />
                         </div>
 
@@ -87,7 +87,7 @@ export const NotificationTestDropdown = () => {
                             onChange={(e) => setMessage(e.target.value)}
                             rows={3}
                             className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-primary text-txt-primary focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                            placeholder="Notification message"
+                            placeholder="Alert message"
                         />
                     </div>
 

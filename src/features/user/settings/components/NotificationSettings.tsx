@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useNotification } from "@/features/notifications";
+import { useSystemAlert } from "@/features/system-alerts";
 import { settingsService } from "../services/settingsService";
 import { SaveChanges } from "./parts/SaveChanges";
 
 export const NotificationSettings = () => {
     const { currentUser } = useAuth();
-    const { success, error: showError } = useNotification();
+    const { success, error: showError } = useSystemAlert();
     const [loading, setLoading] = useState<boolean>(false);
     const [hasChanges, setHasChanges] = useState<boolean>(false);
     

@@ -1,6 +1,6 @@
 import { useState, KeyboardEvent, Dispatch, SetStateAction, useEffect } from "react";
 import { useTheme } from "@/features/shared/theme";
-import { useNotification } from "@/features/notifications";
+import { useSystemAlert } from "@/features/system-alerts";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { settingsService } from "../services/settingsService";
 import { SaveChanges } from "./parts/SaveChanges";
@@ -27,7 +27,7 @@ export const AccountSettings = () => {
     const [isLanguageOpen, setIsLanguageOpen] = useState<boolean>(false);
     const [isTimezoneOpen, setIsTimezoneOpen] = useState<boolean>(false);
     const [, setThemeRaw] = useTheme();
-    const { success, error: showError } = useNotification();
+    const { success, error: showError } = useSystemAlert();
     const { currentUser } = useAuth();
     const [loading, setLoading] = useState<boolean>(false);
     const [hasChanges, setHasChanges] = useState<boolean>(false);

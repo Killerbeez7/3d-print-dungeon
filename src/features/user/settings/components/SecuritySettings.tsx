@@ -1,13 +1,13 @@
 import { useState, FormEvent, ChangeEvent, useEffect } from "react";
 import { changePassword } from "@/features/auth/services/authService";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useNotification } from "@/features/notifications";
+import { useSystemAlert } from "@/features/system-alerts";
 import { settingsService } from "../services/settingsService";
 import { SaveChanges } from "./parts/SaveChanges";
 
 export const SecuritySettings = () => {
     const { currentUser } = useAuth();
-    const { success, error: showError } = useNotification();
+    const { success, error: showError } = useSystemAlert();
     const [currentPassword, setCurrentPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");

@@ -214,6 +214,25 @@ service cloud.firestore {
     match /modelCategories/{docId} {
       allow read: if true;   // for production tighten this
     }
+
+    // -------------- User Notifications --------------
+    match /userNotifications/{notificationId} {
+      // Users can only read/write their own notifications
+      allow read, write: if isSignedIn() && 
+        resource.data.userId == request.auth.uid;
+      
+      // Allow creation of new notifications (for the current user)
+      allow create: if isSignedIn() && 
+        request.resource.data.userId == request.auth.uid;
+      
+      // Allow updates only to own notifications
+      allow update: if isSignedIn() && 
+        resource.data.userId == request.auth.uid;
+      
+      // Allow deletion only of own notifications
+      allow delete: if isSignedIn() && 
+        resource.data.userId == request.auth.uid;
+    }
   }
 }
 

@@ -2,7 +2,7 @@ import { useState, useEffect, ChangeEvent } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { profileService } from "@/features/user/settings/services/profileService";
 import { countries } from "@/data/countries";
-import { useNotification } from "@/features/notifications";
+import { useSystemAlert } from "@/features/system-alerts";
 import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
 import { SaveChanges } from "./parts/SaveChanges";
 
@@ -11,7 +11,7 @@ import { SaveChanges } from "./parts/SaveChanges";
  */
 export const ProfileSettings = () => {
     const { currentUser, publicProfile } = useAuth();
-    const { success, error: showError } = useNotification();
+    const { success, error: showError } = useSystemAlert();
     const [displayName, setDisplayName] = useState<string>(publicProfile?.displayName || currentUser?.displayName || "");
     const [email, setEmail] = useState<string>(currentUser?.email || "");
     const [isEmailPublic, setIsEmailPublic] = useState<boolean>(false);

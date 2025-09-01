@@ -38,6 +38,7 @@ export const ROUTES = {
     USER_SETTINGS: "/settings",
     USER_PROFILE: "/:username",
     USER_PROFILE_REDIRECT: "/profile",
+    USER_NOTIFICATIONS: "/notifications",
 
     /* Admin */
     ADMIN_DASHBOARD: "/admin-dashboard",

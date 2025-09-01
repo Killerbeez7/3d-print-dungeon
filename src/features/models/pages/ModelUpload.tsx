@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useNotification } from "@/features/notifications";
+import { useSystemAlert } from "@/features/system-alerts";
 import { createAdvancedModel } from "@/features/models/services/modelsService";
 import { finalConvertFileToGLB } from "@/features/models/utils/converter";
 import { useModelViewer } from "@/features/models/hooks/useModelViewer";
@@ -22,7 +22,7 @@ export function ModelUpload() {
     const { currentUser, privateProfile } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
-    const notification = useNotification();
+    const notification = useSystemAlert();
 
     const [step, setStep] = useState(1);
     const [error, setError] = useState("");

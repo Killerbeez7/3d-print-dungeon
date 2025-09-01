@@ -4,7 +4,8 @@ import { deleteAllModelsAndRelated } from "../scripts/deleteAllModels";
 import { refreshIdToken } from "@/features/auth/utils/refreshIdToken";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers } from "@fortawesome/free-solid-svg-icons";
-import { NotificationTestDropdown } from "./NotificationTestDropdown";
+import { SystemNotificationsTest } from "./SystemNotificationsTest";
+import { UserNotificationsTest } from "./UserNotificationsTest";
 import { CookieManagement } from "./CookieManagement";
 
 interface ScriptDef {
@@ -70,8 +71,11 @@ export const Scripts = () => {
         <div>
             <h2 className="text-lg font-bold mb-4">Scripts</h2>
 
-            {/* Notification Testing Section */}
-            <NotificationTestDropdown />
+            {/* System Alerts Testing */}
+            <SystemNotificationsTest />
+
+            {/* User Notifications Testing */}
+            <UserNotificationsTest />
 
             {/* Cookie Management Section */}
             <CookieManagement />

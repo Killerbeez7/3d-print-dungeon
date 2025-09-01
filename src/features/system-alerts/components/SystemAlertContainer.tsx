@@ -1,8 +1,8 @@
-import { useNotification } from "../hooks/useNotification";
-import type { NotificationType } from "../types/notification";
+import { useSystemAlert } from "../hooks/useSystemAlert";
+import type { SystemAlertType } from "../types/systemAlert";
 import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from "lucide-react";
 
-const getNotificationIcon = (type: NotificationType) => {
+const getAlertIcon = (type: SystemAlertType) => {
   switch (type) {
     case "success":
       return <CheckCircle className="w-5 h-5 text-green-500" />;
@@ -17,7 +17,7 @@ const getNotificationIcon = (type: NotificationType) => {
   }
 };
 
-const getNotificationStyles = (type: NotificationType) => {
+const getAlertStyles = (type: SystemAlertType) => {
   const baseStyles = "flex items-start gap-3 p-4 rounded-lg shadow-lg border-l-4 transition-all duration-300 ease-in-out";
   
   switch (type) {
@@ -34,39 +34,39 @@ const getNotificationStyles = (type: NotificationType) => {
   }
 };
 
-export const NotificationContainer = () => {
-  const { notifications, removeNotification } = useNotification();
+export const SystemAlertContainer = () => {
+  const { alerts, removeAlert } = useSystemAlert();
 
-  if (notifications.length === 0) {
+  if (alerts.length === 0) {
     return null;
   }
 
   return (
     <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
-      {notifications.map((notification) => (
+      {alerts.map((alert) => (
         <div
-          key={notification.id}
-          className={`${getNotificationStyles(notification.type)} animate-in slide-in-from-right-2 duration-300`}
+          key={alert.id}
+          className={`${getAlertStyles(alert.type)} animate-in slide-in-from-right-2 duration-300`}
         >
           <div className="flex-shrink-0 mt-0.5">
-            {getNotificationIcon(notification.type)}
+            {getAlertIcon(alert.type)}
           </div>
           
           <div className="flex-1 min-w-0">
             <h4 className="text-sm font-medium leading-5">
-              {notification.title}
+              {alert.title}
             </h4>
-            {notification.message && (
+            {alert.message && (
               <p className="text-sm leading-4 mt-1 opacity-90">
-                {notification.message}
+                {alert.message}
               </p>
             )}
           </div>
           
           <button
-            onClick={() => removeNotification(notification.id)}
+            onClick={() => removeAlert(alert.id)}
             className="flex-shrink-0 ml-2 p-1 rounded-md hover:bg-black/10 transition-colors"
-            aria-label="Close notification"
+            aria-label="Close alert"
           >
             <X className="w-4 h-4" />
           </button>

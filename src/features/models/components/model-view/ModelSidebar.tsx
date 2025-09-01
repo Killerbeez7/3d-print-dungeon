@@ -3,7 +3,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useNotification } from "@/features/notifications/hooks/useNotification";
+import { useSystemAlert } from "@/features/system-alerts/hooks/useSystemAlert";
 //components
 import { LikeButton } from "../likeButton";
 import { FavoritesButton } from "../favoritesButton";
@@ -40,7 +40,7 @@ export function ModelSidebar({
 }: ModelSidebarProps) {
     const navigate = useNavigate();
     const { isAdmin } = useAuth();
-    const notification = useNotification();
+    const notification = useSystemAlert();
     const [isEditing, setIsEditing] = useState<boolean>(false);
     const [formData, setFormData] = useState({
         name: model.name || "",

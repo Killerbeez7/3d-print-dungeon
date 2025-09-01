@@ -1,19 +1,19 @@
-export type NotificationType = "success" | "error" | "warning" | "info";
+export type SystemAlertType = "success" | "error" | "warning" | "info";
 
-export interface Notification {
+export interface SystemAlert {
   id: string;
-  type: NotificationType;
+  type: SystemAlertType;
   title: string;
   message: string;
   duration?: number;
   createdAt: Date;
 }
 
-export interface NotificationContextValue {
-  notifications: Notification[];
-  addNotification: (notification: Omit<Notification, "id" | "createdAt">) => void;
-  removeNotification: (id: string) => void;
-  clearAllNotifications: () => void;
+export interface SystemAlertContextValue {
+  alerts: SystemAlert[];
+  addAlert: (alert: Omit<SystemAlert, "id" | "createdAt">) => void;
+  removeAlert: (id: string) => void;
+  clearAllAlerts: () => void;
   success: (title: string, message: string, duration?: number) => void;
   error: (title: string, message: string, duration?: number) => void;
   warning: (title: string, message: string, duration?: number) => void;

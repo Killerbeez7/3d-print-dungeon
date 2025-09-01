@@ -1,4 +1,4 @@
-import { useNotification } from "@/features/notifications";
+import { useSystemAlert } from "@/features/system-alerts";
 
 export interface NotificationTestConfig {
   type: "success" | "error" | "warning" | "info";
@@ -8,7 +8,7 @@ export interface NotificationTestConfig {
 }
 
 export const useNotificationTest = () => {
-  const notification = useNotification();
+  const notification = useSystemAlert();
 
   const testNotification = (config: NotificationTestConfig) => {
     const { type, title, message, duration } = config;

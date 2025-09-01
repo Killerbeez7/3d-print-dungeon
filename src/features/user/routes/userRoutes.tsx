@@ -27,6 +27,12 @@ const SettingsPageSkeleton = lazy(() =>
     }))
 );
 
+const NotificationsPage = lazy(() =>
+    import("@/features/user/notifications/pages/NotificationsPage").then((m) => ({
+        default: m.NotificationsPage,
+    }))
+);
+
 export const userRoutes: RouteObject[] = [
     {
         path: ROUTES.USER_PROFILE_REDIRECT,
@@ -50,6 +56,14 @@ export const userRoutes: RouteObject[] = [
         element: withProtectedMaintenance(
             <Suspense fallback={<SettingsPageSkeleton />}>
                 <SettingsPage />
+            </Suspense>
+        ),
+    },
+    {
+        path: ROUTES.USER_NOTIFICATIONS,
+        element: withProtectedMaintenance(
+            <Suspense>
+                <NotificationsPage />
             </Suspense>
         ),
     },

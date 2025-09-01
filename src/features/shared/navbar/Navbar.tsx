@@ -12,6 +12,7 @@ import { STATIC_ASSETS } from "@/config/assetsConfig";
 // components
 import { AuthButtons } from "./AuthButtons";
 import { GlobalSearch } from "@/features/search/components/GlobalSearch";
+import { NotificationBadge } from "@/features/user/notifications";
 // icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -19,7 +20,6 @@ import {
     MdAccountCircle,
     MdMenu,
     MdClose,
-    MdNotifications,
     MdSearch,
 } from "react-icons/md";
 import {
@@ -247,13 +247,10 @@ export const Navbar = (): React.ReactNode => {
                                             <MdFileUpload className="h-7 w-7" />
                                         </Link>
 
-                                        <Link
-                                            to="/notifications"
+                                        <NotificationBadge
                                             className="text-txt-secondary hover:text-txt-primary"
-                                            title="Notifications"
-                                        >
-                                            <MdNotifications className="h-7 w-7" />
-                                        </Link>
+                                            onClick={() => navigate("/notifications")}
+                                        />
                                     </div>
 
                                     {/* Profile Dropdown */}
@@ -412,13 +409,10 @@ export const Navbar = (): React.ReactNode => {
                             <MdFileUpload className="h-7 w-7" />
                         </Link>
 
-                        <Link
-                            to="/notifications"
+                        <NotificationBadge
                             className="text-txt-secondary hover:text-txt-primary"
-                            title="Notifications"
-                        >
-                            <MdNotifications className="h-7 w-7" />
-                        </Link>
+                            onClick={() => navigate("/notifications")}
+                        />
                     </div>
                 )}
 
