@@ -91,15 +91,23 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
         consent,
         updateMultipleCategories,
         acceptAll: contextAcceptAll,
+        declineAll: contextDeclineAll,
     } = useCookies();
     const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
     const [localConsent, setLocalConsent] = useState(consent);
 
     useEffect(() => {
         if (isOpen) {
-            setLocalConsent(consent);
+            // Open with all options enabled by default for better UX
+            setLocalConsent({
+                essential: true,
+                analytics: true,
+                marketing: true,
+                payment: true,
+                accepted: true,
+            });
         }
-    }, [isOpen, consent]);
+    }, [isOpen]);
 
     const toggleSection = (category: string) => {
         const newExpanded = new Set(expandedSections);
@@ -132,6 +140,20 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
         onClose();
     };
 
+    const handleDeclineNonEssentials = () => {
+        contextDeclineAll();
+
+        setLocalConsent({
+            essential: true,
+            analytics: false,
+            marketing: false,
+            payment: false,
+            accepted: true, // Set to true so banner doesn't show again
+        });
+
+        onClose();
+    };
+
     const handleSaveSettings = () => {
         // Update all categories at once and save to cookies
         updateMultipleCategories({
@@ -148,47 +170,46 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
-            <div className="bg-bg-secondary rounded-xl shadow-2xl max-w-xl w-full h-[65vh] flex flex-col border border-br-primary">
+            <div className="bg-bg-secondary rounded-xl shadow-2xl max-w-xl w-full h-[60vh] flex flex-col border border-br-primary">
                 {/* Header */}
-                <div className="p-6 border-b border-br-secondary flex-shrink-0">
+                <div className="p-4 border-b border-br-secondary flex-shrink-0">
                     <div className="flex items-center justify-between">
-                        <h2 className="text-2xl font-bold text-txt-primary">
+                        <h2 className="text-xl font-semibold text-txt-primary">
                             Cookie Settings
                         </h2>
                         <button
                             onClick={onClose}
-                            className="text-txt-secondary hover:text-txt-primary transition-colors text-xl"
+                            className="text-txt-secondary hover:text-txt-primary transition-colors text-lg"
                         >
                             ✕
                         </button>
                     </div>
-                    <p className="text-txt-secondary mt-2 text-sm">
-                        Rejecting certain types of cookies may impact your experience of
-                        the site and the services we are able to offer. A page refresh
-                        might be needed for settings to take effect.
+                    <p className="text-txt-secondary mt-2 text-xs">
+                        Customize your cookie preferences. Essential cookies are always
+                        enabled for site functionality.
                     </p>
                 </div>
 
                 {/* Cookie Categories */}
-                <div className="p-6 flex-1 overflow-y-auto bg-bg-primary custom-scrollbar">
-                    <div className="space-y-4">
+                <div className="p-4 flex-1 overflow-y-auto bg-bg-primary custom-scrollbar">
+                    <div className="space-y-3">
                         {Object.entries(cookieCategories).map(([category, info]) => (
                             <div
                                 key={category}
                                 className="border border-br-primary rounded-lg overflow-hidden"
                             >
-                                <div className="bg-bg-secondary p-4">
-                                    <div className="flex items-center gap-3">
+                                <div className="bg-bg-secondary p-3">
+                                    <div className="flex items-center gap-2">
                                         <button
                                             type="button"
                                             onClick={() => toggleSection(category)}
-                                            className="text-txt-secondary hover:text-txt-primary transition-colors text-lg font-bold"
+                                            className="text-txt-secondary hover:text-txt-primary transition-colors text-base font-bold"
                                         >
                                             {expandedSections.has(category) ? "−" : "+"}
                                         </button>
                                         <div className="flex-1">
                                             <div className="flex items-center justify-between">
-                                                <div className="font-medium text-txt-primary">
+                                                <div className="text-sm font-medium text-txt-primary">
                                                     {info.title}
                                                 </div>
                                                 <input
@@ -213,12 +234,12 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
                                 </div>
 
                                 {expandedSections.has(category) && (
-                                    <div className="border-t border-br-secondary bg-bg-secondary p-4 space-y-4">
+                                    <div className="border-t border-br-secondary bg-bg-secondary p-3 space-y-3">
                                         <div>
-                                            <h4 className="text-sm font-medium text-txt-primary mb-2">
+                                            <h4 className="text-xs font-medium text-txt-primary mb-1">
                                                 What these cookies do:
                                             </h4>
-                                            <ul className="text-sm text-txt-secondary space-y-1">
+                                            <ul className="text-xs text-txt-secondary space-y-1">
                                                 {info.details.map((detail, index) => (
                                                     <li
                                                         key={index}
@@ -234,10 +255,10 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
                                         </div>
 
                                         <div>
-                                            <h4 className="text-sm font-medium text-txt-primary mb-2">
+                                            <h4 className="text-xs font-medium text-txt-primary mb-1">
                                                 Examples:
                                             </h4>
-                                            <div className="text-sm text-txt-secondary space-y-1">
+                                            <div className="text-xs text-txt-secondary space-y-1">
                                                 {info.examples.map((example, index) => (
                                                     <div
                                                         key={index}
@@ -252,11 +273,11 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
                                             </div>
                                         </div>
 
-                                        <div className="bg-bg-surface p-3 rounded">
-                                            <h4 className="text-sm font-medium text-txt-primary mb-1">
+                                        <div className="bg-bg-surface p-2 rounded">
+                                            <h4 className="text-xs font-medium text-txt-primary mb-1">
                                                 Impact of disabling:
                                             </h4>
-                                            <p className="text-sm text-txt-secondary">
+                                            <p className="text-xs text-txt-secondary">
                                                 {info.impact}
                                             </p>
                                         </div>
@@ -268,25 +289,32 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
                 </div>
 
                 {/* Footer */}
-                <div className="p-6 border-t border-br-secondary flex-shrink-0">
+                <div className="p-4 border-t border-br-secondary flex-shrink-0">
                     <div className="flex justify-between items-center">
-                        <div className="text-sm text-txt-secondary">
+                        <div className="text-xs text-txt-secondary">
                             <p>Last updated: {new Date().toLocaleDateString()}</p>
                         </div>
-                        <div className="flex gap-3">
+                        <div className="flex gap-2">
                             <button
                                 type="button"
-                                onClick={handleAcceptAll}
-                                className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                                onClick={handleDeclineNonEssentials}
+                                className="px-3 py-1.5 text-xs bg-primary text-white rounded hover:bg-primary/90 transition-colors"
                             >
-                                Accept all
+                                Decline Non-Essentials
                             </button>
                             <button
                                 type="button"
                                 onClick={handleSaveSettings}
-                                className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+                                className="px-3 py-1.5 text-xs border border-br-secondary text-txt-secondary hover:text-txt-primary hover:border-br-primary transition-colors rounded"
                             >
-                                Save settings
+                                Save Settings
+                            </button>
+                            <button
+                                type="button"
+                                onClick={handleAcceptAll}
+                                className="px-3 py-1.5 text-xs border border-br-secondary text-txt-secondary hover:text-txt-primary hover:border-br-primary transition-colors rounded"
+                            >
+                                Accept All
                             </button>
                         </div>
                     </div>

@@ -13,18 +13,19 @@ export interface CookieManagementState {
 }
 
 export function useCookieManagement(): CookieManagementState {
-    const { consent, acceptAll, declineAll } = useCookies();
+    const { consent, acceptAll, declineAll, resetToDefault } = useCookies();
     const [showSettingsModal, setShowSettingsModal] = useState(false);
 
     const getConsentStatus = () => {
         if (!consent.accepted) return "Not Set";
-        const acceptedCount = [consent.essential, consent.analytics, consent.marketing]
+        const acceptedCount = [consent.essential, consent.analytics, consent.marketing, consent.payment]
             .filter(Boolean).length;
-        return `${acceptedCount}/3 Accepted`;
+        return `${acceptedCount}/4 Accepted`;
     };
 
     const handleResetCookies = () => {
-        declineAll();
+        // Reset to default state (only essential cookies enabled)
+        resetToDefault();
     };
 
     return {

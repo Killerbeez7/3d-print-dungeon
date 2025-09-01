@@ -67,6 +67,24 @@ export function resetCookieConsent(): void {
     console.log("Cookie consent reset for testing");
 }
 
+export function resetNonEssentialCookies(): void {
+    // Clear all cookies except the consent cookie
+    const cookies = document.cookie.split(";");
+    
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i];
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos).trim() : cookie.trim();
+        
+        // Don't delete the consent cookie
+        if (name !== CONSENT_COOKIE_NAME) {
+            document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+        }
+    }
+    
+    console.log("Non-essential cookies cleared, consent cookie preserved");
+}
+
 export function getAllCookies(): Record<string, string> {
     const cookies: Record<string, string> = {};
     document.cookie.split(';').forEach(cookie => {

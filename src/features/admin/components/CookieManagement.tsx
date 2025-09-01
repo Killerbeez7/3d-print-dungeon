@@ -48,7 +48,7 @@ export const CookieManagement = () => {
             {isOpen && (
                 <div className="mt-2 p-4 bg-bg-secondary rounded-lg border border-br-secondary">
                     {/* Status Grid */}
-                    <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                         <div className="flex items-center justify-between p-2 bg-bg-primary rounded-lg">
                             <span className="text-xs text-txt-secondary">Essential</span>
                             {consent.essential ? (
@@ -70,6 +70,15 @@ export const CookieManagement = () => {
                         <div className="flex items-center justify-between p-2 bg-bg-primary rounded-lg">
                             <span className="text-xs text-txt-secondary">Marketing</span>
                             {consent.marketing ? (
+                                <CheckCircle className="w-4 h-4 text-green-500" />
+                            ) : (
+                                <XCircle className="w-4 h-4 text-red-500" />
+                            )}
+                        </div>
+
+                        <div className="flex items-center justify-between p-2 bg-bg-primary rounded-lg">
+                            <span className="text-xs text-txt-secondary">Payment</span>
+                            {consent.payment ? (
                                 <CheckCircle className="w-4 h-4 text-green-500" />
                             ) : (
                                 <XCircle className="w-4 h-4 text-red-500" />
@@ -98,9 +107,10 @@ export const CookieManagement = () => {
                         <button
                             onClick={handleResetCookies}
                             className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+                            title="Reset to default: only essential cookies enabled"
                         >
                             <FontAwesomeIcon icon={faUndo} className="mr-2" />
-                            Reset
+                            Reset to Default
                         </button>
                     </div>
                 </div>

@@ -1,4 +1,4 @@
-export type CookieCategories = "essential" | "analytics" | "marketing";
+export type CookieCategories = "essential" | "analytics" | "marketing" | "payment";
 
 export type CookieConsent = {
     essential: boolean;
@@ -16,6 +16,8 @@ export interface CookiesContextValue {
     updateMultipleCategories: (updates: Partial<CookieConsent>) => void;
     savePreferences: () => void;
     openSettings: () => void;
+    checkCookiesNeeded: (feature: 'analytics' | 'marketing' | 'payment') => { needed: boolean; type: string | null };
+    resetToDefault: () => void;
 }
 
 

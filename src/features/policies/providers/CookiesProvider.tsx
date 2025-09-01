@@ -1,6 +1,6 @@
 import { useState, useEffect, ReactNode } from "react";
 import { CookiesContext, defaultConsent } from "../context/CookiesContext";
-import { setConsent, getConsent } from "../services/cookies";
+import { setConsent, getConsent, resetNonEssentialCookies, deleteConsent } from "../services/cookies";
 import { CookieCategories, CookieConsent, CookiesContextValue } from "../types/cookies";
 
 export function CookiesProvider({ children }: { children: ReactNode }) {
@@ -16,7 +16,7 @@ export function CookiesProvider({ children }: { children: ReactNode }) {
 
     const acceptAll = () => {
         const newConsent = { 
-            ...defaultConsent, 
+            essential: true, // Always true
             analytics: true, 
             marketing: true, 
             payment: true, 
@@ -32,13 +32,18 @@ export function CookiesProvider({ children }: { children: ReactNode }) {
             analytics: false,
             marketing: false,
             payment: false,
-            accepted: false,
+            accepted: true, // User has made a choice, banner won't show again
         };
         setConsentState(newConsent);
         setConsent(newConsent);
     };
 
     const setCategory = (category: CookieCategories, value: boolean, saveImmediately = false) => {
+        // Don't allow disabling essential cookies
+        if (category === 'essential') {
+            return;
+        }
+        
         const newConsent = { ...consent, [category]: value };
         setConsentState(newConsent);
         
@@ -48,14 +53,22 @@ export function CookiesProvider({ children }: { children: ReactNode }) {
     };
 
     const updateMultipleCategories = (updates: Partial<CookieConsent>) => {
-        const newConsent = { ...consent, ...updates };
+        const newConsent = { 
+            ...consent, 
+            ...updates,
+            essential: true // Always ensure essential is true
+        };
         setConsentState(newConsent);
         setConsent(newConsent);
     };
 
     const savePreferences = () => {
         // Save the current consent state with accepted: true
-        const newConsent = { ...consent, accepted: true };
+        const newConsent = { 
+            ...consent, 
+            essential: true, // Always ensure essential is true
+            accepted: true 
+        };
         setConsentState(newConsent);
         setConsent(newConsent);
     };
@@ -65,6 +78,30 @@ export function CookiesProvider({ children }: { children: ReactNode }) {
         console.log("Open cookie settings");
     };
 
+    const resetToDefault = () => {
+        // Reset to default state by completely clearing consent
+        // This will make the banner show again
+        deleteConsent();
+        setConsentState(defaultConsent);
+        
+        // Clear all non-essential cookies
+        resetNonEssentialCookies();
+    };
+
+    const checkCookiesNeeded = (feature: 'analytics' | 'marketing' | 'payment') => {
+        // Check if a specific feature needs cookies and if user has consented
+        if (feature === 'analytics' && !consent.analytics) {
+            return { needed: true, type: 'analytics' };
+        }
+        if (feature === 'marketing' && !consent.marketing) {
+            return { needed: true, type: 'marketing' };
+        }
+        if (feature === 'payment' && !consent.payment) {
+            return { needed: true, type: 'payment' };
+        }
+        return { needed: false, type: null };
+    };
+
     const contextValue: CookiesContextValue = {
         consent,
         acceptAll,
@@ -72,7 +109,9 @@ export function CookiesProvider({ children }: { children: ReactNode }) {
         setCategory,
         updateMultipleCategories,
         savePreferences,
-        openSettings
+        openSettings,
+        checkCookiesNeeded,
+        resetToDefault
     };
 
     return (
