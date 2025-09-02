@@ -31,7 +31,6 @@ export interface UserNotificationContextValue {
   error: string | null;
   fetchNotifications: () => Promise<void>;
   markAsRead: (id: string) => Promise<void>;
-  markAllAsRead: () => Promise<void>;
   deleteNotification: (id: string) => Promise<void>;
   clearAllNotifications: () => Promise<void>;
   addNotification: (notification: Omit<UserNotification, "id" | "createdAt" | "status">) => Promise<void>;

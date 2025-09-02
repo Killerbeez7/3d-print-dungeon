@@ -12,7 +12,7 @@ import { STATIC_ASSETS } from "@/config/assetsConfig";
 // components
 import { AuthButtons } from "./AuthButtons";
 import { GlobalSearch } from "@/features/search/components/GlobalSearch";
-import { NotificationBadge } from "@/features/user/notifications";
+import { NotificationDropdown } from "@/features/user/notifications";
 // icons
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -247,9 +247,8 @@ export const Navbar = (): React.ReactNode => {
                                             <MdFileUpload className="h-7 w-7" />
                                         </Link>
 
-                                        <NotificationBadge
-                                            className="text-txt-secondary hover:text-txt-primary"
-                                            onClick={() => navigate("/notifications")}
+                                        <NotificationDropdown
+                                            className="text-txt-secondary"
                                         />
                                     </div>
 
@@ -409,9 +408,8 @@ export const Navbar = (): React.ReactNode => {
                             <MdFileUpload className="h-7 w-7" />
                         </Link>
 
-                        <NotificationBadge
+                        <NotificationDropdown
                             className="text-txt-secondary hover:text-txt-primary"
-                            onClick={() => navigate("/notifications")}
                         />
                     </div>
                 )}

@@ -54,3 +54,5 @@ export async function getLikesCount(modelId: string): Promise<number> {
     const count = (data && (data as { count?: number }).count) ?? 0;
     return typeof count === "number" ? count : 0;
 }
+
+

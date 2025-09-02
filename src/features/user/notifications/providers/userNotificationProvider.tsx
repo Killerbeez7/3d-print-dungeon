@@ -67,23 +67,7 @@ export const UserNotificationProvider = ({ children }: { children: ReactNode }) 
     }
   }, [authUser?.uid]);
 
-  const markAllAsRead = useCallback(async () => {
-    if (!authUser?.uid) return;
-    
-    try {
-      await UserNotificationService.markAllAsRead(authUser.uid);
-      setNotifications(prev => 
-        prev.map(notification => ({
-          ...notification,
-          status: "read" as const,
-          readAt: new Date()
-        }))
-      );
-      setUnreadCount(0);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to mark all notifications as read");
-    }
-  }, [authUser?.uid]);
+
 
   const deleteNotification = useCallback(async (id: string) => {
     if (!authUser?.uid) return;
@@ -143,7 +127,6 @@ export const UserNotificationProvider = ({ children }: { children: ReactNode }) 
     error,
     fetchNotifications,
     markAsRead,
-    markAllAsRead,
     deleteNotification,
     clearAllNotifications,
     addNotification,

@@ -87,6 +87,40 @@ export const toggleFollow = onCall(async ({ auth, data }) => {
             }
         });
 
+        // Create notification after the transaction (to avoid transaction conflicts)
+        if (!isCurrentlyFollowing) {
+            try {
+                // Get follower's information
+                const followerSnap = await followerPublicRef.get();
+                const followerData = followerSnap.exists ? followerSnap.data() : {};
+                const followerDisplayName = followerData.displayName || "Anonymous";
+
+                // Create notification
+                await db.collection("userNotifications").add({
+                    userId: followingId,
+                    type: "follow",
+                    title: "New Follower!",
+                    message: `${followerDisplayName} started following you`,
+                    relatedId: followerId,
+                    relatedType: "user",
+                    metadata: {
+                        followerId: followerId,
+                        followerName: followerDisplayName,
+                        followerAvatar: followerData.photoURL || null,
+                    },
+                    status: "unread",
+                    createdAt: now,
+                });
+
+                console.log(
+                    `✅ Follow notification created for user ${followingId} by ${followerDisplayName}`
+                );
+            } catch (error) {
+                console.error("Failed to create follow notification:", error);
+                // Don't throw error - notification failure shouldn't break the follow functionality
+            }
+        }
+
         // Return latest status snapshot
         const [updatedFollowDoc, followerPublicDoc, followingPublicDoc] = await Promise.all([
             followRef.get(),

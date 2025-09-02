@@ -191,7 +191,7 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
                 </div>
 
                 {/* Cookie Categories */}
-                <div className="p-4 flex-1 overflow-y-auto bg-bg-primary custom-scrollbar">
+                <div className="p-4 flex-1 overflow-y-auto bg-bg-primary custom-scrollbar-md">
                     <div className="space-y-3">
                         {Object.entries(cookieCategories).map(([category, info]) => (
                             <div

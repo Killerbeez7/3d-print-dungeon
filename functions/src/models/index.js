@@ -2,12 +2,12 @@ import admin from "firebase-admin";
 import { onDocumentCreated, onDocumentDeleted } from "firebase-functions/v2/firestore";
 import { onCall } from "firebase-functions/v2/https";
 
-// When a like is created, increment model.likes and uploader public stats.likesCount
+// When a like is created, increment model.likes, uploader public stats.likesCount, and create notification
 export const onLikeCreated = onDocumentCreated("likes/{likeId}", async (event) => {
     const snap = event.data;
     if (!snap) return;
-    const { modelId } = snap.data() || {};
-    if (!modelId) return;
+    const { modelId, userId } = snap.data() || {};
+    if (!modelId || !userId) return;
 
     const db = admin.firestore();
     const modelRef = db.doc(`models/${modelId}`);
@@ -28,6 +28,55 @@ export const onLikeCreated = onDocumentCreated("likes/{likeId}", async (event) =
             );
         }
     });
+
+    // Create notification after the transaction (to avoid transaction conflicts)
+    try {
+        // Get model information
+        const modelSnap = await modelRef.get();
+        if (!modelSnap.exists) return;
+
+        const model = modelSnap.data();
+        const uploaderId = model.uploaderId;
+
+        if (!uploaderId) return;
+
+        // Don't create notification if user likes their own model
+        if (uploaderId === userId) return;
+
+        // Get liker's information
+        const likerRef = db.doc(`users/${userId}/public/data`);
+        const likerSnap = await likerRef.get();
+        const likerData = likerSnap.exists ? likerSnap.data() : {};
+        const likerDisplayName = likerData.displayName || "Anonymous";
+
+        // Get model name
+        const modelName = model.name || "Unknown Model";
+
+        // Create notification
+        await db.collection("userNotifications").add({
+            userId: uploaderId,
+            type: "like",
+            title: "New Like!",
+            message: `${likerDisplayName} liked your model "${modelName}"`,
+            relatedId: modelId,
+            relatedType: "model",
+            metadata: {
+                likerId: userId,
+                likerName: likerDisplayName,
+                modelName: modelName,
+                likerAvatar: likerData.photoURL || null,
+            },
+            status: "unread",
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+
+        console.log(
+            `✅ Like notification created for model "${modelName}" by ${likerDisplayName}`
+        );
+    } catch (error) {
+        console.error("Failed to create like notification:", error);
+        // Don't throw error - notification failure shouldn't break the like functionality
+    }
 });
 
 // When a like is deleted, decrement model.likes and uploader public stats.likesCount

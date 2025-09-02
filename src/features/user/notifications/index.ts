@@ -1,6 +1,7 @@
 export { UserNotificationContainer } from "./components/UserNotificationContainer";
 export { UserNotificationItem } from "./components/UserNotificationItem";
 export { NotificationBadge } from "./components/NotificationBadge";
+export { NotificationDropdown } from "./components/NotificationDropdown";
 export { UserNotificationProvider } from "./providers/userNotificationProvider";
 export { useUserNotification } from "./hooks/useUserNotification";
 export { UserNotificationService } from "./services/userNotificationService";
