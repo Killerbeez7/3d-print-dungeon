@@ -20,5 +20,7 @@ export const useFetchModels = (filters: FetchModelsOptions) =>
     queryFn: ({ pageParam }) => fetchModels({ ...filters, cursor: pageParam }),
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     initialPageParam: undefined,
-    staleTime: 0,
+    staleTime: 5 * 60 * 1000, // 5 minutes - data stays fresh for 5 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch when component mounts if data exists
   });

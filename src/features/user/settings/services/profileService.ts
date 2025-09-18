@@ -10,7 +10,6 @@ interface SocialAccounts {
     facebook?: string;
     twitter?: string;
     instagram?: string;
-    linkedin?: string;
 }
 
 interface ProfileData {
@@ -71,13 +70,11 @@ export const profileService = {
             const normalizedFacebook = profileData.socials.facebook?.trim() || null;
             const normalizedTwitter = profileData.socials.twitter?.trim() || null;
             const normalizedInstagram = profileData.socials.instagram?.trim() || null;
-            const normalizedLinkedin = profileData.socials.linkedin?.trim() || null;
 
             const socialLinks: NonNullable<PublicUserData["socialLinks"]> = {
                 facebook: normalizedFacebook,
                 twitter: normalizedTwitter,
                 instagram: normalizedInstagram,
-                linkedin: normalizedLinkedin,
             };
 
             const publicData: Partial<PublicUserData> & { lastActiveAt: Timestamp } = {

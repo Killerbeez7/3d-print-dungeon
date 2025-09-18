@@ -3,7 +3,6 @@
  * @description Displays the portfolio for a user
  * @usedIn UserProfilePage
  */
-
 import type { PublicProfileView } from "@/features/user/types/user";
 import { H2, H3, H4, StatValueSecondary, Badge } from "@/components/index";
 

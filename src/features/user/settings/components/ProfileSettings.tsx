@@ -30,7 +30,6 @@ export const ProfileSettings = () => {
     const [facebook, setFacebook] = useState<string>("");
     const [twitter, setTwitter] = useState<string>("");
     const [instagram, setInstagram] = useState<string>("");
-    const [linkedin, setLinkedin] = useState<string>("");
 
     // Original data for comparison
     const [originalData, setOriginalData] = useState({
@@ -43,7 +42,6 @@ export const ProfileSettings = () => {
         facebook: "",
         twitter: "",
         instagram: "",
-        linkedin: "",
     });
 
     useEffect(() => {
@@ -76,7 +74,6 @@ export const ProfileSettings = () => {
                         setFacebook(publicData.socialLinks.facebook || "");
                         setTwitter(publicData.socialLinks.twitter || "");
                         setInstagram(publicData.socialLinks.instagram || "");
-                        setLinkedin(publicData.socialLinks.linkedin || "");
                     }
                 }
                 
@@ -101,7 +98,6 @@ export const ProfileSettings = () => {
                     facebook: publicData?.socialLinks?.facebook || "",
                     twitter: publicData?.socialLinks?.twitter || "",
                     instagram: publicData?.socialLinks?.instagram || "",
-                    linkedin: publicData?.socialLinks?.linkedin || "",
                 });
             } catch (err) {
                 console.error("Error loading profile data:", err);
@@ -126,11 +122,10 @@ export const ProfileSettings = () => {
             facebook,
             twitter,
             instagram,
-            linkedin,
         };
         const hasChanges = JSON.stringify(currentData) !== JSON.stringify(originalData);
         setHasChanges(hasChanges);
-    }, [displayName, email, isEmailPublic, city, country, bio, facebook, twitter, instagram, linkedin, originalData]);
+    }, [displayName, email, isEmailPublic, city, country, bio, facebook, twitter, instagram, originalData]);
 
     const handleProfilePictureChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -167,7 +162,6 @@ export const ProfileSettings = () => {
                     facebook,
                     twitter,
                     instagram,
-                    linkedin,
                 },
             };
 
@@ -192,7 +186,6 @@ export const ProfileSettings = () => {
                 facebook,
                 twitter,
                 instagram,
-                linkedin,
             });
             setHasChanges(false);
             
@@ -217,7 +210,6 @@ export const ProfileSettings = () => {
         setFacebook(originalData.facebook);
         setTwitter(originalData.twitter);
         setInstagram(originalData.instagram);
-        setLinkedin(originalData.linkedin);
         setHasChanges(false);
     };
 
@@ -442,19 +434,7 @@ export const ProfileSettings = () => {
                                     placeholder="https://instagram.com/username"
                                 />
                             </div>
-                            <div>
-                                <label htmlFor="linkedin" className="block text-sm font-medium text-txt-secondary mb-1">
-                                    LinkedIn
-                                </label>
-                                <input
-                                    type="url"
-                                    id="linkedin"
-                                    value={linkedin}
-                                    onChange={(e) => setLinkedin(e.target.value)}
-                                    className="w-full px-3 py-2 rounded-md border border-br-primary bg-bg-secondary text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
-                                    placeholder="https://linkedin.com/in/username"
-                                />
-                            </div>
+
                         </div>
                     </div>
                 </div>

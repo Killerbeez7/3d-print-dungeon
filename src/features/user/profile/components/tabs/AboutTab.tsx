@@ -1,4 +1,11 @@
 import type { PublicProfileView } from "@/features/user/types/user";
+import { 
+    Twitter, 
+    Instagram, 
+    Facebook, 
+    Globe,
+    ExternalLink
+} from "lucide-react";
 
 interface UserData extends PublicProfileView {
     bio?: string;
@@ -14,29 +21,57 @@ interface UserData extends PublicProfileView {
     };
 }
 
-export const AboutTab = ({ userData }: { userData: UserData }) => {
-    const socialLinks = [
-        {
-            name: "Twitter",
-            icon: "fab fa-twitter",
-            url: userData?.socialLinks?.twitter,
-            color: "text-blue-400 hover:text-blue-500",
-        },
-        {
-            name: "Instagram",
-            icon: "fab fa-instagram",
-            url: userData?.socialLinks?.instagram,
-            color: "text-pink-400 hover:text-pink-500",
-        },
-        {
-            name: "Facebook",
-            icon: "fab fa-facebook",
-            url: userData?.socialLinks?.facebook,
-            color: "text-blue-600 hover:text-blue-700",
-        },
-    ];
+// Social media platform configuration (same as UserHeader for consistency)
+const socialPlatforms = [
+    {
+        key: 'twitter',
+        name: 'Twitter',
+        icon: Twitter,
+        color: 'hover:bg-blue-500/10 hover:text-blue-500 hover:border-blue-500/20',
+        bgColor: 'bg-blue-500/5',
+        borderColor: 'border-blue-500/20',
+        textColor: 'text-blue-500'
+    },
+    {
+        key: 'instagram',
+        name: 'Instagram',
+        icon: Instagram,
+        color: 'hover:bg-pink-500/10 hover:text-pink-500 hover:border-pink-500/20',
+        bgColor: 'bg-pink-500/5',
+        borderColor: 'border-pink-500/20',
+        textColor: 'text-pink-500'
+    },
+    {
+        key: 'facebook',
+        name: 'Facebook',
+        icon: Facebook,
+        color: 'hover:bg-blue-600/10 hover:text-blue-600 hover:border-blue-600/20',
+        bgColor: 'bg-blue-600/5',
+        borderColor: 'border-blue-600/20',
+        textColor: 'text-blue-600'
+    },
 
-    const hasAnySocialLinks = socialLinks.some((link) => link.url);
+    {
+        key: 'website',
+        name: 'Website',
+        icon: Globe,
+        color: 'hover:bg-purple-500/10 hover:text-purple-500 hover:border-purple-500/20',
+        bgColor: 'bg-purple-500/5',
+        borderColor: 'border-purple-500/20',
+        textColor: 'text-purple-500'
+    }
+];
+
+export const AboutTab = ({ userData }: { userData: UserData }) => {
+    // Get available social links
+    const availableSocialLinks = socialPlatforms.filter(platform => {
+        if (platform.key === 'website') {
+            return userData.website;
+        }
+        return userData.socialLinks?.[platform.key as keyof typeof userData.socialLinks];
+    });
+
+    const hasAnySocialLinks = availableSocialLinks.length > 0;
 
     return (
         <div className="space-y-8">
@@ -135,7 +170,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                 </div>
             </div>
 
-            {/* Social Links Section */}
+            {/* Social Links Section - Beautiful UI with Icons */}
             {hasAnySocialLinks && (
                 <div className="bg-bg-secondary rounded-lg p-6">
                     <div className="flex items-center gap-3 mb-4">
@@ -146,24 +181,42 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                             Connect & Follow
                         </h3>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                        {socialLinks
-                            .filter((link) => link.url)
-                            .map((link, index) => (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {availableSocialLinks.map((platform) => {
+                            const IconComponent = platform.icon;
+                            const url = platform.key === 'website' 
+                                ? userData.website 
+                                : userData.socialLinks?.[platform.key as keyof typeof userData.socialLinks];
+                            
+                            if (!url) return null;
+
+                            return (
                                 <a
-                                    key={index}
-                                    href={link.url}
+                                    key={platform.key}
+                                    href={url}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className={`flex flex-col items-center gap-2 p-4 bg-bg-surface rounded-lg hover:shadow-md transition-all duration-200 ${link.color}`}
-                                    title={link.name}
+                                    className={`
+                                        group relative flex flex-col items-center gap-3 p-4 
+                                        rounded-lg border transition-all duration-200 
+                                        ${platform.bgColor} ${platform.borderColor} 
+                                        ${platform.color}
+                                        hover:scale-105 hover:shadow-md
+                                    `}
+                                    title={`Visit ${platform.name}`}
                                 >
-                                    <i className={`${link.icon} text-2xl`}></i>
-                                    <span className="text-sm font-medium">
-                                        {link.name}
+                                    {IconComponent && (
+                                        <IconComponent 
+                                            className={`w-6 h-6 ${platform.textColor} transition-colors`} 
+                                        />
+                                    )}
+                                    <span className="text-sm font-medium text-txt-secondary group-hover:text-txt-primary transition-colors text-center">
+                                        {platform.name}
                                     </span>
+                                    <ExternalLink className="w-3 h-3 text-txt-tertiary opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2" />
                                 </a>
-                            ))}
+                            );
+                        })}
                     </div>
                 </div>
             )}
@@ -230,31 +283,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                 </div>
             )}
 
-            {/* Contact Information */}
-            <div className="bg-bg-secondary rounded-lg p-6">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                        <i className="fas fa-envelope text-white text-sm"></i>
-                    </div>
-                    <h3 className="text-xl font-semibold text-txt-primary">
-                        Get in Touch
-                    </h3>
-                </div>
-                <p className="text-txt-secondary mb-4">
-                    Interested in collaborating or have questions? Feel free to reach out
-                    through any of the social links above or send a direct message.
-                </p>
-                <div className="flex gap-3">
-                    <button className="cta-button px-6 py-3 rounded-lg flex items-center gap-2">
-                        <i className="fas fa-envelope"></i>
-                        Send Message
-                    </button>
-                    <button className="secondary-button px-6 py-3 rounded-lg flex items-center gap-2">
-                        <i className="fas fa-share"></i>
-                        Share Profile
-                    </button>
-                </div>
-            </div>
+
         </div>
     );
 };
