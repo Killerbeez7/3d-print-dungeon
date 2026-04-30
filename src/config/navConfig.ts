@@ -35,8 +35,8 @@ export const NAV_SECTIONS: NavSection[] = [
         label: "Shop",
         to: null,
         items: [
-            { label: "Marketplace", to: "/marketplace" },
-            { label: "Printed Figures", to: "/printed-figures" },
+            { label: "Marketplace", to: ROUTES.MARKETPLACE },
+            { label: "Printed Figures", to: ROUTES.PRINTED_FIGURES },
         ],
     },
     {

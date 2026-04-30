@@ -3,6 +3,7 @@ import { BrowserRouter } from "react-router-dom";
 import { ScrollToTop } from "./utils/ScrollToTop";
 import { ErrorBoundary } from "@/features/shared/ErrorBoundary";
 
+import "@/styles.css";
 // NProgress loading bar styles
 import "nprogress/nprogress.css";
 import "@/styles/nprogress.css";

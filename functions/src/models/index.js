@@ -241,7 +241,7 @@ export const deleteModel = onCall({ maxInstances: 10 }, async (request) => {
             if (path && typeof path === "string") {
                 try {
                     await bucket.file(path).delete();
-                } catch (error) {
+                } catch {
                     // Ignore if file doesn't exist
                     console.log(`File ${path} not found, skipping deletion`);
                 }

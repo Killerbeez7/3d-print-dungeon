@@ -16,11 +16,9 @@ export async function sendViewEvent(
     }
     try {
         const viewerId = await getViewerId(currentUser);
-        // eslint-disable-next-line no-console
         console.log(`Tracking view event for model: ${modelId}, viewer: ${viewerId}`);
         const trackView = httpsCallable(functions, "trackModelView");
         const result: HttpsCallableResult<unknown> = await trackView({ modelId, viewerId });
-        // eslint-disable-next-line no-console
         if ((result.data as { success?: boolean }).success) {
             console.log("View event tracked:", (result.data as { message?: string }).message);
         } else {
@@ -29,10 +27,8 @@ export async function sendViewEvent(
         return result.data;
     } catch (error) {
         if ((error as { code?: string }).code === "not-found") {
-            // eslint-disable-next-line no-console
             console.warn("Model not found for view tracking:", modelId);
         } else {
-            // eslint-disable-next-line no-console
             console.error("Error tracking view event:", error);
         }
         return null;
@@ -81,14 +77,12 @@ export function useModelViewCount(
                     setLoading(false);
                     setError(null);
                 } catch (err) {
-                    // eslint-disable-next-line no-console
                     console.error("Error reading view count:", err);
                     setError(err as FirestoreError);
                     setLoading(false);
                 }
             },
             (err: FirestoreError) => {
-                // eslint-disable-next-line no-console
                 console.error("Error listening to model document:", err);
                 setError(err);
                 setLoading(false);
@@ -109,7 +103,6 @@ export async function getModelViewCount(modelId: string): Promise<number> {
         const result: HttpsCallableResult<unknown> = await getViewCount({ modelId });
         return (result.data as { viewCount?: number }).viewCount ?? 0;
     } catch (error) {
-        // eslint-disable-next-line no-console
         console.error("Error getting view count:", error);
         return 0;
     }

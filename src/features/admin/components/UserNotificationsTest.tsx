@@ -4,10 +4,12 @@ import { UserNotificationService } from "@/features/user/notifications";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
 export const UserNotificationsTest = () => {
+    type TestNotificationType = "test" | "purchase" | "sale" | "like" | "message";
+
     const [isOpen, setIsOpen] = useState(false);
     const [testUserId, setTestUserId] = useState("");
     const [isTestingUser, setIsTestingUser] = useState(false);
-    const [notificationType, setNotificationType] = useState<"test" | "purchase" | "sale" | "like" | "message">("test");
+    const [notificationType, setNotificationType] = useState<TestNotificationType>("test");
 
     const { currentUser } = useAuth();
 
@@ -161,10 +163,10 @@ export const UserNotificationsTest = () => {
                                 { value: "sale", label: "Sale", color: "bg-yellow-600" },
                                 { value: "like", label: "Like", color: "bg-red-600" },
                                 { value: "message", label: "Message", color: "bg-blue-600" }
-                            ].map((type) => (
+                            ].map((type: { value: TestNotificationType; label: string; color: string }) => (
                                 <button
                                     key={type.value}
-                                    onClick={() => setNotificationType(type.value as any)}
+                                    onClick={() => setNotificationType(type.value)}
                                     className={`px-3 py-2 text-white rounded-lg text-sm transition-colors ${
                                         notificationType === type.value 
                                             ? `${type.color} ring-2 ring-offset-2 ring-offset-bg-secondary ring-white` 

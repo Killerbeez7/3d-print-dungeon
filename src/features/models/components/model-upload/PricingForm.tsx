@@ -175,9 +175,9 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
                                 </div>
 
                                 <div className="text-xs text-txt-muted space-y-1">
-                                    <Metadata as="p">• Minimum price is $0.50</Metadata>
-                                    <Metadata as="p">• Payments are processed securely through Stripe</Metadata>
-                                    <Metadata as="p">• You'll need to set up a seller account to receive payments</Metadata>
+                                    <Metadata as="p">Minimum price is $0.50</Metadata>
+                                    <Metadata as="p">Payments are processed securely through Stripe</Metadata>
+                                    <Metadata as="p">You need to set up a seller account to receive payments</Metadata>
                                 </div>
                             </div>
                         )}
@@ -206,7 +206,7 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
                                 <strong>Action Required:</strong> To sell models, you must
                                 complete a one-time seller verification. You will be
                                 redirected to Stripe to complete this securely after
-                                clicking the final "Upload Model" button.
+                                clicking the final Upload Model button.
                             </p>
                         </div>
                     </div>

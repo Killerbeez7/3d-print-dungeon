@@ -19,7 +19,7 @@ export interface UserNotification {
   status: UserNotificationStatus;
   relatedId?: string; // ID of related model, message, etc.
   relatedType?: string; // Type of related item
-  metadata?: Record<string, any>; // Additional data like price, sender, etc.
+  metadata?: Record<string, unknown>; // Additional data like price, sender, etc.
   createdAt: Date;
   readAt?: Date;
 }
@@ -43,5 +43,5 @@ export interface CreateNotificationData {
   message: string;
   relatedId?: string;
   relatedType?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }

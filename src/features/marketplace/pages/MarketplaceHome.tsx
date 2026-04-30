@@ -6,6 +6,7 @@ import { SearchAndFilters } from "../components/SearchAndFilters";
 import { ProductGrid } from "../components/ProductGrid";
 import { PersonalizedRecommendations } from "../components/PersonalizedRecommendations";
 import { AnalyticsTracker } from "@/features/shared/components/AnalyticsTracker";
+import { STATIC_ASSETS } from "@/config/assetsConfig";
 
 const categories = [
     { id: "all", label: "All 3D Models" },
@@ -25,29 +26,29 @@ const subcategories = [
 const productTabs = ["Trending", "Top Rated", "Newest", "Popular", "Sale"];
 
 const mockProducts = [
-    { id: "1", name: "3D Sword", image: "/assets/sword.png", price: "$10" },
-    { id: "2", name: "Fabric Brushes", image: "/assets/brushes.png", price: "$5" },
+    { id: "1", name: "Dungeon Terrain Pack", image: STATIC_ASSETS.CAROUSEL.DUNGEON_MODELS, price: "$10" },
+    { id: "2", name: "Arena Battle Set", image: STATIC_ASSETS.CAROUSEL.ARENA_MODELS, price: "$5" },
 ];
 
 const mockRecommendations = [
     {
         id: "rec1",
         name: "Dragon Miniature",
-        image: "/assets/dragon.png",
+        image: STATIC_ASSETS.CAROUSEL.MINIATURES_COMPETITION,
         price: "$15",
         reason: "Based on your fantasy collection",
     },
     {
         id: "rec2",
         name: "Castle Terrain",
-        image: "/assets/castle.png",
+        image: STATIC_ASSETS.CAROUSEL.DUNGEON_MODELS,
         price: "$25",
         reason: "Popular with terrain builders",
     },
     {
         id: "rec3",
         name: "Knight Figure",
-        image: "/assets/knight.png",
+        image: STATIC_ASSETS.CAROUSEL.BATTLE_MODELS,
         price: "$12",
         reason: "Similar to your recent purchases",
     },
@@ -68,6 +69,10 @@ export const MarketplaceHome = () => {
         >
             <div className="max-w-7xl mx-auto py-8 px-4">
                 <h1 className="text-4xl font-bold mb-6">Marketplace</h1>
+                <p className="mb-6 text-sm text-txt-secondary">
+                    Marketplace inventory is currently a curated preview while live
+                    commerce listings are being connected.
+                </p>
                 <CategoryTabs
                     categories={categories}
                     selected={selectedCategory}

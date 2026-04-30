@@ -18,7 +18,7 @@ const BestSellers = lazy(() =>
 
 export const marketplaceRoutes: RouteObject[] = [
     {
-        path: "/marketplace",
+        path: ROUTES.MARKETPLACE,
         element: withMaintenance(
             <Suspense>
                 <MarketplaceHome />

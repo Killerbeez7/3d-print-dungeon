@@ -74,7 +74,7 @@ export default defineConfig({
         },
         assetsDir: "assets",
         copyPublicDir: true,
-        sourcemap: true,
+        sourcemap: false,
         minify: "terser",
     },
 });
