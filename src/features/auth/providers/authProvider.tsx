@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/config/firebaseConfig";
 // services, context, utils
@@ -38,6 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [maintenanceMode, setMaintenanceMode] = useState(false);
     const [maintenanceMessage, setMaintenanceMessage] = useState<string | null>(null);
     const [maintenanceEndTime, setMaintenanceEndTime] = useState<Date | null>(null);
+    const oauthPopupPendingRef = useRef(false);
 
     const handleAuthErrorWrapper = useCallback((error: unknown, provider: string): never => {
         const authError = handleAuthError(error, provider);
@@ -77,14 +78,37 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     const handleGoogleSignIn = async () => {
+        if (oauthPopupPendingRef.current) return;
+
+        oauthPopupPendingRef.current = true;
         setLoading(true);
+        setAuthError(null);
         try {
             await signInWithGoogle();
             setLoading(false);
         } catch (error) {
             handleAuthErrorWrapper(error, "Google Sign-in");
+        } finally {
+            oauthPopupPendingRef.current = false;
         }
     };
+
+    useEffect(() => {
+        const clearOAuthLoadingOnFocus = () => {
+            if (!oauthPopupPendingRef.current) return;
+
+            window.setTimeout(() => {
+                if (oauthPopupPendingRef.current) {
+                    oauthPopupPendingRef.current = false;
+                    setAuthError(null);
+                    setLoading(false);
+                }
+            }, 300);
+        };
+
+        window.addEventListener("focus", clearOAuthLoadingOnFocus);
+        return () => window.removeEventListener("focus", clearOAuthLoadingOnFocus);
+    }, []);
 
     const handleSignOut = async () => {
         setLoading(true);
