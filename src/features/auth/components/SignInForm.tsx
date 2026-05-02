@@ -1,9 +1,10 @@
-import { useState, FormEvent, ChangeEvent } from "react";
+import { useEffect, useRef, useState, FormEvent, ChangeEvent } from "react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useProgressiveValidation } from "@/features/auth/hooks/useProgressiveValidation";
 import {
     handleAuthError,
     formatErrorForDisplay,
+    isAuthPopupCancellation,
 } from "@/features/auth/utils/errorHandling";
 import { ValidityIndicator } from "./ValidityIndicator";
 import { Spinner } from "@/features/shared/reusable/Spinner";
@@ -43,6 +44,21 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
     const [loading, setLoading] = useState<boolean>(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [showPasswordReset, setShowPasswordReset] = useState<boolean>(false);
+    const oauthInFlightRef = useRef(false);
+
+    useEffect(() => {
+        const clearOAuthLoadingOnFocus = () => {
+            if (!oauthInFlightRef.current) return;
+            window.setTimeout(() => {
+                if (oauthInFlightRef.current) {
+                    setLoading(false);
+                }
+            }, 250);
+        };
+
+        window.addEventListener("focus", clearOAuthLoadingOnFocus);
+        return () => window.removeEventListener("focus", clearOAuthLoadingOnFocus);
+    }, []);
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -81,6 +97,9 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
     const handleOAuthSignIn = async (
         provider: "google" | "facebook" | "twitter"
     ): Promise<void> => {
+        if (oauthInFlightRef.current) return;
+
+        oauthInFlightRef.current = true;
         setLoading(true);
         setError(null);
 
@@ -97,9 +116,12 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
                     break;
             }
         } catch (err) {
+            if (isAuthPopupCancellation(err)) return;
+
             const errorMessage = handleAuthError(err);
             setError(formatErrorForDisplay(errorMessage));
         } finally {
+            oauthInFlightRef.current = false;
             setLoading(false);
         }
     };

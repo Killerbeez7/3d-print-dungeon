@@ -16,15 +16,31 @@ export enum AuthErrorType {
     NETWORK_ERROR = "NETWORK_ERROR",
     INVALID_CREDENTIALS = "INVALID_CREDENTIALS",
     EMAIL_ALREADY_IN_USE = "EMAIL_ALREADY_IN_USE",
-    TOO_MANY_REQUESTS = "TOO_MANY_REQUESTS"
+    TOO_MANY_REQUESTS = "TOO_MANY_REQUESTS",
+    CANCELLED = "CANCELLED"
 }
 
+export const isAuthPopupCancellation = (error: unknown): boolean => {
+    const code = (error as { code?: string })?.code;
+    return (
+        code === "auth/popup-closed-by-user" ||
+        code === "auth/cancelled-popup-request"
+    );
+};
 
 // maps firebase auth errors to user-friendly messages
 export const mapFirebaseError = (error: unknown): AuthError => {
     const code = (error as { code?: string })?.code || "unknown";
 
     switch (code) {
+        case "auth/popup-closed-by-user":
+        case "auth/cancelled-popup-request":
+            return {
+                type: AuthErrorType.CANCELLED,
+                message: "Sign-in was cancelled",
+                code,
+            };
+
         case "auth/user-not-found":
         case "auth/wrong-password":
         case "auth/invalid-credential":

@@ -1,5 +1,6 @@
 {
     "hosting": {
+        "site": "print-dungeon-3d",
         "public": "dist",
         "rewrites": [
             {

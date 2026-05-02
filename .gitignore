@@ -151,3 +151,4 @@ build/
 src/keys/*
 # But do NOT ignore example files
 !src/keys/*.example.json
+*.cache

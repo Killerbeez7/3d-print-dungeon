@@ -22,7 +22,10 @@ import {
 import type { MaintenanceStatus, UserId } from "@/features/maintenance/types/maintenance";
 import type { PrivateProfile, PublicProfile, Role, Permission } from "@/features/user/types/user";
 import type { CustomClaims, AuthUser } from "@/features/auth/types/auth";
-import { handleAuthError } from "@/features/auth/utils/errorHandling";
+import {
+    AuthErrorType,
+    handleAuthError,
+} from "@/features/auth/utils/errorHandling";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -38,7 +41,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const handleAuthErrorWrapper = useCallback((error: unknown, provider: string): never => {
         const authError = handleAuthError(error, provider);
-        setAuthError(authError.message);
+        setAuthError(authError.type === AuthErrorType.CANCELLED ? null : authError.message);
         setLoading(false);
         throw authError;
     }, []);
