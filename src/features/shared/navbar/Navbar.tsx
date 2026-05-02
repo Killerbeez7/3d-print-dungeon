@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, RefObject } from "react";
+import { useState, useRef, useEffect, RefObject, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 // hooks
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -14,6 +14,7 @@ import { AuthButtons } from "./AuthButtons";
 import { GlobalSearch } from "@/features/search/components/GlobalSearch";
 import { NotificationDropdown } from "@/features/user/notifications";
 // icons
+import type { IconType } from "react-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     MdFileUpload,
@@ -21,6 +22,17 @@ import {
     MdMenu,
     MdClose,
     MdSearch,
+    MdArticle,
+    MdBusinessCenter,
+    MdCollections,
+    MdEvent,
+    MdForum,
+    MdInventory2,
+    MdPeople,
+    MdPrecisionManufacturing,
+    MdPrint,
+    MdStorefront,
+    MdViewModule,
 } from "react-icons/md";
 import {
     faSignOutAlt,
@@ -31,6 +43,20 @@ import {
 import type { NavSection } from "@/types/navbar";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
 
+const navItemIcons: Record<string, IconType> = {
+    Models: MdViewModule,
+    Artists: MdPeople,
+    Collections: MdCollections,
+    Events: MdEvent,
+    Forum: MdForum,
+    Blog: MdArticle,
+    Marketplace: MdStorefront,
+    "Printed Figures": MdPrint,
+    "Bulk Orders": MdInventory2,
+    "Custom Solutions": MdPrecisionManufacturing,
+    "Enterprise Suite": MdBusinessCenter,
+};
+
 export const Navbar = (): React.ReactNode => {
     const { isAdmin } = useUserRole();
     const { currentUser, publicProfile, handleSignOut, loading } = useAuth();
@@ -40,22 +66,20 @@ export const Navbar = (): React.ReactNode => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [mobileDropdown, setMobileDropdown] = useState<string | null>(null);
-    const [isSearchVisible, setIsSearchVisible] = useState<boolean>(false);
 
     const navigate = useNavigate();
     const location = useLocation();
-    const dropdownRef = useRef<HTMLDivElement | null>(null);
+    const desktopNavRef = useRef<HTMLDivElement | null>(null);
+    const profileDropdownRef = useRef<HTMLDivElement | null>(null);
     const mobileDropdownRef = useRef<HTMLDivElement | null>(null);
-    const searchOverlayRef = useRef<HTMLDivElement | null>(null);
 
     // helpers
-    const closeAll = (): void => {
+    const closeAll = useCallback((): void => {
         setActiveDropdown(null);
         setMobileDropdown(null);
         setIsMobileMenuOpen(false);
-        setIsSearchVisible(false);
         setShowDropdown(false);
-    };
+    }, [setShowDropdown]);
 
     const handleLogoClick = (): void => {
         if (location.pathname === "/") {
@@ -97,23 +121,23 @@ export const Navbar = (): React.ReactNode => {
         navigate("/search?query=");
     };
 
-    //outside‑click & route‑change
+    // Outside click and route change cleanup.
 
-    useClickOutside(dropdownRef as RefObject<HTMLElement>, () => {
-        setActiveDropdown(null);
+    useClickOutside(desktopNavRef as RefObject<HTMLElement>, () => {
+        setActiveDropdown((prev) => (prev === "profile" ? prev : null));
+    });
+
+    useClickOutside(profileDropdownRef as RefObject<HTMLElement>, () => {
+        setActiveDropdown((prev) => (prev === "profile" ? null : prev));
     });
 
     useClickOutside(mobileDropdownRef as RefObject<HTMLElement>, () => {
         setMobileDropdown(null);
     });
 
-    useClickOutside(searchOverlayRef as RefObject<HTMLElement>, () => {
-        setIsSearchVisible(false);
-    });
-
     useEffect(() => {
         closeAll();
-    }, [location.pathname]);
+    }, [closeAll, location.pathname]);
 
     const urlSafeUsername = toUrlSafeUsername(publicProfile?.username);
 
@@ -127,6 +151,7 @@ export const Navbar = (): React.ReactNode => {
                             {/* mobile hamburger */}
                             <button
                                 id="hamburger-button"
+                                type="button"
                                 className="md:hidden p-[0.5px] rounded-lg text-txt-secondary hover:bg-bg-surface"
                                 onClick={toggleMobileMenu}
                                 aria-label="Toggle mobile menu"
@@ -144,7 +169,7 @@ export const Navbar = (): React.ReactNode => {
                                 <Link to="/" className="flex items-center">
                                     <img
                                         src={STATIC_ASSETS.LOGO}
-                                        alt="Site Logo"
+                                        alt="3D Print Dungeon"
                                         className="h-9 w-auto logo-accent"
                                     />
                                 </Link>
@@ -159,51 +184,73 @@ export const Navbar = (): React.ReactNode => {
                                 >
                                     <img
                                         src={STATIC_ASSETS.LOGO}
-                                        alt="Site Logo"
-                                        className="h-9 w-auto hover:h-10 transition-all duration-300 logo-accent"
+                                        alt="3D Print Dungeon"
+                                        className="h-9 w-auto transition-transform duration-200 hover:scale-105 logo-accent"
                                     />
                                 </Link>
                             </div>
 
                             {/* desktop nav */}
-                            <nav className="hidden md:flex items-center space-x-6">
+                            <nav
+                                ref={desktopNavRef}
+                                className="hidden md:flex items-center space-x-5"
+                                aria-label="Primary navigation"
+                            >
                                 {(NAV_SECTIONS as NavSection[]).map((section) => (
                                     <div
                                         key={section.label}
                                         className="relative group"
-                                        ref={dropdownRef}
                                         onMouseEnter={() =>
                                             setActiveDropdown(section.label)
                                         }
                                         onMouseLeave={() => setActiveDropdown(null)}
                                     >
                                         <button
-                                            className="inline-flex items-center text-md text-txt-secondary hover:text-txt-primary group-hover:text-txt-highlighted whitespace-nowrap"
+                                            type="button"
+                                            className={`relative inline-flex h-10 items-center whitespace-nowrap px-1 text-md transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--accent)] after:transition-opacity after:duration-200 hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary ${
+                                                activeDropdown === section.label
+                                                    ? "text-txt-primary after:opacity-100"
+                                                    : "text-txt-secondary after:opacity-0 group-hover:after:opacity-100"
+                                            }`}
                                             onClick={() => toggleDropdown(section.label)}
+                                            aria-haspopup="menu"
+                                            aria-expanded={activeDropdown === section.label}
                                         >
                                             {section.label}
                                         </button>
                                         {/* Desktop Dropdown */}
                                         <div
-                                            className={`absolute left-0 mt-2 w-48 rounded-md shadow-md bg-bg-secondary border border-br-secondary transition-all duration-200 p-2 z-40 ${
+                                            role="menu"
+                                            className={`absolute left-0 mt-2 w-52 rounded-lg shadow-lg bg-bg-secondary border border-br-secondary transition-all duration-200 p-2 z-40 ${
                                                 activeDropdown === section.label
                                                     ? "opacity-100 visible"
                                                     : "opacity-0 invisible"
                                             }`}
                                         >
                                             <div>
-                                                {section.items.map((item) => (
-                                                    <Link
-                                                        key={item.to}
-                                                        to={item.to}
-                                                        className="block px-3 py-2 text-md text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:rounded-sm hover:shadow-sm hover:font-semibold"
-                                                        onClick={() =>
-                                                            setActiveDropdown(null)
-                                                        }
-                                                    >
-                                                        {item.label}
-                                                    </Link>
-                                                ))}
+                                                {section.items.map((item) => {
+                                                    const ItemIcon = navItemIcons[item.label];
+
+                                                    return (
+                                                        <Link
+                                                            key={item.to}
+                                                            to={item.to}
+                                                            role="menuitem"
+                                                            className="group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
+                                                            onClick={() =>
+                                                                setActiveDropdown(null)
+                                                            }
+                                                        >
+                                                            {ItemIcon && (
+                                                                <ItemIcon
+                                                                    className="h-4 w-4 flex-shrink-0 text-txt-secondary transition-colors group-hover:text-txt-primary"
+                                                                    aria-hidden="true"
+                                                                />
+                                                            )}
+                                                            <span>{item.label}</span>
+                                                        </Link>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
                                     </div>
@@ -222,9 +269,11 @@ export const Navbar = (): React.ReactNode => {
                         <div className="flex items-center space-x-4 justify-end min-w-fit">
                             {/* Quick search icon */}
                             <button
+                                type="button"
                                 onClick={handleSearchClick}
-                                className="hidden md:block lg:hidden text-txt-secondary hover:text-txt-primary"
+                                className="hidden md:block lg:hidden rounded-lg p-1 text-txt-secondary hover:bg-bg-surface hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
                                 title="Search"
+                                aria-label="Search"
                             >
                                 <MdSearch className="h-7 w-7" />
                             </button>
@@ -241,8 +290,9 @@ export const Navbar = (): React.ReactNode => {
                                     <div className="hidden md:flex items-center space-x-4">
                                         <Link
                                             to="/model/upload"
-                                            className="text-txt-secondary hover:text-txt-primary"
-                                            title="Upload Model:desktop"
+                                            className="rounded-lg p-1 text-txt-secondary hover:bg-bg-surface hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
+                                            title="Upload Model"
+                                            aria-label="Upload Model"
                                         >
                                             <MdFileUpload className="h-7 w-7" />
                                         </Link>
@@ -253,18 +303,22 @@ export const Navbar = (): React.ReactNode => {
                                     </div>
 
                                     {/* Profile Dropdown */}
-                                    <div className="relative" ref={dropdownRef}>
+                                    <div className="relative" ref={profileDropdownRef}>
                                         <button
                                             id="profile-button"
+                                            type="button"
                                             onClick={() => toggleDropdown("profile")}
                                             className="flex items-center text-txt-secondary hover:text-txt-primary cursor-pointer transition-colors duration-200 p-1 rounded-lg hover:bg-bg-surface"
                                             aria-label="Profile menu"
+                                            aria-haspopup="menu"
+                                            aria-expanded={activeDropdown === "profile"}
                                         >
                                             <MdAccountCircle className="h-7 w-7" />
                                         </button>
 
                                         {/*Profile Dropdown Options*/}
                                         <div
+                                            role="menu"
                                             className={`absolute right-0 mt-3 w-64 rounded-xl shadow-2xl bg-bg-secondary border border-br-secondary transition-all duration-300 transform origin-top-right z-40 ${
                                                 activeDropdown === "profile"
                                                     ? "opacity-100 visible scale-100"
@@ -287,7 +341,8 @@ export const Navbar = (): React.ReactNode => {
                                             <div className="p-2">
                                                 {isAdmin && (
                                                     <Link
-                                                        to={`/admin-dashboard`}
+                                                        to="/admin-dashboard"
+                                                        role="menuitem"
                                                         className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
                                                         onClick={() =>
                                                             setActiveDropdown(null)
@@ -305,6 +360,7 @@ export const Navbar = (): React.ReactNode => {
 
                                                 <Link
                                                     to={`/${urlSafeUsername}`}
+                                                    role="menuitem"
                                                     className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
                                                     onClick={() =>
                                                         setActiveDropdown(null)
@@ -321,6 +377,7 @@ export const Navbar = (): React.ReactNode => {
 
                                                 <Link
                                                     to="/settings"
+                                                    role="menuitem"
                                                     className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
                                                     onClick={() =>
                                                         setActiveDropdown(null)
@@ -339,6 +396,8 @@ export const Navbar = (): React.ReactNode => {
                                                 <div className="my-2 border-t border-br-secondary"></div>
 
                                                 <button
+                                                    type="button"
+                                                    role="menuitem"
                                                     onClick={() => {
                                                         setActiveDropdown(null);
                                                         handleLogout();
@@ -358,22 +417,6 @@ export const Navbar = (): React.ReactNode => {
                                     </div>
                                 </>
                             )}
-                        </div>
-                    </div>
-
-                    {/* ---------- Search overlay (mobile) ---------- */}
-                    <div
-                        ref={searchOverlayRef}
-                        className={`fixed inset-0 bg-bg-reverse bg-opacity-50 transition-opacity duration-200 ${
-                            isSearchVisible
-                                ? "opacity-100 pointer-events-auto"
-                                : "opacity-0 pointer-events-none"
-                        }`}
-                    >
-                        <div className="absolute top-0 left-0 right-0 bg-bg-primary p-4 shadow-lg transform transition-transform duration-200">
-                            <div className="max-w-3xl mx-auto">
-                                <GlobalSearch />
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -403,7 +446,8 @@ export const Navbar = (): React.ReactNode => {
                         <Link
                             to="/model/upload"
                             className="text-txt-secondary hover:text-txt-primary"
-                            title="Upload Model:mobile"
+                            title="Upload Model"
+                            aria-label="Upload Model"
                         >
                             <MdFileUpload className="h-7 w-7" />
                         </Link>
@@ -423,12 +467,14 @@ export const Navbar = (): React.ReactNode => {
                     {(NAV_SECTIONS as NavSection[]).map((section) => (
                         <div key={section.label}>
                             <button
+                                type="button"
                                 className={`w-full text-left px-4 py-2 text-txt-secondary hover:rounded-md hover:bg-bg-secondary hover:text-txt-primary flex items-center justify-between ${
                                     mobileDropdown === section.label
                                         ? "bg-bg-surface rounded-md text-txt-primary font-semibold"
                                         : ""
                                 }`}
                                 onClick={(e) => toggleMobileDropdown(section.label, e)}
+                                aria-expanded={mobileDropdown === section.label}
                             >
                                 {section.label}
                                 <FontAwesomeIcon

@@ -1,5 +1,16 @@
 // Re-export paragraph components for convenience
 export {
+    Button,
+    buttonStyles,
+} from './Button';
+
+export type {
+    ButtonProps,
+    ButtonSize,
+    ButtonVariant,
+} from './Button';
+
+export {
     H1,
     H2,
     H3,
