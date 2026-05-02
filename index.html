@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
-        <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,6 +23,15 @@
             fetchpriority="high"
         />
 
+        <!-- Preload the stylesheet -->
+        <link
+            rel="preload"
+            href="/src/styles.css"
+            as="style"
+            onload="this.onload=null;this.rel='stylesheet'"
+        />
+
+        <noscript><link rel="stylesheet" href="/src/styles.css" /></noscript>
         <script>
             (function () {
                 // Check the localStorage for a saved theme, or fall back to the system preference.
@@ -45,16 +54,9 @@
             name="description"
             content="3D Print Dungeon: Discover, share, and purchase 3D printable dungeon models, miniatures, and resources for tabletop gaming. Join our community of creators and enthusiasts!"
         />
-        <link rel="canonical" href="https://print-dungeon-3d.firebaseapp.com/" />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="3D Print Dungeon" />
-        <meta property="og:title" content="3D Print Dungeon" />
-        <meta property="og:description" content="Discover, share, and purchase 3D printable dungeon models, miniatures, and resources for tabletop gaming." />
-        <meta property="og:image" content="/assets/carousel-images/MiniaturesCompetition_270.webp" />
-        <meta name="twitter:card" content="summary_large_image" />
     </head>
     <body>
         <div id="root"></div>
-        <script type="module" src="/src/main.tsx"></script>
+        <script type="module" src="/src/main.jsx"></script>
     </body>
 </html>

@@ -11,10 +11,13 @@ const db = getFirestore(app);
 // Define secrets
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
+console.log("✅ defineSecret works:", stripeSecretKey.name);
+console.log("✅ defineSecret works:", stripeWebhookSecret.name);
 
 // Stripe setup
 const getStripe = () => {
     const secretKey = stripeSecretKey.value();
+    console.log("🚀 ~ getStripe: secretKey", secretKey ? "Loaded" : "Not Loaded");
     if (!secretKey) {
         throw new HttpsError("internal", "Stripe secret key not configured");
     }

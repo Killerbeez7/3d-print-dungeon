@@ -9,12 +9,13 @@ export class PaymentService {
     private maxRetries = 2;
     private retryDelay = 1000;
 
-    private async withRetry<T>(operation: () => Promise<T>): Promise<T> {
+    private async withRetry<T>(operation: () => Promise<T>, name: string): Promise<T> {
         let lastError: unknown;
         for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
             try {
                 if (attempt > 0) {
                     const delay = this.retryDelay * Math.pow(2, attempt - 1);
+                    console.log(`Retrying ${name} in ${delay}ms...`);
                     await new Promise((r) => setTimeout(r, delay));
                 }
                 const result = await operation();
@@ -35,9 +36,15 @@ export class PaymentService {
             if (!auth.currentUser) {
                 throw new Error("User not authenticated. Please log in.");
             }
+            console.log("currentUser", auth.currentUser);
+            console.log("currentToken", auth.currentUser.getIdToken());
+            console.log("refreshing token...");
             await auth.currentUser.getIdToken(true);
+            console.log("token refreshed", auth.currentUser);
+            console.log("newToken", auth.currentUser.getIdToken());
             const callable = httpsCallable<unknown, T>(functions, fnName);
             const result = await callable(data);
+            console.log("result", result);
             return result.data;
         } catch (error) {
             console.error(`❌ [${fnName}] Error:`, (error as Error).message || error);
@@ -46,12 +53,12 @@ export class PaymentService {
     }
 
     async createConnectAccount(): Promise<unknown> {
-        return this.withRetry(() => this.callWithAuth("createConnectAccount"));
+        return this.withRetry(() => this.callWithAuth("createConnectAccount"), "createConnectAccount");
     }
 
     async createAccountLink(accountId: string, refreshUrl: string, returnUrl: string): Promise<string> {
         const data = { accountId, refreshUrl, returnUrl };
-        const result = await this.withRetry(() => this.callWithAuth<{ url: string }>("createAccountLink", data));
+        const result = await this.withRetry(() => this.callWithAuth<{ url: string }>("createAccountLink", data), "createAccountLink");
         return result.url;
     }
 
@@ -63,6 +70,7 @@ export class PaymentService {
         requirementsDue: string[];
         isFullyActive: boolean;
     }> {
+        console.log("🔍 [PaymentService] Checking Connect status...");
         try {
             const result = await this.withRetry(
                 () => this.callWithAuth<{
@@ -72,8 +80,10 @@ export class PaymentService {
                     detailsSubmitted: boolean;
                     requirementsDue: string[];
                     isFullyActive: boolean;
-                }>("checkConnectStatus")
+                }>("checkConnectStatus"),
+                "checkConnectStatus"
             );
+            console.log("✅ [PaymentService] Connect status received:", result);
             return result;
         } catch (error) {
             console.error("❌ [PaymentService] checkConnectStatus failed:", error);
@@ -86,7 +96,7 @@ export class PaymentService {
             const fn = httpsCallable<{ modelId: string; amount: number; currency: string }, unknown>(functions, "createPaymentIntent");
             const res = await fn({ modelId, amount, currency });
             return res.data;
-        });
+        }, "createPaymentIntent");
     }
 
     async handlePaymentSuccess(paymentIntentId: string): Promise<unknown> {
@@ -94,7 +104,7 @@ export class PaymentService {
             const fn = httpsCallable<{ paymentIntentId: string }, unknown>(functions, "handlePaymentSuccess");
             const res = await fn({ paymentIntentId });
             return res.data;
-        });
+        }, "handlePaymentSuccess");
     }
 
     async getUserPurchases(): Promise<Purchase[]> {
@@ -102,7 +112,7 @@ export class PaymentService {
             const fn = httpsCallable<undefined, { purchases?: Purchase[] }>(functions, "getUserPurchases");
             const res = await fn();
             return res.data.purchases || [];
-        });
+        }, "getUserPurchases");
     }
 
     async getSellerSales(): Promise<SellerSale[]> {
@@ -110,7 +120,7 @@ export class PaymentService {
             const fn = httpsCallable<undefined, { sales?: SellerSale[] }>(functions, "getSellerSales");
             const res = await fn();
             return res.data.sales || [];
-        });
+        }, "getSellerSales");
     }
 
     formatPrice(amount: number, currency = "USD"): string {

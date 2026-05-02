@@ -109,7 +109,7 @@ export const Footer = () => {
                                 </h6>
                                 <div className="flex flex-col gap-1">
                                     <Link
-                                        to={ROUTES.MARKETPLACE}
+                                        to="/marketplace"
                                         className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                                     >
                                         All Models
@@ -245,70 +245,58 @@ export const Footer = () => {
                                 >
                                     Cookie policy
                                 </Link>
-                                <a
-                                    href="/sitemap.xml"
+                                <Link
+                                    to="/sitemap"
                                     className="text-sm sm:text-base text-txt-secondary hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center"
                                 >
                                     Sitemap
-                                </a>
+                                </Link>
                             </div>
 
                             {/* Social Media Icons */}
                             <div className="flex items-center gap-2 sm:gap-3 text-txt-secondary">
-                                <a
-                                    href="https://twitter.com/"
-                                    target="_blank"
-                                    rel="noreferrer"
+                                <Link
+                                    to="/"
                                     className="hover:text-primary transition-colors"
                                     aria-label="Twitter"
                                 >
                                     <FaTwitter size={14} className="sm:w-4 sm:h-4" />
-                                </a>
-                                <a
-                                    href="https://instagram.com/"
-                                    target="_blank"
-                                    rel="noreferrer"
+                                </Link>
+                                <Link
+                                    to="/"
                                     className="hover:text-primary transition-colors"
                                     aria-label="Instagram"
                                 >
                                     <FaInstagram size={14} className="sm:w-4 sm:h-4" />
-                                </a>
-                                <a
-                                    href="https://facebook.com/"
-                                    target="_blank"
-                                    rel="noreferrer"
+                                </Link>
+                                <Link
+                                    to="/"
                                     className="hover:text-primary transition-colors"
                                     aria-label="Facebook"
                                 >
                                     <FaFacebook size={14} className="sm:w-4 sm:h-4" />
-                                </a>
-                                <a
-                                    href="https://discord.com/"
-                                    target="_blank"
-                                    rel="noreferrer"
+                                </Link>
+                                <Link
+                                    to="/"
                                     className="hover:text-primary transition-colors"
                                     aria-label="Discord"
                                 >
                                     <FaDiscord size={14} className="sm:w-4 sm:h-4" />
-                                </a>
-                                <a
-                                    href="https://pinterest.com/"
-                                    target="_blank"
-                                    rel="noreferrer"
+                                </Link>
+                                <Link
+                                    to="/"
                                     className="hover:text-primary transition-colors"
                                     aria-label="Pinterest"
                                 >
                                     <FaPinterest size={14} className="sm:w-4 sm:h-4" />
-                                </a>
-                                <a
-                                    href="https://linkedin.com/"
-                                    target="_blank"
-                                    rel="noreferrer"
+                                </Link>
+                                <Link
+                                    to="/"
                                     className="hover:text-primary transition-colors"
                                     aria-label="LinkedIn"
                                 >
                                     <FaLinkedin size={14} className="sm:w-4 sm:h-4" />
-                                </a>
+                                </Link>
                             </div>
                         </div>
                     </div>

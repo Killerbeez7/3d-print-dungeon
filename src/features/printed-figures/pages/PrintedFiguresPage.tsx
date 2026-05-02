@@ -1,31 +1,30 @@
 import type { FC } from "react";
 import { PrintedFiguresGrid } from "../components/PrintedFiguresGrid";
 import type { PrintedFigure } from "../components/PrintedFigureCard";
-import { STATIC_ASSETS } from "@/config/assetsConfig";
 
 const mockPrintedFigures: PrintedFigure[] = [
     {
         id: "1",
         name: "Dragon Warrior Miniature",
-        image: STATIC_ASSETS.CAROUSEL.MINIATURES_COMPETITION,
+        image: "/assets/printed-figures/dragon-warrior.jpg",
         price: "$25",
     },
     {
         id: "2",
         name: "Sci-Fi Soldier",
-        image: STATIC_ASSETS.CAROUSEL.BATTLE_MODELS,
+        image: "/assets/printed-figures/sci-fi-soldier.jpg",
         price: "$20",
     },
     {
         id: "3",
         name: "Fantasy Archer",
-        image: STATIC_ASSETS.CAROUSEL.ARENA_MODELS,
+        image: "/assets/printed-figures/fantasy-archer.jpg",
         price: "$22",
     },
     {
         id: "4",
         name: "Steampunk Golem",
-        image: STATIC_ASSETS.CAROUSEL.DUNGEON_MODELS,
+        image: "/assets/printed-figures/steampunk-golem.jpg",
         price: "$30",
     },
 ];
@@ -38,8 +37,7 @@ export const PrintedFiguresPage: FC = () => {
             </h1>
             <p className="text-lg text-[var(--txt-secondary)] mb-8">
                 Browse our collection of high-quality, already printed figures ready to
-                ship to your door. This catalog is a preview until live printed figure
-                inventory is connected.
+                ship to your door.
             </p>
             <PrintedFiguresGrid figures={mockPrintedFigures} />
         </div>

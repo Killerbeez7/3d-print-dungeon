@@ -20,7 +20,6 @@ export const ROUTES = {
 
 
     /* Marketplace */
-    MARKETPLACE: "/marketplace",
     MARKETPLACE_FEATURED: "/marketplace/featured",
     MARKETPLACE_NEW_ARRIVALS: "/marketplace/new-arrivals",
     MARKETPLACE_BEST_SELLERS: "/marketplace/best-sellers",

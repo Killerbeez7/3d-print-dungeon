@@ -10,38 +10,34 @@ Disallow: /admin-panel
 Disallow: /private/
 Disallow: /api/
 Disallow: /settings
-Disallow: /notifications
-Disallow: /admin-dashboard
 Disallow: /model/upload
-Disallow: /model/*/edit
+Disallow: /model/:id/edit
 Disallow: /forum/new-thread
-Disallow: /forum/thread/*/edit
-Disallow: /forum/reply/*/edit
-Disallow: /forum/dashboard
-Disallow: /forum/my-threads
+Disallow: /forum/thread/:threadId/edit
+Disallow: /forum/reply/:replyId/edit
 
 # 3) Allow public-facing pages and directories
 Allow: /artists
+Allow: /artists/:id
 Allow: /collections
 Allow: /events
 Allow: /blog
 Allow: /forum
 Allow: /forum/category/:categoryId
-Allow: /forum/thread/
+Allow: /forum/thread/:threadId
+Allow: /forum/dashboard
+Allow: /forum/my-threads
 Allow: /forum/rules
 Allow: /forum/help
-Allow: /marketplace
 Allow: /marketplace/featured
 Allow: /marketplace/new-arrivals
 Allow: /marketplace/best-sellers
 Allow: /business/bulk-orders
 Allow: /business/custom-solutions
 Allow: /business/enterprise-suite
-Allow: /printed-figures
-Allow: /model/
+Allow: /competitions
+Allow: /model/:id
 Allow: /search
-Allow: /search/artists
-Allow: /policies
 
 # 4) Allow static assets
 Allow: /assets/

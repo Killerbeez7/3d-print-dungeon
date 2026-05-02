@@ -9,14 +9,12 @@ import { Spinner } from "@/features/shared/reusable/Spinner";
 import { ScrollToTopButton } from "@/features/shared/ScrollToTopButton";
 import { LayoutProvider, useLayout } from "./context/layoutContext";
 import { CookieBanner } from "../policies/components/CookieBanner";
-import { RouteMetadata } from "./RouteMetadata";
 
 const AppLayout = () => {
     const { isFooterHidden } = useLayout();
     return (
         <div className="layout flex flex-col min-h-screen">
             <Navbar />
-            <RouteMetadata />
             <main className="flex-1 min-h-screen">
                 <Suspense
                     fallback={

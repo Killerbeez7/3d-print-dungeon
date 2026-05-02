@@ -26,7 +26,6 @@
     "include": [
         "src",
         "functions",
-        "vitest.config.ts",
         "vite.config.ts",
         "__tests__",
         "src/types/react.d.ts",

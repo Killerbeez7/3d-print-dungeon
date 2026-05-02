@@ -3,6 +3,10 @@
         "public": "dist",
         "rewrites": [
             {
+                "source": "/assets/*.js.map",
+                "destination": "/assets/:splat.js.map.br"
+            },
+            {
                 "source": "/assets/**",
                 "destination": "/assets/**"
             },
@@ -12,6 +16,19 @@
             }
         ],
         "headers": [
+            {
+                "source": "/assets/*.map.br",
+                "headers": [
+                    {
+                        "key": "Content-Encoding",
+                        "value": "br"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json; charset=utf-8"
+                    }
+                ]
+            },
             {
                 "source": "/assets/**",
                 "headers": [
