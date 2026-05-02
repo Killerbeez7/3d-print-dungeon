@@ -38,7 +38,7 @@ export const EventEntryForm = ({
                     type="text"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
-                    className="w-full border border-[var(--accent)] rounded px-2 py-2 bg-white dark:bg-[#232323] text-[var(--txt-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+                    className="w-full border border-br-secondary rounded px-2 py-2 bg-bg-surface text-txt-primary focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition"
                     required
                 />
             </div>
@@ -48,7 +48,7 @@ export const EventEntryForm = ({
                     type="url"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
-                    className="w-full border border-[var(--accent)] rounded px-2 py-2 bg-white dark:bg-[#232323] text-[var(--txt-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+                    className="w-full border border-br-secondary rounded px-2 py-2 bg-bg-surface text-txt-primary focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition"
                     required
                 />
             </div>
@@ -57,7 +57,7 @@ export const EventEntryForm = ({
                 <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full border border-[var(--accent)] rounded px-2 py-2 bg-white dark:bg-[#232323] text-[var(--txt-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+                    className="w-full border border-br-secondary rounded px-2 py-2 bg-bg-surface text-txt-primary focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition"
                     required
                 />
             </div>

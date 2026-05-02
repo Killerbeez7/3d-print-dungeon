@@ -78,17 +78,17 @@ export const MaintenancePage = () => {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[60vh] py-12">
-            <div className="max-w-lg w-full mx-4 p-8 bg-white rounded-xl shadow-2xl text-center">
+            <div className="max-w-lg w-full mx-4 p-8 bg-bg-surface rounded-xl shadow-2xl text-center border border-br-secondary">
                 <div className="mb-8">
                     <img
                         src="/logo.png"
                         alt="Site Logo"
                         className="h-16 w-auto mx-auto mb-6"
                     />
-                    <h1 className="text-4xl font-bold text-gray-800 mb-4">
+                    <h1 className="text-4xl font-bold text-txt-primary mb-4">
                         Under Maintenance
                     </h1>
-                    <div className="text-xl text-gray-600 mb-6">
+                    <div className="text-xl text-txt-secondary mb-6">
                         {maintenanceState.message ??
                             "We're currently performing some updates to improve your experience."}
                     </div>
@@ -101,8 +101,8 @@ export const MaintenancePage = () => {
                     {(isAdmin || maintenanceState.isAdmin) && <AccessSiteBtn />}
                 </div>
 
-                <div className="border-t border-gray-200 pt-6">
-                    <div className="text-sm text-gray-600">
+                <div className="border-t border-br-secondary pt-6">
+                    <div className="text-sm text-txt-secondary">
                         If you&apos;re an administrator, please sign in to access the
                         site.
                     </div>

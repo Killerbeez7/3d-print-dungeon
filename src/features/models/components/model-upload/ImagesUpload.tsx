@@ -203,7 +203,7 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
             {renders.length > 0 && renders.length < 16 && (
                 <button 
                     onClick={handleFileSelect}
-                    className="w-full py-3 px-4 border-2 border-dashed border-br-secondary rounded-lg text-txt-secondary hover:border-accent hover:text-accent transition-colors font-medium"
+                    className="w-full py-3 px-4 border-2 border-dashed border-br-secondary rounded-lg text-txt-secondary hover:border-accent hover:bg-accent-soft/40 hover:text-accent transition-colors font-medium"
                 >
                     + Add More Renders
                 </button>

@@ -49,7 +49,7 @@ export const HomePage = (): React.ReactNode => {
     };
 
     if (isError)
-        return <div className="text-center text-red-500">Error loading models.</div>;
+        return <div className="text-center text-error">Error loading models.</div>;
 
     return (
         <div className="text-txt-primary min-h-screen">

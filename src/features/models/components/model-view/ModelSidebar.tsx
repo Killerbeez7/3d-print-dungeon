@@ -1,4 +1,5 @@
 import { useEffect, useState, ChangeEvent } from "react";
+import { Pencil, Trash2 } from "lucide-react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { useNavigate } from "react-router-dom";
@@ -127,9 +128,9 @@ export function ModelSidebar({
     };
 
     return (
-        <aside className="w-full lg:w-[400px] flex flex-col h-full rounded-lg overflow-y-auto">
+        <aside className="w-full lg:w-[400px] flex flex-col h-full overflow-y-auto rounded-lg">
             {/* Model Info Section */}
-            <div className="p-4 pt-0 lg:p-6">
+            <section className="px-4 pb-5 pt-0 lg:px-6 lg:pb-6">
                 {isEditing ? (
                     <>
                         <input
@@ -137,14 +138,14 @@ export function ModelSidebar({
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
-                            className="w-full border border-br-primary rounded px-3 py-2 text-lg lg:text-2xl font-bold mb-3"
+                            className="mb-3 w-full rounded-lg border border-br-secondary bg-surface-card px-3 py-2 text-lg font-bold text-txt-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 lg:text-2xl"
                             required
                         />
                         <textarea
                             name="description"
                             value={formData.description}
                             onChange={handleChange}
-                            className="w-full border border-br-primary rounded px-3 py-2 mb-4 text-sm lg:text-base"
+                            className="mb-4 w-full rounded-lg border border-br-secondary bg-surface-card px-3 py-2 text-sm text-txt-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 lg:text-base"
                             rows={3}
                         />
                         <input
@@ -152,7 +153,7 @@ export function ModelSidebar({
                             name="tags"
                             value={formData.tags}
                             onChange={handleChange}
-                            className="w-full border border-br-primary rounded px-3 py-2 mb-4 text-sm lg:text-base"
+                            className="mb-4 w-full rounded-lg border border-br-secondary bg-surface-card px-3 py-2 text-sm text-txt-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 lg:text-base"
                             placeholder="Tags (comma-separated)"
                         />
                         {error && <p className="text-red-600 mb-2 text-sm">{error}</p>}
@@ -160,14 +161,14 @@ export function ModelSidebar({
                             <button
                                 onClick={handleSave}
                                 disabled={isUpdating}
-                                className="bg-btn-primary text-white py-2 px-4 rounded text-sm lg:text-base flex-1"
+                                className="flex-1 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-btn-primary-text transition-colors hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-focus disabled:opacity-60 lg:text-base"
                             >
                                 {isUpdating ? "Saving..." : "Save"}
                             </button>
                             <button
                                 onClick={handleCancel}
                                 disabled={isUpdating}
-                                className="bg-bg-tertiary text-txt-primary py-2 px-4 rounded border border-br-primary text-sm lg:text-base flex-1"
+                                className="flex-1 rounded-lg border border-br-secondary bg-bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-focus disabled:opacity-60 lg:text-base"
                             >
                                 Cancel
                             </button>
@@ -175,18 +176,18 @@ export function ModelSidebar({
                     </>
                 ) : (
                     <>
-                        <H4 className="text-base lg:text-lg font-bold text-txt-primary mb-3">
+                        <H4 className="mb-3 text-base font-bold text-txt-primary lg:text-lg">
                             {formData.name}
                         </H4>
-                        <p className="text-txt-secondary mb-4 text-sm lg:text-base leading-relaxed">
+                        <p className="text-sm leading-relaxed text-txt-secondary lg:text-base">
                             {formData.description}
                         </p>
                         {formData.tags && (
-                            <div className="flex flex-wrap gap-1 lg:gap-2 mt-4">
+                            <div className="mt-5 flex flex-wrap gap-2">
                                 {formData.tags.split(",").map((tag, i) => (
                                     <span
                                         key={i}
-                                        className="px-2 lg:px-3 py-1 text-xs lg:text-sm rounded-full bg-bg-surface text-txt-secondary"
+                                        className="rounded-full border border-br-subtle bg-bg-surface px-2.5 py-1 text-xs text-txt-secondary"
                                     >
                                         {tag.trim()}
                                     </span>
@@ -195,40 +196,32 @@ export function ModelSidebar({
                         )}
                     </>
                 )}
-            </div>
-
-            {/* Pricing Section */}
-            {model.isPaid && model.price && model.price > 0 && (
-                <div className="px-4 lg:px-6 pb-4">
-                    <div className="bg-gradient-to-r from-accent/10 to-accent/5 border border-accent/20 rounded-lg p-3 lg:p-4">
-                        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-                            <div>
-                                <p className="text-xs lg:text-sm text-txt-secondary">
-                                    Price
-                                </p>
-                                <p className="text-xl lg:text-2xl font-bold text-accent">
-                                    ${model.price}
-                                </p>
-                            </div>
-                            <div className="text-left lg:text-right">
-                                <p className="text-xs text-txt-muted">
-                                    Platform fee (5%)
-                                </p>
-                                <p className="text-xs lg:text-sm text-txt-secondary">
-                                    -${(model.price * 0.05).toFixed(2)}
-                                </p>
-                                <p className="text-xs lg:text-sm font-medium text-txt-primary">
-                                    Seller earns: ${(model.price * 0.95).toFixed(2)}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            </section>
 
             {/* Action Buttons Section */}
-            <div className="p-4 lg:p-6 divider-top">
-                <div className="flex gap-3 lg:gap-4 mb-4">
+            <section className="border-t border-br-subtle px-4 py-5 lg:px-6">
+                {model.isPaid && model.price && model.price > 0 && (
+                    <div className="mb-3">
+                        <p className="text-xs font-medium uppercase text-txt-muted">Price</p>
+                        <p className="mt-1 text-2xl font-semibold leading-tight text-txt-primary">
+                            ${model.price}
+                        </p>
+                    </div>
+                )}
+
+                {/* Purchase/Download Button */}
+                <div className="mb-4">
+                    <PurchaseButton
+                        model={{
+                            ...model,
+                            price: model.price ?? 0,
+                            uploaderId: model.uploaderId ?? "",
+                        }}
+                        className="h-12 w-full text-sm font-semibold lg:text-base"
+                    />
+                </div>
+
+                <div className="flex gap-3">
                     <LikeButton
                         modelId={model.id}
                         initialLikes={model.likes}
@@ -242,106 +235,84 @@ export function ModelSidebar({
                     />
                 </div>
 
-                {/* Purchase/Download Button */}
-                <div className="mb-4 lg:mb-6">
-                    <PurchaseButton
-                        model={{
-                            ...model,
-                            price: model.price ?? 0,
-                            uploaderId: model.uploaderId ?? "",
-                        }}
-                        className="w-full py-3 lg:py-4 text-sm lg:text-base font-medium"
-                    />
-                </div>
-
                 {/* Edit and Delete Buttons for Owner or Admin */}
                 {currentUser && (currentUser.uid === model.uploaderId || isAdmin) && !isEditing && (
-                    <div className="mb-4 lg:mb-6 space-y-3">
-                        <button
-                            onClick={handleEdit}
-                            className="bg-gray-600 hover:bg-gray-700 text-white w-full py-3 lg:py-4 text-sm lg:text-base font-medium transition-colors rounded-lg shadow-sm hover:shadow-md"
-                        >
-                            <span className="inline-flex items-center justify-center gap-2">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-4 w-4 lg:h-5 lg:w-5"
-                                    viewBox="0 0 20 20"
-                                    fill="currentColor"
-                                >
-                                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                                </svg>
-                                <span>Edit Model</span>
-                            </span>
-                        </button>
-                        
-                        {showDeleteConfirm ? (
-                            <div className="space-y-2">
-                                <p className="text-sm text-red-600 text-center">Are you sure? This action cannot be undone.</p>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={handleDelete}
-                                        disabled={isDeleting}
-                                        className="bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white py-2 px-4 rounded text-sm lg:text-base font-medium flex-1 transition-colors"
-                                    >
-                                        {isDeleting ? "Deleting..." : "Delete"}
-                                    </button>
-                                    <button
-                                        onClick={() => setShowDeleteConfirm(false)}
-                                        disabled={isDeleting}
-                                        className="bg-gray-500 hover:bg-gray-600 disabled:bg-gray-400 text-white py-2 px-4 rounded text-sm lg:text-base font-medium flex-1 transition-colors"
-                                    >
-                                        Cancel
-                                    </button>
-                                </div>
-                            </div>
-                        ) : (
-                                                         <button
-                                 onClick={() => setShowDeleteConfirm(true)}
-                                 className="bg-red-600 hover:bg-red-700 text-white w-full py-3 lg:py-4 text-sm lg:text-base font-medium transition-colors rounded-lg shadow-sm hover:shadow-md"
-                             >
+                    <div className="mt-5 border-t border-br-subtle pt-4">
+                        <p className="mb-3 text-xs font-medium uppercase text-txt-muted">
+                            Owner actions
+                        </p>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                            <button
+                                onClick={handleEdit}
+                                className="h-11 w-full rounded-lg border border-br-secondary bg-bg-surface px-4 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-focus"
+                            >
                                 <span className="inline-flex items-center justify-center gap-2">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        className="h-4 w-4 lg:h-5 lg:w-5"
-                                        viewBox="0 0 20 20"
-                                        fill="currentColor"
-                                    >
-                                        <path
-                                            fillRule="evenodd"
-                                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
-                                            clipRule="evenodd"
-                                        />
-                                    </svg>
-                                    <span>Delete Model</span>
+                                    <Pencil className="h-4 w-4 lg:h-5 lg:w-5" aria-hidden="true" />
+                                    <span>Edit Model</span>
                                 </span>
                             </button>
-                        )}
+
+                            {showDeleteConfirm ? (
+                                <div className="space-y-3 rounded-lg border border-error/40 bg-error/5 p-3 sm:col-span-2 lg:col-span-1">
+                                    <p className="text-sm text-error">Delete this model? This action cannot be undone.</p>
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={handleDelete}
+                                            disabled={isDeleting}
+                                            className="h-10 flex-1 rounded-lg bg-error px-4 text-sm font-medium text-txt-inverse transition-colors hover:bg-error-hover focus:outline-none focus:ring-2 focus:ring-error disabled:bg-btn-disabled disabled:opacity-70"
+                                        >
+                                            {isDeleting ? "Deleting..." : "Delete"}
+                                        </button>
+                                        <button
+                                            onClick={() => setShowDeleteConfirm(false)}
+                                            disabled={isDeleting}
+                                            className="h-10 flex-1 rounded-lg border border-br-secondary bg-bg-surface px-4 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-focus disabled:opacity-70"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <button
+                                    onClick={() => setShowDeleteConfirm(true)}
+                                    className="h-11 w-full rounded-lg border border-error/50 bg-transparent px-4 text-sm font-medium text-error transition-colors hover:bg-error/10 focus:outline-none focus:ring-2 focus:ring-error/60"
+                                >
+                                    <span className="inline-flex items-center justify-center gap-2">
+                                        <Trash2 className="h-4 w-4 lg:h-5 lg:w-5" aria-hidden="true" />
+                                        <span>Delete Model</span>
+                                    </span>
+                                </button>
+                            )}
+                        </div>
                     </div>
                 )}
-            </div>
+            </section>
 
             {/* Creator Info Section */}
-            <div className="p-4 lg:p-6 divider-top">
-                <div className="flex items-center gap-3 lg:gap-4">
+            <section className="border-t border-br-subtle px-4 py-5 lg:px-6">
+                <p className="mb-3 text-xs font-medium uppercase text-txt-muted">
+                    Creator
+                </p>
+                <div className="flex items-center gap-3 rounded-lg bg-surface-card/60 p-3 lg:gap-4">
                     <img
                         src={uploader?.photoURL || "/assets/images/user.png"}
                         alt={uploader?.displayName || "Unknown User"}
-                        className="w-14 h-14 lg:w-20 lg:h-20 rounded-lg lg:rounded-[10px] object-cover border-2 border-br-primary"
+                        className="h-14 w-14 rounded-lg border border-br-secondary object-cover lg:h-16 lg:w-16"
                         onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.src = "/assets/images/user.png";
                         }}
                     />
                     <div className="flex-1 min-w-0">
-                        <H5 className="text-base lg:text-lg font-semibold text-txt-primary">
+                        <H5 className="text-base font-semibold text-txt-primary">
                             <span className="block truncate" title={uploader?.displayName || "Anonymous"}>
                                 {uploader?.displayName || "Anonymous"}
                             </span>
                         </H5>
-                        <p className="text-xs lg:text-sm text-txt-secondary mt-1">
+                        <p className="mt-1 text-xs text-txt-secondary">
                             Senior 3D Artist
                         </p>
-                        <div className="flex items-center gap-2 lg:gap-3 mt-2">
+                        <div className="mt-3 flex items-center gap-2 lg:gap-3">
                             {model.uploaderId && (
                                 <FollowButton
                                     targetUserId={model.uploaderId}
@@ -357,7 +328,7 @@ export function ModelSidebar({
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </aside>
     );
 }

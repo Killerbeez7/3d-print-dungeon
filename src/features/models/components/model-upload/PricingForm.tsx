@@ -186,11 +186,11 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
             </div>
 
             {Boolean(modelData.isPaid) && !isVerifiedSeller && (
-                <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mt-4 rounded-r-md">
+                <div className="bg-surface-card border border-br-secondary border-l-accent p-4 mt-4 rounded-r-md shadow-token-sm">
                     <div className="flex">
                         <div className="flex-shrink-0">
                             <svg
-                                className="h-5 w-5 text-yellow-400"
+                                className="h-5 w-5 text-accent"
                                 viewBox="0 0 20 20"
                                 fill="currentColor"
                             >
@@ -202,7 +202,7 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <p className="text-sm text-yellow-700">
+                            <p className="text-sm text-txt-secondary">
                                 <strong>Action Required:</strong> To sell models, you must
                                 complete a one-time seller verification. You will be
                                 redirected to Stripe to complete this securely after

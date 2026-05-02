@@ -42,10 +42,10 @@ const socialPlatforms = [
         key: "website",
         name: "Website",
         icon: Globe,
-        color: "hover:bg-purple-500/10 hover:text-purple-500 hover:border-purple-500/20",
-        bgColor: "bg-purple-500/5",
-        borderColor: "border-purple-500/20",
-        textColor: "text-purple-500",
+        color: "hover:bg-accent-soft hover:text-accent-text hover:border-accent/25",
+        bgColor: "bg-accent-soft",
+        borderColor: "border-accent/25",
+        textColor: "text-accent-text",
     },
 ];
 

@@ -4,8 +4,8 @@
 
 /* Logo Accent Color */
 .logo-accent {
-    filter: brightness(0) saturate(100%) invert(39%) sepia(95%) saturate(1347%)
-        hue-rotate(154deg) brightness(91%) contrast(101%);
+    filter: brightness(0) saturate(100%) invert(65%) sepia(66%) saturate(2221%)
+        hue-rotate(213deg) brightness(102%) contrast(96%);
 }
 
 /* [data-theme="dark"] .logo-accent {

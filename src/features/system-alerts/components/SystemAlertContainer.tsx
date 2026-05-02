@@ -5,15 +5,15 @@ import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from "lucide-react";
 const getAlertIcon = (type: SystemAlertType) => {
   switch (type) {
     case "success":
-      return <CheckCircle className="w-5 h-5 text-green-500" />;
+      return <CheckCircle className="w-5 h-5 text-success" />;
     case "error":
-      return <AlertCircle className="w-5 h-5 text-red-500" />;
+      return <AlertCircle className="w-5 h-5 text-error" />;
     case "warning":
-      return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
+      return <AlertTriangle className="w-5 h-5 text-warning" />;
     case "info":
-      return <Info className="w-5 h-5 text-blue-500" />;
+      return <Info className="w-5 h-5 text-info" />;
     default:
-      return <Info className="w-5 h-5 text-gray-500" />;
+      return <Info className="w-5 h-5 text-txt-muted" />;
   }
 };
 
@@ -22,15 +22,15 @@ const getAlertStyles = (type: SystemAlertType) => {
   
   switch (type) {
     case "success":
-      return `${baseStyles} bg-green-50 border-green-400 text-green-800`;
+      return `${baseStyles} bg-bg-surface border-success text-txt-primary`;
     case "error":
-      return `${baseStyles} bg-red-50 border-red-400 text-red-800`;
+      return `${baseStyles} bg-bg-surface border-error text-txt-primary`;
     case "warning":
-      return `${baseStyles} bg-yellow-50 border-yellow-400 text-yellow-800`;
+      return `${baseStyles} bg-bg-surface border-warning text-txt-primary`;
     case "info":
-      return `${baseStyles} bg-blue-50 border-blue-400 text-blue-800`;
+      return `${baseStyles} bg-bg-surface border-info text-txt-primary`;
     default:
-      return `${baseStyles} bg-gray-50 border-gray-400 text-gray-800`;
+      return `${baseStyles} bg-bg-surface border-br-primary text-txt-primary`;
   }
 };
 

@@ -69,8 +69,8 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                     onClick={(e) => e.stopPropagation()}
                     className={`
                         fixed z-[12001] w-full max-w-md
-                        bg-white text-gray-900
-                        border border-gray-200 rounded-none md:rounded-2xl shadow-2xl
+                        bg-bg-surface text-txt-primary
+                        border border-br-secondary rounded-none md:rounded-2xl shadow-2xl
                         left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
                         transition-all duration-300 ease-out
                         ${isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"}
@@ -80,7 +80,7 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                     <div className="relative p-6 pb-4">
                         {/* Close button */}
                         <button
-                            className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200 text-gray-500 hover:text-gray-700"
+                            className="absolute top-4 right-4 p-2 rounded-full hover:bg-bg-tertiary transition-colors duration-200 text-txt-muted hover:text-txt-primary"
                             onClick={handleClose}
                             disabled={loading}
                             aria-label="Close modal"
@@ -90,10 +90,10 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
 
                         {/* Title */}
                         <div className="text-center mb-6">
-                            <h2 className="text-2xl font-bold mb-2 text-gray-900">
+                            <h2 className="text-2xl font-bold mb-2 text-txt-primary">
                                 {success ? "Check Your Email" : "Reset Password"}
                             </h2>
-                            <p className="text-gray-600 text-sm">
+                            <p className="text-txt-secondary text-sm">
                                 {success
                                     ? "We've sent you a password reset link"
                                     : "Enter your email to receive a password reset link"}
@@ -110,20 +110,20 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                     />
                                 </div>
                                 <div className="space-y-3">
-                                    <p className="text-gray-700">
+                                    <p className="text-txt-primary">
                                         We&apos;ve sent a password reset link to:
                                     </p>
-                                    <p className="font-medium text-gray-900 break-all">{email}</p>
-                                    <p className="text-sm text-gray-600">
+                                    <p className="font-medium text-txt-primary break-all">{email}</p>
+                                    <p className="text-sm text-txt-secondary">
                                         Click the link in your email to reset your password.
                                         <br />
-                                        <span className="text-xs text-gray-500">
+                                        <span className="text-xs text-txt-muted">
                                             The link will take you to our secure password reset page.
                                         </span>
                                     </p>
-                                                                         <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-lg">
-                                         <p className="text-sm text-gray-600">
-                                             <span className="text-gray-500">💡</span> <strong>Didn&apos;t receive the email?</strong> Check your spam or junk folder.
+                                                                         <div className="mt-4 p-3 bg-bg-muted border border-br-secondary rounded-lg">
+                                         <p className="text-sm text-txt-secondary">
+                                             <span className="text-txt-muted">💡</span> <strong>Didn&apos;t receive the email?</strong> Check your spam or junk folder.
                                          </p>
                                      </div>
                                  </div>
@@ -133,12 +133,12 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                      <button
                                          type="button"
                                          onClick={() => setShowAlternatives(!showAlternatives)}
-                                         className="w-full flex items-center justify-between p-3 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+                                         className="w-full flex items-center justify-between p-3 text-sm text-txt-secondary hover:text-txt-primary hover:bg-bg-muted rounded-lg transition-colors duration-200"
                                      >
                                          <span className="font-medium">Try another method</span>
                                          <FontAwesomeIcon 
                                              icon={showAlternatives ? faChevronUp : faChevronDown} 
-                                             className="text-gray-400"
+                                             className="text-txt-muted"
                                          />
                                      </button>
                                      
@@ -150,12 +150,12 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                                      setComingSoonMessage("SMS Verification");
                                                      setTimeout(() => setComingSoonMessage(null), 3000);
                                                  }}
-                                                 className="w-full flex items-center p-3 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors duration-200 border border-gray-200"
+                                                 className="w-full flex items-center p-3 text-left text-sm text-txt-primary hover:bg-bg-muted hover:text-link rounded-lg transition-colors duration-200 border border-br-secondary"
                                              >
-                                                 <FontAwesomeIcon icon={faPhone} className="mr-3 text-blue-500" />
+                                                 <FontAwesomeIcon icon={faPhone} className="mr-3 text-info" />
                                                  <div>
                                                      <div className="font-medium">SMS Verification</div>
-                                                     <div className="text-xs text-gray-500">Receive a code via text message</div>
+                                                     <div className="text-xs text-txt-muted">Receive a code via text message</div>
                                                  </div>
                                              </button>
                                              
@@ -165,12 +165,12 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                                      setComingSoonMessage("Live Chat Support");
                                                      setTimeout(() => setComingSoonMessage(null), 3000);
                                                  }}
-                                                 className="w-full flex items-center p-3 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-lg transition-colors duration-200 border border-gray-200"
+                                                 className="w-full flex items-center p-3 text-left text-sm text-txt-primary hover:bg-bg-muted hover:text-success rounded-lg transition-colors duration-200 border border-br-secondary"
                                              >
                                                  <FontAwesomeIcon icon={faComments} className="mr-3 text-green-500" />
                                                  <div>
                                                      <div className="font-medium">Live Chat Support</div>
-                                                     <div className="text-xs text-gray-500">Get help from our support team</div>
+                                                     <div className="text-xs text-txt-muted">Get help from our support team</div>
                                                  </div>
                                              </button>
                                              
@@ -180,12 +180,12 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                                      setComingSoonMessage("Security Questions");
                                                      setTimeout(() => setComingSoonMessage(null), 3000);
                                                  }}
-                                                 className="w-full flex items-center p-3 text-left text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors duration-200 border border-gray-200"
+                                                 className="w-full flex items-center p-3 text-left text-sm text-txt-primary hover:bg-accent-soft hover:text-accent-text rounded-lg transition-colors duration-200 border border-br-secondary"
                                              >
-                                                 <FontAwesomeIcon icon={faShieldAlt} className="mr-3 text-purple-500" />
+                                                 <FontAwesomeIcon icon={faShieldAlt} className="mr-3 text-accent" />
                                                  <div>
                                                      <div className="font-medium">Security Questions</div>
-                                                     <div className="text-xs text-gray-500">Answer your security questions</div>
+                                                     <div className="text-xs text-txt-muted">Answer your security questions</div>
                                                  </div>
                                              </button>
                                          </div>
@@ -194,8 +194,8 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
 
                                  {/* Coming Soon Message */}
                                  {comingSoonMessage && (
-                                     <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                         <p className="text-sm text-blue-700 text-center">
+                                     <div className="mt-4 p-3 bg-bg-muted border border-br-secondary rounded-lg">
+                                         <p className="text-sm text-link text-center">
                                              🚧 <strong>{comingSoonMessage}</strong> - Coming Soon!
                                          </p>
                                      </div>
@@ -204,7 +204,7 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                  <button
                                      type="button"
                                      onClick={handleClose}
-                                     className="w-full py-3 px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                     className="w-full py-3 px-4 bg-btn-primary text-btn-primary-text rounded-xl hover:bg-btn-primary-hover transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2"
                                  >
                                      Got it
                                  </button>
@@ -216,7 +216,7 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                     <div className="relative">
                                         <FontAwesomeIcon
                                             icon={faEnvelope}
-                                            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                                            className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted"
                                         />
                                         <input
                                             id="reset-email"
@@ -227,7 +227,7 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                             required
                                             spellCheck="false"
                                             autoComplete="email"
-                                            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                                            className="w-full pl-10 pr-4 py-3 border border-br-secondary rounded-xl bg-bg-surface placeholder-txt-muted focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition-all duration-200"
                                             placeholder="Enter your email"
                                             disabled={loading}
                                         />
@@ -236,7 +236,7 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
 
                                 {/* Error message */}
                                 {error && (
-                                    <div className="flex items-center p-3 bg-red-50 border border-red-200 rounded-xl">
+                                    <div className="flex items-center p-3 bg-bg-muted border border-error rounded-xl">
                                         <p className="text-red-700 text-sm font-medium">
                                             {error}
                                         </p>
@@ -247,7 +247,7 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                  <button
                                      type="submit"
                                      disabled={loading || !email.trim()}
-                                     className="w-full py-3 px-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                                     className="w-full py-3 px-4 bg-btn-primary text-btn-primary-text rounded-xl hover:bg-btn-primary-hover disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2"
                                  >
                                      {loading ? (
                                          <div className="flex items-center justify-center">
@@ -264,12 +264,12 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                      <button
                                          type="button"
                                          onClick={() => setShowAlternatives(!showAlternatives)}
-                                         className="w-full flex items-center justify-between p-3 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-50 rounded-lg transition-colors duration-200"
+                                         className="w-full flex items-center justify-between p-3 text-sm text-txt-secondary hover:text-txt-primary hover:bg-bg-muted rounded-lg transition-colors duration-200"
                                      >
                                          <span className="font-medium">Need help? Try another method</span>
                                          <FontAwesomeIcon 
                                              icon={showAlternatives ? faChevronUp : faChevronDown} 
-                                             className="text-gray-400"
+                                             className="text-txt-muted"
                                          />
                                      </button>
                                      
@@ -281,12 +281,12 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                                      setComingSoonMessage("SMS Verification");
                                                      setTimeout(() => setComingSoonMessage(null), 3000);
                                                  }}
-                                                 className="w-full flex items-center p-3 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-colors duration-200 border border-gray-200"
+                                                 className="w-full flex items-center p-3 text-left text-sm text-txt-primary hover:bg-bg-muted hover:text-link rounded-lg transition-colors duration-200 border border-br-secondary"
                                              >
-                                                 <FontAwesomeIcon icon={faPhone} className="mr-3 text-blue-500" />
+                                                 <FontAwesomeIcon icon={faPhone} className="mr-3 text-info" />
                                                  <div>
                                                      <div className="font-medium">SMS Verification</div>
-                                                     <div className="text-xs text-gray-500">Receive a code via text message</div>
+                                                     <div className="text-xs text-txt-muted">Receive a code via text message</div>
                                                  </div>
                                              </button>
                                              
@@ -296,12 +296,12 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                                      setComingSoonMessage("Live Chat Support");
                                                      setTimeout(() => setComingSoonMessage(null), 3000);
                                                  }}
-                                                 className="w-full flex items-center p-3 text-left text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 rounded-lg transition-colors duration-200 border border-gray-200"
+                                                 className="w-full flex items-center p-3 text-left text-sm text-txt-primary hover:bg-bg-muted hover:text-success rounded-lg transition-colors duration-200 border border-br-secondary"
                                              >
                                                  <FontAwesomeIcon icon={faComments} className="mr-3 text-green-500" />
                                                  <div>
                                                      <div className="font-medium">Live Chat Support</div>
-                                                     <div className="text-xs text-gray-500">Get help from our support team</div>
+                                                     <div className="text-xs text-txt-muted">Get help from our support team</div>
                                                  </div>
                                              </button>
                                              
@@ -311,12 +311,12 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
                                                      setComingSoonMessage("Security Questions");
                                                      setTimeout(() => setComingSoonMessage(null), 3000);
                                                  }}
-                                                 className="w-full flex items-center p-3 text-left text-sm text-gray-700 hover:bg-purple-50 hover:text-purple-700 rounded-lg transition-colors duration-200 border border-gray-200"
+                                                 className="w-full flex items-center p-3 text-left text-sm text-txt-primary hover:bg-accent-soft hover:text-accent-text rounded-lg transition-colors duration-200 border border-br-secondary"
                                              >
-                                                 <FontAwesomeIcon icon={faShieldAlt} className="mr-3 text-purple-500" />
+                                                 <FontAwesomeIcon icon={faShieldAlt} className="mr-3 text-accent" />
                                                  <div>
                                                      <div className="font-medium">Security Questions</div>
-                                                     <div className="text-xs text-gray-500">Answer your security questions</div>
+                                                     <div className="text-xs text-txt-muted">Answer your security questions</div>
                                                  </div>
                                              </button>
                                          </div>
@@ -325,8 +325,8 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
 
                                  {/* Coming Soon Message */}
                                  {comingSoonMessage && (
-                                     <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                         <p className="text-sm text-blue-700 text-center">
+                                     <div className="mt-4 p-3 bg-bg-muted border border-br-secondary rounded-lg">
+                                         <p className="text-sm text-link text-center">
                                              🚧 <strong>{comingSoonMessage}</strong> - Coming Soon!
                                          </p>
                                      </div>

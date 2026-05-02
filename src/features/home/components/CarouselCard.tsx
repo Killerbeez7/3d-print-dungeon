@@ -41,8 +41,8 @@ export const CarouselCard = ({
         >
             <div
                 className="relative overflow-hidden rounded-xl group 
-                bg-bg-surface border border-br-secondary transition-all duration-300 
-                hover:shadow-lg"
+                bg-bg-surface border border-br-secondary shadow-token-sm transition-all duration-300 
+                hover:border-br-primary hover:shadow-token-lg"
                 style={{ height }}
             >
                 {/* Image */}
@@ -62,11 +62,11 @@ export const CarouselCard = ({
                 />
 
                 {/* Base gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-bg-page/70 via-bg-page/25 to-transparent pointer-events-none" />
                 
                 {/* Hover gradient overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t
-                 from-black/35 via-black/15 to-transparent 
+                 from-bg-page/50 via-bg-page/20 to-transparent 
                 pointer-events-none opacity-0 group-hover:opacity-100 transition-all 
                  ease-in-out transform translate-y-full group-hover:translate-y-0" />
 
@@ -87,13 +87,13 @@ export const CarouselCard = ({
                         <h3 className="text-token-2xl font-bold leading-token-tight mb-[5px]">{item.title}</h3>
 
                         {item.subtitle && (
-                            <p className="text-token-sm text-gray-200 leading-token-tight">
+                            <p className="text-token-sm text-txt-secondary leading-token-tight">
                                 {item.subtitle}
                             </p>
                         )}
 
                         {showDescription && item.description && (
-                            <p className="text-token-xs text-gray-300 leading-token-relaxed line-clamp-2">
+                            <p className="text-token-xs text-txt-muted leading-token-relaxed line-clamp-2">
                                 {item.description}
                             </p>
                         )}

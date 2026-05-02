@@ -28,7 +28,7 @@ export const ScrollToTopButton = () => {
             onClick={scrollToTop}
             className={`fixed bottom-5 right-5 w-[50px] h-[50px] rounded-full text-2xl cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center ${
                 isVisible ? "opacity-100 visible" : "opacity-0 invisible"
-            } hover:scale-110 z-[101] bg-gradient-to-br from-accent-dark to-accent hover:from-accent hover:to-accent-hover text-white shadow-lg hover:shadow-xl`}
+            } hover:scale-110 z-[101] bg-gradient-to-br from-accent-dark to-accent hover:from-accent hover:to-accent-hover text-btn-primary-text shadow-lg hover:shadow-xl`}
             aria-label="Scroll to top"
         >
             <FaArrowUp className="text-lg" />
