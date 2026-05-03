@@ -16,8 +16,8 @@ export const AuthButtons = ({ onLoginClick, onSignUpClick, isLoading }: AuthButt
                 aria-label="Loading authentication actions"
             >
                 <span className="sr-only">Loading authentication actions</span>
-                <div className="bg-gray-300 rounded-md h-8 w-20" aria-hidden="true"></div>
-                <div className="bg-gray-300 rounded-md h-8 w-20" aria-hidden="true"></div>
+                <div className="bg-bg-muted rounded-md h-8 w-20" aria-hidden="true"></div>
+                <div className="bg-bg-muted rounded-md h-8 w-20" aria-hidden="true"></div>
             </div>
         );
     }

@@ -81,31 +81,54 @@ export const ModelComments = ({ openAuthModal }: ModelCommentsProps) => {
     };
 
     return (
-        // <div className="mt-8 border border-br-secondary p-6 rounded-lg">
-        <div className="mt-8 p-6 pt-0">
-            <h3 className="text-2xl font-bold mb-4 text-txt-primary">Comments</h3>
-            {error && <p className="text-error text-sm mb-4">{error}</p>}
+        <section id="model-discussion" className="mx-auto max-w-5xl scroll-mt-24 border-t border-br-subtle pt-7">
+            <div className="mb-5 flex items-baseline justify-between gap-3">
+                <h3 className="text-xl font-bold text-txt-primary">Comments</h3>
+                <span className="text-sm text-txt-muted">
+                    {comments.length} {comments.length === 1 ? "comment" : "comments"}
+                </span>
+            </div>
+
+            {error && (
+                <div className="mb-4 rounded-lg border border-error/40 bg-error/5 px-3 py-2 text-sm text-error">
+                    {error}
+                </div>
+            )}
             {/* Always show the comment form */}
-            <form onSubmit={handleSubmit} className="mb-6 space-y-4">
+            <form
+                onSubmit={handleSubmit}
+                className="mb-6 rounded-lg border border-br-subtle bg-surface-card p-3"
+            >
                 <textarea
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     placeholder="Share your thoughts..."
-                    className="w-full border border-br-primary rounded-lg p-3 bg-bg-primary text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent"
+                    className="min-h-20 w-full resize-y rounded-md border border-transparent bg-bg-primary p-3 text-sm leading-relaxed text-txt-primary placeholder:text-txt-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
                     rows={3}
                 />
-                <button type="submit" className="cta-button px-4 py-2">
-                    Submit
-                </button>
+                <div className="mt-3 flex items-center justify-between gap-3">
+                    <p className="text-xs text-txt-muted">
+                        {currentUser ? "Post as " + (currentUser.displayName || "Anonymous") : "Sign in to join the discussion"}
+                    </p>
+                    <button
+                        type="submit"
+                        className="h-10 rounded-lg bg-accent px-5 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-focus disabled:cursor-not-allowed disabled:opacity-60"
+                        disabled={!newComment.trim()}
+                    >
+                        Submit
+                    </button>
+                </div>
             </form>
             {loading ? (
-                <p className="text-txt-secondary">Loading comments...</p>
+                <p className="py-4 text-sm text-txt-secondary">
+                    Loading comments...
+                </p>
             ) : comments.length === 0 ? (
-                <p className="text-txt-secondary">
-                    No comments yet. Be the first to comment!
+                <p className="py-2 text-sm text-txt-muted">
+                    No comments yet. Start the discussion with a question or feedback.
                 </p>
             ) : (
-                <ul className="space-y-6">
+                <ul className="divide-y divide-br-subtle">
                     {comments.map((comment: Comment) => {
                         const isOwner = currentUser && currentUser.uid === comment.userId;
                         const isEditing = editingCommentId === comment.id;
@@ -113,27 +136,32 @@ export const ModelComments = ({ openAuthModal }: ModelCommentsProps) => {
                             return (
                                 <li
                                     key={comment.id}
-                                    className="border border-br-primary rounded-lg p-4 bg-bg-primary"
+                                    className="py-5"
                                 >
-                                    <div className="mb-2 text-sm font-semibold text-txt-primary">
-                                        {comment.userName}
+                                    <div className="mb-3 flex items-center gap-3">
+                                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent-text">
+                                            {comment.userName?.charAt(0)?.toUpperCase() || "A"}
+                                        </div>
+                                        <div className="text-sm font-semibold text-txt-primary">
+                                            {comment.userName}
+                                        </div>
                                     </div>
                                     <textarea
                                         value={editingText}
                                         onChange={(e) => setEditingText(e.target.value)}
-                                        className="w-full border border-br-primary rounded-lg p-2 mb-2 bg-bg-primary text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent"
+                                        className="mb-3 w-full rounded-lg border border-br-secondary bg-surface-card p-3 text-sm text-txt-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
                                         rows={2}
                                     />
                                     <div className="flex justify-end gap-2">
                                         <button
                                             onClick={() => saveEditing(comment.id)}
-                                            className="bg-success text-white text-sm px-3 py-1 rounded hover:bg-success/80 transition-colors"
+                                            className="h-9 rounded-lg bg-accent px-3 text-sm font-medium text-btn-primary-text transition-colors hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-focus"
                                         >
                                             Save
                                         </button>
                                         <button
                                             onClick={cancelEditing}
-                                            className="bg-bg-tertiary text-txt-primary text-sm px-3 py-1 rounded hover:bg-bg-surface transition-colors"
+                                            className="h-9 rounded-lg border border-br-secondary bg-bg-surface px-3 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-focus"
                                         >
                                             Cancel
                                         </button>
@@ -144,45 +172,52 @@ export const ModelComments = ({ openAuthModal }: ModelCommentsProps) => {
                         return (
                             <li
                                 key={comment.id}
-                                className="border border-br-primary rounded-lg p-4 bg-bg-primary"
+                                className="py-5"
                             >
-                                <div className="flex justify-between items-center mb-2">
-                                    <div className="text-sm font-semibold text-txt-primary">
-                                        {comment.userName}
-                                    </div>
-                                    {comment.createdAt && (
-                                        <div className="text-xs text-txt-secondary">
-                                            {formatDistanceToNow(
-                                                comment.createdAt.toDate(),
-                                                { addSuffix: true }
+                                <div className="mb-3 flex items-start justify-between gap-3">
+                                    <div className="flex min-w-0 items-center gap-3">
+                                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-bg-tertiary text-sm font-semibold text-txt-secondary">
+                                            {comment.userName?.charAt(0)?.toUpperCase() || "A"}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <div className="truncate text-sm font-semibold text-txt-primary">
+                                                {comment.userName}
+                                            </div>
+                                            {comment.createdAt && (
+                                                <div className="text-xs text-txt-muted">
+                                                    {formatDistanceToNow(
+                                                        comment.createdAt.toDate(),
+                                                        { addSuffix: true }
+                                                    )}
+                                                </div>
                                             )}
+                                        </div>
+                                    </div>
+                                    {isOwner && (
+                                        <div className="flex shrink-0 gap-3">
+                                            <button
+                                                onClick={() => startEditing(comment)}
+                                                className="text-sm font-medium text-accent-text transition-colors hover:text-accent-hover"
+                                            >
+                                                Edit
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(comment.id)}
+                                                className="text-sm font-medium text-error transition-colors hover:text-error-hover"
+                                            >
+                                                Delete
+                                            </button>
                                         </div>
                                     )}
                                 </div>
-                                <p className="text-sm text-txt-secondary whitespace-pre-line">
+                                <p className="whitespace-pre-line text-sm leading-relaxed text-txt-secondary">
                                     {comment.text}
                                 </p>
-                                {isOwner && (
-                                    <div className="flex justify-end gap-3 mt-2">
-                                        <button
-                                            onClick={() => startEditing(comment)}
-                                            className="text-sm text-accent hover:text-accent-hover hover:underline"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(comment.id)}
-                                            className="text-sm text-error hover:text-error/80 hover:underline"
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                )}
                             </li>
                         );
                     })}
                 </ul>
             )}
-        </div>
+        </section>
     );
 };

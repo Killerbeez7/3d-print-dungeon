@@ -10,6 +10,8 @@ body {
     font-family: "Inter", sans-serif;
     font-size: 16px;
     background-color: var(--bg-primary);
+    background-image: var(--ambient-brand);
+    background-attachment: fixed;
 }
 
 *,
@@ -110,113 +112,214 @@ h6 {
 @import "tailwindcss";
 
 :root {
-    --background-main-rgb: 245, 247, 249;
+    /*
+     * Color usage rules:
+     * - Neutral surfaces are the default foundation. Do not use purple for full
+     *   sections, page backgrounds, or large card surfaces.
+     * - Purple is reserved for action, focus, active, link, selected, badge, and
+     *   small highlight states.
+     * - `--accent-soft` is for compact highlights only. It should not be used as
+     *   a full-section or large-card background.
+     * - `--surface-card` is the default card/input surface.
+     * - `--surface-elevated` is for modals, dropdowns, popovers, and overlays.
+     * - `--bg-section` is for large layout sections and persistent chrome.
+     */
+    --background-main-rgb: 247, 248, 250;
     --background-second-rgb: 255, 255, 255;
 
-    --bg-primary: #f6f9fb; /* light, airy base */
-    --bg-secondary: #ffffff;
-    --bg-surface: #fdfefe;
-    --bg-tertiary: #e8eef1;
-    --bg-reverse: #0d0d0d;
+    --bg-page: #f7f8fa;
+    --bg-section: #ffffff;
+    --bg-muted: #eef0f3;
+    --bg-inverse: #0b0c0f;
+    --surface-card: #ffffff;
+    --surface-elevated: #f3f4f6;
+    --surface-overlay: rgba(11, 12, 15, 0.64);
+    --ambient-brand: radial-gradient(
+        1100px circle at 18% 0%,
+        rgba(124, 92, 255, 0.035),
+        transparent 58%
+    );
 
-    --txt-primary: #101415;
-    --txt-secondary: #5c6b70;
-    --txt-highlight: #000000;
-    --txt-muted: #8b9a9e;
+    --bg-primary: var(--bg-page);
+    --bg-secondary: var(--bg-section);
+    --bg-surface: var(--surface-card);
+    --bg-tertiary: var(--bg-muted);
+    --bg-reverse: var(--bg-inverse);
 
-    --accent-dark: #007a78; /* deep teal */
-    --accent: #00b3b0; /* bright, modern teal */
-    --accent-hover: #33c5c3; /* lighter hover tone */
-    --accent-rgb: 0, 179, 176; /* RGB values for shadows */
+    --txt-primary: #15171c;
+    --txt-secondary: #4b5563;
+    --txt-highlight: #0b0c0f;
+    --txt-muted: #737987;
+    --txt-inverse: #ffffff;
 
-    --btn-main: #d7e4e6;
-    --btn-secondary: #b7c9cb;
-    --btn-hover: #9fb6b8;
+    --accent-dark: #5d3df5;
+    --accent: #735bff;
+    --accent-hover: #5f45ee;
+    --accent-soft: #f1efff;
+    --accent-muted: #e4ddff;
+    --accent-text: #4f35d5;
+    --accent-rgb: 115, 91, 255;
 
-    --contrast: #ff6f61; /* coral red for strong calls to action */
-    --contrast-hover: #ff8a7f;
+    --btn-primary: var(--accent);
+    --btn-primary-hover: var(--accent-hover);
+    --btn-primary-text: #ffffff;
+    --btn-main: #e5e7eb;
+    --btn-secondary: #f3f4f6;
+    --btn-hover: #d9dde3;
+    --btn-secondary-hover: #e5e7eb;
+    --btn-disabled: #e5e7eb;
 
-    --br-primary: #a5b5b8;
-    --br-secondary: #c5d0d3;
+    --contrast: #b45309;
+    --contrast-hover: #92400e;
 
-    --success: #28c76f;
-    --error: #f44336;
+    --br-primary: #9ca3af;
+    --br-secondary: #d1d5db;
+    --br-subtle: #e5e7eb;
 
-    --model-viewer-background: #9b9b9b;
+    --success: #15803d;
+    --success-hover: #166534;
+    --warning: #b45309;
+    --error: #dc2626;
+    --error-hover: #b91c1c;
+    --info: #2563eb;
+    --link: var(--accent-text);
+    --link-hover: var(--accent-dark);
+    --focus: var(--accent);
+
+    --model-viewer-background: #eef0f3;
 }
 
 [data-theme="dark"] {
-    --background-main-rgb: 15, 17, 18;
-    --background-second-rgb: 26, 29, 31;
+    --background-main-rgb: 11, 11, 15;
+    --background-second-rgb: 17, 18, 24;
 
-    --bg-primary: #0f1112;
-    --bg-secondary: #1a1d1f;
-    --bg-surface: #222628;
-    --bg-tertiary: #2b2f31;
-    --bg-reverse: #f6f9fb;
+    --bg-page: #0b0b0f;
+    --bg-section: #111218;
+    --bg-muted: #151821;
+    --bg-inverse: #f7f8fa;
+    --surface-card: #1a1d26;
+    --surface-elevated: #212432;
+    --surface-overlay: rgba(11, 11, 15, 0.78);
+    --ambient-brand: radial-gradient(
+        1200px circle at 20% 0%,
+        rgba(124, 92, 255, 0.075),
+        transparent 58%
+    );
 
-    --txt-primary: #f6f9fb;
-    --txt-secondary: #aebfc2;
+    --bg-primary: var(--bg-page);
+    --bg-secondary: var(--bg-section);
+    --bg-surface: var(--surface-card);
+    --bg-tertiary: var(--bg-muted);
+    --bg-reverse: var(--bg-inverse);
+
+    --txt-primary: #f4f4f5;
+    --txt-secondary: #c3c7cf;
     --txt-highlight: #ffffff;
-    --txt-muted: #87989b;
+    --txt-muted: #8f96a3;
+    --txt-inverse: #0b0c0f;
 
-    --accent-dark: #00908d;
-    --accent: #00c4c1;
-    --accent-hover: #33d2d0;
+    --accent-dark: #6b4eff;
+    --accent: #735bff;
+    --accent-hover: #8b75ff;
+    --accent-soft: #19162a;
+    --accent-muted: #25213f;
+    --accent-text: #cbc2ff;
+    --accent-rgb: 115, 91, 255;
+    ---atmosphere: radial-gradient(
+        1000px circle at 50% 0%,
+        rgba(115, 91, 255, 0.07),
+        transparent 62%
+    );
 
-    --btn-main: #2d3a3b;
-    --btn-secondary: #3c4a4b;
-    --btn-hover: #4a5a5c;
+    --btn-primary: var(--accent);
+    --btn-primary-hover: var(--accent-dark);
+    --btn-primary-text: #ffffff;
+    --btn-main: #232633;
+    --btn-secondary: #262a36;
+    --btn-hover: #303544;
+    --btn-secondary-hover: #303544;
+    --btn-disabled: #242732;
 
-    --contrast: #ff6f61;
-    --contrast-hover: #ff8a7f;
+    --contrast: #f59e0b;
+    --contrast-hover: #fbbf24;
 
-    --br-primary: #5b6a6b;
-    --br-secondary: #475557;
+    --br-primary: #414757;
+    --br-secondary: #303541;
+    --br-subtle: #252934;
 
     --success: #34d399;
-    --error: #f87171;
+    --success-hover: #10b981;
+    --warning: #fbbf24;
+    --error: #fb7185;
+    --error-hover: #f43f5e;
+    --info: #60a5fa;
+    --link: var(--accent-text);
+    --link-hover: var(--accent-hover);
+    --focus: #9277ff;
 
-    --model-viewer-background: #222628;
+    --model-viewer-background: #151821;
 }
 
 @theme {
+    --color-bg-page: var(--bg-page);
+    --color-bg-section: var(--bg-section);
+    --color-bg-muted: var(--bg-muted);
+    --color-bg-inverse: var(--bg-inverse);
+    --color-surface-card: var(--surface-card);
+    --color-surface-elevated: var(--surface-elevated);
+
     --color-bg-primary: var(--bg-primary);
     --color-bg-secondary: var(--bg-secondary);
     --color-bg-surface: var(--bg-surface);
+    --color-bg-tertiary: var(--bg-tertiary);
     --color-bg-reverse: var(--bg-reverse);
 
     --color-txt-primary: var(--txt-primary);
     --color-txt-secondary: var(--txt-secondary);
     --color-txt-highlighted: var(--txt-highlight);
+    --color-txt-highlight: var(--txt-highlight);
     --color-txt-muted: var(--txt-muted);
+    --color-txt-inverse: var(--txt-inverse);
 
     --color-accent: var(--accent);
     --color-accent-dark: var(--accent-dark);
     --color-accent-hover: var(--accent-hover);
+    --color-accent-soft: var(--accent-soft);
+    --color-accent-muted: var(--accent-muted);
+    --color-accent-text: var(--accent-text);
 
     --color-contrast: var(--contrast);
     --color-contrast-hover: var(--contrast-hover);
 
     --color-br-primary: var(--br-primary);
     --color-br-secondary: var(--br-secondary);
+    --color-br-subtle: var(--br-subtle);
 
-    --color-btn-primary: var(--accent);
-    --color-btn-primary-hover: var(--accent-hover);
+    --color-primary: var(--btn-primary);
+    --color-primary-hover: var(--btn-primary-hover);
+    --color-btn-primary: var(--btn-primary);
+    --color-btn-primary-hover: var(--btn-primary-hover);
+    --color-btn-primary-text: var(--btn-primary-text);
     --color-btn-secondary: var(--btn-secondary);
     --color-btn-secondary-hover: var(--btn-secondary-hover);
     --color-btn-disabled: var(--btn-disabled);
 
-    --color-focus: var(--accent-hover);
+    --color-link: var(--link);
+    --color-link-hover: var(--link-hover);
+    --color-focus: var(--focus);
     --color-success: var(--success);
+    --color-success-hover: var(--success-hover);
+    --color-warning: var(--warning);
     --color-error: var(--error);
+    --color-error-hover: var(--error-hover);
+    --color-info: var(--info);
 
     --color-model-viewer-background: var(--model-viewer-background);
 
-    --color-auth-modal-error: #f44336;
-    --color-auth-modal-error-text: #808080;
-    --color-auth-modal-text-primary: #808080;
-    --color-auth-modal-text-secondary: #87989b;
+    --color-auth-modal-error: var(--error);
+    --color-auth-modal-error-text: var(--txt-muted);
+    --color-auth-modal-text-primary: var(--txt-secondary);
+    --color-auth-modal-text-secondary: var(--txt-muted);
 }
 
 /* Custom Divider */

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useForum } from "@/features/forum/hooks/useForum";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useModal } from "@/hooks/useModal";
 import { FaEdit, FaTrash, FaReply, FaEye, FaCalendar, FaUser } from "react-icons/fa";
 import Skeleton from "@/features/shared/Skeleton";
 import { ReplyEditor } from "./ReplyEditor";
@@ -15,6 +16,7 @@ export const ForumThread: FC = () => {
     const navigate = useNavigate();
 
     const { currentUser } = useAuth();
+    const { open } = useModal("auth");
     const {
         loadThread,
         loadMoreReplies,
@@ -218,6 +220,23 @@ export const ForumThread: FC = () => {
                         </button>
                     )}
 
+                    {!currentUser && !currentThread.isLocked && (
+                        <button
+                            type="button"
+                            onClick={() => open({ mode: "login" })}
+                            className="inline-flex items-center px-3 py-1.5 text-sm rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
+                        >
+                            <FaReply className="mr-1" size={12} />
+                            Sign in to Reply
+                        </button>
+                    )}
+
+                    {currentThread.isLocked && (
+                        <span className="text-sm text-[var(--txt-muted)]">
+                            This thread is locked, so new replies are closed.
+                        </span>
+                    )}
+
                     {currentUser?.uid === currentThread.authorId && (
                         <>
                             <Link
@@ -342,10 +361,28 @@ export const ForumThread: FC = () => {
                         )}
                     </div>
                 ) : (
-                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
-                        <p className="text-gray-500 dark:text-gray-400">
-                            No replies yet. Be the first to respond!
+                    <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+                        <h3 className="font-semibold mb-2">No replies yet</h3>
+                        <p className="text-[var(--txt-muted)] mb-4">
+                            {currentThread.isLocked
+                                ? "This thread is locked and no longer accepts replies."
+                                : "Add the first response if you can answer the question or move the discussion forward."}
                         </p>
+                        {!currentThread.isLocked && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (!currentUser) {
+                                        open({ mode: "login" });
+                                        return;
+                                    }
+                                    setIsReplying(true);
+                                }}
+                                className="px-4 py-2 rounded-lg bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)]"
+                            >
+                                {currentUser ? "Post Reply" : "Sign in to Reply"}
+                            </button>
+                        )}
                     </div>
                 )}
             </div>

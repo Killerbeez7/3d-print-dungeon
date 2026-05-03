@@ -40,7 +40,7 @@ export function ValidityIndicator({
                 <div className={baseClasses}>
                     <FontAwesomeIcon
                         icon={faCheck}
-                        className={`${sizeClasses[size]} text-gray-500`}
+                        className={`${sizeClasses[size]} text-txt-muted`}
                     />
                 </div>
             );
@@ -54,7 +54,7 @@ export function ValidityIndicator({
                     <button
                         type="button"
                         onClick={onClear}
-                        className={`${baseClasses} text-red-500 hover:text-red-600 transition-colors`}
+                        className={`${baseClasses} text-error hover:text-error-hover transition-colors`}
                     >
                         <FontAwesomeIcon icon={faTimes} className={sizeClasses[size]} />
                     </button>

@@ -45,23 +45,23 @@ export const FilesUpload: FC<FilesUploadProps> = ({ step, files, setFiles }) => 
             {step === 1 && (
                 <div
                     {...getRootProps()}
-                    className={`group relative flex flex-col items-center justify-center gap-4 border-2 border-dashed rounded-xl p-10 mb-6 cursor-pointer transition-all duration-200 
+                    className={`group relative flex flex-col items-center justify-center gap-4 border-2 border-dashed rounded-xl p-10 mb-6 cursor-pointer transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-bg-secondary
                         ${
                             isDragActive
-                                ? "border-accent bg-accent/10 shadow-lg"
-                                : "border-br-secondary/60 bg-bg-surface hover:border-accent/60 hover:shadow-md"
+                                ? "border-accent bg-accent-soft shadow-token-lg shadow-accent/10"
+                                : "border-br-secondary/60 bg-bg-surface hover:border-accent hover:bg-accent-soft/40 hover:shadow-token-md"
                         }
                     `}
                 >
                     <input {...getInputProps()} />
                     <FontAwesomeIcon
                         icon={faCloudArrowUp}
-                        className="text-5xl text-accent transition-transform duration-200 group-hover:scale-105"
+                        className="text-5xl text-accent transition-all duration-200 group-hover:scale-105 group-hover:text-accent-hover"
                     />
-                    <H2 size="lg" className="text-center">
+                    <H2 size="lg" className="text-center transition-colors group-hover:text-txt-highlight">
                         Drag & Drop your files
                     </H2>
-                    <Label as="p" className="text-center">or click to browse</Label>
+                    <Label as="p" className="text-center transition-colors group-hover:text-accent-text">or click to browse</Label>
                     <Metadata as="p" className="text-center max-w-lg">
                         Supported: {ALLOWED_EXTENSIONS.join(", ")}
                     </Metadata>

@@ -143,7 +143,7 @@ export const Navbar = (): React.ReactNode => {
 
     return (
         <div className="sticky top-0 left-0 right-0 z-50">
-            <nav className="bg-bg-primary relative z-50">
+            <nav className="bg-bg-section/95 border-b border-br-subtle shadow-sm backdrop-blur-md relative z-50">
                 <div className="mx-auto px-4 sm:px-6 py-5">
                     <div className="flex items-center h-10">
                         {/* LEFT: logo & desktop nav */}
@@ -207,7 +207,7 @@ export const Navbar = (): React.ReactNode => {
                                     >
                                         <button
                                             type="button"
-                                            className={`relative inline-flex h-10 items-center whitespace-nowrap px-1 text-md transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--accent)] after:transition-opacity after:duration-200 hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary ${
+                                            className={`relative inline-flex h-10 items-center whitespace-nowrap px-1 text-md transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--accent)] after:transition-opacity after:duration-200 hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
                                                 activeDropdown === section.label
                                                     ? "text-txt-primary after:opacity-100"
                                                     : "text-txt-secondary after:opacity-0 group-hover:after:opacity-100"
@@ -221,7 +221,7 @@ export const Navbar = (): React.ReactNode => {
                                         {/* Desktop Dropdown */}
                                         <div
                                             role="menu"
-                                            className={`absolute left-0 mt-2 w-52 rounded-lg shadow-lg bg-bg-secondary border border-br-secondary transition-all duration-200 p-2 z-40 ${
+                                            className={`absolute left-0 mt-2 w-52 rounded-lg shadow-lg bg-surface-elevated border border-br-secondary transition-all duration-200 p-2 z-40 ${
                                                 activeDropdown === section.label
                                                     ? "opacity-100 visible"
                                                     : "opacity-0 invisible"
@@ -319,7 +319,7 @@ export const Navbar = (): React.ReactNode => {
                                         {/*Profile Dropdown Options*/}
                                         <div
                                             role="menu"
-                                            className={`absolute right-0 mt-3 w-64 rounded-xl shadow-2xl bg-bg-secondary border border-br-secondary transition-all duration-300 transform origin-top-right z-40 ${
+                                            className={`absolute right-0 mt-3 w-64 rounded-xl shadow-2xl bg-surface-elevated border border-br-secondary transition-all duration-300 transform origin-top-right z-40 ${
                                                 activeDropdown === "profile"
                                                     ? "opacity-100 visible scale-100"
                                                     : "opacity-0 invisible scale-95"
@@ -433,7 +433,7 @@ export const Navbar = (): React.ReactNode => {
             {/* ---------- Mobile drawer ---------- */}
 
             <div
-                className={`md:hidden shadow-md divider-top bg-bg-primary absolute inset-x-0 transition-all duration-300 ease-in-out transform z-30 ${
+                className={`md:hidden shadow-md divider-top bg-bg-section border-b border-br-subtle absolute inset-x-0 transition-all duration-300 ease-in-out transform z-30 ${
                     isMobileMenuOpen
                         ? "translate-y-0 opacity-100 pointer-events-auto"
                         : "-translate-y-full opacity-0 pointer-events-none"

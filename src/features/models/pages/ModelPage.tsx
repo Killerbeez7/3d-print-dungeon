@@ -126,7 +126,7 @@ export function ModelPage() {
                 />
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto px-4 pb-8 lg:px-7">
                 <CommentsProvider modelId={model.id}>
                     <ModelComments openAuthModal={() => open({ mode: "login" })} />
                 </CommentsProvider>

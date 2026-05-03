@@ -61,6 +61,12 @@ export const ForumCategory: FC = () => {
                         <option value="replyCount">Most Replies</option>
                     </select>
                 </div>
+                <Link
+                    to={`/forum/new-thread?category=${categoryId}`}
+                    className="px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
+                >
+                    New Thread
+                </Link>
             </div>
 
             {/* Thread List */}

@@ -209,7 +209,7 @@ export const UserNotificationsTest = () => {
                         <button
                             onClick={handleTestUserNotification}
                             disabled={isTestingUser || !testUserId.trim()}
-                            className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+                            className="px-4 py-2 bg-warning text-txt-inverse rounded-lg hover:bg-contrast-hover transition-colors disabled:opacity-50 flex items-center justify-center"
                         >
                             <TestTube className="w-4 h-4 mr-2" />
                             {isTestingUser ? "Testing..." : `Test ${notificationType.charAt(0).toUpperCase() + notificationType.slice(1)}`}
@@ -218,7 +218,7 @@ export const UserNotificationsTest = () => {
                         <button
                             onClick={handleTestMultipleUsers}
                             disabled={isTestingUser || !testUserId.trim()}
-                            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 flex items-center justify-center"
+                            className="px-4 py-2 bg-btn-primary text-btn-primary-text rounded-lg hover:bg-btn-primary-hover transition-colors disabled:opacity-50 flex items-center justify-center"
                         >
                             <TestTube className="w-4 h-4 mr-2" />
                             Test Multiple Types

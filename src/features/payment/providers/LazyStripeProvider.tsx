@@ -27,10 +27,10 @@ const baseStripeOptions: StripeElementsOptions = {
     appearance: {
         theme: "stripe" as const,
         variables: {
-            colorPrimary: "#0570de",
-            colorBackground: "#ffffff",
-            colorText: "#30313d",
-            colorDanger: "#df1b41",
+            colorPrimary: "var(--accent)",
+            colorBackground: "var(--bg-surface)",
+            colorText: "var(--txt-primary)",
+            colorDanger: "var(--error)",
             fontFamily: "Inter, system-ui, sans-serif",
             spacingUnit: "4px",
             borderRadius: "8px",

@@ -1,18 +1,18 @@
 export const getBadgeColorClass = (color?: string) => {
     switch (color) {
         case "primary":
-            return "bg-primary text-white";
+            return "bg-gradient-to-r from-accent-dark to-accent text-btn-primary-text shadow-accent-sm";
         case "secondary":
-            return "bg-secondary text-white";
+            return "bg-btn-secondary text-txt-primary border border-br-secondary";
         case "accent":
-            return "bg-accent text-white";
+            return "bg-accent-soft text-accent-text border border-accent/30 shadow-accent-sm";
         case "success":
-            return "bg-green-500 text-white";
+            return "bg-success text-txt-inverse";
         case "warning":
-            return "bg-yellow-500 text-black";
+            return "bg-warning text-txt-inverse";
         case "error":
-            return "bg-red-500 text-white";
+            return "bg-error text-txt-inverse";
         default:
-            return "bg-accent text-white";
+            return "bg-accent-soft text-accent-text border border-accent/30 shadow-accent-sm";
     }
 };

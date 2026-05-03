@@ -1,17 +1,21 @@
 import { Link, useLocation } from "react-router-dom";
 import { LuPanelLeftClose, LuPanelLeftOpen } from "react-icons/lu";
-import { MdHome, MdDashboard } from "react-icons/md";
-import { FaUser, FaInfoCircle, FaQuestionCircle } from "react-icons/fa";
+import { MdDashboard, MdHome } from "react-icons/md";
+import { FaInfoCircle, FaQuestionCircle, FaUser } from "react-icons/fa";
 import type { ForumSidebarProps } from "@/features/forum/types/forum";
 import type { IconType } from "react-icons";
-import type { FC, ReactNode } from "react";
+import type { FC } from "react";
+
+export const FORUM_RAIL_WIDTH = 72;
+export const FORUM_EXPANDED_WIDTH = 320;
 
 interface SidebarLinkProps {
-    icon?: IconType;
-    label?: ReactNode;
+    icon: IconType;
+    label: string;
     to: string;
     onClick?: () => void;
-    className?: string;
+    isActive?: boolean;
+    showLabel: boolean;
 }
 
 const SidebarLink: FC<SidebarLinkProps> = ({
@@ -19,17 +23,37 @@ const SidebarLink: FC<SidebarLinkProps> = ({
     label,
     to,
     onClick,
-    className = "",
-}) => (
-    <Link
-        to={to}
-        onClick={onClick}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-[var(--bg-surface)] ${className}`}
-    >
-        {Icon && <Icon size={20} width={20} height={20} />}
-        {label && <span>{label}</span>}
-    </Link>
-);
+    isActive = false,
+    showLabel,
+}) => {
+    return (
+        <Link
+            to={to}
+            onClick={onClick}
+            title={showLabel ? undefined : label}
+            aria-label={label}
+            className={[
+                "grid h-10 grid-cols-[40px_1fr] items-center rounded-lg text-sm transition-colors duration-200",
+                isActive
+                    ? "bg-[var(--bg-surface)] font-semibold text-[var(--txt-primary)]"
+                    : "text-[var(--txt-secondary)] hover:bg-[var(--bg-surface)] hover:text-[var(--txt-primary)]",
+            ].join(" ")}
+        >
+            <span className="flex h-10 w-10 items-center justify-center">
+                <Icon size={20} className="shrink-0" />
+            </span>
+
+            <span
+                className={[
+                    "min-w-0 overflow-hidden whitespace-nowrap pr-3 pl-2 will-change-[opacity] transition-opacity duration-150 ease-out",
+                    showLabel ? "opacity-100 delay-100" : "pointer-events-none opacity-0 delay-0",
+                ].join(" ")}
+            >
+                {label}
+            </span>
+        </Link>
+    );
+};
 
 export const ForumSidebar: FC<ForumSidebarProps> = ({
     isSidebarOpen,
@@ -39,208 +63,120 @@ export const ForumSidebar: FC<ForumSidebarProps> = ({
     className,
 }) => {
     const location = useLocation();
+    const showLabels = isSidebarOpen;
+
+    const isActive = (path: string) => location.pathname === path;
+    const isCategoryActive = (categoryId: string) =>
+        location.pathname === `/forum/category/${categoryId}`;
+
+    const mainLinks = [
+        { icon: MdHome, label: "Home", to: "/forum" },
+        { icon: MdDashboard, label: "Dashboard", to: "/forum/dashboard" },
+        { icon: FaUser, label: "My Threads", to: "/forum/my-threads" },
+    ];
+
+    const infoLinks = [
+        { icon: FaInfoCircle, label: "Forum Rules", to: "/forum/rules" },
+        { icon: FaQuestionCircle, label: "Help", to: "/forum/help" },
+    ];
+
+    const handleLinkClick = () => {
+        handleSidebarClick();
+    };
+
+    const renderSection = (
+        links: Array<{ icon: IconType; label: string; to: string }>
+    ) => (
+        <div className="space-y-1">
+            {links.map((link) => (
+                <SidebarLink
+                    key={link.to}
+                    icon={link.icon}
+                    label={link.label}
+                    to={link.to}
+                    onClick={handleLinkClick}
+                    isActive={isActive(link.to)}
+                    showLabel={showLabels}
+                />
+            ))}
+        </div>
+    );
 
     return (
-        <div className={`${className} sticky top-20 h-[calc(100vh-120px)]`}>
-            {/* Compact Sidebar */}
-            <div
-                className={`absolute left-0 w-[70px] h-[calc(100vh-120px)] flex flex-col transition-all duration-300 ease-in-out ${
-                    !isSidebarOpen
-                        ? "translate-x-0 opacity-100"
-                        : "-translate-x-full opacity-0"
-                }`}
-            >
-                <section className="text-[var(--txt-primary)] h-full">
-                    <div className="p-3">
-                        <div className="flex justify-center items-center">
-                            <button
-                                onClick={toggleSidebar}
-                                className="p-2 rounded-[10px] text-[var(--txt-secondary)] hover:bg-[var(--bg-surface)]"
-                                aria-label="Toggle sidebar"
-                            >
-                                <LuPanelLeftOpen size={20} width={20} height={20} />
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="divider-top p-[10px] flex-1">
-                        <nav className="space-y-1 flex flex-col items-center">
-                            {categories && (
-                                <>
-                                    {/* MAIN */}
-                                    <SidebarLink
-                                        icon={MdHome}
-                                        label={null}
-                                        to="/forum"
-                                        onClick={handleSidebarClick}
-                                        className="justify-center flex items-center mx-auto p-2"
-                                    />
-                                    <SidebarLink
-                                        icon={MdDashboard}
-                                        label={null}
-                                        to="/forum/dashboard"
-                                        onClick={handleSidebarClick}
-                                        className="justify-center flex items-center mx-auto p-2"
-                                    />
-                                    <SidebarLink
-                                        icon={FaUser}
-                                        label={null}
-                                        to="/forum/my-threads"
-                                        onClick={handleSidebarClick}
-                                        className="justify-center flex items-center mx-auto p-2"
-                                    />
-                                    <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
-                                    {/* CATEGORIES */}
-                                    {categories.map((category) => {
-                                        const Icon = category.icon;
-                                        return (
-                                            <SidebarLink
-                                                key={category.id}
-                                                icon={Icon}
-                                                label={null}
-                                                to={`/forum/category/${category.id}`}
-                                                onClick={handleSidebarClick}
-                                                className={`justify-center flex items-center mx-auto p-2 ${
-                                                    location.pathname ===
-                                                    `/forum/category/${category.id}`
-                                                        ? "bg-[var(--bg-surface)] text-[var(--txt-primary)]"
-                                                        : "hover:bg-[var(--bg-surface)]"
-                                                }`}
-                                            />
-                                        );
-                                    })}
-                                    <div className="my-2 border-t border-[var(--br-secondary)] w-full" />
-                                    {/* INFO */}
-                                    <SidebarLink
-                                        icon={FaInfoCircle}
-                                        label={null}
-                                        to="/forum/rules"
-                                        onClick={handleSidebarClick}
-                                        className="justify-center flex items-center mx-auto p-2"
-                                    />
-                                    <SidebarLink
-                                        icon={FaQuestionCircle}
-                                        label={null}
-                                        to="/forum/help"
-                                        onClick={handleSidebarClick}
-                                        className="justify-center flex items-center mx-auto p-2"
-                                    />
-                                </>
-                            )}
-                        </nav>
-                    </div>
-                </section>
-            </div>
-
-            {/* Full Sidebar */}
-            <div
-                className={`hidden md:flex absolute left-0 w-[100vw] lg:w-[300px] h-[calc(100vh-120px)] flex-col transition-transform duration-200 ${
-                    isSidebarOpen
-                        ? "translate-x-0 opacity-100"
-                        : "-translate-x-[100vw] opacity-0"
-                }`}
-            >
-                <section
-                    className={`text-[var(--txt-primary)] h-full ${
+        <aside
+            className={[
+                className ?? "",
+                "sticky top-20 hidden self-start shrink-0 overflow-hidden border-r border-[var(--br-secondary)]",
+                "bg-[var(--bg-primary)] text-[var(--txt-primary)] shadow-xl transition-[width] duration-300 ease-in-out md:flex md:flex-col",
+            ].join(" ")}
+            style={{
+                width: isSidebarOpen ? FORUM_EXPANDED_WIDTH : FORUM_RAIL_WIDTH,
+                height: "calc(100vh - 5rem)",
+            }}
+        >
+            <div className="grid h-14 grid-cols-[40px_1fr] items-center px-4">
+                <button
+                    type="button"
+                    onClick={toggleSidebar}
+                    aria-expanded={isSidebarOpen}
+                    aria-pressed={isSidebarOpen}
+                    aria-label={
                         isSidebarOpen
-                            ? "bg-[var(--bg-primary)]"
-                            : "bg-[var(--bg-primary)]"
-                    }`}
+                            ? "Collapse forum navigation"
+                            : "Expand forum navigation"
+                    }
+                    className="flex h-10 w-10 items-center justify-center rounded-lg text-[var(--txt-secondary)] transition-colors duration-200 hover:bg-[var(--bg-surface)] hover:text-[var(--txt-primary)]"
                 >
-                    <div className="p-3">
-                        <div className="flex justify-end items-center">
-                            <button
-                                onClick={toggleSidebar}
-                                className="p-2 rounded-[10px] text-[var(--txt-secondary)] hover:bg-[var(--bg-surface)]"
-                                aria-label="Toggle sidebar"
-                            >
-                                <LuPanelLeftClose size={20} width={20} height={20} />
-                            </button>
-                        </div>
-                    </div>
+                    {isSidebarOpen ? (
+                        <LuPanelLeftClose size={20} />
+                    ) : (
+                        <LuPanelLeftOpen size={20} />
+                    )}
+                </button>
 
-                    <div className="divider-top p-3 flex-1">
-                        <nav className="space-y-1">
-                            {categories && (
-                                <>
-                                    {/* MAIN */}
-
-                                    <div className="mb-2">
-                                        <div>
-                                            <SidebarLink
-                                                icon={MdHome}
-                                                label="Home"
-                                                to="/forum"
-                                                onClick={handleSidebarClick}
-                                            />
-                                        </div>
-                                        <div>
-                                            <SidebarLink
-                                                icon={MdDashboard}
-                                                label="Dashboard"
-                                                to="/forum/dashboard"
-                                                onClick={handleSidebarClick}
-                                            />
-                                        </div>
-                                        <div>
-                                            <SidebarLink
-                                                icon={FaUser}
-                                                label="My Threads"
-                                                to="/forum/my-threads"
-                                                onClick={handleSidebarClick}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="my-1 border-t border-[var(--br-secondary)]" />
-                                    {/* CATEGORIES */}
-                                    <div className="mb-2">
-                                        <h5 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-1">
-                                            CATEGORIES
-                                        </h5>
-                                        {categories.map((category) => {
-                                            const Icon = category.icon;
-                                            return (
-                                                <SidebarLink
-                                                    key={category.id}
-                                                    icon={Icon}
-                                                    label={category.name}
-                                                    to={`/forum/category/${category.id}`}
-                                                    onClick={handleSidebarClick}
-                                                    className={`$${
-                                                        location.pathname ===
-                                                        `/forum/category/${category.id}`
-                                                            ? "bg-[var(--bg-surface)] text-[var(--txt-primary)] font-semibold"
-                                                            : "hover:bg-[var(--bg-surface)]"
-                                                    }`}
-                                                />
-                                            );
-                                        })}
-                                    </div>
-                                    <div className="my-1 border-t border-[var(--br-secondary)]" />
-                                    {/* INFO */}
-                                    <div>
-                                        <h5 className="px-3 text-xs font-semibold text-[var(--txt-muted)] uppercase tracking-wider mb-1">
-                                            INFO
-                                        </h5>
-                                        <SidebarLink
-                                            icon={FaInfoCircle}
-                                            label="Forum Rules"
-                                            to="/forum/rules"
-                                            onClick={handleSidebarClick}
-                                        />
-                                        <SidebarLink
-                                            icon={FaQuestionCircle}
-                                            label="Help"
-                                            to="/forum/help"
-                                            onClick={handleSidebarClick}
-                                        />
-                                    </div>
-                                </>
-                            )}
-                        </nav>
-                    </div>
-                </section>
+                <span
+                    className={[
+                        "min-w-0 overflow-hidden whitespace-nowrap pl-3 text-sm font-semibold text-[var(--txt-primary)] will-change-[opacity] transition-opacity duration-150 ease-out",
+                        showLabels ? "opacity-100 delay-100" : "pointer-events-none opacity-0 delay-0",
+                    ].join(" ")}
+                >
+                    Forum
+                </span>
             </div>
-        </div>
+
+            <nav className="flex min-h-0 flex-1 flex-col border-t border-[var(--br-secondary)] px-4 py-3">
+                <div className="space-y-1">
+                    {renderSection(mainLinks)}
+                </div>
+
+                <div className="my-4 border-t border-[var(--br-secondary)]" />
+
+                <div className="min-h-0 flex-1 overflow-y-auto">
+                    <div className="space-y-1">
+                        {categories.map((category) => {
+                            const CategoryIcon = category.icon ?? FaQuestionCircle;
+
+                            return (
+                                <SidebarLink
+                                    key={category.id}
+                                    icon={CategoryIcon}
+                                    label={category.name}
+                                    to={`/forum/category/${category.id}`}
+                                    onClick={handleLinkClick}
+                                    isActive={isCategoryActive(category.id)}
+                                    showLabel={showLabels}
+                                />
+                            );
+                        })}
+                    </div>
+                </div>
+
+                <div className="my-4 border-t border-[var(--br-secondary)]" />
+
+                <div className="space-y-1 pb-1">
+                    {renderSection(infoLinks)}
+                </div>
+            </nav>
+        </aside>
     );
 };

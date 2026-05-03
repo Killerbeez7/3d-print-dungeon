@@ -20,7 +20,7 @@ const NextArrow = ({ className, style, onClick }: ArrowProps) => (
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "rgba(0,0,0,0.5)",
+            background: "var(--surface-overlay)",
             borderRadius: "50%",
             width: "35px",
             height: "35px",
@@ -30,7 +30,7 @@ const NextArrow = ({ className, style, onClick }: ArrowProps) => (
         }}
         onClick={onClick}
     >
-        <FaArrowRight style={{ color: "#fff", fontSize: "20px" }} />
+        <FaArrowRight style={{ color: "var(--txt-highlight)", fontSize: "20px" }} />
     </div>
 );
 
@@ -42,7 +42,7 @@ const PrevArrow = ({ className, style, onClick }: ArrowProps) => (
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            background: "rgba(0,0,0,0.5)",
+            background: "var(--surface-overlay)",
             borderRadius: "50%",
             width: "35px",
             height: "35px",
@@ -52,7 +52,7 @@ const PrevArrow = ({ className, style, onClick }: ArrowProps) => (
         }}
         onClick={onClick}
     >
-        <FaArrowLeft style={{ color: "#fff", fontSize: "20px" }} />
+        <FaArrowLeft style={{ color: "var(--txt-highlight)", fontSize: "20px" }} />
     </div>
 );
 

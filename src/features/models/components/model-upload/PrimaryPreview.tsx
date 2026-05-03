@@ -21,7 +21,7 @@ export const PrimaryPreview: FC<PrimaryPreviewProps> = ({
         return (
             <div
                 onClick={onSelect}
-                className="aspect-video flex flex-col items-center justify-center border-2 border-dashed border-br-primary rounded-lg cursor-pointer hover:border-accent hover:text-accent transition-colors"
+                className="aspect-video flex flex-col items-center justify-center border-2 border-dashed border-br-primary rounded-lg cursor-pointer hover:border-accent hover:bg-accent-soft/40 hover:text-accent transition-colors"
             >
                 <FontAwesomeIcon icon={faImage} className="text-4xl mb-3" />
                 <span className="font-medium">Add Primary Render</span>

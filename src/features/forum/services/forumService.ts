@@ -16,12 +16,14 @@ import {
     increment,
     QueryDocumentSnapshot,
     DocumentData,
+    DocumentSnapshot,
     writeBatch,
 } from "firebase/firestore";
 import type {
     ForumThread, ForumReply, ForumCategory, FetchThreadsOptions, FetchRepliesOptions,
     CreateThreadParams, CreateReplyParams
 } from "@/features/forum/types/forum";
+import { FORUM_CATEGORIES } from "@/config/forumCategories";
 
 
 export const PAGE_SIZE = 20;
@@ -43,6 +45,7 @@ export async function fetchThreads(opts: FetchThreadsOptions = {}): Promise<{
         timeFrame,
     } = opts;
 
+    const normalizedSearch = search?.trim().toLowerCase();
     let q = query(collection(db, "forumThreads"));
 
     // Apply filters
@@ -52,16 +55,6 @@ export async function fetchThreads(opts: FetchThreadsOptions = {}): Promise<{
 
     if (authorId) {
         q = query(q, where("authorId", "==", authorId));
-    }
-
-    if (search) {
-        // Note: This requires a composite index for title range queries with sorting
-        // The search functionality might need to be implemented differently for better performance
-        q = query(
-            q,
-            where("title", ">=", search),
-            where("title", "<=", search + "\uf8ff")
-        );
     }
 
     // Apply specific filters
@@ -97,13 +90,39 @@ export async function fetchThreads(opts: FetchThreadsOptions = {}): Promise<{
     // Apply sorting
     q = query(q, orderBy(sortBy, sortOrder));
 
-    // Apply pagination
-    q = cursor ? query(q, startAfter(cursor), limit(lim)) : query(q, limit(lim));
+    // Search is intentionally client-filtered across the latest matching query window
+    // so titles, body text, category names, and tags all behave consistently.
+    const queryLimit = normalizedSearch ? Math.max(lim, 100) : lim;
+    q = cursor ? query(q, startAfter(cursor), limit(queryLimit)) : query(q, limit(queryLimit));
 
     const snap = await getDocs(q);
+    let threads = snap.docs.map(normalizeThread);
+
+    if (normalizedSearch) {
+        threads = threads.filter((thread) => {
+            const categoryName =
+                FORUM_CATEGORIES.find((category) => category.id === thread.categoryId)
+                    ?.name ?? "";
+            const searchable = [
+                thread.title,
+                thread.content,
+                categoryName,
+                thread.categoryId,
+                ...(thread.tags ?? []),
+            ]
+                .join(" ")
+                .toLowerCase();
+
+            return searchable.includes(normalizedSearch);
+        });
+    }
+
     return {
-        threads: snap.docs.map(normalizeThread),
-        nextCursor: snap.docs.length === lim ? snap.docs[snap.docs.length - 1] : undefined,
+        threads,
+        nextCursor:
+            !normalizedSearch && snap.docs.length === lim
+                ? snap.docs[snap.docs.length - 1]
+                : undefined,
     };
 }
 
@@ -124,9 +143,30 @@ export async function fetchReplies(opts: FetchRepliesOptions): Promise<{
 
     const snap = await getDocs(q);
     return {
-        replies: snap.docs.map((doc) => ({ ...(doc.data() as ForumReply), id: doc.id })),
+        replies: snap.docs.map(normalizeReply),
         nextCursor: snap.docs.length === lim ? snap.docs[snap.docs.length - 1] : undefined,
     };
+}
+
+export async function getUserReplies(
+    authorId: string,
+    limitCount: number = 20
+): Promise<ForumReply[]> {
+    try {
+        const repliesRef = collection(db, "forumReplies");
+        const q = query(
+            repliesRef,
+            where("authorId", "==", authorId),
+            orderBy("createdAt", "desc"),
+            limit(limitCount)
+        );
+
+        const snapshot = await getDocs(q);
+        return snapshot.docs.map(normalizeReply);
+    } catch (error) {
+        console.error("Error getting user replies:", error);
+        throw error;
+    }
 }
 
 // Create a new forum thread
@@ -253,9 +293,22 @@ export async function getThreadById(threadId: string): Promise<ForumThread> {
 
 
 // Update a thread
-export async function updateThread(threadId: string, threadData: Partial<ForumThread>): Promise<string> {
+export async function updateThread(
+    threadId: string,
+    threadData: Partial<ForumThread>,
+    authorId?: string
+): Promise<string> {
     try {
         const threadRef = doc(db, "forumThreads", threadId);
+        const threadSnap = await getDoc(threadRef);
+
+        if (!threadSnap.exists()) {
+            throw new Error("Thread not found");
+        }
+
+        if (authorId && threadSnap.data().authorId !== authorId) {
+            throw new Error("You can only edit your own threads");
+        }
 
         // Remove undefined values to avoid Firestore errors
         const cleanData = Object.fromEntries(
@@ -269,6 +322,22 @@ export async function updateThread(threadId: string, threadData: Partial<ForumTh
         return threadId;
     } catch (error) {
         console.error("Error updating thread:", error);
+        throw error;
+    }
+}
+
+export async function getReplyById(replyId: string): Promise<ForumReply> {
+    try {
+        const replyRef = doc(db, "forumReplies", replyId);
+        const replySnap = await getDoc(replyRef);
+
+        if (!replySnap.exists()) {
+            throw new Error("Reply not found");
+        }
+
+        return normalizeReply(replySnap);
+    } catch (error) {
+        console.error("Error getting reply:", error);
         throw error;
     }
 }
@@ -344,9 +413,23 @@ export async function updateReply(replyId: string, replyData: Record<string, unk
 }
 
 // Delete a reply
-export async function deleteReply(replyId: string, threadId: string): Promise<string> {
+export async function deleteReply(
+    replyId: string,
+    threadId: string,
+    authorId?: string
+): Promise<string> {
     try {
         const replyRef = doc(db, "forumReplies", replyId);
+        const replySnap = await getDoc(replyRef);
+
+        if (!replySnap.exists()) {
+            throw new Error("Reply not found");
+        }
+
+        if (authorId && replySnap.data().authorId !== authorId) {
+            throw new Error("You can only delete your own replies");
+        }
+
         await deleteDoc(replyRef);
 
         // Update thread's replyCount
@@ -449,8 +532,8 @@ export async function getUnansweredThreads(limitCount: number = 10): Promise<For
 }
 
 // Normalize thread document data
-function normalizeThread(doc: QueryDocumentSnapshot<DocumentData>): ForumThread {
-    const data = doc.data();
+function normalizeThread(doc: QueryDocumentSnapshot<DocumentData> | DocumentSnapshot<DocumentData>): ForumThread {
+    const data = doc.data() ?? {};
 
     return {
         id: doc.id,
@@ -468,4 +551,23 @@ function normalizeThread(doc: QueryDocumentSnapshot<DocumentData>): ForumThread 
         isLocked: Boolean(data.isLocked),
         tags: Array.isArray(data.tags) ? data.tags : [],
     };
-} 
+}
+
+function normalizeReply(doc: QueryDocumentSnapshot<DocumentData> | DocumentSnapshot<DocumentData>): ForumReply {
+    const data = doc.data() ?? {};
+
+    return {
+        id: doc.id,
+        threadId: typeof data.threadId === "string" ? data.threadId : "",
+        content: typeof data.content === "string" ? data.content : "",
+        authorId: typeof data.authorId === "string" ? data.authorId : "",
+        authorName: typeof data.authorName === "string" ? data.authorName : "",
+        authorPhotoURL:
+            typeof data.authorPhotoURL === "string" ? data.authorPhotoURL : "",
+        createdAt: data.createdAt as Date,
+        updatedAt: data.updatedAt as Date,
+        isEdited: Boolean(data.isEdited),
+        parentReplyId:
+            typeof data.parentReplyId === "string" ? data.parentReplyId : undefined,
+    };
+}

@@ -50,7 +50,7 @@ export const LazyImage = ({
         <div ref={imgRef} className={`relative overflow-hidden select-none ${wrapperClassName}`}>
             {!loaded && (
                 <div
-                    className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse"
+                    className="absolute inset-0 bg-bg-muted animate-pulse"
                     style={{ transition: "opacity 0.5s ease" }}
                 ></div>
             )}

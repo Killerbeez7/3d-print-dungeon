@@ -49,7 +49,7 @@ export const EventsHome = () => {
                             className={`flex-1 px-2 sm:px-4 py-2 rounded font-semibold transition text-center text-sm sm:text-base
                     ${
                         type === key
-                            ? "bg-accent text-txt-highlight"
+                            ? "bg-btn-primary text-btn-primary-text"
                             : "bg-bg-surface text-txt-primary hover:bg-bg-tertiary"
                     }`}
                         >
@@ -73,7 +73,7 @@ export const EventsHome = () => {
             {showCreate && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center">
                     {/* Backdrop with blur effect */}
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowCreate(false)} />
+                    <div className="absolute inset-0 bg-bg-page/70 backdrop-blur-sm" onClick={() => setShowCreate(false)} />
                     
                     {/* Modal content */}
                     <div className="relative bg-bg-secondary border border-br-secondary rounded-2xl shadow-2xl p-8 max-w-2xl w-full mx-4 transform transition-all duration-300 ease-out">

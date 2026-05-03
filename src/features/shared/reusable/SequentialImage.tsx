@@ -45,7 +45,7 @@ export const SequentialImage = memo(function SequentialImage({
                 position: "relative",
                 width: "100%",
                 paddingBottom: "100%",
-                background: "#333",
+                background: "var(--bg-muted)",
                 ...(shouldLoad ? {} : placeholderStyle),
             }}
         >

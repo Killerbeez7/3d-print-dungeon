@@ -1,6 +1,8 @@
-import { FC, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useForum } from "@/features/forum/hooks/useForum";
+import { FC } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useModal } from "@/hooks/useModal";
+import { useFetchThreads, useFetchCategories } from "@/features/forum/hooks";
 import { formatDistanceToNow } from "date-fns";
 import { FaComment, FaEye, FaTag, FaUser, FaCalendar } from "react-icons/fa";
 import Skeleton from "@/features/shared/Skeleton";
@@ -18,41 +20,24 @@ export const ThreadList: FC<ThreadListProps> = ({
     showCategory = false,
     isCompact = false,
 }: ThreadListProps) => {
-    const { getThreadsByCategory, loadMoreThreads, threads, pagination, loading, error } =
-        useForum();
+    const { currentUser } = useAuth();
+    const { open } = useModal("auth");
+    const navigate = useNavigate();
+    const { data: categories = [] } = useFetchCategories();
+    const {
+        data,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+        isLoading,
+        error,
+    } = useFetchThreads({
+        categoryId,
+        sortBy: sortBy as "lastActivity" | "createdAt" | "views" | "replyCount",
+        sortOrder: "desc",
+    });
 
-    const [localThreads, setLocalThreads] = useState<ForumThread[]>([]);
-    const [loadingMore, setLoadingMore] = useState<boolean>(false);
-
-    useEffect(() => {
-        const fetchThreads = async () => {
-            try {
-                await getThreadsByCategory(categoryId, sortBy as "lastActivity" | "createdAt" | "views" | "replyCount");
-            } catch (err) {
-                const msg = err instanceof Error ? err.message : String(err);
-                console.error("Error fetching threads:", msg);
-            }
-        };
-        fetchThreads();
-    }, [categoryId, sortBy, getThreadsByCategory]);
-
-    useEffect(() => {
-        if (categoryId && threads.byCategory && threads.byCategory[categoryId]) {
-            setLocalThreads(threads.byCategory[categoryId]);
-        }
-    }, [categoryId, threads.byCategory]);
-
-    const handleLoadMore = async () => {
-        setLoadingMore(true);
-        try {
-            await loadMoreThreads(categoryId, sortBy as "lastActivity" | "createdAt" | "views" | "replyCount");
-        } catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            console.error("Error loading more threads:", msg);
-        } finally {
-            setLoadingMore(false);
-        }
-    };
+    const localThreads = data?.pages.flatMap((page) => page.threads) ?? [];
 
     const formatDate = (timestamp: unknown): string => {
         if (!timestamp) return "Unknown date";
@@ -65,7 +50,7 @@ export const ThreadList: FC<ThreadListProps> = ({
         return formatDistanceToNow(date, { addSuffix: true });
     };
 
-    if (loading && !loadingMore) {
+    if (isLoading) {
         return (
             <div className="space-y-4">
                 {[...Array(5)].map((_, i) => (
@@ -88,23 +73,32 @@ export const ThreadList: FC<ThreadListProps> = ({
     if (error) {
         return (
             <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-4 rounded-lg">
-                Error loading threads: {error}
+                Error loading threads: {error.message}
             </div>
         );
     }
 
     if (!localThreads || localThreads.length === 0) {
         return (
-            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
-                <p className="text-[var(--txt-muted)]">
-                    No threads found in this category. Be the first to start a discussion!
+            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+                <h3 className="font-semibold mb-2">No threads in this category</h3>
+                <p className="text-[var(--txt-muted)] mb-4">
+                    This category is ready for focused discussion. Start the first thread
+                    here or browse another category from the sidebar.
                 </p>
-                <Link
-                    to="/forum/new-thread"
-                    className="inline-block mt-4 px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
+                <button
+                    type="button"
+                    onClick={() => {
+                        if (!currentUser) {
+                            open({ mode: "login" });
+                            return;
+                        }
+                        navigate(`/forum/new-thread?category=${categoryId}`);
+                    }}
+                    className="inline-block px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
                 >
-                    Create New Thread
-                </Link>
+                    Create Thread in This Category
+                </button>
             </div>
         );
     }
@@ -173,21 +167,25 @@ export const ThreadList: FC<ThreadListProps> = ({
                         {showCategory && (
                             <span className="inline-flex items-center ml-auto text-blue-600 dark:text-blue-400">
                                 <Link to={`/forum/category/${thread.categoryId}`}>
-                                    {thread.categoryName ?? "Category"}
+                                    {thread.categoryName ??
+                                        categories.find(
+                                            (category) => category.id === thread.categoryId
+                                        )?.name ??
+                                        "Category"}
                                 </Link>
                             </span>
                         )}
                     </div>
                 </div>
             ))}
-            {pagination.threads.hasMore && (
+            {hasNextPage && (
                 <div className="flex justify-center mt-4">
                     <button
-                        onClick={handleLoadMore}
-                        disabled={loadingMore}
+                        onClick={() => fetchNextPage()}
+                        disabled={isFetchingNextPage}
                         className="px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] disabled:bg-[var(--accent-hover)] disabled:cursor-not-allowed transition"
                     >
-                        {loadingMore ? <Spinner size={12} /> : "Load More"}
+                        {isFetchingNextPage ? <Spinner size={12} /> : "Load More"}
                     </button>
                 </div>
             )}

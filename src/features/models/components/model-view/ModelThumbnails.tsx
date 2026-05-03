@@ -18,16 +18,16 @@ export const ModelThumbnails = ({
             <div className="flex space-x-4 overflow-x-auto pb-5 -mx-2 px-2">
                 <div
                     onClick={() => setSelectedRenderIndex(-1)}
-                    className={`flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 border-2 rounded-lg cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800 ${
+                    className={`flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 border-2 rounded-lg cursor-pointer overflow-hidden bg-bg-muted ${
                         selectedRenderIndex === -1
-                            ? "border-fuchsia-600 shadow-lg ring-2 ring-fuchsia-500/50"
-                            : "border-gray-200 dark:border-gray-700 hover:border-fuchsia-500 hover:shadow-md"
+                            ? "border-accent shadow-lg ring-2 ring-accent/45"
+                            : "border-br-secondary hover:border-accent hover:shadow-md"
                     }`}
                 >
                     <div className="w-full h-full flex items-center justify-center">
                         <Model3DIcon
                             size={32}
-                            className="text-gray-600 dark:text-gray-400"
+                            className="text-txt-secondary"
                         />
                     </div>
                 </div>
@@ -36,10 +36,10 @@ export const ModelThumbnails = ({
                     <div
                         key={idx}
                         onClick={() => setSelectedRenderIndex(idx)}
-                        className={`flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 border-2 rounded-lg cursor-pointer overflow-hidden bg-gray-100 dark:bg-gray-800 ${
+                        className={`flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 border-2 rounded-lg cursor-pointer overflow-hidden bg-bg-muted ${
                             selectedRenderIndex === idx
-                                ? "border-fuchsia-600 shadow-lg ring-2 ring-fuchsia-500/50"
-                                : "border-gray-200 dark:border-gray-700 hover:border-fuchsia-500 hover:shadow-md"
+                                ? "border-accent shadow-lg ring-2 ring-accent/45"
+                                : "border-br-secondary hover:border-accent hover:shadow-md"
                         }`}
                     >
                         <LazyImage

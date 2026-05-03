@@ -55,10 +55,10 @@ const socialPlatforms = [
         key: 'website',
         name: 'Website',
         icon: Globe,
-        color: 'hover:bg-purple-500/10 hover:text-purple-500 hover:border-purple-500/20',
-        bgColor: 'bg-purple-500/5',
-        borderColor: 'border-purple-500/20',
-        textColor: 'text-purple-500'
+        color: 'hover:bg-accent-soft hover:text-accent-text hover:border-accent/25',
+        bgColor: 'bg-accent-soft',
+        borderColor: 'border-accent/25',
+        textColor: 'text-accent-text'
     }
 ];
 
@@ -92,7 +92,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
             {/* Personal Information */}
             <div className="bg-bg-secondary rounded-lg p-6">
                 <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-success rounded-full flex items-center justify-center">
                         <i className="fas fa-info text-white text-sm"></i>
                     </div>
                     <h3 className="text-xl font-semibold text-txt-primary">

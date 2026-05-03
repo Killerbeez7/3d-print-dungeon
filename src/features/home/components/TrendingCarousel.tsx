@@ -38,10 +38,10 @@ export const TrendingCarousel: FC<TrendingCarouselProps> = ({
                 </div>
 
                 {/* Overlay Content */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-t from-bg-page/70 to-transparent flex flex-col justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                     {/* Top Content - Mature Badge */}
                     {item.mature && (
-                        <Badge as="div" className="bg-red-600 text-white px-2 py-1 rounded self-start">
+                        <Badge as="div" className="bg-error text-txt-highlight px-2 py-1 rounded self-start">
                             MATURE CONTENT
                         </Badge>
                     )}
@@ -54,7 +54,7 @@ export const TrendingCarousel: FC<TrendingCarouselProps> = ({
 
                         {/* Rating and Reviews */}
                         <div className="flex items-center gap-2 mb-2">
-                            <span className="bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded">
+                            <span className="bg-accent-soft text-accent-text text-xs px-1.5 py-0.5 rounded">
                                 {item.rating.toFixed(1)}
                             </span>
                             <span className="text-xs opacity-90">

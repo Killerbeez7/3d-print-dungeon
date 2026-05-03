@@ -131,7 +131,7 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
                             required
                             spellCheck="false"
                             autoComplete="email"
-                            className="w-full pl-10 pr-4 py-3 border border-br-secondary rounded-xl bg-white placeholder-gray-500 shadow-token-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:border-[var(--color-focus)] transition-all duration-200"
+                            className="w-full pl-10 pr-4 py-3 border border-br-secondary rounded-xl bg-bg-surface text-txt-primary placeholder-txt-muted shadow-token-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:border-[var(--color-focus)] transition-all duration-200"
                             placeholder="Enter your email"
                         />
                         <ValidityIndicator
@@ -172,7 +172,7 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
                             required
                             spellCheck="false"
                             autoComplete="new-password"
-                            className="w-full pl-10 pr-12 py-3 border border-br-secondary rounded-xl bg-white placeholder-gray-500 shadow-token-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:border-[var(--color-focus)] transition-all duration-200"
+                            className="w-full pl-10 pr-12 py-3 border border-br-secondary rounded-xl bg-bg-surface text-txt-primary placeholder-txt-muted shadow-token-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:border-[var(--color-focus)] transition-all duration-200"
                             placeholder="Create a password"
                         />
                         <button
@@ -221,7 +221,7 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
                             required
                             spellCheck="false"
                             autoComplete="new-password"
-                            className="w-full pl-10 pr-12 py-3 border border-br-secondary rounded-xl bg-white placeholder-gray-500 shadow-token-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:border-[var(--color-focus)] transition-all duration-200"
+                            className="w-full pl-10 pr-12 py-3 border border-br-secondary rounded-xl bg-bg-surface text-txt-primary placeholder-txt-muted shadow-token-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:border-[var(--color-focus)] transition-all duration-200"
                             placeholder="Confirm your password"
                         />
                         <button
@@ -257,10 +257,10 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
 
                 {/* Error message */}
                 {error && (
-                    <div className="flex items-center p-3 bg-red-50 border border-red-200 rounded-xl">
+                    <div className="flex items-center p-3 bg-bg-muted border border-error rounded-xl">
                         <FontAwesomeIcon
                             icon={faExclamationTriangle}
-                            className="text-red-500 mr-2"
+                            className="text-error mr-2"
                         />
                         <p className="text-auth-modal-text-primary text-sm font-medium">
                             {error}
@@ -298,7 +298,7 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
                         onClick={() => handleOAuthSignIn("google")}
                         disabled={loading}
                         className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary 
-                        rounded-lg lg:rounded-xl text-gray-700 bg-white hover:shadow-token-md hover:scale-[1.02] 
+                        rounded-lg lg:rounded-xl text-txt-primary bg-bg-surface hover:shadow-token-md hover:scale-[1.02] 
                         transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Google"
                     >
@@ -315,7 +315,7 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
                     <button
                         onClick={() => handleOAuthSignIn("facebook")}
                         disabled={loading}
-                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-txt-primary bg-bg-surface hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Facebook"
                     >
                         <FontAwesomeIcon
@@ -331,7 +331,7 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
                     <button
                         onClick={() => handleOAuthSignIn("twitter")}
                         disabled={loading}
-                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-gray-700 bg-white hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                        className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary rounded-lg lg:rounded-xl text-txt-primary bg-bg-surface hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                         title="Continue with Twitter"
                     >
                         <FontAwesomeIcon
@@ -348,12 +348,12 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
 
             {/* Switch to Sign In */}
             <div className="mt-6 text-center">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-txt-secondary">
                     Already have an account?{" "}
                     <button
                         type="button"
                         onClick={onSwitchToSignIn}
-                        className="text-slate-700 hover:text-blue-600 font-semibold transition-all duration-200 hover:scale-105 hover:underline"
+                        className="text-link hover:text-link-hover font-semibold transition-all duration-200 hover:scale-105 hover:underline"
                     >
                         Sign In
                     </button>
