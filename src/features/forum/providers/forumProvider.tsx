@@ -15,6 +15,7 @@ import {
     incrementThreadViews,
     fetchThreads,
     fetchReplies,
+    getUserReplies as getUserRepliesService,
 } from "@/features/forum/services/forumService";
 import { FORUM_CATEGORIES } from "@/config/forumCategories";
 import type {
@@ -409,7 +410,7 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             setLoading(true);
             setError(null);
             try {
-                await updateThreadService(threadId, data);
+                await updateThreadService(threadId, data, currentUser.uid);
                 setCurrentThread((prev) =>
                     prev?.id === threadId ? { ...prev, ...data } : prev
                 );
@@ -515,7 +516,7 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
             setLoading(true);
             setError(null);
             try {
-                await deleteReplyService(replyId, threadId);
+                await deleteReplyService(replyId, threadId, currentUser.uid);
                 setCurrentThread((prev) => {
                     if (!prev) return null;
                     return {
@@ -628,15 +629,11 @@ export const ForumProvider = ({ children }: ForumProviderProps) => {
         []
     );
 
-    // Get user's replies - placeholder implementation
     const getUserReplies = useCallback(async (userId: string) => {
         setLoading(true);
         setError(null);
         try {
-            // TODO: Implement getUserReplies in forumService
-            // For now, return empty array
-            console.log("Getting replies for user:", userId);
-            return [] as ForumReply[];
+            return await getUserRepliesService(userId, 20);
         } catch (err) {
             const msg = err instanceof Error ? err.message : String(err);
             console.error("Error getting user replies:", msg);

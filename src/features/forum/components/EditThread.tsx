@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useForum } from "@/features/forum/hooks/useForum";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { ThreadEditor } from "./ThreadEditor";
 import Skeleton from "@/features/shared/Skeleton";
 import { FORUM_PATHS, FORUM_HOME_PATH } from "@/features/forum/constants/forumPaths";
@@ -9,6 +10,7 @@ import type { FC } from "react";
 export const EditThread: FC = () => {
     const { threadId } = useParams<Record<string, string | undefined>>();
     const navigate = useNavigate();
+    const { currentUser } = useAuth();
 
     const { loadThread, updateThread, currentThread, categories, loading, error } =
         useForum();
@@ -101,6 +103,23 @@ export const EditThread: FC = () => {
         categoryId: currentThread.categoryId,
         tags: currentThread.tags || [],
     };
+
+    if (currentUser?.uid !== currentThread.authorId) {
+        return (
+            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-3">Cannot edit this thread</h2>
+                <p className="text-[var(--txt-secondary)] mb-6">
+                    You can only edit threads that you created.
+                </p>
+                <button
+                    onClick={() => navigate(FORUM_PATHS.THREAD(currentThread.id))}
+                    className="inline-block px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
+                >
+                    Back to Thread
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">

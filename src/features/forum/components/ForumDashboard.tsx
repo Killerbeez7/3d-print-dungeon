@@ -23,8 +23,8 @@ export const ForumDashboard: FC = () => {
                 if (currentUser) {
                     const threads = await getUserThreads(currentUser.uid);
                     const replies = await getUserReplies(currentUser.uid);
-                    setUserThreads(threads.slice(0, 5)); // Show 5 most recent
-                    setUserReplies(replies.slice(0, 5));
+                    setUserThreads(threads);
+                    setUserReplies(replies);
                 }
             } catch {
                 // handle error
@@ -34,6 +34,20 @@ export const ForumDashboard: FC = () => {
         };
         fetchData();
     }, [currentUser, getUserThreads, getUserReplies]);
+
+    if (!currentUser) {
+        return (
+            <div className="text-[var(--txt-primary)] rounded-lg shadow p-6">
+                <h1 className="text-2xl font-bold mb-2">Forum Dashboard</h1>
+                <p className="text-[var(--txt-secondary)] mb-6">
+                    Sign in to see your forum threads, replies, and activity shortcuts.
+                </p>
+                <Link to="/forum" className="secondary-button px-4 py-2">
+                    Back to Forum
+                </Link>
+            </div>
+        );
+    }
 
     return (
         <div className=" text-[var(--txt-primary)] rounded-lg shadow p-6">
@@ -85,10 +99,15 @@ export const ForumDashboard: FC = () => {
                 ) : userThreads.length === 0 ? (
                     <div className="text-[var(--txt-muted)]">
                         You haven&apos;t started any threads yet.
+                        <div className="mt-3">
+                            <Link to="/forum/new-thread" className="text-[var(--accent)]">
+                                Create your first thread
+                            </Link>
+                        </div>
                     </div>
                 ) : (
                     <ul className="space-y-2">
-                        {userThreads.map((thread: ForumThread) => (
+                        {userThreads.slice(0, 5).map((thread: ForumThread) => (
                             <li key={thread.id}>
                                 <Link
                                     to={`/forum/thread/${thread.id}`}
@@ -97,7 +116,7 @@ export const ForumDashboard: FC = () => {
                                     {thread.title}
                                 </Link>
                                 <span className="ml-2 text-xs text-[var(--txt-muted)]">
-                                    {/* Optionally show date or stats here */}
+                                    {thread.replyCount || 0} replies
                                 </span>
                             </li>
                         ))}
@@ -119,28 +138,24 @@ export const ForumDashboard: FC = () => {
                     </div>
                 ) : (
                     <ul className="space-y-2">
-                        {userReplies.map((reply: ForumReply) => (
+                        {userReplies.slice(0, 5).map((reply: ForumReply) => (
                             <li key={reply.id}>
                                 <span className="text-[var(--txt-muted)]">On </span>
                                 <Link
                                     to={`/forum/thread/${reply.threadId}`}
                                     className="font-medium hover:text-[var(--accent)]"
                                 >
-                                    {"Thread"}
+                                    thread
                                 </Link>
                                 <span className="ml-2 text-xs text-[var(--txt-muted)]">
-                                    {/* Optionally show date or stats here */}
+                                    {reply.content.slice(0, 90)}
+                                    {reply.content.length > 90 ? "..." : ""}
                                 </span>
                             </li>
                         ))}
                     </ul>
                 )}
-                <Link to="/forum/my-threads" className="text-[var(--accent)] text-sm">
-                    View all my replies
-                </Link>
             </div>
-
-            {/* Moderation Tools (if user is mod/admin) can be added here */}
         </div>
     );
 };

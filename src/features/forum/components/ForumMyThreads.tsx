@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { useForum } from "@/features/forum/hooks/useForum";
 import { useFetchThreads, useFetchCategories } from "@/features/forum/hooks";
 import {
     FaEye,
@@ -26,11 +28,14 @@ type FilterOption = "all" | "recent" | "popular" | "unanswered" | "pinned";
 
 export const ForumMyThreads: FC = () => {
     const { currentUser } = useAuth();
+    const { deleteThread } = useForum();
+    const queryClient = useQueryClient();
     const { data: categories = [] } = useFetchCategories();
 
     const [sortBy, setSortBy] = useState<SortOption>("newest");
     const [filterBy, setFilterBy] = useState<FilterOption>("all");
     const [searchQuery, setSearchQuery] = useState<string>("");
+    const [deletingThreadId, setDeletingThreadId] = useState<string | null>(null);
 
     // Fetch user's threads
     const getThreadFilters = () => {
@@ -150,6 +155,34 @@ export const ForumMyThreads: FC = () => {
                 totalThreads > 0 ? Math.round(totalRepliesReceived / totalThreads) : 0,
         };
     }, [allThreads]);
+
+    const getThreadDate = (value: ForumThread["createdAt"]): Date => {
+        const timestamp = value as unknown as { toDate?: () => Date };
+        if (timestamp && typeof timestamp.toDate === "function") {
+            return timestamp.toDate();
+        }
+        return new Date(value);
+    };
+
+    const handleDeleteThread = async (thread: ForumThread) => {
+        if (
+            !window.confirm(
+                `Delete "${thread.title}"? This removes the thread and its replies.`
+            )
+        ) {
+            return;
+        }
+
+        setDeletingThreadId(thread.id);
+        try {
+            await deleteThread(thread.id);
+            await queryClient.invalidateQueries({ queryKey: ["forum-threads"] });
+        } catch (error) {
+            console.error("Error deleting thread:", error);
+        } finally {
+            setDeletingThreadId(null);
+        }
+    };
 
     if (!currentUser) {
         return (
@@ -292,7 +325,7 @@ export const ForumMyThreads: FC = () => {
                                     allThreads.filter((thread) => {
                                         const daysSinceCreated =
                                             (Date.now() -
-                                                new Date(thread.createdAt).getTime()) /
+                                                getThreadDate(thread.createdAt).getTime()) /
                                             (1000 * 60 * 60 * 24);
                                         return daysSinceCreated <= 7;
                                     }).length
@@ -308,7 +341,7 @@ export const ForumMyThreads: FC = () => {
                                     allThreads.filter((thread) => {
                                         const daysSinceCreated =
                                             (Date.now() -
-                                                new Date(thread.createdAt).getTime()) /
+                                                getThreadDate(thread.createdAt).getTime()) /
                                             (1000 * 60 * 60 * 24);
                                         return daysSinceCreated <= 30;
                                     }).length
@@ -469,10 +502,17 @@ export const ForumMyThreads: FC = () => {
                                             <FaEdit size={14} />
                                         </Link>
                                         <button
+                                            type="button"
+                                            onClick={() => handleDeleteThread(thread)}
+                                            disabled={deletingThreadId === thread.id}
                                             className="p-2 text-[var(--txt-secondary)] hover:text-red-500 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
                                             title="Delete Thread"
                                         >
-                                            <FaTrash size={14} />
+                                            {deletingThreadId === thread.id ? (
+                                                <span className="text-xs">...</span>
+                                            ) : (
+                                                <FaTrash size={14} />
+                                            )}
                                         </button>
                                     </div>
                                 </div>
@@ -494,7 +534,6 @@ export const ForumMyThreads: FC = () => {
                     </>
                 ) : (
                     <div className="text-center py-12">
-                        <div className="text-6xl mb-4">📝</div>
                         <h3 className="text-xl font-semibold text-[var(--txt-primary)] mb-2">
                             {searchQuery || filterBy !== "all"
                                 ? "No threads found"
@@ -505,12 +544,26 @@ export const ForumMyThreads: FC = () => {
                                 ? "Try adjusting your search or filter criteria."
                                 : "Start your first discussion to see it here!"}
                         </p>
-                        <Link
-                            to={FORUM_PATHS.NEW_THREAD}
-                            className="inline-block px-6 py-3 bg-[var(--accent)] text-[var(--txt-highlight)] rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
-                        >
-                            Create Your First Thread
-                        </Link>
+                        <div className="flex flex-wrap justify-center gap-3">
+                            {(searchQuery || filterBy !== "all") && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSearchQuery("");
+                                        setFilterBy("all");
+                                    }}
+                                    className="px-6 py-3 border border-[var(--br-secondary)] text-[var(--txt-primary)] rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors"
+                                >
+                                    Clear Filters
+                                </button>
+                            )}
+                            <Link
+                                to={FORUM_PATHS.NEW_THREAD}
+                                className="inline-block px-6 py-3 bg-[var(--accent)] text-[var(--txt-highlight)] rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
+                            >
+                                Create Thread
+                            </Link>
+                        </div>
                     </div>
                 )}
             </div>

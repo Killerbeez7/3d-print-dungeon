@@ -41,23 +41,28 @@ async function startDownload(url: string) {
         }
 
         let receivedLength = 0;
-        const chunks: Uint8Array[] = [];
+        const chunks: BlobPart[] = [];
         let lastReportedProgress = 0;
 
         while (true) {
             const { done, value } = await reader.read();
             if (done) break;
-            if (value) {
-                chunks.push(value);
-                receivedLength += value.length;
 
-                const progress = contentLength > 0
-                    ? receivedLength / contentLength
-                    : Math.min(receivedLength / 1000000, 0.95);
+            if (value) {
+                const normalizedChunk = new Uint8Array(value);
+                chunks.push(normalizedChunk);
+                receivedLength += normalizedChunk.length;
+
+                const progress =
+                    contentLength > 0
+                        ? receivedLength / contentLength
+                        : Math.min(receivedLength / 1000000, 0.95);
 
                 entry.progress = Math.min(progress, 0.99);
+
                 const currentPercent = Math.round(entry.progress * 100);
                 const lastPercent = Math.round(lastReportedProgress * 100);
+
                 if (currentPercent > lastPercent) {
                     notify(url);
                     lastReportedProgress = entry.progress;
@@ -73,8 +78,6 @@ async function startDownload(url: string) {
         notify(url);
     } catch (err) {
         if (controller.signal.aborted) {
-            // console.log(`❌ Loading aborted for ${url}`);
-            // Leave status as idle on abort
             entry.status = "idle";
             entry.progress = 0;
         } else {
@@ -88,8 +91,6 @@ async function startDownload(url: string) {
         delete entry.controller;
     }
 }
-
-
 
 function getEntry(url: string): Entry {
     let entry = registry.get(url);
