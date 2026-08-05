@@ -5,42 +5,42 @@ import { defaultCarouselSettings } from "@/features/shared/reusable/carousel/car
 import { H2 } from "@/components/ResponsiveHeading";
 
 interface FeaturedCarouselProps {
-    items: CarouselItem[];
-    title?: string;
-    className?: string;
+  items: CarouselItem[];
+  title?: string;
+  className?: string;
 }
 
 export const FeaturedCarousel = ({
-    items = [],
-    title,
-    className = "",
+  items = [],
+  title,
+  className = "",
 }: FeaturedCarouselProps) => {
-    if (items.length === 0) return null;
+  if (items.length === 0) return null;
 
-    return (
-        <section className={`relative pb-5 pt-6 lg:pt-7 ${className}`}>
-            {title && (
-                <div className="mb-5 px-4">
-                    <H2 size="2xl" className="text-txt-primary">
-                        {title}
-                    </H2>
-                </div>
-            )}
+  return (
+    <section className={`relative pb-5 pt-6 lg:pt-7 ${className}`}>
+      {title && (
+        <div className="mb-5 px-4">
+          <H2 size="2xl" className="text-txt-primary">
+            {title}
+          </H2>
+        </div>
+      )}
 
-            <ReusableCarousel
-                items={items}
-                renderItem={(item, index) => (
-                    <CarouselCard
-                        item={item}
-                        priority={index < defaultCarouselSettings.slidesToShow}
-                        showDescription={false}
-                    />
-                )}
-                {...defaultCarouselSettings}
-                className="carousel-section"
-                itemClassName="carousel-item"
-                containerClassName="px-2 md:px-4 lg:px-6"
-            />
-        </section>
-    );
+      <ReusableCarousel
+        items={items}
+        renderItem={(item, index) => (
+          <CarouselCard
+            item={item}
+            priority={index < defaultCarouselSettings.slidesToShow}
+            showDescription={false}
+          />
+        )}
+        {...defaultCarouselSettings}
+        className="carousel-section"
+        itemClassName="carousel-item"
+        containerClassName="px-2 md:px-4 lg:px-6"
+      />
+    </section>
+  );
 };
