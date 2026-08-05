@@ -21,12 +21,14 @@ const NextArrow = ({ className, style, onClick }: ArrowProps) => (
             alignItems: "center",
             justifyContent: "center",
             background: "var(--surface-overlay)",
+            border: "1px solid var(--br-subtle)",
             borderRadius: "50%",
             width: "35px",
             height: "35px",
             right: "10px",
             zIndex: 2,
             cursor: "pointer",
+            backdropFilter: "blur(8px)",
         }}
         onClick={onClick}
     >
@@ -43,12 +45,14 @@ const PrevArrow = ({ className, style, onClick }: ArrowProps) => (
             alignItems: "center",
             justifyContent: "center",
             background: "var(--surface-overlay)",
+            border: "1px solid var(--br-subtle)",
             borderRadius: "50%",
             width: "35px",
             height: "35px",
             left: "10px",
             zIndex: 2,
             cursor: "pointer",
+            backdropFilter: "blur(8px)",
         }}
         onClick={onClick}
     >
@@ -201,7 +205,7 @@ export function ReusableCarousel<T = { id?: string | number }>(
 
     return (
         <section
-            className={`p-2 ${containerClassName}`}
+            className={`py-1 ${containerClassName || "px-2"}`}
             // onMouseDown={handleMouseDown}
             // onMouseMove={handleMouseMove}
             // onMouseUp={handleMouseUp}

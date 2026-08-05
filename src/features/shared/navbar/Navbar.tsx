@@ -143,11 +143,11 @@ export const Navbar = (): React.ReactNode => {
 
     return (
         <div className="sticky top-0 left-0 right-0 z-50">
-            <nav className="bg-bg-section/95 border-b border-br-subtle shadow-sm backdrop-blur-md relative z-50">
-                <div className="mx-auto px-4 sm:px-6 py-5">
+            <nav className="relative z-50 border-b border-br-subtle/80 bg-bg-section/90 shadow-sm backdrop-blur-md">
+                <div className="px-4 py-4 sm:px-6 lg:px-8">
                     <div className="flex items-center h-10">
                         {/* LEFT: logo & desktop nav */}
-                        <div className="flex items-center space-x-4 min-w-fit">
+                        <div className="flex min-w-fit items-center gap-4">
                             {/* mobile hamburger */}
                             <button
                                 id="hamburger-button"
@@ -179,7 +179,7 @@ export const Navbar = (): React.ReactNode => {
                             <div className="hidden md:block whitespace-nowrap flex-shrink-0 w-[50px]">
                                 <Link
                                     to="/"
-                                    className="flex items-center space-x-2 ml-2"
+                                    className="flex items-center"
                                     onClick={handleLogoClick}
                                 >
                                     <img
@@ -193,7 +193,7 @@ export const Navbar = (): React.ReactNode => {
                             {/* desktop nav */}
                             <nav
                                 ref={desktopNavRef}
-                                className="hidden md:flex items-center space-x-5"
+                                className="hidden items-center gap-5 md:flex"
                                 aria-label="Primary navigation"
                             >
                                 {(NAV_SECTIONS as NavSection[]).map((section) => (
@@ -207,7 +207,7 @@ export const Navbar = (): React.ReactNode => {
                                     >
                                         <button
                                             type="button"
-                                            className={`relative inline-flex h-10 items-center whitespace-nowrap px-1 text-md transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--accent)] after:transition-opacity after:duration-200 hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+                                            className={`relative inline-flex h-10 items-center whitespace-nowrap px-1 text-sm font-medium transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--accent)] after:transition-opacity after:duration-200 hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
                                                 activeDropdown === section.label
                                                     ? "text-txt-primary after:opacity-100"
                                                     : "text-txt-secondary after:opacity-0 group-hover:after:opacity-100"
@@ -259,14 +259,14 @@ export const Navbar = (): React.ReactNode => {
                         </div>
 
                         {/* ---------- CENTER: global search ---------- */}
-                        <div className="flex-1 flex justify-center px-4 max-w-6xl mx-auto w-1/2">
+                        <div className="mx-auto flex w-1/2 max-w-5xl flex-1 justify-center px-5">
                             <div className="w-full hidden lg:block">
                                 <GlobalSearch />
                             </div>
                         </div>
 
                         {/* ---------- RIGHT: auth & icons ---------- */}
-                        <div className="flex items-center space-x-4 justify-end min-w-fit">
+                        <div className="flex min-w-fit items-center justify-end gap-3">
                             {/* Quick search icon */}
                             <button
                                 type="button"
@@ -287,7 +287,7 @@ export const Navbar = (): React.ReactNode => {
                             ) : (
                                 <>
                                     {/* Desktop buttons */}
-                                    <div className="hidden md:flex items-center space-x-4">
+                                    <div className="hidden items-center gap-3 md:flex">
                                         <Link
                                             to="/model/upload"
                                             className="rounded-lg p-1 text-txt-secondary hover:bg-bg-surface hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"

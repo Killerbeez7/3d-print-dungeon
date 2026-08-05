@@ -4,13 +4,15 @@ interface ProductCardProps {
     product: { id: string; name: string; image: string; price: string };
 }
 export const ProductCard: FC<ProductCardProps> = ({ product }) => (
-    <div className="bg-[var(--bg-surface)] rounded-xl shadow-md hover:shadow-xl transition p-3 flex flex-col items-center">
-        <img
-            src={product.image}
-            alt={product.name}
-            className="w-full h-44 object-cover rounded-lg mb-2 border border-[var(--bg-tertiary)]"
-        />
-        <h3 className="mt-2 font-semibold text-center text-lg">{product.name}</h3>
-        <p className="text-[var(--accent)] font-bold text-md">{product.price}</p>
+    <div className="group overflow-hidden rounded-xl border border-br-subtle bg-bg-surface p-3 shadow-token-sm transition-all duration-300 hover:border-accent/30 hover:shadow-token-lg">
+        <div className="mb-3 overflow-hidden rounded-lg border border-br-subtle bg-bg-muted">
+            <img
+                src={product.image}
+                alt={product.name}
+                className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+        </div>
+        <p className="font-semibold text-txt-primary">{product.name}</p>
+        <p className="mt-1 text-sm font-semibold text-accent-text">{product.price}</p>
     </div>
 );

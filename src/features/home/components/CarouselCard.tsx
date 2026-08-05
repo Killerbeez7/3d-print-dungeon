@@ -37,19 +37,19 @@ export const CarouselCard = ({
             rel="noopener noreferrer"
             ref={linkRef}
             aria-hidden={isHidden ? "true" : undefined}
-            className="group"
+            className="group block"
         >
             <div
-                className="relative overflow-hidden rounded-xl group 
-                bg-bg-surface border border-br-secondary shadow-token-sm transition-all duration-300 
-                hover:border-br-primary hover:shadow-token-lg"
+                className="relative overflow-hidden rounded-xl bg-bg-surface 
+                border border-br-subtle/70 shadow-token-sm transition-all duration-300 
+                hover:border-accent/30 hover:shadow-token-lg"
                 style={{ height }}
             >
                 {/* Image */}
                 <img
                     src={item.image}
                     alt={item.title}
-                    className="w-full h-full object-cover transition-all duration-500 select-none group-hover:scale-115"
+                    className="w-full h-full object-cover transition-transform duration-700 select-none group-hover:scale-105"
                     loading={priority ? "eager" : "lazy"}
                     fetchPriority={priority ? "high" : undefined}
                     decoding="async"
@@ -62,18 +62,16 @@ export const CarouselCard = ({
                 />
 
                 {/* Base gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-bg-page/70 via-bg-page/25 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-t from-bg-page/82 via-bg-page/25 to-transparent pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-b from-bg-page/12 via-transparent to-transparent pointer-events-none" />
                 
                 {/* Hover gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t
-                 from-bg-page/50 via-bg-page/20 to-transparent 
-                pointer-events-none opacity-0 group-hover:opacity-100 transition-all 
-                 ease-in-out transform translate-y-full group-hover:translate-y-0" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(var(--accent-rgb),0.1),transparent_58%)] pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
                 {/* Badge */}
                 {item.badge && (
                     <div
-                        className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold pointer-events-none ${getBadgeColorClass(
+                        className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[0.65rem] font-semibold uppercase leading-none pointer-events-none backdrop-blur-md ${getBadgeColorClass(
                             item.badgeColor
                         )}`}
                     >
@@ -82,18 +80,20 @@ export const CarouselCard = ({
                 )}
 
                 {/* Content */}
-                <div className="absolute bottom-0 left-0 right-0 p-token-4 text-white pointer-events-none">
-                    <div className="gap-token-3">
-                        <h3 className="text-token-2xl font-bold leading-token-tight mb-[5px]">{item.title}</h3>
+                <div className="absolute bottom-0 left-0 right-0 p-4 text-txt-highlight pointer-events-none">
+                    <div className="max-w-[92%]">
+                        <h3 className="mb-1 line-clamp-2 text-[1.05rem] font-bold leading-[1.12] text-txt-highlight drop-shadow md:text-[1.15rem]">
+                            {item.title}
+                        </h3>
 
                         {item.subtitle && (
-                            <p className="text-token-sm text-txt-secondary leading-token-tight">
+                            <p className="text-sm font-medium leading-tight text-txt-highlight/80">
                                 {item.subtitle}
                             </p>
                         )}
 
                         {showDescription && item.description && (
-                            <p className="text-token-xs text-txt-muted leading-token-relaxed line-clamp-2">
+                            <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-txt-highlight/65">
                                 {item.description}
                             </p>
                         )}

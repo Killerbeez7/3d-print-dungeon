@@ -33,13 +33,13 @@ export const AccountSettings = () => {
     const [hasChanges, setHasChanges] = useState<boolean>(false);
     
     // Local state for settings
-    const [localTheme, setLocalTheme] = useState<string>("system");
+    const [localTheme, setLocalTheme] = useState<string>("dark");
     const [localLanguage, setLocalLanguage] = useState<string>("en");
     const [localTimezone, setLocalTimezone] = useState<string>("UTC");
     
     // Original settings for comparison
     const [originalSettings, setOriginalSettings] = useState({
-        theme: "system",
+        theme: "dark",
         language: "en",
         timezone: "UTC",
     });
@@ -50,9 +50,8 @@ export const AccountSettings = () => {
             : () => {};
 
     const themes: ThemeOption[] = [
-        { id: "system", label: "OS Default" },
-        { id: "light", label: "Light" },
         { id: "dark", label: "Dark" },
+        { id: "light", label: "Light" },
     ];
 
     const languages: LanguageOption[] = [
@@ -89,7 +88,10 @@ export const AccountSettings = () => {
             try {
                 const userSettings = await settingsService.getUserSettings(currentUser.uid);
                 if (userSettings) {
-                    const themeValue = userSettings.theme || "system";
+                    const themeValue =
+                        userSettings.theme === "light" || userSettings.theme === "dark"
+                            ? userSettings.theme
+                            : "dark";
                     const languageValue = userSettings.language || "en";
                     const timezoneValue = userSettings.timezone || "UTC";
                     
@@ -146,7 +148,7 @@ export const AccountSettings = () => {
         setLoading(true);
         try {
             await settingsService.updateUserSettings(currentUser.uid, {
-                theme: localTheme as "light" | "dark" | "auto",
+                theme: localTheme as "light" | "dark",
                 language: localLanguage,
                 timezone: localTimezone,
             });

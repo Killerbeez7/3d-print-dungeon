@@ -11,14 +11,15 @@ export const SubcategoryBar: FC<SubcategoryBarProps> = ({
     selected,
     onSelect,
 }) => (
-    <div className="flex gap-2 mb-4 overflow-x-auto">
+    <div className="mb-5 flex gap-2 overflow-x-auto pb-1">
         {subcategories.map((sub) => (
             <button
+                type="button"
                 key={sub.id}
-                className={`px-4 py-1 rounded-full text-sm border transition
+                className={`whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
                     ${selected === sub.id
-                        ? "bg-[var(--accent)] text-white border-[var(--accent)]"
-                        : "bg-[var(--bg-secondary)] text-[var(--txt-primary)] border-[var(--bg-tertiary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--accent)]"}
+                        ? "border-accent/45 bg-accent-soft text-accent-text"
+                        : "border-br-subtle bg-bg-section text-txt-secondary hover:border-accent/40 hover:text-txt-primary"}
                 `}
                 onClick={() => onSelect(sub.id)}
             >

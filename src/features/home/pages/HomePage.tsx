@@ -52,12 +52,26 @@ export const HomePage = (): React.ReactNode => {
         return <div className="text-center text-error">Error loading models.</div>;
 
     return (
-        <div className="text-txt-primary min-h-screen">
-            <FeaturedCarousel
-                items={featuredCarouselItems}
+        <div className="relative min-h-screen overflow-hidden bg-bg-primary text-txt-primary">
+            <div
+                className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(ellipse_at_top,rgba(var(--accent-rgb),0.08),transparent_62%)] opacity-80"
+                aria-hidden="true"
             />
-            <section className="p-4 md:p-8">
-                <H2 size="2xl" className="mb-6">All Models</H2>
+            <div className="relative">
+                <FeaturedCarousel items={featuredCarouselItems} />
+            </div>
+            <section className="relative px-4 pb-12 pt-8 md:px-6 md:pt-10 lg:px-8">
+                <div className="mb-6 border-t border-br-subtle/70 pt-7">
+                    <div className="mb-2 flex items-center gap-3">
+                        <span className="h-px w-8 bg-accent" aria-hidden="true" />
+                        <p className="text-xs font-semibold uppercase text-accent-text">
+                            Marketplace
+                        </p>
+                    </div>
+                    <H2 size="2xl" className="leading-tight">
+                        All Models
+                    </H2>
+                </div>
                 <InfiniteScrollList
                     items={models}
                     hasMore={hasNextPage}

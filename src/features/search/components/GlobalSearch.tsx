@@ -55,9 +55,7 @@ export function GlobalSearch() {
         }
         const timer = setTimeout(async () => {
             try {
-                console.log("Searching for artists with term:", searchTerm);
                 const artists = await searchArtists(searchTerm, 5);
-                console.log("Found artists:", artists);
                 setArtistResults(artists);
             } catch (err) {
                 console.error("Error fetching artists:", err);
@@ -161,7 +159,7 @@ export function GlobalSearch() {
                 value={searchTerm}
                 onChange={handleInputChange}
                 onFocus={handleFocus}
-                className="border-2 text-txt-primary border-br-secondary rounded-full w-full text-sm focus:outline-none focus:border-accent-hover py-2 pl-10 pr-10"
+                className="h-10 w-full rounded-full border border-br-secondary/80 bg-bg-primary/70 py-2 pl-10 pr-10 text-sm text-txt-primary placeholder:text-txt-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
             />
             {searchTerm && (
                 <button
@@ -173,7 +171,7 @@ export function GlobalSearch() {
                 </button>
             )}
             {!isMobile && showDropdown && (
-                <div className="absolute top-[110%] left-0 w-full text-txt-primary bg-bg-primary border border-br-secondary rounded-md shadow-lg mt-1 z-50">
+                <div className="absolute left-0 top-[110%] z-50 mt-1 w-full rounded-lg border border-br-secondary bg-surface-elevated text-txt-primary shadow-lg">
                     <ul className="py-2 max-h-80 overflow-auto text-sm">
                         {searchTerm.trim() && artistResults.length > 0 && (
                             <>
@@ -181,7 +179,7 @@ export function GlobalSearch() {
                                     <li
                                         key={`artist-${a.uid}`}
                                         onMouseDown={() => handleArtistSelect(a)}
-                                        className="px-3 py-2 hover:--btn-secondary-hover cursor-pointer"
+                                        className="cursor-pointer px-3 py-2 hover:bg-bg-surface"
                                     >
                                         <div className="font-medium">{a.displayName}</div>
                                         <div className="text-xs text-txt-muted">

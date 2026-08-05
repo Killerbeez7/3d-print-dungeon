@@ -66,28 +66,41 @@ export const MarketplaceHome = () => {
             eventName="marketplace_view"
             eventData={{ category: selectedCategory }}
         >
-            <div className="max-w-7xl mx-auto py-8 px-4">
-                <h1 className="text-4xl font-bold mb-6">Marketplace</h1>
-                <CategoryTabs
-                    categories={categories}
-                    selected={selectedCategory}
-                    onSelect={setSelectedCategory}
+            <div className="relative min-h-screen overflow-hidden bg-bg-primary px-4 py-8 text-txt-primary">
+                <div
+                    className="pointer-events-none absolute inset-x-0 top-0 h-80 bg-[radial-gradient(ellipse_at_top,rgba(var(--accent-rgb),0.07),transparent_62%)]"
+                    aria-hidden="true"
                 />
-                <SubcategoryBar
-                    subcategories={subcategories}
-                    selected={selectedSubcategory}
-                    onSelect={setSelectedSubcategory}
-                />
-                <SearchAndFilters />
-                <ProductTabs
-                    tabs={productTabs}
-                    selected={selectedTab}
-                    onSelect={setSelectedTab}
-                />
-                <ProductGrid products={filteredProducts} />
+                <div className="relative mx-auto max-w-7xl">
+                    <div className="mb-7">
+                        <p className="mb-2 text-xs font-semibold uppercase text-accent-text">
+                            Marketplace
+                        </p>
+                        <h1 className="text-3xl font-bold leading-tight text-txt-primary md:text-4xl">
+                            Browse printable models
+                        </h1>
+                    </div>
+                    <CategoryTabs
+                        categories={categories}
+                        selected={selectedCategory}
+                        onSelect={setSelectedCategory}
+                    />
+                    <SubcategoryBar
+                        subcategories={subcategories}
+                        selected={selectedSubcategory}
+                        onSelect={setSelectedSubcategory}
+                    />
+                    <SearchAndFilters />
+                    <ProductTabs
+                        tabs={productTabs}
+                        selected={selectedTab}
+                        onSelect={setSelectedTab}
+                    />
+                    <ProductGrid products={filteredProducts} />
 
-                <div className="mt-8">
-                    <PersonalizedRecommendations recommendations={mockRecommendations} />
+                    <div className="mt-10">
+                        <PersonalizedRecommendations recommendations={mockRecommendations} />
+                    </div>
                 </div>
             </div>
         </AnalyticsTracker>

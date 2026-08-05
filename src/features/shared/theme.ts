@@ -11,10 +11,7 @@ type NonSystemTheme = Exclude<Theme, typeof SYSTEM>;
 const THEME_KEY = "theme";
 
 function getSystemTheme(): NonSystemTheme {
-    if (typeof window !== "undefined" && typeof window.matchMedia === "function") {
-        return window.matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
-    }
-    return LIGHT;
+    return DARK;
 }
 
 function getStoredTheme(): NonSystemTheme | null {
@@ -27,7 +24,7 @@ function getStoredTheme(): NonSystemTheme | null {
 
 export function useTheme(): [Theme, Dispatch<SetStateAction<Theme>>] {
     const [theme, setTheme] = useState<Theme>(() => {
-        return getStoredTheme() ?? SYSTEM;
+        return getStoredTheme() ?? DARK;
     });
 
     // Apply theme whenever it changes
@@ -41,22 +38,10 @@ export function useTheme(): [Theme, Dispatch<SetStateAction<Theme>>] {
         }
     }, [theme]);
 
-    // Sync when the user changes their OS preference while in "system" mode
+    // Keep legacy "system" values pinned to the app default.
     useEffect(() => {
-        if (theme !== SYSTEM || typeof window === "undefined") return;
-        const mq = window.matchMedia("(prefers-color-scheme: dark)");
-        const syncSystem = () => {
-            const applied = mq.matches ? DARK : LIGHT;
-            if (typeof document !== "undefined") {
-                document.documentElement.setAttribute("data-theme", applied);
-            }
-        };
-        syncSystem();
-        // Newer browsers
-        if (typeof mq.addEventListener === "function") {
-            mq.addEventListener("change", syncSystem);
-            return () => mq.removeEventListener("change", syncSystem);
-        }
+        if (theme !== SYSTEM || typeof document === "undefined") return;
+        document.documentElement.setAttribute("data-theme", DARK);
     }, [theme]);
 
     return [theme, setTheme];

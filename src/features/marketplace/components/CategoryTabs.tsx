@@ -11,14 +11,15 @@ export const CategoryTabs: FC<CategoryTabsProps> = ({
     selected,
     onSelect,
 }) => (
-    <div className="flex gap-2 mb-4 overflow-x-auto">
+    <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
         {categories.map((cat) => (
             <button
+                type="button"
                 key={cat.id}
-                className={`px-4 py-2 rounded ${
+                className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
                     selected === cat.id
-                        ? "bg-accent text-white"
-                        : "bg-bg-surface text-txt-primary"
+                        ? "border-accent bg-accent text-btn-primary-text shadow-accent-sm"
+                        : "border-br-subtle bg-bg-surface text-txt-secondary hover:border-accent/45 hover:text-txt-primary"
                 }`}
                 onClick={() => onSelect(cat.id)}
             >

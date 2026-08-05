@@ -18,10 +18,12 @@ export const FeaturedCarousel = ({
     if (items.length === 0) return null;
 
     return (
-        <section className={`py-8 ${className}`}>
+        <section className={`relative pb-5 pt-6 lg:pt-7 ${className}`}>
             {title && (
-                <div className="px-4 mb-6">
-                    <H2 size="2xl" className="text-txt-primary">{title}</H2>
+                <div className="mb-5 px-4">
+                    <H2 size="2xl" className="text-txt-primary">
+                        {title}
+                    </H2>
                 </div>
             )}
 
@@ -37,6 +39,7 @@ export const FeaturedCarousel = ({
                 {...defaultCarouselSettings}
                 className="carousel-section"
                 itemClassName="carousel-item"
+                containerClassName="px-2 md:px-4 lg:px-6"
             />
         </section>
     );

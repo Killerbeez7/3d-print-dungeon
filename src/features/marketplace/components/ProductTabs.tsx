@@ -7,14 +7,15 @@ interface ProductTabsProps {
 }
 
 export const ProductTabs: FC<ProductTabsProps> = ({ tabs, selected, onSelect }) => (
-    <div className="flex gap-2 mb-6">
+    <div className="mb-6 flex gap-2 overflow-x-auto pb-1">
         {tabs.map((tab) => (
             <button
+                type="button"
                 key={tab}
-                className={`px-4 py-2 rounded-full font-medium shadow transition
+                className={`whitespace-nowrap rounded-full border px-4 py-2 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus
                     ${selected === tab
-                        ? "bg-[var(--accent)] text-white shadow-lg"
-                        : "bg-[var(--bg-surface)] text-[var(--txt-primary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--accent)]"}
+                        ? "border-accent bg-accent text-btn-primary-text shadow-accent-sm"
+                        : "border-br-subtle bg-bg-surface text-txt-secondary hover:border-accent/40 hover:text-txt-primary"}
                 `}
                 onClick={() => onSelect(tab)}
             >

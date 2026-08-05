@@ -34,18 +34,12 @@
         <noscript><link rel="stylesheet" href="/src/styles.css" /></noscript>
         <script>
             (function () {
-                // Check the localStorage for a saved theme, or fall back to the system preference.
                 const savedTheme = localStorage.getItem("theme");
-                const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-                    .matches
-                    ? "dark"
-                    : "light";
-
-                // Set theme to system if no saved theme exists or if it's set to 'system'.
                 const theme =
-                    savedTheme === "system" ? systemTheme : savedTheme || systemTheme;
+                    savedTheme === "light" || savedTheme === "dark"
+                        ? savedTheme
+                        : "dark";
 
-                // Apply the theme to the document element.
                 document.documentElement.setAttribute("data-theme", theme);
             })();
         </script>

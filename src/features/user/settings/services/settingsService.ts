@@ -83,7 +83,7 @@ export const settingsService = {
                 sessionTimeout: 60,
                 loginNotifications: true,
             },
-            theme: "auto",
+            theme: "dark",
         };
     }
 };

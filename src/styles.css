@@ -114,9 +114,9 @@ h6 {
 :root {
     /*
      * Color usage rules:
-     * - Neutral surfaces are the default foundation. Do not use purple for full
+     * - Neutral surfaces are the default foundation. Do not use accent color for full
      *   sections, page backgrounds, or large card surfaces.
-     * - Purple is reserved for action, focus, active, link, selected, badge, and
+     * - Violet is reserved for action, focus, active, link, selected, badge, and
      *   small highlight states.
      * - `--accent-soft` is for compact highlights only. It should not be used as
      *   a full-section or large-card background.
@@ -136,7 +136,7 @@ h6 {
     --surface-overlay: rgba(11, 12, 15, 0.64);
     --ambient-brand: radial-gradient(
         1100px circle at 18% 0%,
-        rgba(124, 92, 255, 0.035),
+        rgba(112, 93, 214, 0.035),
         transparent 58%
     );
 
@@ -152,13 +152,15 @@ h6 {
     --txt-muted: #737987;
     --txt-inverse: #ffffff;
 
-    --accent-dark: #5d3df5;
-    --accent: #735bff;
-    --accent-hover: #5f45ee;
-    --accent-soft: #f1efff;
-    --accent-muted: #e4ddff;
-    --accent-text: #4f35d5;
-    --accent-rgb: 115, 91, 255;
+    --accent-dark: #5b48c8;
+    --accent: #705dd6;
+    --accent-hover: #624fc8;
+    --accent-soft: #f0edff;
+    --accent-muted: #ddd7ff;
+    --accent-text: #5140ad;
+    --accent-rgb: 112, 93, 214;
+    --logo-accent-filter: brightness(0) saturate(100%) invert(43%) sepia(37%)
+        saturate(1543%) hue-rotate(218deg) brightness(88%) contrast(91%);
 
     --btn-primary: var(--accent);
     --btn-primary-hover: var(--accent-hover);
@@ -202,7 +204,7 @@ h6 {
     --surface-overlay: rgba(11, 11, 15, 0.78);
     --ambient-brand: radial-gradient(
         1200px circle at 20% 0%,
-        rgba(124, 92, 255, 0.075),
+        rgba(139, 122, 246, 0.06),
         transparent 58%
     );
 
@@ -218,16 +220,18 @@ h6 {
     --txt-muted: #8f96a3;
     --txt-inverse: #0b0c0f;
 
-    --accent-dark: #6b4eff;
-    --accent: #735bff;
-    --accent-hover: #8b75ff;
-    --accent-soft: #19162a;
-    --accent-muted: #25213f;
-    --accent-text: #cbc2ff;
-    --accent-rgb: 115, 91, 255;
-    ---atmosphere: radial-gradient(
+    --accent-dark: #6f5be3;
+    --accent: #8b7af6;
+    --accent-hover: #a395ff;
+    --accent-soft: #1a172d;
+    --accent-muted: #282344;
+    --accent-text: #cbc3ff;
+    --accent-rgb: 139, 122, 246;
+    --logo-accent-filter: brightness(0) saturate(100%) invert(61%) sepia(72%)
+        saturate(1375%) hue-rotate(214deg) brightness(99%) contrast(94%);
+    --atmosphere: radial-gradient(
         1000px circle at 50% 0%,
-        rgba(115, 91, 255, 0.07),
+        rgba(139, 122, 246, 0.06),
         transparent 62%
     );
 
@@ -255,7 +259,7 @@ h6 {
     --info: #60a5fa;
     --link: var(--accent-text);
     --link-hover: var(--accent-hover);
-    --focus: #9277ff;
+    --focus: #a395ff;
 
     --model-viewer-background: #151821;
 }
