@@ -1,42 +1,30 @@
-<h1 align="center">3D Print Dungeon 🧩</h1>
+<div align="center">
+
+# 3D Print Dungeon
+
+**A full-stack marketplace and community platform for discovering, uploading, previewing, and selling 3D printable models.**
+
+<img src="https://skillicons.dev/icons?i=react,ts,vite,tailwind,firebase,nodejs,js,docker,nginx" alt="React, TypeScript, Vite, Tailwind CSS, Firebase, Node.js, JavaScript, Docker, and Nginx" />
+
+</div>
+
+<br/>
 
 <p align="center">
-  <strong>A full-stack marketplace and community platform for discovering, sharing, previewing, and purchasing 3D-printable models.</strong>
-</p>
-
-<p align="center">
-  Built with React, TypeScript, Vite, Firebase, Cloud Functions, Firestore, Google Model Viewer, and Stripe.
-</p>
-
-<p align="center">
-  <a href="https://print-dungeon-3d.web.app/"><strong>Live Demo</strong></a>
-  ·
+  <a href="https://printdungeon.com"><strong>Live URL</strong></a>
+  |
   <a href="#features"><strong>Features</strong></a>
-  ·
+  |
   <a href="#product-flow"><strong>Product Flow</strong></a>
-  ·
+  |
   <a href="#architecture"><strong>Architecture</strong></a>
-  ·
+  |
   <a href="#project-status"><strong>Project Status</strong></a>
-  ·
+  |
   <a href="#local-development"><strong>Local Setup</strong></a>
 </p>
 
-> **Project status:** Deployed portfolio MVP. The core marketplace, authentication, upload, 3D preview, community, administration, and payment flows are implemented. Some secondary showcase sections still use mock or placeholder content.
-
-<!--
-HERO IMAGE
-
-Add:
-docs/images/print-dungeon-hero.png
-
-Recommended capture:
-- Marketplace or home page with several strong model cards
-- Search/navigation visible
-- Clean crop without browser tabs
-- 16:9 or similarly wide ratio
-
-Then uncomment:
+<br/>
 
 <p align="center">
   <img
@@ -45,7 +33,7 @@ Then uncomment:
     width="950"
   />
 </p>
--->
+
 
 ---
 
@@ -114,80 +102,105 @@ The project was developed end to end and combines a React frontend with Firebase
 
 ## Tech Stack
 
-<p align="left">
-  <img
-    src="https://skillicons.dev/icons?i=react,ts,vite,tailwind,firebase,threejs,nodejs,docker,git"
-    height="48"
-    alt="React, TypeScript, Vite, Tailwind CSS, Firebase, Three.js, Node.js, Docker, and Git"
-  />
-</p>
+Built with a React and TypeScript frontend, Firebase-managed backend services, Stripe payment workflows, Google Model Viewer previews, and a Vite-based development and production toolchain.
 
-| Area | Technologies |
-|---|---|
-| Frontend | React 19, TypeScript 5, Vite 6, Tailwind CSS 4 |
-| Routing and data | React Router 7, TanStack Query |
-| Authentication | Firebase Authentication |
-| Database | Cloud Firestore |
-| Storage | Firebase Storage |
-| Serverless backend | Firebase Cloud Functions, Node.js 20 |
-| Payments | Stripe.js, React Stripe.js, Stripe Node SDK |
-| 3D rendering | Google Model Viewer, Three.js conversion utilities |
-| Testing | Vitest, React Testing Library, jsdom |
-| Delivery | Firebase Hosting, Docker, Docker Compose, Nginx |
-| App tooling | ESLint, Vite PWA, compression tooling |
+| Area               | Technologies                                       |
+| ------------------ | -------------------------------------------------- |
+| Frontend           | React 19, TypeScript 5, Vite 6, Tailwind CSS 4     |
+| Routing and data   | React Router 7, TanStack Query                     |
+| Authentication     | Firebase Authentication                            |
+| Database           | Cloud Firestore                                    |
+| Storage            | Firebase Storage                                   |
+| Serverless backend | Firebase Cloud Functions, Node.js 20               |
+| Payments           | Stripe.js, React Stripe.js, Stripe Node SDK        |
+| 3D rendering       | Google Model Viewer, Three.js conversion utilities |
+| Testing            | Vitest, React Testing Library, jsdom               |
+| Delivery           | Firebase Hosting, Docker, Docker Compose, Nginx    |
+| App tooling        | ESLint, Vite PWA, compression tooling              |
 
 ---
 
 ## Product Preview
 
+The hero screenshot is shown above. Additional screenshots are available in `docs/images`.
+
+
+
+<p align="center">
+  <img
+    src="docs/images/model-details.png"
+    alt="Model details page with interactive 3D preview"
+    width="49%"
+  />
+  <img
+    src="docs/images/search-results.png"
+    alt="Search results and marketplace filters"
+    width="49%"
+  />
+</p>
+
+<p align="center">
+  <img
+    src="docs/images/upload-model.png"
+    alt="Model upload flow"
+    width="49%"
+  />
+  <img
+    src="docs/images/forum.png"
+    alt="Community forum"
+    width="49%"
+  />
+</p>
+
+<p align="center">
+  <img
+    src="docs/images/admin-dashboard.png"
+    alt="Admin dashboard"
+    width="49%"
+  />
+</p>
+
+<p align="center">
+  <img
+    src="docs/images/mobile-home.png"
+    alt="Mobile home page"
+    height="420"
+  />
+  &nbsp;
+  <img
+    src="docs/images/mobile-menu.png"
+    alt="Mobile navigation menu"
+    height="420"
+  />
+</p>
+
 <!--
-Add the screenshots described in docs/images/IMAGE_GUIDE.md, then replace
-the placeholder cells below with the provided image markup.
+If the mobile screenshots feel too tall in the main README, use this compact
+collapsible version instead of the visible mobile screenshot block above.
+
+<details>
+  <summary><strong>Mobile screenshots</strong></summary>
+
+  <p align="center">
+    <img
+      src="docs/images/mobile-home.png"
+      alt="Mobile home page"
+      height="420"
+    />
+    &nbsp;
+    <img
+      src="docs/images/mobile-menu.png"
+      alt="Mobile navigation menu"
+      height="420"
+    />
+  </p>
+</details>
 -->
 
-<table>
-  <tr>
-    <td align="center"><strong>Marketplace</strong></td>
-    <td align="center"><strong>Interactive Model Preview</strong></td>
-  </tr>
-  <tr>
-    <td align="center">
-      <em>Add <code>docs/images/marketplace.png</code></em>
-    </td>
-    <td align="center">
-      <em>Add <code>docs/images/model-details.png</code></em>
-    </td>
-  </tr>
-  <tr>
-    <td align="center"><strong>Model Upload</strong></td>
-    <td align="center"><strong>Administration</strong></td>
-  </tr>
-  <tr>
-    <td align="center">
-      <em>Add <code>docs/images/upload-flow.png</code></em>
-    </td>
-    <td align="center">
-      <em>Add <code>docs/images/admin-dashboard.png</code></em>
-    </td>
-  </tr>
-</table>
-
-> Remove the placeholder cells before publishing the final screenshot version. Ready-to-paste markup is included in `docs/images/IMAGE_GUIDE.md`.
-
 <!--
-OPTIONAL DEMO GIF
+Optional demo GIF:
 
-Add:
-docs/images/marketplace-demo.gif
-
-Recommended flow:
-1. Browse or search for a model.
-2. Open the model detail page.
-3. Rotate or zoom the 3D preview.
-4. Open the download or purchase action.
-5. Keep the GIF around 10–15 seconds and preferably below 10 MB.
-
-Then uncomment:
+Add `docs/images/marketplace-demo.gif`, then uncomment this block.
 
 <p align="center">
   <img
@@ -198,7 +211,6 @@ Then uncomment:
 </p>
 -->
 
----
 
 ## Product Flow
 
@@ -248,19 +260,19 @@ The application uses a feature-oriented React frontend supported by Firebase-man
 
 ```text
 3d-print-dungeon/
-├── src/                    # React application and feature modules
-├── functions/              # Firebase Cloud Functions
-├── public/                 # Static assets, manifest, and SEO files
-├── scripts/                # Sitemap, PWA, and maintenance utilities
-├── __tests__/              # Vitest and React Testing Library files
-├── docs/                   # Project documentation
-├── firestore.rules         # Firestore authorization rules
-├── storage.rules           # Storage authorization rules
-├── firestore.indexes.json  # Firestore indexes
-├── firebase.json           # Hosting, Functions, emulators, rules, extensions
-├── Dockerfile              # Multi-stage frontend production image
-├── docker-compose.yml      # Containerized development/production profiles
-└── nginx.conf              # SPA delivery and production headers
+|-- src/                    # React application and feature modules
+|-- functions/              # Firebase Cloud Functions
+|-- public/                 # Static assets, manifest, and SEO files
+|-- scripts/                # Sitemap, PWA, and maintenance utilities
+|-- __tests__/              # Vitest and React Testing Library files
+|-- docs/                   # Project documentation
+|-- firestore.rules         # Firestore authorization rules
+|-- storage.rules           # Storage authorization rules
+|-- firestore.indexes.json  # Firestore indexes
+|-- firebase.json           # Hosting, Functions, emulators, rules, extensions
+|-- Dockerfile              # Multi-stage frontend production image
+|-- docker-compose.yml      # Containerized development/production profiles
+`-- nginx.conf              # SPA delivery and production headers
 ```
 
 ### High-level system flow
@@ -333,17 +345,21 @@ The configured test tooling demonstrates the intended quality workflow, but this
 
 ## Deployment
 
-| Component | Platform |
-|---|---|
-| Frontend hosting | Firebase Hosting |
-| Database | Cloud Firestore |
-| Authentication | Firebase Authentication |
-| File storage | Firebase Storage |
-| Serverless backend | Firebase Cloud Functions |
-| Payments | Stripe |
-| Alternative frontend packaging | Docker and Nginx |
+| Component                      | Platform                 |
+| ------------------------------ | ------------------------ |
+| Frontend hosting               | Firebase Hosting         |
+| Database                       | Cloud Firestore          |
+| Authentication                 | Firebase Authentication  |
+| File storage                   | Firebase Storage         |
+| Serverless backend             | Firebase Cloud Functions |
+| Payments                       | Stripe                   |
+| Alternative frontend packaging | Docker and Nginx         |
 
-**Verified live deployments:**
+**Live deployment:**
+
+- [printdungeon.com](https://printdungeon.com)
+
+Firebase hosting mirrors:
 
 - [print-dungeon-3d.web.app](https://print-dungeon-3d.web.app/)
 - [print-dungeon-3d.firebaseapp.com](https://print-dungeon-3d.firebaseapp.com/)
@@ -402,12 +418,12 @@ The project contains marketplace, community, administration, and business-facing
 
 ### Implemented with limitations
 
-- [~] Model and artist search — some sorting and pagination behavior needs refinement
-- [~] Stripe Connect and paid delivery — implemented as a portfolio flow and requires production hardening
-- [~] Forum view tracking — implementation and rule behavior need alignment
-- [~] Marketplace landing areas — mixed live and mock content
-- [~] Notifications — core UI and storage exist, but some helper types exceed current usage
-- [~] Automated tests — tooling exists, but suites require repair and expansion
+- [~] Model and artist search - some sorting and pagination behavior needs refinement
+- [~] Stripe Connect and paid delivery - implemented as a portfolio flow and requires production hardening
+- [~] Forum view tracking - implementation and rule behavior need alignment
+- [~] Marketplace landing areas - mixed live and mock content
+- [~] Notifications - core UI and storage exist, but some helper types exceed current usage
+- [~] Automated tests - tooling exists, but suites require repair and expansion
 
 ### Prototype or placeholder areas
 
@@ -545,5 +561,5 @@ npm run preview
 **Plamen Tsvetkov**
 
 - [GitHub](https://github.com/Killerbeez7)
-- [Live Demo](https://print-dungeon-3d.web.app/)
+- [Live Demo](https://printdungeon.com)
 - [Email](mailto:plamen.tsvetkov96@gmail.com)
