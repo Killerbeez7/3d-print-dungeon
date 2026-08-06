@@ -433,16 +433,6 @@ The project contains marketplace, community, administration, and business-facing
 - [ ] Printed figures
 - [ ] New-arrivals and best-seller marketplace sections
 
-### Recommended next improvements
-
-- [ ] Enforce server-side model pricing during payment creation
-- [ ] Protect paid model files behind verified purchase access
-- [ ] Repair lint and automated test suites
-- [ ] Add integration tests for authentication, uploads, purchases, and forum flows
-- [ ] Finish marketplace sorting and pagination
-- [ ] Replace mock showcase sections with live data or remove them
-- [ ] Consolidate role information and authorization rules
-- [ ] Refresh sitemap, robots, routes, and older documentation
 
 ---
 
