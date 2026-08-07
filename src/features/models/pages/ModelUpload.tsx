@@ -16,12 +16,11 @@ import { SellerVerification } from "@/features/payment/components/SellerVerifica
 import { paymentService } from "@/features/payment/services/paymentService";
 import { H1 } from "@/components/index";
 
-import type { ModelData } from "@/features/models/types/model";
+import type { ModelUploadData } from "@/features/models/types/model";
 
 const UPLOAD_STATE_KEY = "pendingUploadState";
 
-const INITIAL_MODEL_DATA: ModelData = {
-  id: "",
+const INITIAL_MODEL_DATA: ModelUploadData = {
   name: "",
   description: "",
   categoryIds: [],
@@ -31,13 +30,6 @@ const INITIAL_MODEL_DATA: ModelData = {
   selectedRenderIndex: 0,
   price: 0,
   isPaid: false,
-  uploaderId: "",
-  convertedFileUrl: "",
-  originalFileUrl: "",
-  renderExtraUrls: [],
-  posterUrl: "",
-  renderPrimaryUrl: "",
-  uploaderDisplayName: "",
   isAI: false,
 };
 
@@ -140,7 +132,7 @@ export function ModelUpload() {
     setIsPollingConnectStatus(true);
   };
 
-  const [modelData, setModelData] = useState<ModelData>(INITIAL_MODEL_DATA);
+  const [modelData, setModelData] = useState<ModelUploadData>(INITIAL_MODEL_DATA);
 
   // @ts-expect-error FIX later
   const modelViewerRef = useRef();
