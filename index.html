@@ -1,56 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Michroma&display=swap"
-            rel="stylesheet"
-        />
+    <meta
+      name="description"
+      content="3D Print Dungeon: Discover, share, and purchase 3D printable dungeon models, miniatures, and resources for tabletop gaming. Join our community of creators and enthusiasts!"
+    />
 
-        <!-- Preconnect to Firestore for faster first query handshake -->
-        <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+    <meta name="theme-color" content="#0f1115" />
 
-        <!-- Preload the LCP image for faster rendering on mobile -->
-        <link
-            rel="preload"
-            href="/assets/carousel-images/MiniaturesCompetition_270.webp"
-            as="image"
-            fetchpriority="high"
-        />
+    <title>3D Print Dungeon</title>
 
-        <!-- Preload the stylesheet -->
-        <link
-            rel="preload"
-            href="/src/styles.css"
-            as="style"
-            onload="this.onload=null;this.rel='stylesheet'"
-        />
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 
-        <noscript><link rel="stylesheet" href="/src/styles.css" /></noscript>
-        <script>
-            (function () {
-                const savedTheme = localStorage.getItem("theme");
-                const theme =
-                    savedTheme === "light" || savedTheme === "dark"
-                        ? savedTheme
-                        : "dark";
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Michroma&display=swap"
+      rel="stylesheet"
+    />
 
-                document.documentElement.setAttribute("data-theme", theme);
-            })();
-        </script>
-        <title>3D Print Dungeon</title>
-        <meta
-            name="description"
-            content="3D Print Dungeon: Discover, share, and purchase 3D printable dungeon models, miniatures, and resources for tabletop gaming. Join our community of creators and enthusiasts!"
-        />
-    </head>
-    <body>
-        <div id="root"></div>
-        <script type="module" src="/src/main.jsx"></script>
-    </body>
+    <!-- Firestore -->
+    <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
+
+    <!-- Initial LCP image -->
+    <link
+      rel="preload"
+      href="/assets/carousel-images/MiniaturesCompetition_270.webp"
+      as="image"
+      fetchpriority="high"
+    />
+
+    <script>
+      try {
+        document.documentElement.setAttribute(
+          "data-theme",
+          localStorage.getItem("theme") || "dark"
+        );
+      } catch {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>
