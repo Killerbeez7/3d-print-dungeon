@@ -1,88 +1,85 @@
 import { useState, useEffect, type ChangeEvent } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useSearch } from "./useSearch";
-import { useModels } from "../../models/hooks/useModels";
 
 export const useSearchPage = () => {
-    const { activeTab, setActiveTab } = useSearch();
-    const { loading: modelsLoading } = useModels();
-    const navigate = useNavigate();
-    
-    // Local state for search input
-    const [localQuery, setLocalQuery] = useState<string>("");
-    const [debouncedQuery, setDebouncedQuery] = useState<string>("");
-    const [searchParams, setSearchParams] = useSearchParams();
-    
-    // On mount, initialize local query from URL query parameter and set correct URL for artworks tab
-    useEffect(() => {
-        const queryFromURL = searchParams.get("query") || "";
-        setLocalQuery(queryFromURL);
-        
-        // If we're on artworks tab and no sort_by parameter exists, add it
-        if (activeTab === "artworks" && !searchParams.get("sort_by")) {
-            setSearchParams({ sort_by: "relevance" });
-        }
-    }, [searchParams, activeTab, setSearchParams]);
+  const navigate = useNavigate();
 
-    // Debounce local query update and update the URL
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            setDebouncedQuery(localQuery);
-            
-            // Preserve sort_by parameter when updating query
-            const currentSortBy = searchParams.get("sort_by");
-            if (currentSortBy) {
-                if (localQuery.trim()) {
-                    setSearchParams({ sort_by: currentSortBy, query: localQuery });
-                } else {
-                    setSearchParams({ sort_by: currentSortBy });
-                }
-            } else {
-                if (localQuery.trim()) {
-                    setSearchParams({ query: localQuery });
-                } else {
-                    setSearchParams({});
-                }
-            }
-        }, 300);
-        return () => clearTimeout(handler);
-    }, [localQuery, setSearchParams, searchParams]);
+  const { activeTab, setActiveTab } = useSearch();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [localQuery, setLocalQuery] = useState(() => searchParams.get("query") ?? "");
+  const [debouncedQuery, setDebouncedQuery] = useState(
+    () => searchParams.get("query") ?? ""
+  );
 
-    // Show the prompt when the query is empty (filter logic will be handled in component)
-    const noSearchNoFilters = !debouncedQuery.trim();
+  // Ensure each search tab has default sort
+  useEffect(() => {
+    if (activeTab === "artworks" && !searchParams.has("sort_by")) {
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current);
 
-    // Handle input change
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setLocalQuery(e.target.value);
-    };
+        next.set("sort_by", "relevance");
 
-    // Clear search input
-    const handleClear = () => {
-        setLocalQuery("");
-    };
+        return next;
+      });
+    }
+  }, [activeTab, searchParams, setSearchParams]);
 
-    // Switch active tabs and clear search
-    const handleTabSwitch = (tab: string) => {
-        setActiveTab(tab);
-        setLocalQuery("");
-        setDebouncedQuery("");
-        
-        // Navigate to the appropriate route
-        if (tab === "artworks") {
-            navigate("/search?sort_by=relevance");
+  // Debounce search input and sync it with the URL
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const query = localQuery.trim();
+
+      setDebouncedQuery(query);
+
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current);
+
+        if (query) {
+          next.set("query", query);
         } else {
-            navigate("/search/artists?sort_by=followers");
+          next.delete("query");
         }
-    };
 
-    return {
-        localQuery,
-        debouncedQuery,
-        activeTab,
-        modelsLoading,
-        noSearchNoFilters,
-        handleInputChange,
-        handleClear,
-        handleTabSwitch,
+        return next;
+      });
+    }, 300);
+
+    return () => {
+      window.clearTimeout(timer);
     };
+  }, [localQuery, setSearchParams]);
+
+  const noSearchNoFilters = !debouncedQuery.trim();
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setLocalQuery(e.target.value);
+  };
+
+  const handleClear = () => {
+    setLocalQuery("");
+  };
+
+  const handleTabSwitch = (tab: string) => {
+    setActiveTab(tab);
+    setLocalQuery("");
+    setDebouncedQuery("");
+
+    if (tab === "artworks") {
+      navigate("/search?sort_by=relevance");
+      return;
+    }
+
+    navigate("/search/artists?sort_by=followers");
+  };
+
+  return {
+    localQuery,
+    debouncedQuery,
+    activeTab,
+    noSearchNoFilters,
+    handleInputChange,
+    handleClear,
+    handleTabSwitch,
+  };
 };
