@@ -1,136 +1,136 @@
 import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams } from "react-router-dom";
 //hooks
-import { useModels } from "../hooks/useModels";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useModal } from "@/hooks/useModal";
+import { useFetchModel } from "../hooks";
+import { usePublicProfile } from "@/features/user/hooks/usePublicProfile";
 import {
-    useViewTracker,
-    useModelViewCount,
+  useViewTracker,
+  useModelViewCount,
 } from "@/features/models/services/viewService";
 import { useThreeJsImporter } from "@/features/models/hooks/useOnDemandModelViewer";
+// Config
 import { fullscreenConfig } from "@/config/fullscreenConfig";
-
-const ModelViewer = lazy(() =>
-    import("../components/model-view/ModelViewer").then((module) => ({
-        default: module.ModelViewer,
-    }))
-);
-
 //components
 import { ModelSidebar } from "../components/model-view/ModelSidebar";
 import { ModelThumbnails } from "../components/model-view/ModelThumbnails";
 import { CommentsProvider } from "@/features/models/providers/commentsProvider";
 import { ModelComments } from "../components/model-view/ModelComments";
 import { Spinner } from "@/features/shared/reusable/Spinner";
-import type { ModelData } from "@/features/models/types/model";
+
+const ModelViewer = lazy(() =>
+  import("../components/model-view/ModelViewer").then((module) => ({
+    default: module.ModelViewer,
+  }))
+);
 
 export function ModelPage() {
-    const { modelId } = useParams<{ modelId: string }>();
-    const { models, loading, uploader, fetchUploader } = useModels();
-    const { currentUser } = useAuth();
-    const { open } = useModal("auth");
-    const [selectedRenderIndex, setSelectedRenderIndex] = useState<number>(-1);
-    const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-    const { threeImported, importThreeJs } = useThreeJsImporter();
+  const { modelId } = useParams<{ modelId: string }>();
 
-    // Import Three.js immediately when page opens (one-time background loading)
-    useEffect(() => {
-        importThreeJs();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty dependency array - only run once on mount
+  const { currentUser } = useAuth();
+  const { open } = useModal("auth");
 
-    // Use new lightweight view tracking system
-    useViewTracker(modelId ?? "", currentUser ?? undefined);
-    const { count: viewCount, loading: viewCountLoading } = useModelViewCount(
-        modelId ?? ""
-    );
+  const [selectedRenderIndex, setSelectedRenderIndex] = useState<number>(-1);
 
-    useEffect(() => {
-        const m = models.find((m: ModelData) => m.id === modelId);
-        if (m?.uploaderId) fetchUploader(m.uploaderId);
-    }, [modelId, models, fetchUploader]);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
-    // Track fullscreen state changes
-    useEffect(() => {
-        const cleanup = fullscreenConfig.onChange(() => {
-            setIsFullscreen(fullscreenConfig.isFullscreen());
-        });
-        return cleanup;
-    }, []);
+  const { data: model, isLoading: modelLoading } = useFetchModel(modelId);
 
-    const model: ModelData | undefined = models.find((m: ModelData) => m.id === modelId);
+  const { data: uploader, isLoading: uploaderLoading } = usePublicProfile(
+    model?.uploaderId
+  );
 
-    // Prepare combined render URLs for both viewer and thumbnails
-    const combinedRenderUrls = model
-        ? [
-              ...(model.renderPrimaryUrl ? [model.renderPrimaryUrl] : []),
-              ...(Array.isArray(model.renderExtraUrls) ? model.renderExtraUrls : []),
-          ]
-        : [];
+  const { threeImported, importThreeJs } = useThreeJsImporter();
 
-    if (loading)
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <Spinner size={24} />
-            </div>
-        );
-    if (!model)
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                Model not found
-            </div>
-        );
+  // Load Three.js when the page opens
+  useEffect(() => {
+    importThreeJs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
+  useViewTracker(modelId ?? "", currentUser ?? undefined);
+  const { count: viewCount, loading: viewCountLoading } = useModelViewCount(
+    modelId ?? ""
+  );
+
+  // Track fullscreen state changes
+  useEffect(() => {
+    const cleanup = fullscreenConfig.onChange(() => {
+      setIsFullscreen(fullscreenConfig.isFullscreen());
+    });
+    return cleanup;
+  }, []);
+
+  if (modelLoading) {
     return (
-        <div>
-            <div className="text-txt-primary flex flex-col lg:flex-row gap-4 p-4 lg:p-6 lg:pl-7 lg:pr-2">
-                {/* VIEWER  --------------------------------------------------- */}
-                <div className="flex-1 flex flex-col gap-4">
-                    <Suspense fallback={<div />}>
-                        {(() => {
-                            const viewerModel = {
-                                ...model,
-                                // Pass the merged array so the viewer can work unchanged
-                                renderExtraUrls: combinedRenderUrls,
-                            } as typeof model;
-
-                            return (
-                                <ModelViewer
-                                    model={viewerModel}
-                                    selectedRenderIndex={selectedRenderIndex}
-                                    setSelectedRenderIndex={setSelectedRenderIndex}
-                                    threeImported={threeImported}
-                                />
-                            );
-                        })()}
-                    </Suspense>
-
-                    {/* Thumbnails - Visible when not in fullscreen */}
-                    {!isFullscreen && (
-                        <ModelThumbnails
-                            renderUrls={combinedRenderUrls}
-                            selectedRenderIndex={selectedRenderIndex}
-                            setSelectedRenderIndex={setSelectedRenderIndex}
-                        />
-                    )}
-                </div>
-
-                <ModelSidebar
-                    model={model}
-                    uploader={uploader}
-                    viewCount={viewCount}
-                    viewCountLoading={viewCountLoading}
-                    currentUser={currentUser}
-                    openAuthModal={() => open({ mode: "login" })}
-                />
-            </div>
-
-            <div className="flex-1 overflow-y-auto px-4 pb-8 lg:px-7">
-                <CommentsProvider modelId={model.id}>
-                    <ModelComments openAuthModal={() => open({ mode: "login" })} />
-                </CommentsProvider>
-            </div>
-        </div>
+      <div className="flex min-h-screen items-center justify-center">
+        <Spinner size={24} />
+      </div>
     );
+  }
+
+  if (!model) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">Model not found</div>
+    );
+  }
+
+  const combinedRenderUrls = [
+    ...(model.renderPrimaryUrl ? [model.renderPrimaryUrl] : []),
+    ...(Array.isArray(model.renderExtraUrls) ? model.renderExtraUrls : []),
+  ];
+
+  const viewerModel = {
+    ...model,
+    renderExtraUrls: combinedRenderUrls,
+  };
+
+  return (
+    <div>
+      <div className="flex flex-col gap-4 p-4 text-txt-primary lg:flex-row lg:p-6 lg:pl-7 lg:pr-2">
+        {/* Viewer */}
+        <div className="flex flex-1 flex-col gap-4">
+          <Suspense
+            fallback={
+              <div className="flex min-h-[320px] items-center justify-center">
+                <Spinner size={24} />
+              </div>
+            }
+          >
+            <ModelViewer
+              model={viewerModel}
+              selectedRenderIndex={selectedRenderIndex}
+              setSelectedRenderIndex={setSelectedRenderIndex}
+              threeImported={threeImported}
+            />
+          </Suspense>
+
+          {/* Thumbnails - Visible when not in fullscreen */}
+          {!isFullscreen && (
+            <ModelThumbnails
+              renderUrls={combinedRenderUrls}
+              selectedRenderIndex={selectedRenderIndex}
+              setSelectedRenderIndex={setSelectedRenderIndex}
+            />
+          )}
+        </div>
+
+        <ModelSidebar
+          model={model}
+          uploader={uploaderLoading ? undefined : uploader ?? undefined}
+          viewCount={viewCount}
+          viewCountLoading={viewCountLoading}
+          currentUser={currentUser}
+          openAuthModal={() => open({ mode: "login" })}
+        />
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-4 pb-8 lg:px-7">
+        <CommentsProvider modelId={model.id}>
+          <ModelComments openAuthModal={() => open({ mode: "login" })} />
+        </CommentsProvider>
+      </div>
+    </div>
+  );
 }
