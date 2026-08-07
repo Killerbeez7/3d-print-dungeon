@@ -1,29 +1,34 @@
-import { ModalProvider } from "@/providers/modalProvider";
-import { AuthProvider } from "./features/auth/providers/authProvider";
-import { CookiesProvider } from "./features/policies/providers/CookiesProvider";
-import { SystemAlertProvider, SystemAlertContainer } from "./features/system-alerts";
-import { UserNotificationProvider } from "./features/user/notifications";
 import { Suspense } from "react";
 import { AppRoutes } from "./AppRoutes";
-import { useRouteProgress } from "@/hooks/useRouteProgress";
+
+// Providers
+import { AuthProvider } from "@/features/auth/providers/authProvider";
+import { CookiesProvider } from "@/features/policies/providers/CookiesProvider";
+import { MaintenanceProvider } from "@/features/maintenance/providers/MaintenanceProvider";
+import { ModalProvider } from "@/providers/modalProvider";
+
+// Components
+import { SystemAlertContainer, SystemAlertProvider } from "@/features/system-alerts";
+import { UserNotificationProvider } from "@/features/user/notifications";
 
 export const App = () => {
-  useRouteProgress();
-
   return (
     <AuthProvider>
-      <CookiesProvider>
-        <SystemAlertProvider>
-          <UserNotificationProvider>
-            <ModalProvider>
-              <Suspense>
-                <AppRoutes />
-              </Suspense>
-              <SystemAlertContainer />
-            </ModalProvider>
-          </UserNotificationProvider>
-        </SystemAlertProvider>
-      </CookiesProvider>
+      <MaintenanceProvider>
+        <CookiesProvider>
+          <SystemAlertProvider>
+            <UserNotificationProvider>
+              <ModalProvider>
+                <Suspense fallback={null}>
+                  <AppRoutes />
+                </Suspense>
+
+                <SystemAlertContainer />
+              </ModalProvider>
+            </UserNotificationProvider>
+          </SystemAlertProvider>
+        </CookiesProvider>
+      </MaintenanceProvider>
     </AuthProvider>
   );
 };
