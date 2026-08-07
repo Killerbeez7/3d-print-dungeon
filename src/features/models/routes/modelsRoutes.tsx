@@ -1,14 +1,18 @@
 import { lazy, Suspense } from "react";
-import { withMaintenance, withProtectedMaintenance } from "../../../helpers/routeHelpers";
-import { ROUTES } from "../../../constants/routeConstants";
 import type { RouteObject } from "react-router-dom";
+
+import { ROUTES } from "@/constants/routeConstants";
+import { withProtected } from "@/helpers/routeHelpers";
+import { RouteLoadingIndicator } from "@/components/RouteLoadingIndicator";
 
 const ModelUpload = lazy(() =>
   import("../pages/ModelUpload").then((m) => ({ default: m.ModelUpload }))
 );
+
 const ModelPage = lazy(() =>
   import("../pages/ModelPage").then((m) => ({ default: m.ModelPage }))
 );
+
 const ModelEdit = lazy(() =>
   import("../pages/ModelEdit").then((m) => ({ default: m.ModelEdit }))
 );
@@ -16,24 +20,24 @@ const ModelEdit = lazy(() =>
 export const modelsRoutes: RouteObject[] = [
   {
     path: ROUTES.MODEL_UPLOAD,
-    element: withProtectedMaintenance(
-      <Suspense>
+    element: withProtected(
+      <Suspense fallback={<RouteLoadingIndicator />}>
         <ModelUpload />
       </Suspense>
     ),
   },
   {
     path: ROUTES.MODEL_VIEW,
-    element: withMaintenance(
-      <Suspense>
+    element: (
+      <Suspense fallback={<RouteLoadingIndicator />}>
         <ModelPage />
       </Suspense>
     ),
   },
   {
     path: ROUTES.MODEL_EDIT,
-    element: withProtectedMaintenance(
-      <Suspense>
+    element: withProtected(
+      <Suspense fallback={<RouteLoadingIndicator />}>
         <ModelEdit />
       </Suspense>,
       { allowedRoles: ["admin", "artist"] }
