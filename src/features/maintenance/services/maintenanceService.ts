@@ -1,168 +1,238 @@
-import { doc, getDoc, onSnapshot, setDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "../../../config/firebaseConfig";
-import { isAdmin } from "../../admin/services/adminService";
-import type { MaintenanceStatus, MaintenanceSettings } from "@/features/maintenance/types/maintenance";
+import {
+  doc,
+  getDoc,
+  onSnapshot,
+  Timestamp,
+  type FirestoreError,
+} from "firebase/firestore";
+
+import { db } from "@/config/firebaseConfig";
+
+import type {
+  MaintenanceSettings,
+  MaintenanceStatus,
+} from "@/features/maintenance/types/maintenance";
 
 const MAINTENANCE_SETTINGS_REF = doc(db, "settings", "maintenance");
-const OLD_SETTINGS_REF = doc(db, "settings", "global");
 
-const adjustToGMT3 = (date: Date) => {
-    return new Date(date.getTime() + 3 * 60 * 60 * 1000);
+const DEFAULT_MAINTENANCE_STATUS: MaintenanceStatus = {
+  inMaintenance: false,
+  message: null,
+  endTime: null,
 };
 
-// Clean up old maintenance settings
-export const cleanupOldMaintenanceSettings = async () => {
-    try {
-        // Check if old settings exist
-        const oldSettingsDoc = await getDoc(OLD_SETTINGS_REF);
-        if (oldSettingsDoc.exists()) {
-            const oldData = oldSettingsDoc.data();
+const MAX_TIMEOUT_MS = 2_147_483_647;
 
-            // If old settings had maintenance mode enabled, migrate it
-            if (oldData.siteMaintenanceMode) {
-                await setDoc(
-                    MAINTENANCE_SETTINGS_REF,
-                    {
-                        isMaintenanceMode: true,
-                        maintenanceMessage:
-                            oldData.maintenanceMessage || "Site is under maintenance",
-                        maintenanceEndTime: null,
-                        lastUpdated: serverTimestamp(),
-                    },
-                    { merge: true }
-                );
-            }
+function toDate(value: unknown): Date | null {
+  if (!value) {
+    return null;
+  }
 
-            // Create new settings object without maintenance fields
-            const newSettings = { ...oldData };
-            delete newSettings.siteMaintenanceMode;
-            delete newSettings.maintenanceMessage;
+  if (value instanceof Timestamp) {
+    return value.toDate();
+  }
 
-            // Update global settings without maintenance fields
-            await setDoc(OLD_SETTINGS_REF, newSettings);
-        }
-    } catch (error) {
-        console.error("Error cleaning up old maintenance settings:", error);
+  if (value instanceof Date) {
+    return value;
+  }
+
+  // Temporary compatibility with values saved by the old implementation.
+  if (typeof value === "string") {
+    const date = new Date(value);
+
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  return null;
+}
+
+function isImmediateMaintenanceActive(settings: MaintenanceSettings): boolean {
+  if (!settings.isMaintenanceMode) {
+    return false;
+  }
+
+  const endTime = toDate(settings.maintenanceEndTime);
+
+  // No end time means maintenance stays active until manually disabled.
+  if (!endTime) {
+    return true;
+  }
+
+  return Date.now() < endTime.getTime();
+}
+
+function isScheduledMaintenanceActive(settings: MaintenanceSettings): boolean {
+  const scheduled = settings.scheduledMaintenance;
+
+  if (!scheduled?.isScheduled) {
+    return false;
+  }
+
+  const startTime = toDate(scheduled.startTime);
+  const endTime = toDate(scheduled.endTime);
+
+  if (!startTime || !endTime) {
+    return false;
+  }
+
+  const now = Date.now();
+
+  return now >= startTime.getTime() && now < endTime.getTime();
+}
+
+function getMaintenanceStatus(settings: MaintenanceSettings): MaintenanceStatus {
+  if (isImmediateMaintenanceActive(settings)) {
+    return {
+      inMaintenance: true,
+      message: settings.maintenanceMessage || "Site is under maintenance",
+      endTime: toDate(settings.maintenanceEndTime),
+    };
+  }
+
+  if (isScheduledMaintenanceActive(settings)) {
+    return {
+      inMaintenance: true,
+      message: settings.scheduledMaintenance.message || "Site is under maintenance",
+      endTime: toDate(settings.scheduledMaintenance.endTime),
+    };
+  }
+
+  return DEFAULT_MAINTENANCE_STATUS;
+}
+
+function getNextBoundary(settings: MaintenanceSettings): number | null {
+  const now = Date.now();
+
+  // Current/manual maintenance end.
+  if (settings.isMaintenanceMode) {
+    const endTime = toDate(settings.maintenanceEndTime)?.getTime();
+
+    if (endTime && endTime > now) {
+      return endTime;
     }
-};
+  }
 
+  const scheduled = settings.scheduledMaintenance;
 
-const checkScheduledMaintenance = (settings: MaintenanceSettings) => {
-    if (!settings.scheduledMaintenance?.isScheduled) return false;
+  if (scheduled?.isScheduled && scheduled.startTime && scheduled.endTime) {
+    const startTime = toDate(scheduled.startTime)?.getTime();
 
-    const now = new Date();
-    const startTime = settings.scheduledMaintenance.startTime;
-    const endTime = settings.scheduledMaintenance.endTime;
+    const endTime = toDate(scheduled.endTime)?.getTime();
 
-    if (!startTime || !endTime) return false;
-
-    const adjustedNow = adjustToGMT3(now);
-    const adjustedStart = adjustToGMT3(startTime);
-    const adjustedEnd = adjustToGMT3(endTime);
-
-    return adjustedNow >= adjustedStart && adjustedNow <= adjustedEnd;
-};
-
-export const checkMaintenanceStatus = async (userId = null) => {
-    try {
-        const settingsDoc = await getDoc(MAINTENANCE_SETTINGS_REF);
-
-        if (!settingsDoc.exists()) {
-            return {
-                inMaintenance: false,
-                message: null,
-                endTime: null,
-                isAdmin: false,
-            };
-        }
-
-        const settings = settingsDoc.data();
-        const adminStatus = userId ? await isAdmin(userId) : false;
-
-        // Check immediate maintenance mode
-        if (settings.isMaintenanceMode) {
-            return {
-                inMaintenance: true,
-                message: settings.maintenanceMessage,
-                endTime: settings.maintenanceEndTime?.toDate() || null,
-                isAdmin: adminStatus,
-            };
-        }
-
-        // Check scheduled maintenance
-        const isInScheduledMaintenance = checkScheduledMaintenance(settings as MaintenanceSettings);
-        if (isInScheduledMaintenance) {
-            return {
-                inMaintenance: true,
-                message: settings.scheduledMaintenance.message,
-                endTime: settings.scheduledMaintenance.endTime.toDate(),
-                isAdmin: adminStatus,
-            };
-        }
-
-        return {
-            inMaintenance: false,
-            message: null,
-            endTime: null,
-            isAdmin: adminStatus,
-        };
-    } catch (error) {
-        console.error("Error checking maintenance status:", error);
-        return {
-            inMaintenance: false,
-            message: null,
-            endTime: null,
-            isAdmin: false,
-        };
+    if (!startTime || !endTime) {
+      return null;
     }
-};
 
-export const subscribeToMaintenanceStatus = (
-    callback: (status: MaintenanceStatus) => void,
-    userId: string | null = null
-) => {
-    return onSnapshot(MAINTENANCE_SETTINGS_REF, async (doc) => {
-        if (!doc.exists()) {
-            callback({
-                inMaintenance: false,
-                message: null,
-                endTime: null,
-                isAdmin: false,
-            });
-            return;
+    if (now < startTime) {
+      return startTime;
+    }
+
+    if (now < endTime) {
+      return endTime;
+    }
+  }
+
+  return null;
+}
+
+export async function checkMaintenanceStatus(): Promise<MaintenanceStatus> {
+  try {
+    const snapshot = await getDoc(MAINTENANCE_SETTINGS_REF);
+
+    if (!snapshot.exists()) {
+      return DEFAULT_MAINTENANCE_STATUS;
+    }
+
+    return getMaintenanceStatus(snapshot.data() as MaintenanceSettings);
+  } catch (error) {
+    console.error("Failed to check maintenance status:", error);
+
+    // Fail open if maintenance status cannot be read.
+    return DEFAULT_MAINTENANCE_STATUS;
+  }
+}
+
+export function subscribeToMaintenanceStatus(
+  onStatus: (status: MaintenanceStatus) => void,
+  onError?: (error: FirestoreError | Error) => void
+) {
+  let currentSettings: MaintenanceSettings | null = null;
+
+  let boundaryTimer: number | null = null;
+
+  const clearBoundaryTimer = () => {
+    if (boundaryTimer !== null) {
+      window.clearTimeout(boundaryTimer);
+      boundaryTimer = null;
+    }
+  };
+
+  const scheduleNextBoundaryCheck = (settings: MaintenanceSettings) => {
+    clearBoundaryTimer();
+
+    const nextBoundary = getNextBoundary(settings);
+
+    if (nextBoundary === null) {
+      return;
+    }
+
+    const delay = Math.min(Math.max(nextBoundary - Date.now(), 0), MAX_TIMEOUT_MS);
+
+    boundaryTimer = window.setTimeout(() => {
+      if (!currentSettings) {
+        return;
+      }
+
+      onStatus(getMaintenanceStatus(currentSettings));
+
+      scheduleNextBoundaryCheck(currentSettings);
+    }, delay);
+  };
+
+  const unsubscribe = onSnapshot(
+    MAINTENANCE_SETTINGS_REF,
+
+    (snapshot) => {
+      try {
+        if (!snapshot.exists()) {
+          currentSettings = null;
+
+          clearBoundaryTimer();
+
+          onStatus(DEFAULT_MAINTENANCE_STATUS);
+
+          return;
         }
 
-        const settings = doc.data();
-        const adminStatus = userId ? await isAdmin(userId) : false;
+        const settings = snapshot.data() as MaintenanceSettings;
 
-        // Check immediate maintenance mode
-        if (settings.isMaintenanceMode) {
-            callback({
-                inMaintenance: true,
-                message: settings.maintenanceMessage,
-                endTime: settings.maintenanceEndTime?.toDate() || null,
-                isAdmin: adminStatus,
-            });
-            return;
-        }
+        currentSettings = settings;
 
-        // Check scheduled maintenance
-        const isInScheduledMaintenance = checkScheduledMaintenance(settings as MaintenanceSettings);
-        if (isInScheduledMaintenance) {
-            callback({
-                inMaintenance: true,
-                message: settings.scheduledMaintenance.message,
-                endTime: settings.scheduledMaintenance.endTime.toDate(),
-                isAdmin: adminStatus,
-            });
-            return;
-        }
+        onStatus(getMaintenanceStatus(settings));
 
-        callback({
-            inMaintenance: false,
-            message: null,
-            endTime: null,
-            isAdmin: adminStatus,
-        });
-    });
-};
+        scheduleNextBoundaryCheck(settings);
+      } catch (error) {
+        clearBoundaryTimer();
+
+        const parsedError = error instanceof Error ? error : new Error(String(error));
+
+        console.error("Failed to process maintenance settings:", parsedError);
+
+        onError?.(parsedError);
+      }
+    },
+
+    (error) => {
+      clearBoundaryTimer();
+
+      console.error("Maintenance listener failed:", error);
+
+      onError?.(error);
+    }
+  );
+
+  return () => {
+    clearBoundaryTimer();
+    unsubscribe();
+  };
+}

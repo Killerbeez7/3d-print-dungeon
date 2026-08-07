@@ -1,113 +1,120 @@
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useEffect, useState } from "react";
-import { subscribeToMaintenanceStatus } from "@/features/maintenance/services/maintenanceService";
+import { useMaintenance } from "../hooks/useMaintenance";
 
-interface MaintenanceState {
-    inMaintenance: boolean;
-    message: string | null;
-    endTime: Date | null;
-    isAdmin: boolean;
-}
-
-interface TimeLeft {
-    hours: number;
-    minutes: number;
-    seconds: number;
-}
+type TimeLeft = {
+  hours: number;
+  minutes: number;
+  seconds: number;
+};
 
 export const MaintenancePage = () => {
-    const navigate = useNavigate();
-    const { currentUser, isAdmin } = useAuth();
-    const [maintenanceState, setMaintenanceState] = useState<MaintenanceState>({
-        inMaintenance: false,
-        message: null,
-        endTime: null,
-        isAdmin: false,
-    });
-    const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const unsubscribe = subscribeToMaintenanceStatus((state: MaintenanceState) => {
-            setMaintenanceState(state);
-        }, currentUser?.uid as string | null | undefined);
+  const { currentUser, isAdmin } = useAuth();
+  const { status, loading, enableAdminBypass } = useMaintenance();
 
-        return () => unsubscribe();
-    }, [currentUser?.uid]);
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
-    // Update countdown timer
-    useEffect(() => {
-        if (maintenanceState.endTime) {
-            const updateTimer = () => {
-                const now = new Date();
-                // Adjust for GMT+3
-                const adjustedNow = new Date(now.getTime() + 3 * 60 * 60 * 1000);
-                const adjustedEnd = new Date(
-                    maintenanceState.endTime!.getTime() + 3 * 60 * 60 * 1000
-                );
-                const diff = adjustedEnd.getTime() - adjustedNow.getTime();
+  useEffect(() => {
+    if (!loading && status && !status.inMaintenance) {
+      navigate("/", { replace: true });
+    }
+  }, [loading, status, navigate]);
 
-                if (diff <= 0) {
-                    setTimeLeft(null);
-                    return;
-                }
+  // Update countdown timer.
+  useEffect(() => {
+    if (!status?.endTime) {
+      setTimeLeft(null);
+      return;
+    }
 
-                const hours = Math.floor(diff / (1000 * 60 * 60));
-                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-                setTimeLeft({ hours, minutes, seconds });
-            };
+    const updateTimer = () => {
+      const diff = status.endTime!.getTime() - Date.now();
 
-            updateTimer();
-            const timer = setInterval(updateTimer, 1000);
+      if (diff <= 0) {
+        setTimeLeft(null);
+        return;
+      }
 
-            return () => clearInterval(timer);
-        }
-    }, [maintenanceState.endTime]);
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-    const AccessSiteBtn = () => {
-        return (
-            <button
-                onClick={() => navigate("/")}
-                className="mt-6 px-6 py-3 bg-accent text-white rounded-lg hover:bg-accent-hover transition-colors"
-            >
-                Access Site
-            </button>
-        );
+      setTimeLeft({
+        hours,
+        minutes,
+        seconds,
+      });
     };
 
-    return (
-        <div className="flex flex-col items-center justify-center min-h-[60vh] py-12">
-            <div className="max-w-lg w-full mx-4 p-8 bg-bg-surface rounded-xl shadow-2xl text-center border border-br-secondary">
-                <div className="mb-8">
-                    <img
-                        src="/logo.png"
-                        alt="Site Logo"
-                        className="h-16 w-auto mx-auto mb-6"
-                    />
-                    <h1 className="text-4xl font-bold text-txt-primary mb-4">
-                        Under Maintenance
-                    </h1>
-                    <div className="text-xl text-txt-secondary mb-6">
-                        {maintenanceState.message ??
-                            "We're currently performing some updates to improve your experience."}
-                    </div>
-                    {timeLeft && (
-                        <div className="text-lg font-medium text-accent mb-6">
-                            Expected completion in: {timeLeft.hours}h {timeLeft.minutes}m{" "}
-                            {timeLeft.seconds}s
-                        </div>
-                    )}
-                    {(isAdmin || maintenanceState.isAdmin) && <AccessSiteBtn />}
-                </div>
+    updateTimer();
 
-                <div className="border-t border-br-secondary pt-6">
-                    <div className="text-sm text-txt-secondary">
-                        If you&apos;re an administrator, please sign in to access the
-                        site.
-                    </div>
-                </div>
+    const timer = window.setInterval(updateTimer, 1000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [status?.endTime]);
+
+  if (loading || !status) {
+    return null;
+  }
+
+  return (
+    <div className="flex min-h-[60vh] flex-col items-center justify-center py-12">
+      <div className="mx-4 w-full max-w-lg rounded-xl border border-br-secondary bg-bg-surface p-8 text-center shadow-2xl">
+        <div className="mb-8">
+          <img
+            src="/logo.png"
+            alt="3D Print Dungeon"
+            className="mx-auto mb-6 h-16 w-auto"
+          />
+
+          <h1 className="mb-4 text-4xl font-bold text-txt-primary">Under Maintenance</h1>
+
+          <div className="mb-6 text-xl text-txt-secondary">
+            {status.message ??
+              "We're currently performing some updates to improve your experience."}
+          </div>
+
+          {timeLeft && (
+            <div className="mb-6 text-lg font-medium text-accent">
+              Expected completion in: {timeLeft.hours}h {timeLeft.minutes}m{" "}
+              {timeLeft.seconds}s
             </div>
+          )}
+
+          {!currentUser ? (
+            <button
+              type="button"
+              onClick={() => navigate("/login")}
+              className="mt-6 rounded-lg bg-accent px-6 py-3 text-white transition-colors hover:bg-accent-hover"
+            >
+              Sign in
+            </button>
+          ) : isAdmin ? (
+            <button
+              type="button"
+              onClick={() => {
+                enableAdminBypass();
+                navigate("/", { replace: true });
+              }}
+              className="mt-6 rounded-lg bg-accent px-6 py-3 text-white transition-colors hover:bg-accent-hover"
+            >
+              Access Site
+            </button>
+          ) : null}
         </div>
-    );
+
+        <div className="border-t border-br-secondary pt-6">
+          <p className="text-sm text-txt-secondary">
+            If you&apos;re an administrator, please sign in to access the site.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 };

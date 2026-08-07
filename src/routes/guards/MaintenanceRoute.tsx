@@ -1,67 +1,34 @@
+import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
+
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useState, useEffect, ReactNode } from "react";
-import { subscribeToMaintenanceStatus } from "@/features/maintenance/services/maintenanceService";
-import { MaintenanceStatus } from "@/features/maintenance/types/maintenance";
+import { useMaintenance } from "@/features/maintenance/hooks/useMaintenance";
+import { Spinner } from "@/features/shared/reusable/Spinner";
 
-interface MaintenanceRouteProps {
-    children: ReactNode;
-    fallback?: ReactNode;
-    redirectTo?: string;
-}
+type MaintenanceRouteProps = {
+  children: ReactNode;
+};
 
-export function MaintenanceRoute({
-    children,
-    fallback = null,
-    redirectTo = "/maintenance",
-}: MaintenanceRouteProps): ReactNode {
-    const { isAdmin } = useAuth();
-    const [maintenanceState, setMaintenanceState] = useState<MaintenanceStatus>({
-        inMaintenance: false,
-        message: null,
-        endTime: null,
-        isAdmin: false,
-    });
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<unknown>(null);
+export function MaintenanceRoute({ children }: MaintenanceRouteProps) {
+  const { isAdmin } = useAuth();
 
-    useEffect(() => {
-        let isMounted = true;
-        try {
-            const unsubscribe = subscribeToMaintenanceStatus((state: MaintenanceStatus) => {
-                if (isMounted) {
-                    setMaintenanceState(state);
-                    setLoading(false);
-                }
-            });
-            return () => {
-                isMounted = false;
-                unsubscribe();
-            };
-        } catch (err) {
-            console.error("Error in MaintenanceRoute:", err);
-            setError(err);
-            setLoading(false);
-        }
-    }, []);
+  const { status, loading, hasError, adminBypass } = useMaintenance();
 
-    // Handle errors gracefully
-    if (error) {
-        console.error("MaintenanceRoute error:", error);
-        return children;
-    }
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-bg-primary text-txt-primary">
+        <Spinner size={50} />
+      </div>
+    );
+  }
 
-    if (loading) {
-        return fallback;
-    }
-
-    // If maintenance is on and user is not admin, redirect to maintenance page
-    if (maintenanceState.inMaintenance && !isAdmin) {
-        if (window.location.pathname !== redirectTo) {
-            return <Navigate to={redirectTo} replace />;
-        }
-    }
-
-    // If maintenance is off or user is admin, allow access
+  if (hasError || !status) {
     return children;
+  }
+
+  if (status.inMaintenance && !(isAdmin && adminBypass)) {
+    return <Navigate to="/maintenance" replace />;
+  }
+
+  return children;
 }

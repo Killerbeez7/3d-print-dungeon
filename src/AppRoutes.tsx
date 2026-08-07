@@ -2,7 +2,7 @@ import { Navigate, useRoutes, type RouteObject } from "react-router-dom";
 
 import { ROUTES } from "./constants/routeConstants";
 
-import { authRoutes } from "./features/auth/routes/authRoutes";
+// import { authRoutes } from "./features/auth/routes/authRoutes";
 import { userRoutes } from "./features/user/routes/userRoutes";
 import { homeRoutes } from "./features/home/routes/homeRoutes";
 import { blogRoutes } from "./features/blog/routes/blogRoutes";
@@ -15,16 +15,18 @@ import { artistsRoutes } from "./features/artists/routes/artistsRoutes";
 import { policiesRoutes } from "./features/policies/routes/policiesRoutes";
 import { businessRoutes } from "./features/business/routes/businessRoutes";
 import { collectionsRoutes } from "./features/collections/routes/collectionsRoutes";
-import { maintenanceRoutes } from "./features/maintenance/routes/maintenanceRoutes";
+// import { maintenanceRoutes } from "./features/maintenance/routes/maintenanceRoutes";
 import { marketplaceRoutes } from "./features/marketplace/routes/marketplaceRoutes";
 import { printedFiguresRoutes } from "./features/printed-figures/routes/printedFiguresRoutes";
 
-import Layout from "./features/shared/Layout";
+import Layout from "@/features/shared/Layout";
+import { MaintenancePage } from "@/features/maintenance/pages/MaintenancePage";
+import { MaintenanceRoute } from "@/routes/guards/MaintenanceRoute";
 
 const mainRoutes: RouteObject[] = [
   ...homeRoutes,
-  ...maintenanceRoutes,
-  ...authRoutes,
+  // ...maintenanceRoutes,
+  // ...authRoutes,
   ...collectionsRoutes,
   ...artistsRoutes,
   ...eventsRoutes,
@@ -43,10 +45,25 @@ const mainRoutes: RouteObject[] = [
 
 const routesConfig: RouteObject[] = [
   {
-    element: <Layout />,
+    path: ROUTES.MAINTENANCE,
+    element: <MaintenancePage />,
+  },
+  {
+    element: (
+      <MaintenanceRoute>
+        <Layout />
+      </MaintenanceRoute>
+    ),
     children: mainRoutes,
   },
 ];
+
+// const routesConfig: RouteObject[] = [
+//   {
+//     element: <Layout />,
+//     children: mainRoutes,
+//   },
+// ];
 
 export const AppRoutes = () => {
   return useRoutes(routesConfig);

@@ -16,8 +16,9 @@ export function ProtectedRoute({
   requireAdmin = false,
   allowedRoles = [],
   redirectTo = "/",
-}: ProtectedRouteProps): React.ReactNode | null {
+}: ProtectedRouteProps) {
   const { currentUser, roles = [], isAdmin, loading } = useAuth();
+
   const location = useLocation();
 
   if (loading) {

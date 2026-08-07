@@ -1,20 +1,20 @@
+import type { Timestamp } from "firebase/firestore";
+
 export interface MaintenanceStatus {
-    inMaintenance: boolean;
-    message: string | null;
-    endTime: Date | null;
-    isAdmin: boolean;
+  inMaintenance: boolean;
+  message: string | null;
+  endTime: Date | null;
 }
 
 export interface MaintenanceSettings {
-    isMaintenanceMode: boolean;
-    maintenanceMessage: string;
-    maintenanceEndTime: Date | null;
-    scheduledMaintenance: {
-        isScheduled: boolean;
-        startTime: Date | null;
-        endTime: Date | null;
-        message: string;
-    };
-}
+  isMaintenanceMode: boolean;
+  maintenanceMessage: string;
+  maintenanceEndTime: Timestamp | null;
 
-export type UserId = string | null | undefined; 
+  scheduledMaintenance: {
+    isScheduled: boolean;
+    startTime: Timestamp | null;
+    endTime: Timestamp | null;
+    message: string;
+  };
+}
