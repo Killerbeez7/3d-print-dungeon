@@ -20,15 +20,20 @@ export interface AuthContextValue {
   currentUser: CurrentUser | null;
   privateProfile: PrivateProfile | null;
   publicProfile: PublicProfile | null;
+
   roles: Role[];
   permissions: Permission[];
+
   isAdmin: boolean;
   isSuper: boolean;
   isArtist: boolean;
   isModerator: boolean;
+
   claims: CustomClaims | null;
+
   loading: boolean;
   authError: string | null;
+
   handleEmailSignUp(email: string, password: string): Promise<void>;
   handleEmailSignIn(email: string, password: string): Promise<void>;
   handleGoogleSignIn(): Promise<void>;
@@ -61,16 +66,18 @@ export interface UserData {
   updatedAt?: Date;
 }
 
-// Consolidated shape the UI can rely on without stitching pieces together
 export interface AuthUser {
   uid: string;
   email: string | null;
   displayName: string;
   username: string;
-  photoURL: string | null | undefined;
+  photoURL: string | null;
+
   roles: Role[];
   permissions: Permission[];
+
   provider: string;
+
   isAdmin: boolean;
   isSuper: boolean;
   isArtist: boolean;
