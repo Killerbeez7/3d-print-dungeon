@@ -28,10 +28,11 @@ Purpose: To track the refactoring progress, keep changes small, working my up fr
 1. [x] - `src/features/models/hooks/useFetchModel.ts`
 2. [x] - `src/features/models/hooks/useFetchModels.ts`
 3. [x] - `src/features/models/types/models.ts`
-4. [ ] - `src/features/models/services/`
-5. [x] - `src/features/models/pages/ModelPage.tsx`
-6. [x] - `src/features/models/pages/ModelEdit.tsx`
-7. [x] - `src/features/models/pages/ModelUpload.tsx`
+4. [x] - `src/features/models/pages/ModelPage.tsx`
+5. [x] - `src/features/models/pages/ModelEdit.tsx`
+6. [x] - `src/features/models/pages/ModelUpload.tsx`
+7. [x] - `src/features/models/services/ModelsFetchService.ts`
+8. [x] - `src/features/models/services/ModelsService.ts`
 
 # Search
 1. [x] - `src/features/search/useSearchPage.tsx`

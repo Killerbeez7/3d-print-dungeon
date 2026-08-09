@@ -1,18 +1,52 @@
-import { db, storage } from "../../../config/firebaseConfig";
-import {
-    collection,
-    addDoc,
-    serverTimestamp,
-    doc,
-    updateDoc,
-    runTransaction,
-} from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { finalConvertFileToGLB } from "../utils/converter";
-import { STORAGE_PATHS } from '../../../constants/storagePaths';
 import { httpsCallable } from "firebase/functions";
-import { functions } from "../../../config/firebaseConfig";
-import type { ModelData } from "../types/model";
+import {
+    doc,
+    addDoc,
+    updateDoc,
+    collection,
+    runTransaction,
+    serverTimestamp,
+} from "firebase/firestore";
+import {
+    ref,
+    getDownloadURL,
+    uploadBytesResumable,
+    type StorageReference,
+    type UploadTaskSnapshot,
+} from "firebase/storage";
+import { db, functions, storage } from "@/config/firebaseConfig";
+import { STORAGE_PATHS } from "@/constants/storagePaths";
+import type { ModelUpdateData } from "@/features/models/types/model";
+import { finalConvertFileToGLB } from "@/features/models/utils/converter";
+
+const CACHE_CONTROL = "public,max-age=31536000,immutable";
+
+function uploadAndGetUrl(
+    fileRef: StorageReference,
+    data: Blob,
+    contentType: string,
+    onProgress?: (snapshot: UploadTaskSnapshot) => void
+): Promise<string> {
+    const task = uploadBytesResumable(fileRef, data, {
+        contentType: contentType || "application/octet-stream",
+        cacheControl: CACHE_CONTROL,
+    });
+
+    return new Promise((resolve, reject) => {
+        task.on(
+            "state_changed",
+            (snapshot) => {
+                onProgress?.(snapshot);
+            },
+            reject,
+            () => {
+                getDownloadURL(task.snapshot.ref)
+                    .then(resolve)
+                    .catch(reject);
+            }
+        );
+    });
+}
 
 export interface CreateModelParams {
     name: string;
@@ -32,6 +66,7 @@ export interface CreateModelParams {
     isPaid?: boolean;
     isAI?: boolean;
 }
+
 export interface CreateModelResult {
     modelId: string;
     originalFileUrl: string;
@@ -41,7 +76,6 @@ export interface CreateModelResult {
     posterUrl: string | null;
 }
 
-// Create a new 3D model and upload all related files.
 export async function createAdvancedModel({
     name,
     description,
@@ -60,165 +94,167 @@ export async function createAdvancedModel({
     isPaid = false,
     isAI = false,
 }: CreateModelParams): Promise<CreateModelResult> {
-    const progressFn = onProgress || (() => { });
-    let progress = 0;
-    progressFn(progress);
+    const progressFn = onProgress ?? (() => undefined);
 
-    // original 3D file
-    const origRef = ref(storage, `${STORAGE_PATHS.ORIGINAL}/${file.name}`);
-    const origTask = uploadBytesResumable(origRef, file, {
-        contentType: file.type,
-        cacheControl: "public,max-age=31536000,immutable"
-    });
-    const originalFileUrl: string = await new Promise((res, rej) => {
-        origTask.on(
-            "state_changed",
-            (snap) => {
-                progress = (snap.bytesTransferred / snap.totalBytes) * 20;
-                progressFn(progress);
-            },
-            rej,
-            async () => res(await getDownloadURL(origTask.snapshot.ref))
+    // Unique folder prevents files with the same name from overwriting each other.
+    const uploadKey = `${uploaderId}/${crypto.randomUUID()}`;
+
+    progressFn(0);
+
+    // Upload original model file.
+    const originalRef = ref(
+        storage,
+        `${STORAGE_PATHS.ORIGINAL}/${uploadKey}/${file.name}`
+    );
+
+    const originalFileUrl = await uploadAndGetUrl(
+        originalRef,
+        file,
+        file.type,
+        (snapshot) => {
+            const progress =
+                (snapshot.bytesTransferred / snapshot.totalBytes) * 20;
+
+            progressFn(progress);
+        }
+    );
+
+    // Convert STL/OBJ models to GLB when needed.
+    const lowerFileName = file.name.toLowerCase();
+
+    let convertedFileUrl = originalFileUrl;
+
+    if (
+        lowerFileName.endsWith(".stl") ||
+        lowerFileName.endsWith(".obj")
+    ) {
+        const convertedBlob =
+            preConvertedFile ?? (await finalConvertFileToGLB(file)).blob;
+
+        const baseName = file.name.replace(/\.[^.]+$/, "");
+
+        const convertedRef = ref(
+            storage,
+            `${STORAGE_PATHS.CONVERTED}/${uploadKey}/${baseName}.glb`
         );
-    });
 
-    // convert to GLB
-    const lower = file.name.toLowerCase();
-    let convertedFileUrl: string = originalFileUrl;
-    if (lower.endsWith(".stl") || lower.endsWith(".obj")) {
-        const blob = preConvertedFile
-            ? preConvertedFile
-            : (await finalConvertFileToGLB(file)).blob;
-        const base = file.name.replace(/\.[^.]+$/, "");
-        const convRef = ref(storage, `${STORAGE_PATHS.CONVERTED}/${base}.glb`);
-        const convTask = uploadBytesResumable(convRef, blob, {
-            contentType: "model/gltf-binary",
-            cacheControl: "public,max-age=31536000,immutable"
-        });
-        convertedFileUrl = await new Promise((res, rej) => {
-            convTask.on(
-                "state_changed",
-                (snap) => {
-                    const offset = 20 + (snap.bytesTransferred / snap.totalBytes) * 20;
-                    progressFn(offset);
-                },
-                rej,
-                async () => res(await getDownloadURL(convTask.snapshot.ref))
-            );
-        });
+        convertedFileUrl = await uploadAndGetUrl(
+            convertedRef,
+            convertedBlob,
+            "model/gltf-binary",
+            (snapshot) => {
+                const progress =
+                    20 +
+                    (snapshot.bytesTransferred / snapshot.totalBytes) * 20;
+
+                progressFn(progress);
+            }
+        );
     } else {
         progressFn(40);
     }
 
-    // renders: one primary, rest extras
+    // Upload primary and additional renders.
     let renderPrimaryUrl: string | null = null;
     let renderExtraUrls: string[] = [];
 
-    if (renderFiles?.length) {
-        // primary
-        const primary = renderFiles[selectedRenderIndex];
-        if (primary) {
-            const pRef = ref(storage, `${STORAGE_PATHS.RENDER_PRIMARY}/${primary.name}`);
-            const pTask = uploadBytesResumable(pRef, primary, {
-                contentType: primary.type,
-                cacheControl: "public,max-age=31536000,immutable"
-            });
-            renderPrimaryUrl = await new Promise((res, rej) => {
-                pTask.on(
-                    "state_changed",
-                    () => { },
-                    rej,
-                    async () => {
-                        res(await getDownloadURL(pTask.snapshot.ref));
-                    }
-                );
-            });
+    if (renderFiles.length > 0) {
+        const primaryRender = renderFiles[selectedRenderIndex];
+
+        if (primaryRender) {
+            const primaryRef = ref(
+                storage,
+                `${STORAGE_PATHS.RENDER_PRIMARY}/${uploadKey}/${primaryRender.name}`
+            );
+
+            renderPrimaryUrl = await uploadAndGetUrl(
+                primaryRef,
+                primaryRender,
+                primaryRender.type
+            );
         }
 
-        // extras
-        renderExtraUrls = await Promise.all(
-            renderFiles
-                .filter((_, i) => i !== selectedRenderIndex)
-                .map(async (extra) => {
-                    const xRef = ref(
-                        storage,
-                        `${STORAGE_PATHS.RENDER_EXTRAS}/${extra.name}`
-                    );
-                    const xTask = uploadBytesResumable(xRef, extra, {
-                        contentType: extra.type,
-                        cacheControl: "public,max-age=31536000,immutable"
-                    });
-                    return await new Promise<string>((res, rej) => {
-                        xTask.on(
-                            "state_changed",
-                            () => { },
-                            rej,
-                            async () => {
-                                res(await getDownloadURL(xTask.snapshot.ref));
-                            }
-                        );
-                    });
-                })
+        const extraRenders = renderFiles.filter(
+            (_, index) => index !== selectedRenderIndex
         );
+
+        renderExtraUrls = await Promise.all(
+            extraRenders.map((extra) => {
+                const extraRef = ref(
+                    storage,
+                    `${STORAGE_PATHS.RENDER_EXTRAS}/${uploadKey}/${extra.name}`
+                );
+
+                return uploadAndGetUrl(
+                    extraRef,
+                    extra,
+                    extra.type
+                );
+            })
+        );
+
         progressFn(60);
     }
 
-    // create poster for model-viewer
+    // Upload generated model-viewer poster.
     let posterUrl: string | null = null;
+
     if (posterBlob) {
-        const postRef = ref(storage, `${STORAGE_PATHS.POSTERS}/${file.name}.webp`);
-        const postTask = uploadBytesResumable(postRef, posterBlob, {
-            contentType: "image/webp",
-            cacheControl: "public,max-age=31536000,immutable"
-        });
-        posterUrl = await new Promise((res, rej) => {
-            postTask.on(
-                "state_changed",
-                () => { },
-                rej,
-                async () => {
-                    res(await getDownloadURL(postTask.snapshot.ref));
-                }
-            );
-        });
+        const baseName = file.name.replace(/\.[^.]+$/, "");
+
+        const posterRef = ref(
+            storage,
+            `${STORAGE_PATHS.POSTERS}/${uploadKey}/${baseName}.webp`
+        );
+
+        posterUrl = await uploadAndGetUrl(
+            posterRef,
+            posterBlob,
+            "image/webp"
+        );
     }
+
     progressFn(80);
 
-    // write Firestore
+    // Create model document.
     const modelDoc = await addDoc(collection(db, "models"), {
         name,
         description,
         categoryIds,
         tags,
+
         uploaderId,
         uploaderUsername,
         uploaderDisplayName,
+
         originalFileUrl,
         convertedFileUrl,
         renderPrimaryUrl,
         renderExtraUrls,
         posterUrl,
-        price: parseFloat(String(price)) || 0,
-        isPaid: Boolean(isPaid),
-        isAI: Boolean(isAI),
+
+        price: Number.isFinite(price) ? price : 0,
+        isPaid,
+        isAI,
         currency: "usd",
-        createdAt: serverTimestamp(),
+
         views: 0,
         likes: 0,
         purchaseCount: 0,
         totalRevenue: 0,
+
+        createdAt: serverTimestamp(),
     });
 
-    // link to user and increment upload count
+    // Link model to the uploader and update upload statistics.
     if (uploaderId) {
         const userRef = doc(db, "users", uploaderId);
+
         try {
-            // Use a transaction to ensure atomic updates
             await runTransaction(db, async (transaction) => {
                 const userDoc = await transaction.get(userRef);
-                
+
                 if (!userDoc.exists()) {
-                    // Create new user document with proper stats structure
                     transaction.set(userRef, {
                         uploads: [modelDoc.id],
                         isArtist: true,
@@ -231,34 +267,31 @@ export async function createAdvancedModel({
                             loginCount: 0,
                         },
                     });
-                } else {
-                    // Update existing user document
-                    const currentData = userDoc.data();
-                    const currentUploads = currentData.uploads || [];
-                    const currentStats = currentData.stats || {};
-                    
-                    transaction.update(userRef, {
-                        uploads: [...currentUploads, modelDoc.id],
-                        isArtist: true,
-                        "stats.uploadsCount": (currentStats.uploadsCount || 0) + 1,
-                    });
+
+                    return;
                 }
+
+                const userData = userDoc.data();
+                const currentUploads = userData.uploads ?? [];
+                const currentStats = userData.stats ?? {};
+
+                transaction.update(userRef, {
+                    uploads: [...currentUploads, modelDoc.id],
+                    isArtist: true,
+                    "stats.uploadsCount":
+                        (currentStats.uploadsCount ?? 0) + 1,
+                });
             });
-        } catch (err) {
-            console.warn("User stats update failed:", err);
+        } catch (error) {
+            console.warn(
+                "Model uploaded, but user stats update failed:",
+                error
+            );
         }
     }
 
-    // Create or update artist profile when user becomes an artist
-    // const artistRef = doc(db, "artists", uploaderId);
-    // await setDoc(artistRef, {
-    //     username: uploaderUsername,
-    //     displayName: uploaderDisplayName,
-    //     isArtist: true,
-    //     updatedAt: serverTimestamp(),
-    // }, { merge: true });
-
     progressFn(100);
+
     return {
         modelId: modelDoc.id,
         originalFileUrl,
@@ -269,33 +302,25 @@ export async function createAdvancedModel({
     };
 }
 
-
-// Update model information
 export async function updateModel(
-    modelId: string, 
-    updates: Partial<Pick<ModelData, 'name' | 'description' | 'tags' | 'categoryIds' | 'price' | 'isPaid'>>
+    modelId: string,
+    updates: ModelUpdateData
 ): Promise<void> {
-    try {
-        const modelRef = doc(db, "models", modelId);
-        await updateDoc(modelRef, {
-            ...updates,
-            updatedAt: serverTimestamp(),
-        });
-    } catch (error) {
-        console.error("Error updating model:", error);
-        throw error;
-    }
+    const modelRef = doc(db, "models", modelId);
+
+    await updateDoc(modelRef, {
+        ...updates,
+        updatedAt: serverTimestamp(),
+    });
 }
 
-// Delete model using Cloud Function
-export const deleteModel = async (modelId: string): Promise<void> => {
-    const deleteModelFunction = httpsCallable(functions, 'deleteModel');
-    
-    try {
-        const result = await deleteModelFunction({ modelId });
-        console.log('Model deleted successfully:', result);
-    } catch (error) {
-        console.error('Error deleting model:', error);
-        throw error;
-    }
-};
+export async function deleteModel(
+    modelId: string
+): Promise<void> {
+    const deleteModelFunction = httpsCallable<
+        { modelId: string },
+        unknown
+    >(functions, "deleteModel");
+
+    await deleteModelFunction({ modelId });
+}
