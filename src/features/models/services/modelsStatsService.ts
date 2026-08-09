@@ -1,95 +1,78 @@
-import { db } from "../../../config/firebaseConfig";
 import {
     doc,
-    updateDoc,
-    increment,
-    serverTimestamp,
-    query,
-    collection,
-    where,
+    getDoc,
     getDocs,
+    updateDoc,
+    query,
+    where,
+    increment,
+    collection,
+    serverTimestamp,
 } from "firebase/firestore";
 
-// Increment the view count for a model
-export const incrementModelViews = async (modelId: string): Promise<void> => {
-    try {
-        const modelRef = doc(db, "models", modelId);
-        await updateDoc(modelRef, {
-            views: increment(1),
-            lastViewed: serverTimestamp(),
-        });
-    } catch (error) {
-        console.error("Error incrementing views:", error);
-    }
+import { db } from "@/config/firebaseConfig";
+import type { ModelStats } from "../types/model";
+
+export async function incrementModelViews(
+    modelId: string
+): Promise<void> {
+    const modelRef = doc(db, "models", modelId);
+
+    await updateDoc(modelRef, {
+        views: increment(1),
+        lastViewed: serverTimestamp(),
+    });
 };
 
-// Utility function to recalculate user upload count
-export async function recalculateUserUploadCount(userId: string): Promise<number> {
-    try {
-        // Get all models uploaded by this user
-        const modelsQuery = query(
-            collection(db, "models"),
-            where("uploaderId", "==", userId)
-        );
-        const modelsSnapshot = await getDocs(modelsQuery);
-        const actualCount = modelsSnapshot.size;
+export async function syncUserUploadCount(
+    userId: string
+): Promise<number> {
+    const modelsQuery = query(
+        collection(db, "models"),
+        where("uploaderId", "==", userId)
+    );
 
-        // Update user's upload count
-        const userRef = doc(db, "users", userId);
-        await updateDoc(userRef, {
-            "stats.uploadsCount": actualCount,
-        });
+    const modelsSnapshot = await getDocs(modelsQuery);
+    const uploadCount = modelsSnapshot.size;
 
-        console.log(`Recalculated upload count for user ${userId}: ${actualCount}`);
-        return actualCount;
-    } catch (error) {
-        console.error("Error recalculating user upload count:", error);
-        throw error;
-    }
+    const userRef = doc(db, "users", userId);
+
+    await updateDoc(userRef, {
+        "stats.uploadsCount": uploadCount,
+    });
+
+    return uploadCount;
 }
 
-// Get model statistics
-export async function getModelStats(modelId: string): Promise<{
-    views: number;
-    likes: number;
-    purchaseCount: number;
-    totalRevenue: number;
-} | null> {
-    try {
-        const { getDoc } = await import("firebase/firestore");
-        const modelRef = doc(db, "models", modelId);
-        const modelSnap = await getDoc(modelRef);
-        
-        if (modelSnap.exists()) {
-            const data = modelSnap.data();
-            return {
-                views: data.views || 0,
-                likes: data.likes || 0,
-                purchaseCount: data.purchaseCount || 0,
-                totalRevenue: data.totalRevenue || 0,
-            };
-        }
+export async function getModelStats(
+    modelId: string
+): Promise<ModelStats | null> {
+    const modelRef = doc(db, "models", modelId);
+    const modelSnapshot = await getDoc(modelRef);
+
+    if (!modelSnapshot.exists()) {
         return null;
-    } catch (error) {
-        console.error("Error fetching model stats:", error);
-        throw error;
     }
+
+    const data = modelSnapshot.data();
+
+    return {
+        views: data.views ?? 0,
+        likes: data.likes ?? 0,
+        purchaseCount: data.purchaseCount ?? 0,
+        totalRevenue: data.totalRevenue ?? 0,
+    };
 }
 
-// Update model purchase statistics
 export async function updateModelPurchaseStats(
-    modelId: string, 
+    modelId: string,
     purchaseAmount: number
 ): Promise<void> {
-    try {
-        const modelRef = doc(db, "models", modelId);
-        await updateDoc(modelRef, {
-            purchaseCount: increment(1),
-            totalRevenue: increment(purchaseAmount),
-            lastPurchased: serverTimestamp(),
-        });
-    } catch (error) {
-        console.error("Error updating model purchase stats:", error);
-        throw error;
-    }
+    const modelRef = doc(db, "models", modelId);
+
+    await updateDoc(modelRef, {
+        purchaseCount: increment(1),
+        totalRevenue: increment(purchaseAmount),
+        lastPurchased: serverTimestamp(),
+    });
 }

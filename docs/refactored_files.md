@@ -33,6 +33,7 @@ Purpose: To track the refactoring progress, keep changes small, working my up fr
 6. [x] - `src/features/models/pages/ModelUpload.tsx`
 7. [x] - `src/features/models/services/ModelsFetchService.ts`
 8. [x] - `src/features/models/services/ModelsService.ts`
+9. [x] - `src/features/models/services/ModelsStatsService.ts`
 
 # Search
 1. [x] - `src/features/search/useSearchPage.tsx`
