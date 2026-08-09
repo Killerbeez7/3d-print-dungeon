@@ -1,30 +1,44 @@
-import { db } from "../../../config/firebaseConfig";
 import {
     collection,
-    query,
-    orderBy,
-    limit,
+    doc,
+    getDoc,
     getDocs,
+    limit,
+    orderBy,
+    query,
     startAfter,
-    QueryDocumentSnapshot,
-    DocumentData,
     where,
+    type DocumentData,
+    type QueryDocumentSnapshot
 } from "firebase/firestore";
+
+import { db } from "../../../config/firebaseConfig";
 import type { ModelData } from "../types/model";
 
 export const PAGE_SIZE = 32;
 
+function mapModelDocument(
+    document: QueryDocumentSnapshot<DocumentData>
+): ModelData {
+    return {
+        ...(document.data() as Omit<ModelData, "id">),
+        id: document.id
+    };
+}
+
 export interface FetchModelsOptions {
     cursor?: QueryDocumentSnapshot<DocumentData>;
     limit?: number;
-    categoryIds?: string[]; // array of category document ids
+    categoryIds?: string[];
     search?: string;
     hideAI?: boolean;
-    uploaderId?: string; // filter by uploader uid
+    uploaderId?: string;
 }
 
 // Fetch models with pagination + optional filters
-export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
+export async function fetchModels(
+    opts: FetchModelsOptions = {}
+): Promise<{
     models: ModelData[];
     nextCursor?: QueryDocumentSnapshot<DocumentData>;
 }> {
@@ -69,7 +83,7 @@ export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
         );
 
         const nameSnap = await getDocs(nameQuery);
-        const nameMatches = nameSnap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id }));
+        const nameMatches = nameSnap.docs.map(mapModelDocument);
 
         // Apply additional filters to name matches
         let filteredMatches = nameMatches;
@@ -82,6 +96,12 @@ export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
 
         if (hideAI) {
             filteredMatches = filteredMatches.filter(model => !model.isAI);
+        }
+
+        if (uploaderId) {
+            filteredMatches = filteredMatches.filter(
+                (model) => model.uploaderId === uploaderId
+            );
         }
 
         // If we have enough results after filtering, return them
@@ -100,7 +120,7 @@ export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
         );
 
         const allSnap = await getDocs(allQuery);
-        const allModels = allSnap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id }));
+        const allModels = allSnap.docs.map(mapModelDocument);
 
         // Filter by search term across multiple fields (name, description, tags only)
         const searchFiltered = allModels.filter((model) => {
@@ -125,6 +145,12 @@ export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
             finalFiltered = finalFiltered.filter(model => !model.isAI);
         }
 
+        if (uploaderId) {
+            finalFiltered = finalFiltered.filter(
+                (model) => model.uploaderId === uploaderId
+            );
+        }
+
         return {
             models: finalFiltered.slice(0, lim),
             nextCursor: finalFiltered.length > lim ? allSnap.docs[allSnap.docs.length - 1] : undefined,
@@ -136,61 +162,25 @@ export async function fetchModels(opts: FetchModelsOptions = {}): Promise<{
 
     const snap = await getDocs(q);
     return {
-        models: snap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id })),
+        models: snap.docs.map(mapModelDocument),
         nextCursor:
             snap.docs.length === lim ? snap.docs[snap.docs.length - 1] : undefined,
     };
 }
 
 // Get a single model by ID
-export async function getModelById(modelId: string): Promise<ModelData | null> {
-    try {
-        const { doc, getDoc } = await import("firebase/firestore");
-        const modelRef = doc(db, "models", modelId);
-        const modelSnap = await getDoc(modelRef);
-        
-        if (modelSnap.exists()) {
-            return { ...(modelSnap.data() as ModelData), id: modelSnap.id };
-        }
+export async function getModelById(
+    modelId: string
+): Promise<ModelData | null> {
+    const modelRef = doc(db, "models", modelId);
+    const modelSnap = await getDoc(modelRef);
+
+    if (!modelSnap.exists()) {
         return null;
-    } catch (error) {
-        console.error("Error fetching model by ID:", error);
-        throw error;
     }
+
+    return {
+        ...(modelSnap.data() as Omit<ModelData, "id">),
+        id: modelSnap.id
+    };
 }
-
-// Get models by category
-// export async function getModelsByCategory(categoryId: string, limit: number = 10): Promise<ModelData[]> {
-//     try {
-//         const q = query(
-//             collection(db, "models"),
-//             where("categoryIds", "array-contains", categoryId),
-//             orderBy("createdAt", "desc"),
-//             limit(limit)
-//         );
-        
-//         const snap = await getDocs(q);
-//         return snap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id }));
-//     } catch (error) {
-//         console.error("Error fetching models by category:", error);
-//         throw error;
-//     }
-// }
-
-// Get models by user
-// export async function getModelsByUser(userId: string, limit: number = 20): Promise<ModelData[]> {
-//     try {
-//         const q = query(
-//             collection(db, "models"),
-//             where("uploaderId", "==", userId),
-//             orderBy("createdAt", "desc"),
-//             limit(limit)
-//         );
-        
-//         const snap = await getDocs(q);
-//         return snap.docs.map((d) => ({ ...(d.data() as ModelData), id: d.id }));
-//     } catch (error) {
-//         console.error("Error fetching models by user:", error);
-//         throw error;
-//     }
-// }
