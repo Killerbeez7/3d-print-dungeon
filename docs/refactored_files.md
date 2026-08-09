@@ -43,10 +43,19 @@ Purpose: To track the refactoring progress, keep changes small, working my up fr
 1. [x] - `src/features/search/useSearchPage.tsx`
 2. [x] - `src/features/search/useArtistsSearchPage.tsx`
 
-## Auth
-1. [x] - `src/features/auth/context/authContext.tsx`
-2. [x] - `src/features/auth/hooks/useAuth.tsx`
-3. [ ] - `src/features/auth/providers/authProvider.tsx`
-4. [ ] - `src/features/auth/hooks/useUserRole.ts`
-5. [ ] - `src/features/auth/types/auth.ts`
-6. [ ] - `src/features/auth/services/authService.ts`
+### Auth
+1. [x] - `src/features/auth/types/auth.ts`
+2. [x] - `src/features/auth/context/authContext.tsx`
+3. [x] - `src/features/auth/services/authService.ts`
+4. [x] - `src/features/auth/utils/refreshIdToken.ts`
+5. [x] - `src/features/auth/utils/errorHandling.ts`
+6. [x] - `src/features/auth/providers/authProvider.tsx`
+7. [x] - `src/features/auth/hooks/useAuth.tsx`
+8. [x] - `src/features/auth/hooks/useUserRole.ts`
+9. [x] - `src/features/auth/routes/authRoutes.tsx`
+
+### Auth validation
+1. [x] - `src/features/auth/utils/inputValidators.tsx`
+2. [x] - `src/features/auth/utils/checkAvailability.ts`
+3. [x] - `src/features/auth/hooks/useProgressiveValidation.ts`
+4. [x] - `src/features/auth/utils/authUtils.ts`
