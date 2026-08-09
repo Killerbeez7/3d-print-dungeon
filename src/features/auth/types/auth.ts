@@ -22,9 +22,6 @@ export interface AuthContextValue {
     isArtist: boolean;
     isModerator: boolean;
     claims: CustomClaims | null;
-    maintenanceMode: boolean;
-    maintenanceMessage: string | null;
-    maintenanceEndTime: Date | null;
     loading: boolean;
     authError: string | null;
     handleEmailSignUp(email: string, password: string): Promise<void>;
