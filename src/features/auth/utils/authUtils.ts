@@ -1,61 +1,21 @@
-import { refreshIdToken } from "./refreshIdToken";
-
-import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
-
-import {
-    validateUsername,
-    validateEmail,
-    validatePassword,
-    validateConfirmPassword,
-    type ValidationResult,
-    type ValidationContext
+export {
+  validateEmail,
+  validateUsername,
+  validatePassword,
+  validateConfirmPassword,
 } from "./inputValidators";
 
-import {
-    isUsernameAvailableInDB,
-    isEmailAvailableInDB
-} from "./checkAvailability";
+export type { ValidationResult, ValidationContext } from "./inputValidators";
 
-import {
-    handleAuthError,
-    mapFirebaseError,
-    formatErrorForDisplay,
-    isRecoverableError,
-    type AuthError
-} from "./errorHandling";
-
+export { isUsernameAvailableInDB, isEmailAvailableInDB } from "./checkAvailability";
 
 export {
-    // Validation
-    validateUsername,
-    validateEmail,
-    validatePassword,
-    validateConfirmPassword,
+  handleAuthError,
+  mapFirebaseError,
+  isRecoverableError,
+  formatErrorForDisplay,
+} from "./errorHandling";
 
-    // Availability checking
-    isUsernameAvailableInDB,
-    isEmailAvailableInDB,
+export type { AuthError } from "./errorHandling";
 
-    // Error handling
-    handleAuthError,
-    mapFirebaseError,
-    formatErrorForDisplay,
-    isRecoverableError,
-
-    // Token management
-    refreshIdToken,
-
-    // Image utilities
-    getAvatarUrlWithCacheBust,
-
-    // Types
-    type ValidationResult,
-    type ValidationContext,
-    type AuthError
-};
-
-
-
-
-
-
+export { refreshIdToken } from "./refreshIdToken";
