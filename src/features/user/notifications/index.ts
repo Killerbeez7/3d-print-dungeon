@@ -1,14 +1,19 @@
-export { UserNotificationContainer } from "./components/UserNotificationContainer";
-export { UserNotificationItem } from "./components/UserNotificationItem";
 export { NotificationBadge } from "./components/NotificationBadge";
+export { UserNotificationItem } from "./components/UserNotificationItem";
 export { NotificationDropdown } from "./components/NotificationDropdown";
+
 export { UserNotificationProvider } from "./providers/userNotificationProvider";
+
 export { useUserNotification } from "./hooks/useUserNotification";
+
 export { UserNotificationService } from "./services/userNotificationService";
-export type { 
-  UserNotification, 
-  UserNotificationType, 
-  UserNotificationStatus, 
+
+export type {
+  UserNotification,
+  UserNotificationType,
+  UserNotificationStatus,
+  CreateNotificationData,
+  UserNotificationMetadata,
+  CreateUserNotificationInput,
   UserNotificationContextValue,
-  CreateNotificationData 
 } from "./types/userNotification";
