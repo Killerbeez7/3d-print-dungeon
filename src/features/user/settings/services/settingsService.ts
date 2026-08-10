@@ -1,90 +1,93 @@
-import { doc, getDoc, setDoc, getFirestore } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 
-const db = getFirestore();
+import { db } from "@/config/firebaseConfig";
 
-export interface UserAppSettings {
-    language: string;
-    timezone: string;
+import type { UserSettings } from "../types/settings";
+
+type StoredUserSettings = Partial<
+  Omit<UserSettings, "notifications" | "privacy" | "security">
+> & {
+  notifications?: Partial<UserSettings["notifications"]>;
+  privacy?: Partial<UserSettings["privacy"]>;
+  security?: Partial<UserSettings["security"]>;
+};
+
+export const DEFAULT_USER_SETTINGS: UserSettings = {
+  language: "en",
+  timezone: "UTC",
+  theme: "dark",
+
+  notifications: {
+    email: true,
+    push: true,
+    marketing: false,
+    newFollowers: true,
+    newLikes: true,
+    newComments: true,
+    modelUpdates: true,
+  },
+
+  privacy: {
+    profileVisibility: "public",
+    showEmail: false,
+    showLocation: true,
+    showLastActive: true,
+    allowMessages: "everyone",
+  },
+
+  security: {
+    twoFactorEnabled: false,
+    sessionTimeout: 60,
+    loginNotifications: true,
+  },
+};
+
+function normalizeUserSettings(settings?: StoredUserSettings): UserSettings {
+  return {
+    language: settings?.language ?? DEFAULT_USER_SETTINGS.language,
+
+    timezone: settings?.timezone ?? DEFAULT_USER_SETTINGS.timezone,
+
+    theme: settings?.theme ?? DEFAULT_USER_SETTINGS.theme,
+
     notifications: {
-        email: boolean;
-        push: boolean;
-        marketing: boolean;
-        newFollowers: boolean;
-        newLikes: boolean;
-        newComments: boolean;
-        modelUpdates: boolean;
-    };
+      ...DEFAULT_USER_SETTINGS.notifications,
+      ...settings?.notifications,
+    },
+
     privacy: {
-        profileVisibility: "public" | "private" | "friends";
-        showEmail: boolean;
-        showLocation: boolean;
-        showLastActive: boolean;
-        allowMessages: "everyone" | "followers" | "none";
-    };
+      ...DEFAULT_USER_SETTINGS.privacy,
+      ...settings?.privacy,
+    },
+
     security: {
-        twoFactorEnabled: boolean;
-        sessionTimeout: number; // minutes
-        loginNotifications: boolean;
-    };
-    theme?: "light" | "dark" | "auto";
+      ...DEFAULT_USER_SETTINGS.security,
+      ...settings?.security,
+    },
+  };
 }
 
 export const settingsService = {
-    async getUserSettings(userId: string): Promise<UserAppSettings | null> {
-        try {
-            const settingsDoc = await getDoc(doc(db, "users", userId, "settings", "app"));
-            
-            if (!settingsDoc.exists()) {
-                return null;
-            }
-            
-            return settingsDoc.data() as UserAppSettings;
-        } catch (error) {
-            console.error("Error fetching user settings:", error);
-            throw error;
-        }
-    },
+  async getUserSettings(userId: string): Promise<UserSettings> {
+    const settingsRef = doc(db, "users", userId, "settings", "app");
 
-    async updateUserSettings(userId: string, settings: Partial<UserAppSettings>): Promise<void> {
-        try {
-            await setDoc(
-                doc(db, "users", userId, "settings", "app"), 
-                { ...settings },
-                { merge: true }
-            );
-        } catch (error) {
-            console.error("Error updating user settings:", error);
-            throw error;
-        }
-    },
+    const snapshot = await getDoc(settingsRef);
 
-    async getDefaultSettings(): Promise<UserAppSettings> {
-        return {
-            language: "en",
-            timezone: "UTC",
-            notifications: {
-                email: true,
-                push: true,
-                marketing: false,
-                newFollowers: true,
-                newLikes: true,
-                newComments: true,
-                modelUpdates: true,
-            },
-            privacy: {
-                profileVisibility: "public",
-                showEmail: false,
-                showLocation: true,
-                showLastActive: true,
-                allowMessages: "everyone",
-            },
-            security: {
-                twoFactorEnabled: false,
-                sessionTimeout: 60,
-                loginNotifications: true,
-            },
-            theme: "dark",
-        };
+    if (!snapshot.exists()) {
+      return normalizeUserSettings();
     }
-};
 
+    return normalizeUserSettings(snapshot.data() as StoredUserSettings);
+  },
+
+  async updateUserSettings(
+    userId: string,
+    settings: Partial<UserSettings>
+  ): Promise<void> {
+    const settingsRef = doc(db, "users", userId, "settings", "app");
+
+    await setDoc(settingsRef, settings, {
+      merge: true,
+    });
+  },
+};
