@@ -3,3 +3,4 @@
 3. [ ] - add no drag to home page model images
 4. [ ] - unify all react-icons in the app
 5. [ ] - extract helper functions from notificationsDropdown and notificationsItem into separate file
+6. [ ] - remove old broken typography system H1, H2 ...
