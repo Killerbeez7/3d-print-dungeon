@@ -2,10 +2,10 @@ import { Suspense } from "react";
 import { AppRoutes } from "./AppRoutes";
 
 // Providers
-import { AuthProvider } from "@/features/auth/providers/authProvider";
-import { CookiesProvider } from "@/features/policies/providers/CookiesProvider";
-import { MaintenanceProvider } from "@/features/maintenance/providers/MaintenanceProvider";
-import { ModalProvider } from "@/features/shared/modal/providers/modalProvider";
+import { AuthProvider } from "./features/auth";
+import { CookiesProvider } from "./features/policies";
+import { MaintenanceProvider } from "./features/maintenance";
+import { ModalProvider } from "./features/shared/modal";
 
 // Components
 import { SystemAlertContainer, SystemAlertProvider } from "@/features/system-alerts";
