@@ -5,18 +5,18 @@ export { UserPortfolio } from "./components/UserPortfolio";
 
 // Pages
 export { PublicProfilePage } from "./pages/PublicProfilePage";
-export { SettingsPage } from "../settings/pages/SettingsPage";
 
 // Hooks
-export { useProfile } from "./hooks/useProfile";
+export { usePublicProfile, usePublicProfileByUsername } from "./hooks/usePublicProfile";
 
 // Types
 export type {
-    Tab,
-    UploadedArtwork,
-    LikedArtwork,
-    UserCollection,
-    ChartData,
-    SortOption,
-    LikedSortOption,
+  PublicProfile,
+  PublicProfileView,
+  UploadedArtwork,
+  LikedArtwork,
+  UserCollection,
+  ChartData,
+  SortOption,
+  LikedSortOption,
 } from "./types/profile";
