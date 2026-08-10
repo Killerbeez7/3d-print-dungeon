@@ -2,7 +2,7 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { useParams } from "react-router-dom";
 //hooks
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useModal } from "@/hooks/useModal";
+import { useModal } from "@/features/shared/modal/hooks/useModal";
 import { useFetchModel } from "../hooks";
 import { usePublicProfile } from "@/features/user/hooks/usePublicProfile";
 import {

@@ -5,7 +5,7 @@ import { AppRoutes } from "./AppRoutes";
 import { AuthProvider } from "@/features/auth/providers/authProvider";
 import { CookiesProvider } from "@/features/policies/providers/CookiesProvider";
 import { MaintenanceProvider } from "@/features/maintenance/providers/MaintenanceProvider";
-import { ModalProvider } from "@/providers/modalProvider";
+import { ModalProvider } from "@/features/shared/modal/providers/modalProvider";
 
 // Components
 import { SystemAlertContainer, SystemAlertProvider } from "@/features/system-alerts";
