@@ -1,4 +1,4 @@
-export type ThemePreference = "light" | "dark" | "auto";
+export type ThemePreference = "light" | "dark" | "system";
 
 export type ProfileVisibility = "public" | "private" | "friends";
 

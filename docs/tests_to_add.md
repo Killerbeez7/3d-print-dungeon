@@ -71,3 +71,4 @@ This document lists all tests to add or improve to achieve ~90% coverage. Tests 
 - Mock external services (Firebase, Stripe) in all tests
 - Ensure accessibility and user interaction coverage
 - Update this file as coverage improves or requirements change 
+- On page refresh there is a slight refresh and layout shift especialy visible in navbar links and search is moving
