@@ -3,7 +3,7 @@ import { AppRoutes } from "./AppRoutes";
 
 // Providers
 import { AuthProvider } from "./features/auth";
-import { CookiesProvider } from "./features/policies";
+import { CookiesProvider } from "./features/cookies";
 import { MaintenanceProvider } from "./features/maintenance";
 import { ModalProvider } from "./features/shared/modal";
 

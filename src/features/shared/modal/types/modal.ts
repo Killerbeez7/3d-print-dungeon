@@ -1,4 +1,4 @@
-export type ModalId = "auth" | "alert";
+export type ModalId = "auth" | "alert" | "payment";
 
 export type ModalPayload = Record<string, unknown>;
 

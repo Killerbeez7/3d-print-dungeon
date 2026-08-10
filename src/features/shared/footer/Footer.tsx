@@ -8,7 +8,7 @@ import {
   FaPinterest,
 } from "react-icons/fa";
 import { AlertModal } from "../AlertModal";
-import { CookieSettingsModal } from "../../policies/components/CookieSettingsModal";
+import { CookieSettingsModal } from "@/features/cookies/components/CookieSettingsModal";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/constants/routeConstants";
 import { FORUM_HOME_PATH } from "@/features/forum/constants/forumPaths";

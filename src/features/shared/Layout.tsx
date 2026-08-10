@@ -8,39 +8,39 @@ import { AuthModal } from "../auth/components/AuthModal";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 import { ScrollToTopButton } from "@/features/shared/ScrollToTopButton";
 import { LayoutProvider, useLayout } from "./context/layoutContext";
-import { CookieBanner } from "../policies/components/CookieBanner";
+import { CookieBanner } from "../cookies/components/CookieBanner";
 
 const AppLayout = () => {
-    const { isFooterHidden } = useLayout();
-    return (
-        <div className="layout flex flex-col min-h-screen">
-            <Navbar />
-            <main className="flex-1 min-h-screen">
-                <Suspense
-                    fallback={
-                        <div className="h-full flex items-center justify-center">
-                            <Spinner size={48} />
-                        </div>
-                    }
-                >
-                    <Outlet />
-                    <ScrollToTopButton />
-                </Suspense>
-            </main>
-            <AuthModal />
-            <CookieBanner />
+  const { isFooterHidden } = useLayout();
+  return (
+    <div className="layout flex flex-col min-h-screen">
+      <Navbar />
+      <main className="flex-1 min-h-screen">
+        <Suspense
+          fallback={
+            <div className="h-full flex items-center justify-center">
+              <Spinner size={48} />
+            </div>
+          }
+        >
+          <Outlet />
+          <ScrollToTopButton />
+        </Suspense>
+      </main>
+      <AuthModal />
+      <CookieBanner />
 
-            {!isFooterHidden && <Footer />}
-        </div>
-    );
+      {!isFooterHidden && <Footer />}
+    </div>
+  );
 };
 
 export const Layout = () => {
-    return (
-        <LayoutProvider>
-            <AppLayout />
-        </LayoutProvider>
-    );
+  return (
+    <LayoutProvider>
+      <AppLayout />
+    </LayoutProvider>
+  );
 };
 
 export default Layout;

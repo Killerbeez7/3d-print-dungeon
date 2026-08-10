@@ -12,7 +12,7 @@ import { eventsRoutes } from "./features/events/routes/eventRoutes";
 import { modelsRoutes } from "./features/models/routes/modelsRoutes";
 import { searchRoutes } from "./features/search/routes/searchRoutes";
 import { artistsRoutes } from "./features/artists/routes/artistsRoutes";
-import { policiesRoutes } from "./features/policies/routes/policiesRoutes";
+import { policiesRoutes } from "./features/cookies/routes/policiesRoutes";
 import { businessRoutes } from "./features/business/routes/businessRoutes";
 import { collectionsRoutes } from "./features/collections/routes/collectionsRoutes";
 // import { maintenanceRoutes } from "./features/maintenance/routes/maintenanceRoutes";
