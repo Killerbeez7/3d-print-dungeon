@@ -47,13 +47,6 @@ export type PublicProfileView = PublicProfile & {
   uid: string;
 };
 
-export interface Tab {
-  id: string;
-  label: string;
-  icon: string;
-  count?: number;
-}
-
 export interface UploadedArtwork {
   id: string;
   name?: string;
