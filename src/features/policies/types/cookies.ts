@@ -1,35 +1,40 @@
-export type CookieCategories = "essential" | "analytics" | "marketing" | "payment";
+export type CookieCategory = "essential" | "analytics" | "marketing" | "payment";
 
-export type CookieConsent = {
-    essential: boolean;
-    analytics: boolean;
-    payment: boolean;
-    marketing: boolean;
-    accepted: boolean;
-};
+export type OptionalCookieCategory = Exclude<CookieCategory, "essential">;
+
+export interface CookieConsent {
+  essential: true;
+  analytics: boolean;
+  marketing: boolean;
+  payment: boolean;
+  accepted: boolean;
+}
+
+export type CookiePreferencesUpdate = Partial<Omit<CookieConsent, "essential">>;
+
+export interface CookieCheckResult {
+  needed: boolean;
+  type: OptionalCookieCategory | null;
+}
 
 export interface CookiesContextValue {
-    consent: CookieConsent;
-    acceptAll: () => void;
-    declineAll: () => void;
-    setCategory: (category: CookieCategories, value: boolean, saveImmediately?: boolean) => void;
-    updateMultipleCategories: (updates: Partial<CookieConsent>) => void;
-    savePreferences: () => void;
-    openSettings: () => void;
-    checkCookiesNeeded: (feature: 'analytics' | 'marketing' | 'payment') => { needed: boolean; type: string | null };
-    resetToDefault: () => void;
-}
+  consent: CookieConsent;
 
+  acceptAll: () => void;
+  declineAll: () => void;
 
-export interface ConsentRequirement {
-    route: string;
-    requiredConsent: CookieCategories[];
-    description: string;
-    fallbackPath?: string;
-}
+  setCategory: (
+    category: OptionalCookieCategory,
+    value: boolean,
+    saveImmediately?: boolean
+  ) => void;
 
-export interface FeatureConsentRequirement {
-    feature: string;
-    requiredConsent: CookieCategories[];
-    description: string;
+  updateMultipleCategories: (updates: CookiePreferencesUpdate) => void;
+
+  savePreferences: () => void;
+  openSettings: () => void;
+
+  checkCookiesNeeded: (feature: OptionalCookieCategory) => CookieCheckResult;
+
+  resetToDefault: () => void;
 }
