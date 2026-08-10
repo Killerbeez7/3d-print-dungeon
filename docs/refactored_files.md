@@ -1,6 +1,9 @@
 # Full App Refactor
 
-Purpose: To track the refactoring progress, keep changes small, working my up from root to the top, keep code clean and readable
+# Goal: 
+Track the refactoring progress, keep changes small, working my way up from root to the top, 
+keep code clean and readable, refactor only the business logic and leave UI for later
+
 
 ## App root
 1. [x] - `index.html`
@@ -59,3 +62,23 @@ Purpose: To track the refactoring progress, keep changes small, working my up fr
 2. [x] - `src/features/auth/utils/checkAvailability.ts`
 3. [x] - `src/features/auth/hooks/useProgressiveValidation.ts`
 4. [x] - `src/features/auth/utils/authUtils.ts`
+
+### Cookies
+1. [x] - `src/features/cookies/types/cookies.ts`
+2. [x] - `src/features/cookies/context/CookiesContext.tsx`
+3. [x] - `src/features/cookies/services/cookiesService.ts`
+4. [x] - `src/features/cookies/providers/CookiesProvider.tsx`
+5. [x] - `src/features/cookies/hooks/useCookies.ts`
+6. [x] - `src/features/cookies/hooks/useCookieConsent.ts`
+7. [x] - `src/features/cookies/components/ConsentRequiredFeature.tsx`
+8. [x] - `src/features/cookies/components/CookieBanner.tsx`
+9. [x] - `src/features/cookies/components/CookieSettingsModal.tsx`
+10. [x] - `src/features/cookies/routes/policiesRoutes.tsx`
+
+### System Alerts
+1. [x] `types/systemAlert.ts`
+2. [x] `context/systemAlertContext.ts`
+3. [x] `hooks/useSystemAlert.ts`
+4. [x] `providers/systemAlertProvider.tsx`
+5. [x] `components/SystemAlertContainer.tsx`
+6. [x] `index.ts`
