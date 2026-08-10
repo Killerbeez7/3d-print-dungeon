@@ -1,30 +1,41 @@
-import React from 'react';
+import type { ReactNode } from "react";
+import { useCookies } from "../hooks/useCookies";
+import { useCookieConsent } from "../hooks/useCookieConsent";
+import type { CookieCategory } from "../types/cookies";
 
 interface ConsentRequiredFeatureProps {
-    requiredConsent: string[];
-    fallbackContent: React.ReactNode;
-    showSettingsButton?: boolean;
-    children: React.ReactNode;
+  requiredConsent: CookieCategory[];
+  fallbackContent: ReactNode;
+  showSettingsButton?: boolean;
+  children: ReactNode;
 }
 
-export const ConsentRequiredFeature: React.FC<ConsentRequiredFeatureProps> = ({
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    requiredConsent,
-    fallbackContent,
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    showSettingsButton = false,
-    children
-}) => {
-    // For now, we'll just render the children directly
-    // In a real implementation, this would check user consent status
-    // and show fallback content if consent is not given
-    
-    // TODO: Implement actual consent checking logic
-    const hasConsent = true; // Placeholder - replace with actual consent check
-    
-    if (!hasConsent) {
-        return <>{fallbackContent}</>;
-    }
-    
+export function ConsentRequiredFeature({
+  requiredConsent,
+  fallbackContent,
+  showSettingsButton = false,
+  children,
+}: ConsentRequiredFeatureProps) {
+  const { hasConsent } = useCookieConsent();
+  const { openSettings } = useCookies();
+
+  if (hasConsent(requiredConsent)) {
     return <>{children}</>;
-};
+  }
+
+  return (
+    <>
+      {fallbackContent}
+
+      {showSettingsButton && (
+        <button
+          type="button"
+          onClick={openSettings}
+          className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+        >
+          Manage Cookie Preferences
+        </button>
+      )}
+    </>
+  );
+}

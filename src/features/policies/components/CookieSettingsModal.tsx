@@ -1,325 +1,359 @@
 import { useState, useEffect } from "react";
-import { useCookies } from "../hooks/useCookies";
+
 import "@/styles/customScrollbar.css";
 
-interface CookieCategory {
-    title: string;
-    description: string;
-    required: boolean;
-    details: string[];
-    examples: string[];
-    impact: string;
+import { useCookies } from "../hooks/useCookies";
+import type { CookieCategory, OptionalCookieCategory } from "../types/cookies";
+
+interface CookieCategoryInfo {
+  title: string;
+  description: string;
+  required: boolean;
+  details: string[];
+  examples: string[];
+  impact: string;
 }
 
-const cookieCategories: Record<string, CookieCategory> = {
-    essential: {
-        title: "Essential Cookies",
-        description:
-            "These cookies are strictly necessary for the website to function and cannot be disabled.",
-        required: true,
-        details: [
-            "Authentication and security",
-            "Session management",
-            "Basic website functionality",
-            "Shopping cart functionality",
-            "User preferences storage",
-        ],
-        examples: [
-            "Session cookies for login status",
-            "CSRF protection tokens",
-            "Language preference settings",
-        ],
-        impact: "Disabling these cookies will prevent the website from functioning properly.",
-    },
-    analytics: {
-        title: "Analytics Cookies",
-        description:
-            "Help us understand how visitors interact with our website to improve user experience.",
-        required: false,
-        details: [
-            "Page view tracking",
-            "User behavior analysis",
-            "Performance monitoring",
-            "Error tracking",
-            "Traffic source analysis",
-        ],
-        examples: ["Google Analytics", "Heatmap tracking", "Conversion tracking"],
-        impact: "Disabling these cookies will prevent us from improving the website based on usage data.",
-    },
-    marketing: {
-        title: "Marketing Cookies",
-        description:
-            "Used to deliver personalized advertisements and content based on your interests.",
-        required: false,
-        details: [
-            "Ad personalization",
-            "Social media integration",
-            "Retargeting campaigns",
-            "Cross-site tracking",
-            "Interest-based advertising",
-        ],
-        examples: ["Facebook Pixel", "Google Ads", "Social media sharing buttons"],
-        impact: "Disabling these cookies will show you generic ads instead of personalized content.",
-    },
-    payment: {
-        title: "Payment Cookies",
-        description: "Required for secure payment processing and transaction management.",
-        required: false,
-        details: [
-            "Payment security",
-            "Transaction verification",
-            "Fraud prevention",
-            "Payment method storage",
-            "Order processing",
-        ],
-        examples: [
-            "Stripe payment tokens",
-            "PayPal session cookies",
-            "3D Secure authentication",
-        ],
-        impact: "Disabling these cookies will prevent secure payment processing.",
-    },
+const cookieCategories: Record<CookieCategory, CookieCategoryInfo> = {
+  essential: {
+    title: "Essential Cookies",
+    description:
+      "These cookies are strictly necessary for the website to function and cannot be disabled.",
+    required: true,
+    details: [
+      "Authentication and security",
+      "Session management",
+      "Basic website functionality",
+      "Shopping cart functionality",
+      "User preferences storage",
+    ],
+    examples: [
+      "Session cookies for login status",
+      "CSRF protection tokens",
+      "Language preference settings",
+    ],
+    impact:
+      "Disabling these cookies would prevent parts of the website from functioning properly.",
+  },
+  analytics: {
+    title: "Analytics Cookies",
+    description:
+      "Help us understand how visitors interact with the website so we can improve it.",
+    required: false,
+    details: [
+      "Page view tracking",
+      "User behavior analysis",
+      "Performance monitoring",
+      "Error tracking",
+      "Traffic source analysis",
+    ],
+    examples: ["Analytics tools", "Performance tracking", "Conversion tracking"],
+    impact:
+      "Disabling these cookies limits the usage data available to help us improve the website.",
+  },
+  marketing: {
+    title: "Marketing Cookies",
+    description:
+      "Used for personalized content, recommendations, and marketing features.",
+    required: false,
+    details: [
+      "Personalized recommendations",
+      "Ad personalization",
+      "Retargeting campaigns",
+      "Social media integration",
+      "Interest-based content",
+    ],
+    examples: [
+      "Personalized recommendations",
+      "Advertising integrations",
+      "Social media features",
+    ],
+    impact:
+      "Disabling these cookies may prevent personalized recommendations and marketing features.",
+  },
+  payment: {
+    title: "Payment Cookies",
+    description:
+      "Used by payment-related features when additional storage or third-party services are required.",
+    required: false,
+    details: [
+      "Payment security",
+      "Transaction verification",
+      "Fraud prevention",
+      "Payment processing",
+    ],
+    examples: [
+      "Payment provider integrations",
+      "Transaction verification",
+      "3D Secure authentication",
+    ],
+    impact:
+      "Disabling these cookies may prevent some payment-related features from working.",
+  },
 };
 
 interface CookieSettingsModalProps {
-    isOpen: boolean;
-    onClose: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProps) {
-    const {
-        consent,
-        updateMultipleCategories,
-        acceptAll: contextAcceptAll,
-        declineAll: contextDeclineAll,
-    } = useCookies();
-    const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set());
-    const [localConsent, setLocalConsent] = useState(consent);
+  const { consent, updateMultipleCategories, acceptAll, declineAll } = useCookies();
 
-    useEffect(() => {
-        if (isOpen) {
-            // Open with all options enabled by default for better UX
-            setLocalConsent({
-                essential: true,
-                analytics: true,
-                marketing: true,
-                payment: true,
-                accepted: true,
-            });
-        }
-    }, [isOpen]);
+  const [expandedSections, setExpandedSections] = useState<Set<CookieCategory>>(
+    new Set()
+  );
 
-    const toggleSection = (category: string) => {
-        const newExpanded = new Set(expandedSections);
-        if (newExpanded.has(category)) {
-            newExpanded.delete(category);
-        } else {
-            newExpanded.add(category);
-        }
-        setExpandedSections(newExpanded);
-    };
+  const [localConsent, setLocalConsent] = useState(consent);
 
-    const handleToggle = (categoryId: string, value: boolean) => {
-        setLocalConsent((prev) => ({
-            ...prev,
-            [categoryId]: value,
-        }));
-    };
+  useEffect(() => {
+    if (isOpen) {
+      setLocalConsent(consent);
+    }
+  }, [isOpen, consent]);
 
-    const handleAcceptAll = () => {
-        contextAcceptAll();
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
 
-        setLocalConsent({
-            essential: true,
-            analytics: true,
-            marketing: true,
-            payment: true,
-            accepted: true,
-        });
-
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
         onClose();
+      }
     };
 
-    const handleDeclineNonEssentials = () => {
-        contextDeclineAll();
+    window.addEventListener("keydown", handleKeyDown);
 
-        setLocalConsent({
-            essential: true,
-            analytics: false,
-            marketing: false,
-            payment: false,
-            accepted: true, // Set to true so banner doesn't show again
-        });
-
-        onClose();
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
     };
+  }, [isOpen, onClose]);
 
-    const handleSaveSettings = () => {
-        // Update all categories at once and save to cookies
-        updateMultipleCategories({
-            analytics: localConsent.analytics,
-            marketing: localConsent.marketing,
-            payment: localConsent.payment,
-            accepted: true,
-        });
+  const toggleSection = (category: CookieCategory) => {
+    setExpandedSections((current) => {
+      const next = new Set(current);
 
-        onClose();
-    };
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
 
-    if (!isOpen) return null;
+      return next;
+    });
+  };
 
-    return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-4">
-            <div className="bg-bg-secondary rounded-xl shadow-2xl max-w-xl w-full h-[60vh] flex flex-col border border-br-primary">
-                {/* Header */}
-                <div className="p-4 border-b border-br-secondary flex-shrink-0">
-                    <div className="flex items-center justify-between">
-                        <h2 className="text-xl font-semibold text-txt-primary">
-                            Cookie Settings
-                        </h2>
-                        <button
-                            onClick={onClose}
-                            className="text-txt-secondary hover:text-txt-primary transition-colors text-lg"
-                        >
-                            ✕
-                        </button>
-                    </div>
-                    <p className="text-txt-secondary mt-2 text-xs">
-                        Customize your cookie preferences. Essential cookies are always
-                        enabled for site functionality.
-                    </p>
-                </div>
+  const handleToggle = (category: OptionalCookieCategory, value: boolean) => {
+    setLocalConsent((current) => ({
+      ...current,
+      [category]: value,
+    }));
+  };
 
-                {/* Cookie Categories */}
-                <div className="p-4 flex-1 overflow-y-auto bg-bg-primary custom-scrollbar-md">
-                    <div className="space-y-3">
-                        {Object.entries(cookieCategories).map(([category, info]) => (
-                            <div
-                                key={category}
-                                className="border border-br-primary rounded-lg overflow-hidden"
-                            >
-                                <div className="bg-bg-secondary p-3">
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => toggleSection(category)}
-                                            className="text-txt-secondary hover:text-txt-primary transition-colors text-base font-bold"
-                                        >
-                                            {expandedSections.has(category) ? "−" : "+"}
-                                        </button>
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between">
-                                                <div className="text-sm font-medium text-txt-primary">
-                                                    {info.title}
-                                                </div>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={
-                                                        localConsent[
-                                                            category as keyof typeof localConsent
-                                                        ] as boolean
-                                                    }
-                                                    disabled={category === "essential"}
-                                                    onChange={(e) =>
-                                                        handleToggle(
-                                                            category,
-                                                            e.target.checked
-                                                        )
-                                                    }
-                                                    className="w-4 h-4 text-primary border-br-secondary rounded focus:ring-primary disabled:opacity-50"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+  const handleAcceptAll = () => {
+    acceptAll();
+    onClose();
+  };
 
-                                {expandedSections.has(category) && (
-                                    <div className="border-t border-br-secondary bg-bg-secondary p-3 space-y-3">
-                                        <div>
-                                            <h4 className="text-xs font-medium text-txt-primary mb-1">
-                                                What these cookies do:
-                                            </h4>
-                                            <ul className="text-xs text-txt-secondary space-y-1">
-                                                {info.details.map((detail, index) => (
-                                                    <li
-                                                        key={index}
-                                                        className="flex items-start gap-2"
-                                                    >
-                                                        <span className="text-primary">
-                                                            •
-                                                        </span>
-                                                        <span>{detail}</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </div>
+  const handleDeclineNonEssentials = () => {
+    declineAll();
+    onClose();
+  };
 
-                                        <div>
-                                            <h4 className="text-xs font-medium text-txt-primary mb-1">
-                                                Examples:
-                                            </h4>
-                                            <div className="text-xs text-txt-secondary space-y-1">
-                                                {info.examples.map((example, index) => (
-                                                    <div
-                                                        key={index}
-                                                        className="flex items-start gap-2"
-                                                    >
-                                                        <span className="text-primary">
-                                                            •
-                                                        </span>
-                                                        <span>{example}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
+  const handleSaveSettings = () => {
+    updateMultipleCategories({
+      analytics: localConsent.analytics,
+      marketing: localConsent.marketing,
+      payment: localConsent.payment,
+      accepted: true,
+    });
 
-                                        <div className="bg-bg-surface p-2 rounded">
-                                            <h4 className="text-xs font-medium text-txt-primary mb-1">
-                                                Impact of disabling:
-                                            </h4>
-                                            <p className="text-xs text-txt-secondary">
-                                                {info.impact}
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+    onClose();
+  };
 
-                {/* Footer */}
-                <div className="p-4 border-t border-br-secondary flex-shrink-0">
-                    <div className="flex justify-between items-center">
-                        <div className="text-xs text-txt-secondary">
-                            <p>Last updated: {new Date().toLocaleDateString()}</p>
-                        </div>
-                        <div className="flex gap-2">
-                            <button
-                                type="button"
-                                onClick={handleDeclineNonEssentials}
-                                className="px-3 py-1.5 text-xs bg-primary text-white rounded hover:bg-primary/90 transition-colors"
-                            >
-                                Decline Non-Essentials
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleSaveSettings}
-                                className="px-3 py-1.5 text-xs border border-br-secondary text-txt-secondary hover:text-txt-primary hover:border-br-primary transition-colors rounded"
-                            >
-                                Save Settings
-                            </button>
-                            <button
-                                type="button"
-                                onClick={handleAcceptAll}
-                                className="px-3 py-1.5 text-xs border border-br-secondary text-txt-secondary hover:text-txt-primary hover:border-br-primary transition-colors rounded"
-                            >
-                                Accept All
-                            </button>
-                        </div>
-                    </div>
-                </div>
+  if (!isOpen) {
+    return null;
+  }
+
+  const categoryEntries = Object.entries(cookieCategories) as [
+    CookieCategory,
+    CookieCategoryInfo
+  ][];
+
+  return (
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cookie-settings-title"
+        className="flex max-h-[82vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-br-secondary bg-bg-secondary shadow-2xl"
+      >
+        {/* Header */}
+        <div className="flex-shrink-0 border-b border-br-secondary px-5 py-4">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2
+                id="cookie-settings-title"
+                className="text-lg font-semibold tracking-tight text-txt-primary"
+              >
+                Cookie Settings
+              </h2>
+
+              <p className="mt-1 max-w-md text-xs leading-relaxed text-txt-secondary">
+                Choose which optional cookies you allow. Essential cookies are always
+                enabled.
+              </p>
             </div>
+
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close cookie settings"
+              className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-br-secondary bg-bg-surface text-sm text-txt-secondary transition-all hover:border-br-primary hover:text-txt-primary"
+            >
+              ✕
+            </button>
+          </div>
         </div>
-    );
+
+        {/* Cookie Categories */}
+        <div className="custom-scrollbar-md flex-1 overflow-y-auto bg-bg-primary/60 p-3">
+          <div className="space-y-2">
+            {categoryEntries.map(([category, info]) => {
+              const isExpanded = expandedSections.has(category);
+              const isEssential = category === "essential";
+
+              return (
+                <div
+                  key={category}
+                  className="overflow-hidden rounded-xl border border-br-secondary bg-bg-secondary transition-colors hover:border-br-primary"
+                >
+                  {/* Category Header */}
+                  <div className="px-3 py-2.5">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => toggleSection(category)}
+                        aria-label={`${isExpanded ? "Collapse" : "Expand"} ${info.title}`}
+                        aria-expanded={isExpanded}
+                        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-br-secondary bg-bg-surface text-lg font-medium leading-none text-primary transition-all hover:border-primary/40 hover:bg-primary/10"
+                      >
+                        {isExpanded ? "−" : "+"}
+                      </button>
+
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-medium text-txt-primary">
+                              {info.title}
+                            </p>
+
+                            <p className="mt-0.5 text-xs leading-relaxed text-txt-secondary">
+                              {info.description}
+                            </p>
+                          </div>
+
+                          <input
+                            type="checkbox"
+                            checked={localConsent[category]}
+                            disabled={isEssential}
+                            onChange={(event) => {
+                              if (category === "essential") {
+                                return;
+                              }
+
+                              handleToggle(category, event.target.checked);
+                            }}
+                            aria-label={info.title}
+                            className="h-4 w-4 flex-shrink-0 rounded border-br-secondary text-primary focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Expanded Details */}
+                  {isExpanded && (
+                    <div className="space-y-3 border-t border-br-secondary bg-bg-surface/40 px-4 py-3">
+                      <div>
+                        <h4 className="mb-1.5 text-xs font-medium text-txt-primary">
+                          What these cookies do
+                        </h4>
+
+                        <ul className="space-y-1.5 text-xs text-txt-secondary">
+                          {info.details.map((detail) => (
+                            <li key={detail} className="flex items-start gap-2">
+                              <span className="mt-[1px] text-primary">•</span>
+
+                              <span className="leading-relaxed">{detail}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div>
+                        <h4 className="mb-1.5 text-xs font-medium text-txt-primary">
+                          Examples
+                        </h4>
+
+                        <ul className="space-y-1.5 text-xs text-txt-secondary">
+                          {info.examples.map((example) => (
+                            <li key={example} className="flex items-start gap-2">
+                              <span className="mt-[1px] text-primary">•</span>
+
+                              <span className="leading-relaxed">{example}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="rounded-lg border border-br-secondary bg-bg-primary/50 p-2.5">
+                        <h4 className="mb-1 text-xs font-medium text-txt-primary">
+                          Impact of disabling
+                        </h4>
+
+                        <p className="text-xs leading-relaxed text-txt-secondary">
+                          {info.impact}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex-shrink-0 border-t border-br-secondary bg-bg-secondary px-4 py-3">
+          <div className="flex flex-wrap items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={handleDeclineNonEssentials}
+              className="min-w-[135px] rounded-lg border border-br-secondary px-4 py-2 text-xs font-medium text-txt-secondary transition-colors hover:border-br-primary hover:bg-bg-surface hover:text-txt-primary"
+            >
+              Decline
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSaveSettings}
+              className="min-w-[135px] rounded-lg border border-primary/40 bg-primary/10 px-4 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/15"
+            >
+              Save Preferences
+            </button>
+
+            <button
+              type="button"
+              onClick={handleAcceptAll}
+              className="min-w-[135px] rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-primary/90"
+            >
+              Accept All
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
