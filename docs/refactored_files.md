@@ -82,3 +82,16 @@ keep code clean and readable, refactor only the business logic and leave UI for 
 4. [x] `providers/systemAlertProvider.tsx`
 5. [x] `components/SystemAlertContainer.tsx`
 6. [x] `index.ts`
+
+### User Notifications
+1. [x] `types/userNotification.ts`
+2. [x] `context/userNotificationContext.ts`
+3. [x] `hooks/useUserNotification.ts`
+4. [x] `services/userNotificationService.ts`
+5. [x] `providers/userNotificationProvider.tsx`
+6. [x] `components/NotificationBadge.tsx`
+7. [x] `components/NotificationDropdown.tsx`
+8. [x] `components/UserNotificationItem.tsx`
+9.  [x] `components/ClearAllConfirmModal.tsx`
+10. [x] `pages/NotificationsPage.tsx`
+11. [x] `index.ts`
