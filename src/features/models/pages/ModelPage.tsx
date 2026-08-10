@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useModal } from "@/features/shared/modal/hooks/useModal";
 import { useFetchModel } from "../hooks";
-import { usePublicProfile } from "@/features/user/hooks/usePublicProfile";
+import { usePublicProfile } from "@/features/user/profile";
 import {
   useViewTracker,
   useModelViewCount,
