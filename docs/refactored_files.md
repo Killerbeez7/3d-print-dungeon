@@ -95,3 +95,10 @@ keep code clean and readable, refactor only the business logic and leave UI for 
 9.  [x] `components/ClearAllConfirmModal.tsx`
 10. [x] `pages/NotificationsPage.tsx`
 11. [x] `index.ts`
+
+### Modal
+1. [x] `types/modal.ts`
+2. [x] `context/modalContext.ts`
+3. [x] `hooks/useModal.ts`
+4. [x] `providers/ModalProvider.tsx`
+5. [x] `index.ts`
