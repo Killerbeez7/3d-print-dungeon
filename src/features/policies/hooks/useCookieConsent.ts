@@ -1,27 +1,28 @@
 import { useCookies } from "./useCookies";
-import { CookieCategories } from "../types/cookies";
+import type { CookieCategory } from "../types/cookies";
 
 export function useCookieConsent() {
-    const { consent } = useCookies();
+  const { consent } = useCookies();
 
-    const hasConsent = (categories: CookieCategories | CookieCategories[]): boolean => {
-        const categoryArray = Array.isArray(categories) ? categories : [categories];
-        return categoryArray.every(category => consent[category]);
-    };
+  const hasConsent = (categories: CookieCategory | CookieCategory[]): boolean => {
+    const categoryList = Array.isArray(categories) ? categories : [categories];
 
-    const hasAnyConsent = (categories: CookieCategories[]): boolean => {
-        return categories.some(category => consent[category]);
-    };
+    return categoryList.every((category) => consent[category]);
+  };
 
-    const getMissingConsent = (categories: CookieCategories[]): CookieCategories[] => {
-        return categories.filter(category => !consent[category]);
-    };
+  const hasAnyConsent = (categories: CookieCategory[]): boolean => {
+    return categories.some((category) => consent[category]);
+  };
 
-    return {
-        consent,
-        hasConsent,
-        hasAnyConsent,
-        getMissingConsent,
-        isAccepted: consent.accepted,
-    };
-} 
+  const getMissingConsent = (categories: CookieCategory[]): CookieCategory[] => {
+    return categories.filter((category) => !consent[category]);
+  };
+
+  return {
+    consent,
+    hasConsent,
+    hasAnyConsent,
+    getMissingConsent,
+    isAccepted: consent.accepted,
+  };
+}
