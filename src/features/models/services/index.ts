@@ -9,6 +9,6 @@ export * from "./modelsStatsService";
 
 // Related services
 export * from "../likes/services/likesService";
-export * from "./favoritesService";
+export * from "../favorites/services/favoritesService";
 export * from "./commentsService";
 export * from "./viewService";

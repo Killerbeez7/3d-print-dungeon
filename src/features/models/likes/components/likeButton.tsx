@@ -45,7 +45,7 @@ export const LikeButton = ({
       disabled={isLoading || isMutating}
       aria-pressed={liked}
       aria-label={liked ? "Unlike model" : "Like model"}
-      className="inline-flex items-center gap-2"
+      className="inline-flex items-center gap-2 cursor-pointer"
     >
       <span className="flex items-center justify-center">
         <FontAwesomeIcon
