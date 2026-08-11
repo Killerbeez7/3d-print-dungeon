@@ -17,7 +17,8 @@ import { httpsCallable } from "firebase/functions";
 import { auth, db } from "@/config/firebaseConfig";
 import { isUsernameAvailableInDB } from "../utils/authUtils";
 
-import type { PublicProfile, PrivateProfile } from "@/features/user/types/user";
+import type { PrivateProfile } from "@/features/user/types/user";
+import type { PublicProfile } from "@/features/user/profile";
 import { handleAuthError } from "../utils/errorHandling";
 
 import { functions } from "@/config/firebaseConfig";

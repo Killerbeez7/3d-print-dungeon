@@ -1,5 +1,5 @@
-import type { Role } from "@/features/user/types/user";
 import { useAuth } from "./useAuth";
+import type { Role } from "../types/permissions";
 
 export function useUserRole() {
   const { roles, isAdmin } = useAuth();

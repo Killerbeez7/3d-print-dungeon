@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { Role } from "@/features/user/types/user";
+import type { Role } from "@/features/auth/types/permissions";
 
 import { MaintenanceRoute } from "@/routes/guards/MaintenanceRoute";
 import { ProtectedRoute } from "@/routes/guards/ProtectedRoute";

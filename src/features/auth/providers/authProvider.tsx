@@ -16,13 +16,11 @@ import {
 } from "../services/authService";
 
 // types
-import type {
-  PrivateProfile,
-  PublicProfile,
-  Role,
-  Permission,
-} from "@/features/user/types/user";
+import type { PrivateProfile } from "@/features/user/types/user";
+import type { PublicProfile } from "@/features/user/profile";
+import type { Role, Permission } from "../types/permissions";
 import type { CustomClaims, AuthUser } from "../types/auth";
+
 import { AuthErrorType, handleAuthError } from "../utils/errorHandling";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {

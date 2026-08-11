@@ -1,10 +1,10 @@
-import type {
-  CurrentUser,
-  PrivateProfile,
-  PublicProfile,
-  Role,
-  Permission,
-} from "@/features/user/types/user";
+import { Role, Permission } from "./permissions";
+import type { PrivateProfile } from "@/features/user/types/user";
+import type { PublicProfile } from "@/features/user/profile/types/profile";
+
+import type { User as FirebaseUser } from "firebase/auth";
+
+export type CurrentUser = FirebaseUser;
 
 export type CustomClaims = {
   [key: string]: unknown;

@@ -1,15 +1,35 @@
 import { useState, useEffect } from "react";
+import { MdCheck, MdEdit, MdClose } from "react-icons/md";
+
 import { grantRole, revokeRole } from "@/features/admin/services/adminService";
-import { fetchAllUsersForAdmin } from "@/features/admin/services/userManagementService";
+
+import {
+  fetchAllUsersForAdmin,
+  type AdminUserRow,
+} from "@/features/admin/services/userManagementService";
+
+import type { Role } from "@/features/auth/types/permissions";
+
 import { Spinner } from "@/features/shared/reusable/Spinner";
-import { MdEdit, MdCheck, MdClose } from "react-icons/md";
-import type { AdminUserRow } from "@/features/admin/services/userManagementService";
 
-const ALL_ROLES = ["admin", "moderator", "contributor", "premium"] as const;
-export type Role = (typeof ALL_ROLES)[number];
+const MANAGEABLE_ROLES = [
+  "user",
+  "artist",
+  "moderator",
+  "admin",
+] as const satisfies readonly Role[];
 
-// Use AdminUserRow instead of the old UserRow
-export interface UserRow extends AdminUserRow {
+const ALL_ROLES = [
+  "user",
+  "artist",
+  "moderator",
+  "admin",
+  "superadmin",
+] as const satisfies readonly Role[];
+
+const isRole = (value: string): value is Role => ALL_ROLES.some((role) => role === value);
+
+export interface UserRow extends Omit<AdminUserRow, "roles"> {
   roles?: Role[];
 }
 
@@ -20,206 +40,231 @@ interface EditingUser {
 
 export const UserManagement = () => {
   const [users, setUsers] = useState<UserRow[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+
+  const [loading, setLoading] = useState(true);
+
   const [editingUser, setEditingUser] = useState<EditingUser | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
-    (async () => {
+    const loadUsers = async () => {
       try {
         const adminUsers = await fetchAllUsersForAdmin();
-        const result: UserRow[] = adminUsers.map((user) => {
-          // Map roles to Role[] if present
-          const roles = Array.isArray(user.roles)
-            ? user.roles.filter((r): r is Role => ALL_ROLES.includes(r as Role))
-            : undefined;
-          return {
-            ...user,
-            roles,
-          };
-        });
+
+        const result: UserRow[] = adminUsers.map((user) => ({
+          ...user,
+          roles: Array.isArray(user.roles) ? user.roles.filter(isRole) : undefined,
+        }));
+
         setUsers(result);
-      } catch (err) {
-        console.error("Fetch users failed", err);
+      } catch (error) {
+        console.error("Fetch users failed", error);
       } finally {
         setLoading(false);
       }
-    })();
+    };
+
+    loadUsers();
   }, []);
 
-  const startEdit = (u: UserRow) =>
-    setEditingUser({ id: u.id, roles: [...(u.roles || [])] });
+  const startEdit = (user: UserRow) => {
+    setEditingUser({
+      id: user.id,
+      roles: [...(user.roles ?? [])],
+    });
+  };
 
-  const toggleRole = (role: Role) =>
-    setEditingUser((prev) => {
-      if (!prev) return prev;
-      const has = prev.roles.includes(role);
+  const toggleRole = (role: Role) => {
+    setEditingUser((current) => {
+      if (!current) {
+        return current;
+      }
+
+      const hasRole = current.roles.includes(role);
+
       return {
-        ...prev,
-        roles: has ? prev.roles.filter((r) => r !== role) : [...prev.roles, role],
+        ...current,
+        roles: hasRole
+          ? current.roles.filter((currentRole) => currentRole !== role)
+          : [...current.roles, role],
       };
     });
+  };
 
   const handleSave = async () => {
-    if (!editingUser) return;
-    const original = users.find((u) => u.id === editingUser.id) || { roles: [] };
-    const origRoles = original.roles || [];
-    const newRoles = editingUser.roles || [];
+    if (!editingUser) {
+      return;
+    }
+
+    const originalUser = users.find((user) => user.id === editingUser.id);
+
+    const originalRoles = originalUser?.roles ?? [];
+
+    const newRoles = editingUser.roles;
+
+    const rolesToAdd = newRoles.filter((role) => !originalRoles.includes(role));
+
+    const rolesToRemove = originalRoles.filter((role) => !newRoles.includes(role));
+
     try {
       setLoading(true);
-      const toAdd = newRoles.filter((r) => !origRoles.includes(r));
-      const toRemove = origRoles.filter((r) => !newRoles.includes(r));
-      for (const role of toAdd) {
-        try {
-          await grantRole(editingUser.id, role);
-          console.debug(`Successfully granted ${role} to ${editingUser.id}`);
-        } catch (err) {
-          console.error(`Failed to grant ${role}:`, err);
-          throw err;
-        }
+
+      for (const role of rolesToAdd) {
+        await grantRole(editingUser.id, role);
       }
-      for (const role of toRemove) {
-        try {
-          await revokeRole(editingUser.id, role);
-          console.debug(`Successfully revoked ${role} from ${editingUser.id}`);
-        } catch (err) {
-          console.error(`Failed to revoke ${role}:`, err);
-          throw err;
-        }
+
+      for (const role of rolesToRemove) {
+        await revokeRole(editingUser.id, role);
       }
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === editingUser.id ? { ...u, roles: editingUser.roles } : u
+
+      setUsers((current) =>
+        current.map((user) =>
+          user.id === editingUser.id
+            ? {
+                ...user,
+                roles: editingUser.roles,
+              }
+            : user
         )
       );
+
       setEditingUser(null);
-    } catch (err) {
-      console.error("Failed to save user roles:", err);
+    } catch (error) {
+      console.error("Failed to save user roles:", error);
+
       alert(
-        (err as Error).message || "Failed to update roles. Check console for details."
+        error instanceof Error
+          ? error.message
+          : "Failed to update roles. Check console for details."
       );
     } finally {
       setLoading(false);
     }
   };
 
-  const q = searchQuery.toLowerCase();
-  const filtered = users.filter(
-    (u) =>
-      u.username?.toLowerCase().includes(q) ||
-      u.displayName?.toLowerCase().includes(q) ||
-      u.email?.toLowerCase().includes(q) ||
-      ""
-  );
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+
+  const filteredUsers = users.filter((user) => {
+    if (!normalizedQuery) {
+      return true;
+    }
+
+    return (
+      user.username?.toLowerCase().includes(normalizedQuery) ||
+      user.displayName?.toLowerCase().includes(normalizedQuery) ||
+      user.email?.toLowerCase().includes(normalizedQuery)
+    );
+  });
+
+  if (loading && users.length === 0) {
+    return <Spinner />;
+  }
 
   return (
-    <div className="space-y-6">
+    <div>
       <input
         type="text"
         placeholder="Search users…"
         className="w-full px-4 py-2 rounded-lg bg-bg-secondary text-txt-primary"
         value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
+        onChange={(event) => setSearchQuery(event.target.value)}
       />
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-br-secondary">
-          <thead className="bg-bg-secondary">
-            <tr>
-              {["User", "Email", "Roles", "Actions"].map((h) => (
-                <th
-                  key={h}
-                  className="px-6 py-3 text-left text-xs font-medium text-txt-secondary uppercase tracking-wider"
-                >
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-br-secondary">
-            {filtered.map((u) => {
-              const isEditing = editingUser?.id === u.id;
-              const roles = isEditing ? editingUser.roles : u.roles || [];
-              return (
-                <tr key={u.id}>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src={u.photoURL || "/default-avatar.png"}
-                        alt=""
-                      />
-                      <span className="text-sm font-medium text-white">
-                        {u.displayName || "Anonymous"}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-txt-secondary">{u.email}</td>
-                  <td className="px-6 py-4">
-                    {isEditing ? (
-                      <div className="flex flex-wrap gap-2">
-                        {ALL_ROLES.map((r) => (
-                          <button
-                            key={r}
-                            onClick={() => toggleRole(r)}
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              roles.includes(r)
-                                ? "bg-accent text-white"
-                                : "bg-bg-secondary text-txt-secondary"
-                            }`}
-                          >
-                            {r}
-                          </button>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="flex flex-wrap gap-1">
-                        {roles.map((r) => (
-                          <span
-                            key={r}
-                            className="px-2 py-1 rounded-full text-xs font-medium bg-accent/10 text-txt-primary"
-                          >
-                            {r}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    {isEditing ? (
-                      <span className="flex gap-2 justify-end">
-                        {loading ? (
-                          <Spinner />
-                        ) : (
-                          <>
-                            <button
-                              onClick={handleSave}
-                              className="text-green-500 hover:text-green-600"
-                            >
-                              <MdCheck size={20} />
-                            </button>
-                            <button
-                              onClick={() => setEditingUser(null)}
-                              className="text-red-500 hover:text-red-600"
-                            >
-                              <MdClose size={20} />
-                            </button>
-                          </>
-                        )}
-                      </span>
-                    ) : (
+
+      <div>
+        <div>
+          {["User", "Email", "Roles", "Actions"].map((heading) => (
+            <span key={heading}>{heading}</span>
+          ))}
+        </div>
+
+        {filteredUsers.map((user) => {
+          const isEditing = editingUser?.id === user.id;
+
+          const roles = isEditing ? editingUser.roles : user.roles ?? [];
+
+          return (
+            <div key={user.id}>
+              <div>
+                <img
+                  className="h-8 w-8 rounded-full"
+                  src={user.photoURL || "/default-avatar.png"}
+                  alt=""
+                />
+
+                <span>{user.displayName || "Anonymous"}</span>
+              </div>
+
+              <span>{user.email}</span>
+
+              <div>
+                {isEditing ? (
+                  <>
+                    {MANAGEABLE_ROLES.map((role) => (
                       <button
-                        onClick={() => startEdit(u)}
-                        className="text-accent hover:text-accent-hover"
+                        type="button"
+                        key={role}
+                        onClick={() => toggleRole(role)}
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          roles.includes(role)
+                            ? "bg-accent text-white"
+                            : "bg-bg-secondary text-txt-secondary"
+                        }`}
                       >
-                        <MdEdit size={20} />
+                        {role}
                       </button>
+                    ))}
+
+                    {roles.includes("superadmin") && (
+                      <span className="px-2 py-1 rounded-full text-xs font-medium">
+                        superadmin
+                      </span>
                     )}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                  </>
+                ) : (
+                  roles.map((role) => <span key={role}>{role}</span>)
+                )}
+              </div>
+
+              <div>
+                {isEditing ? (
+                  loading ? (
+                    <Spinner />
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleSave}
+                        className="text-accent hover:text-accent-hover"
+                        aria-label="Save roles"
+                      >
+                        <MdCheck />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setEditingUser(null)}
+                        className="text-red-500 hover:text-red-600"
+                        aria-label="Cancel editing"
+                      >
+                        <MdClose />
+                      </button>
+                    </>
+                  )
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => startEdit(user)}
+                    className="text-accent hover:text-accent-hover"
+                    aria-label="Edit roles"
+                  >
+                    <MdEdit />
+                  </button>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

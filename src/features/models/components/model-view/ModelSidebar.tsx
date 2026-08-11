@@ -13,7 +13,7 @@ import { FollowButton } from "@/features/user/follow/components/FollowButton";
 import { H4, H5 } from "@/components/ResponsiveHeading";
 
 //types
-import type { CurrentUser } from "@/features/user/types/user";
+import type { CurrentUser } from "@/features/auth/types/auth";
 import type { ModelData } from "@/features/models/types/model";
 
 interface Uploader {
