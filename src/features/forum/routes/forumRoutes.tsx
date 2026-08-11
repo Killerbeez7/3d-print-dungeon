@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { ForumProvider } from "@/features/forum/providers/forumProvider";
-import { withProtectedMaintenance } from "@/helpers/routeHelpers";
+import { withProtected } from "@/helpers/routeHelpers";
 import type { RouteObject } from "react-router-dom";
 
 // Layout
@@ -119,7 +119,7 @@ export const forumRoutes: RouteObject[] = [
       },
       {
         path: "new-thread",
-        element: withProtectedMaintenance(
+        element: withProtected(
           <Suspense>
             <CreateThread />
           </Suspense>
@@ -127,7 +127,7 @@ export const forumRoutes: RouteObject[] = [
       },
       {
         path: "thread/:threadId/edit",
-        element: withProtectedMaintenance(
+        element: withProtected(
           <Suspense>
             <EditThread />
           </Suspense>
@@ -135,7 +135,7 @@ export const forumRoutes: RouteObject[] = [
       },
       {
         path: "reply/:replyId/edit",
-        element: withProtectedMaintenance(
+        element: withProtected(
           <Suspense>
             <EditReply />
           </Suspense>

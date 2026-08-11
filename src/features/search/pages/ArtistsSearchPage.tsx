@@ -5,14 +5,12 @@ import { SearchTabs } from "../components/SearchTabs";
 import { SearchEmptyState } from "../components/SearchEmptyState";
 import { ArtistsFilters } from "@/features/search-filters/components/ArtistsFilters";
 import { useArtistsSearchPage } from "../hooks/useArtistsSearchPage";
-import { Spinner } from "@/features/shared/reusable/Spinner";
 
 export const ArtistsSearchPage = () => {
   const {
     localQuery,
     debouncedQuery,
     activeTab,
-    modelsLoading,
     noSearchNoFilters,
     handleInputChange,
     handleClear,
@@ -22,9 +20,7 @@ export const ArtistsSearchPage = () => {
   return (
     <FiltersProvider>
       <div className="min-h-screen text-txt-primary">
-        {/* Search Input and Tabs Section with gray background */}
         <div className="bg-bg-secondary py-12 px-6 pb-0">
-          {/* Large Search Input */}
           <div className="">
             <SearchInput
               value={localQuery}
@@ -49,10 +45,6 @@ export const ArtistsSearchPage = () => {
           {/* Results */}
           {noSearchNoFilters ? (
             <SearchEmptyState />
-          ) : modelsLoading ? (
-            <div className="flex justify-center py-10">
-              <Spinner size={24} />
-            </div>
           ) : (
             <SearchResults
               search={debouncedQuery}

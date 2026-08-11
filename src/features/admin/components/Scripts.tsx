@@ -5,7 +5,6 @@ import { refreshIdToken } from "@/features/auth/utils/refreshIdToken";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers } from "@fortawesome/free-solid-svg-icons";
 import { SystemNotificationsTest } from "./SystemNotificationsTest";
-import { UserNotificationsTest } from "./UserNotificationsTest";
 import { CookieManagement } from "./CookieManagement";
 
 interface ScriptDef {
@@ -71,9 +70,6 @@ export const Scripts = () => {
 
       {/* System Alerts Testing */}
       <SystemNotificationsTest />
-
-      {/* User Notifications Testing */}
-      <UserNotificationsTest />
 
       {/* Cookie Management Section */}
       <CookieManagement />
