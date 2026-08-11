@@ -83,18 +83,7 @@ keep code clean and readable, refactor only the business logic and leave UI for 
 5. [x] `components/SystemAlertContainer.tsx`
 6. [x] `index.ts`
 
-### User Notifications
-1. [x] `types/userNotification.ts`
-2. [x] `context/userNotificationContext.ts`
-3. [x] `hooks/useUserNotification.ts`
-4. [x] `services/userNotificationService.ts`
-5. [x] `providers/userNotificationProvider.tsx`
-6. [x] `components/NotificationBadge.tsx`
-7. [x] `components/NotificationDropdown.tsx`
-8. [x] `components/UserNotificationItem.tsx`
-9.  [x] `components/ClearAllConfirmModal.tsx`
-10. [x] `pages/NotificationsPage.tsx`
-11. [x] `index.ts`
+
 
 ### Modal
 1. [x] `types/modal.ts`
@@ -102,3 +91,82 @@ keep code clean and readable, refactor only the business logic and leave UI for 
 3. [x] `hooks/useModal.ts`
 4. [x] `providers/ModalProvider.tsx`
 5. [x] `index.ts`
+
+====================================================================================================
+
+---
+
+## User - Notifications
+
+### Data layer
+- [x] `notifications/types/userNotification.ts`
+- [x] `notifications/context/userNotificationContext.ts`
+- [x] `notifications/hooks/useUserNotification.ts`
+- [x] `notifications/services/userNotificationService.ts`
+- [x] `notifications/providers/userNotificationProvider.tsx`
+- [x] `notifications/index.ts` 
+
+### Components
+- [x] `notifications/components/NotificationBadge.tsx`
+- [x] `notifications/components/NotificationDropdown.tsx`
+- [x] `notifications/components/UserNotificationItem.tsx`
+- [x] `notifications/components/ClearAllConfirmModal.tsx`
+
+### Pages 
+- [x] `notifications/pages/NotificationsPage.tsx`
+
+---
+
+## User - Profile
+
+### Data layer
+- [x] `profile/types/profile.ts`
+- [x] `profile/services/profileService.ts`
+- [x] `profile/hooks/usePublicProfile.ts`
+- [x] `profile/index.ts`
+
+### Pages
+- [x] `profile/pages/PublicProfilePage.tsx`
+- [x] `profile/pages/ProfileRedirect.tsx`
+
+### Components
+- [x] `profile/components/UserHeader.tsx`
+- [x] `profile/components/UserPortfolio.tsx`
+- [x] `profile/components/UserStats.tsx`
+- [x] `profile/components/PrivateStats.tsx`
+- [x] `profile/components/ProfileSettingsPanel.tsx`
+
+---
+
+## User - Settings
+
+### Data layer
+- [x] `settings/types/settings.ts`
+- [x] `settings/services/settingsService.ts`
+- [x] `settings/services/profileService.ts`
+
+### Shared components
+- [x] `settings/components/parts/SaveChanges.tsx`
+
+### Components
+- [x] `settings/components/AccountSettings.tsx`
+- [x] `settings/components/NotificationSettings.tsx`
+- [x] `settings/components/PrivacySettings.tsx`
+- [x] `settings/components/SecuritySettings.tsx`
+- [x] `settings/components/SettingsPageSkeleton.tsx`
+- [x] `settings/components/ProfileSettings.tsx`
+
+### Pages
+- [x] `settings/pages/SettingsPage.tsx`
+
+### Final cleanup
+- [ ] `settings/index.ts` if present
+- [ ] Remove Settings types from `user/types/user.ts` when no longer used
+- [ ] Verify privacy settings are actually enforced by Profile / messaging / Firestore rules
+- [ ] Revisit `friends` visibility when Follow/Social is audited
+- [ ] Add real MFA/session security features only when backend/auth enforcement exists
+- [ ] Fix profile avatar not loading in Settings
+- [ ] Fix password change flow
+- [ ] when user click on settings/account current theme is by default dark and if theme is set to light it switches visibly make it persistent ..
+---
+
