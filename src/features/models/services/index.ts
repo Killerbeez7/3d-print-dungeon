@@ -10,5 +10,5 @@ export * from "./modelsStatsService";
 // Related services
 export * from "../likes/services/likesService";
 export * from "../favorites/services/favoritesService";
-export * from "./commentsService";
+export * from "../comments/services/commentsService";
 export * from "./viewService";

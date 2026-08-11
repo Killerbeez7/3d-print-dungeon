@@ -7,7 +7,7 @@ import {
 
 const PUBLIC_PROFILE_STALE_TIME = 5 * 60 * 1000;
 
-export function usePublicProfile(userId: string) {
+export function usePublicProfile(userId?: string) {
   return useQuery({
     queryKey: ["users", "ppublic-profile", "id", userId],
 

@@ -15,7 +15,7 @@ import { fullscreenConfig } from "@/config/fullscreenConfig";
 //components
 import { ModelSidebar } from "../components/model-view/ModelSidebar";
 import { ModelThumbnails } from "../components/model-view/ModelThumbnails";
-import { CommentsProvider } from "@/features/models/providers/commentsProvider";
+
 import { ModelComments } from "../components/model-view/ModelComments";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 
@@ -127,9 +127,7 @@ export function ModelPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 pb-8 lg:px-7">
-        <CommentsProvider modelId={model.id}>
-          <ModelComments openAuthModal={() => open({ mode: "login" })} />
-        </CommentsProvider>
+        <ModelComments modelId={model.id} openAuthModal={() => open({ mode: "login" })} />
       </div>
     </div>
   );
