@@ -8,7 +8,7 @@ export * from "./modelsFetchService";
 export * from "./modelsStatsService";
 
 // Related services
-export * from "./likesService";
+export * from "../likes/services/likesService";
 export * from "./favoritesService";
 export * from "./commentsService";
 export * from "./viewService";

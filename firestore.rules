@@ -89,8 +89,32 @@ service cloud.firestore {
     
     // -------------- Likes --------------
     match /likes/{likeId} {
-      allow read: if true;
-      allow write: if isSignedIn();
+      allow get: if isSignedIn();
+      allow list: if false;
+
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasAll([
+          "userId",
+          "modelId",
+          "createdAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "userId",
+          "modelId",
+          "createdAt"
+        ])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.modelId is string
+        && request.resource.data.createdAt == request.time
+        && likeId == request.auth.uid + "_" + request.resource.data.modelId
+        && exists(
+          /databases/$(database)/documents/models/$(request.resource.data.modelId)
+        );
+
+      allow update: if false;
+
+      allow delete: if isSignedIn()
+        && resource.data.userId == request.auth.uid;
     }
 
     // -------------- Follows --------------

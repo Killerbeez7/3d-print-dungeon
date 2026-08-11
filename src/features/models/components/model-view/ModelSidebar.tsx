@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useSystemAlert } from "@/features/system-alerts/hooks/useSystemAlert";
 //components
-import { LikeButton } from "../likeButton";
+import { LikeButton } from "../../likes/components/likeButton";
 import { FavoritesButton } from "../favoritesButton";
 import { PurchaseButton } from "@/features/payment/components/PurchaseButton";
 import { FollowButton } from "@/features/user/follow/components/FollowButton";
