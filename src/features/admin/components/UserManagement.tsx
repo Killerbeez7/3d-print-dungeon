@@ -27,6 +27,14 @@ const ALL_ROLES = [
   "superadmin",
 ] as const satisfies readonly Role[];
 
+const ROLE_CLASSES: Record<Role, string> = {
+  user: "bg-slate-500/15 text-slate-300",
+  artist: "bg-violet-500/15 text-violet-300",
+  moderator: "bg-blue-500/15 text-blue-300",
+  admin: "bg-red-500/15 text-red-300",
+  superadmin: "bg-amber-500/15 text-amber-300",
+};
+
 const isRole = (value: string): value is Role => ALL_ROLES.some((role) => role === value);
 
 export interface UserRow extends Omit<AdminUserRow, "roles"> {
@@ -158,113 +166,144 @@ export const UserManagement = () => {
   });
 
   if (loading && users.length === 0) {
-    return <Spinner />;
+    return (
+      <div className="flex min-h-40 items-center justify-center">
+        <Spinner />
+      </div>
+    );
   }
 
   return (
-    <div>
+    <div className="space-y-4">
       <input
         type="text"
-        placeholder="Search users…"
-        className="w-full px-4 py-2 rounded-lg bg-bg-secondary text-txt-primary"
+        placeholder="Search users..."
+        className="w-full rounded-lg bg-bg-secondary px-4 py-2 text-txt-primary"
         value={searchQuery}
         onChange={(event) => setSearchQuery(event.target.value)}
       />
 
-      <div>
-        <div>
-          {["User", "Email", "Roles", "Actions"].map((heading) => (
-            <span key={heading}>{heading}</span>
-          ))}
-        </div>
+      <div className="overflow-x-auto">
+        <div className="min-w-[700px]">
+          {/* Header */}
+          <div className="grid grid-cols-[1.25fr_1.5fr_1fr_80px] items-center bg-bg-secondary px-4 py-3 text-xs font-medium uppercase text-txt-secondary">
+            <span>User</span>
+            <span>Email</span>
+            <span>Roles</span>
+            <span className="text-center">Actions</span>
+          </div>
 
-        {filteredUsers.map((user) => {
-          const isEditing = editingUser?.id === user.id;
+          {/* Users */}
+          <div>
+            {filteredUsers.map((user) => {
+              const isEditing = editingUser?.id === user.id;
 
-          const roles = isEditing ? editingUser.roles : user.roles ?? [];
+              const roles = isEditing ? editingUser.roles : user.roles ?? [];
 
-          return (
-            <div key={user.id}>
-              <div>
-                <img
-                  className="h-8 w-8 rounded-full"
-                  src={user.photoURL || "/default-avatar.png"}
-                  alt=""
-                />
+              return (
+                <div
+                  key={user.id}
+                  className="grid min-h-14 grid-cols-[1.25fr_1.5fr_1fr_80px] items-center border-b border-br-secondary px-4 py-2"
+                >
+                  {/* User */}
+                  <div className="flex min-w-0 items-center gap-3">
+                    <img
+                      className="h-8 w-8 shrink-0 rounded-full object-cover"
+                      src={user.photoURL || "/default-avatar.png"}
+                      alt={user.displayName || user.username || "User"}
+                    />
 
-                <span>{user.displayName || "Anonymous"}</span>
-              </div>
+                    <span className="truncate text-sm text-txt-primary">
+                      {user.displayName || user.username || "Anonymous"}
+                    </span>
+                  </div>
 
-              <span>{user.email}</span>
+                  {/* Email */}
+                  <span className="truncate pr-4 text-sm text-txt-secondary">
+                    {user.email || "—"}
+                  </span>
 
-              <div>
-                {isEditing ? (
-                  <>
-                    {MANAGEABLE_ROLES.map((role) => (
+                  {/* Roles */}
+                  <div className="flex flex-wrap items-center gap-1">
+                    {isEditing ? (
+                      <>
+                        {MANAGEABLE_ROLES.map((role) => (
+                          <button
+                            type="button"
+                            key={role}
+                            onClick={() => toggleRole(role)}
+                            className={`rounded-full px-2 py-1 text-xs font-medium ${
+                              roles.includes(role)
+                                ? ROLE_CLASSES[role]
+                                : "bg-bg-secondary text-txt-secondary"
+                            }`}
+                          >
+                            {role}
+                          </button>
+                        ))}
+
+                        {roles.includes("superadmin") && (
+                          <span className="rounded-full bg-bg-secondary px-2 py-1 text-xs font-medium text-txt-secondary">
+                            superadmin
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      roles.map((role) => (
+                        <span
+                          key={role}
+                          className={`rounded-full px-2 py-1 text-xs font-medium ${ROLE_CLASSES[role]}`}
+                        >
+                          {role}
+                        </span>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-center gap-2">
+                    {isEditing ? (
+                      loading ? (
+                        <Spinner />
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            onClick={handleSave}
+                            className="text-accent hover:text-accent-hover"
+                            aria-label="Save roles"
+                          >
+                            <MdCheck className="w-6 h-6" />
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setEditingUser(null)}
+                            className="text-red-500 hover:text-red-600"
+                            aria-label="Cancel editing"
+                          >
+                            <MdClose className="w-6 h-6" />
+                          </button>
+                        </>
+                      )
+                    ) : (
                       <button
                         type="button"
-                        key={role}
-                        onClick={() => toggleRole(role)}
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          roles.includes(role)
-                            ? "bg-accent text-white"
-                            : "bg-bg-secondary text-txt-secondary"
+                        onClick={() => startEdit(user)}
+                        className="text-accent hover:text-accent-hover"
+                        aria-label={`Edit roles for ${
+                          user.displayName || user.username || "user"
                         }`}
                       >
-                        {role}
+                        <MdEdit className="w-6 h-6" />
                       </button>
-                    ))}
-
-                    {roles.includes("superadmin") && (
-                      <span className="px-2 py-1 rounded-full text-xs font-medium">
-                        superadmin
-                      </span>
                     )}
-                  </>
-                ) : (
-                  roles.map((role) => <span key={role}>{role}</span>)
-                )}
-              </div>
-
-              <div>
-                {isEditing ? (
-                  loading ? (
-                    <Spinner />
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        onClick={handleSave}
-                        className="text-accent hover:text-accent-hover"
-                        aria-label="Save roles"
-                      >
-                        <MdCheck />
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setEditingUser(null)}
-                        className="text-red-500 hover:text-red-600"
-                        aria-label="Cancel editing"
-                      >
-                        <MdClose />
-                      </button>
-                    </>
-                  )
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => startEdit(user)}
-                    className="text-accent hover:text-accent-hover"
-                    aria-label="Edit roles"
-                  >
-                    <MdEdit />
-                  </button>
-                )}
-              </div>
-            </div>
-          );
-        })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
