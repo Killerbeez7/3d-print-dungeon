@@ -67,8 +67,12 @@ keep code clean and readable, refactor only the business logic and leave UI for 
 - [ ] **UI/UX polish**
 
 ## Likes
-- [ ] **Architecture/business logic**
+- [x] **Architecture/business logic**
 - [ ] **UI/UX polish**
+
+#### Deferred
+- [ ] Fix Like/Likes width shifting adjacent Favorite button
+- [ ] Review model-deletion effect on uploader `likesCount`
 
 ## Favorites
 - [ ] **Architecture/business logic**
@@ -89,9 +93,8 @@ keep code clean and readable, refactor only the business logic and leave UI for 
 =========================================================================
 
 
-=========================================================================
 
----
+=========================================================================
 
 ## Current feature
 
