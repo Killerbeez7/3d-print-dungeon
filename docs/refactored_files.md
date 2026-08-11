@@ -168,5 +168,18 @@ keep code clean and readable, refactor only the business logic and leave UI for 
 - [ ] Fix profile avatar not loading in Settings
 - [ ] Fix password change flow
 - [ ] when user click on settings/account current theme is by default dark and if theme is set to light it switches visibly make it persistent ..
+
+--- 
+
+## User - Follow
+
+### Data layer
+- [x] `follow/types/follow.ts`
+- [x] `follow/services/followService.ts`
+- [x] `follow/hooks/useFollow.ts`
+
+### Components
+- [x] `follow/components/FollowButton.tsx`
+
 ---
 

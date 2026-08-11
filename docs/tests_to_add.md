@@ -66,6 +66,8 @@ This document lists all tests to add or improve to achieve ~90% coverage. Tests 
 ---
 
 ## Notes
+- !! Check the whole app for proper getFunctions usage from fireabaseConfig
+
 - Prioritize critical flows (auth, upload, payment, forum thread/reply)
 - Add integration tests for flows spanning multiple components (e.g., upload to purchase)
 - Mock external services (Firebase, Stripe) in all tests
