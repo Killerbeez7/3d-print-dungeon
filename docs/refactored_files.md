@@ -30,6 +30,10 @@ keep code clean and readable, refactor only the business logic and leave UI for 
 - [x] **Architecture/business logic**
 - [ ] **UI/UX polish**
 
+## Search
+- [x] **Architecture/business logic**
+- [ ] **UI/UX polish**
+- [ ] 
 ---
 
 # User
@@ -75,11 +79,11 @@ keep code clean and readable, refactor only the business logic and leave UI for 
 - [ ] Review model-deletion effect on uploader `likesCount`
 
 ## Favorites
-- [ ] **Architecture/business logic**
+- [x] **Architecture/business logic**
 - [ ] **UI/UX polish**
 
 ## Comments
-- [ ] **Architecture/business logic**
+- [x] **Architecture/business logic**
 - [ ] **UI/UX polish**
 
 ## Views
