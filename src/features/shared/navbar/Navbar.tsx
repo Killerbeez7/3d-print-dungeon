@@ -57,7 +57,17 @@ const navItemIcons: Record<string, IconType> = {
   "Enterprise Suite": MdBusinessCenter,
 };
 
-export const Navbar = (): React.ReactNode => {
+const NavbarAuthSkeleton = () => {
+  return (
+    <div className="flex h-10 items-center justify-end gap-3" aria-hidden="true">
+      <div className="h-7 w-7 animate-pulse rounded-lg bg-bg-surface" />
+      <div className="h-7 w-7 animate-pulse rounded-lg bg-bg-surface" />
+      <div className="h-7 w-7 animate-pulse rounded-full bg-bg-surface" />
+    </div>
+  );
+};
+
+export const Navbar = () => {
   const { isAdmin } = useUserRole();
   const { currentUser, publicProfile, handleSignOut, loading } = useAuth();
   const { open } = useModal("auth");
@@ -142,10 +152,18 @@ export const Navbar = (): React.ReactNode => {
   return (
     <div className="sticky top-0 left-0 right-0 z-50">
       <nav className="relative z-50 border-b border-br-subtle/80 bg-bg-section/90 shadow-sm backdrop-blur-md">
-        <div className="px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center h-10">
-            {/* LEFT: logo & desktop nav */}
-            <div className="flex min-w-fit items-center gap-4">
+        <div className="h-[72px] px-4 sm:px-6 lg:px-8">
+          <div
+            className="
+    grid h-full min-w-0
+    grid-cols-[auto_minmax(0,1fr)_auto]
+    items-center gap-x-4
+    lg:grid-cols-[384px_minmax(220px,1fr)_168px]
+    lg:gap-x-6
+  "
+          >
+            {/* LEFT */}
+            <div className="flex min-w-0 items-center gap-4">
               {/* mobile hamburger */}
               <button
                 id="hamburger-button"
@@ -159,23 +177,31 @@ export const Navbar = (): React.ReactNode => {
               </button>
 
               {/* logo mobile */}
-              <div className="md:hidden absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap flex-shrink-0">
-                <Link to="/" className="flex items-center">
+              <div className="absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 md:hidden">
+                <Link to="/" className="flex h-full w-full items-center justify-center">
                   <img
                     src={STATIC_ASSETS.LOGO}
                     alt="3D Print Dungeon"
-                    className="h-9 w-auto logo-accent"
+                    width={36}
+                    height={36}
+                    className="h-9 w-9 object-contain logo-accent"
                   />
                 </Link>
               </div>
 
-              {/* logo desktop */}
-              <div className="hidden md:block whitespace-nowrap flex-shrink-0 w-[50px]">
-                <Link to="/" className="flex items-center" onClick={handleLogoClick}>
+              {/* Logo desktop */}
+              <div className="hidden h-10 w-[50px] shrink-0 items-center md:flex">
+                <Link
+                  to="/"
+                  className="flex h-10 w-10 items-center justify-center"
+                  onClick={handleLogoClick}
+                >
                   <img
                     src={STATIC_ASSETS.LOGO}
                     alt="3D Print Dungeon"
-                    className="h-9 w-auto transition-transform duration-200 hover:scale-105 logo-accent"
+                    width={36}
+                    height={36}
+                    className="h-9 w-9 object-contain transition-transform duration-200 hover:scale-105 logo-accent"
                   />
                 </Link>
               </div>
@@ -244,31 +270,37 @@ export const Navbar = (): React.ReactNode => {
               </nav>
             </div>
 
-            {/* ---------- CENTER: global search ---------- */}
-            <div className="mx-auto flex w-1/2 max-w-5xl flex-1 justify-center px-5">
-              <div className="w-full hidden lg:block">
+            {/* CENTER: global search */}
+            <div className="hidden min-w-0 w-full justify-self-center lg:block">
+              <div className="mx-auto w-full max-w-5xl">
                 <GlobalSearch />
               </div>
             </div>
 
-            {/* ---------- RIGHT: auth & icons ---------- */}
-            <div className="flex min-w-fit items-center justify-end gap-3">
+            {/* RIGHT */}
+            <div className="flex min-w-0 items-center justify-end gap-3">
               {/* Quick search icon */}
               <button
                 type="button"
                 onClick={handleSearchClick}
-                className="hidden md:block lg:hidden rounded-lg p-1 text-txt-secondary hover:bg-bg-surface hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
+                className="hidden md:block lg:hidden rounded-lg p-1 text-txt-secondary hover:bg-bg-surface hover:text-txt-primary focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-br-primary"
                 title="Search"
                 aria-label="Search"
               >
                 <MdSearch className="h-7 w-7" />
               </button>
 
-              {!currentUser ? (
+              {loading ? (
+                <NavbarAuthSkeleton />
+              ) : !currentUser ? (
                 <AuthButtons
-                  isLoading={loading}
-                  onLoginClick={() => open({ mode: "signin" })}
-                  onSignUpClick={() => open({ mode: "signup" })}
+                  isLoading={false}
+                  onLoginClick={() => {
+                    open({ mode: "signin" });
+                  }}
+                  onSignUpClick={() => {
+                    open({ mode: "signup" });
+                  }}
                 />
               ) : (
                 <>

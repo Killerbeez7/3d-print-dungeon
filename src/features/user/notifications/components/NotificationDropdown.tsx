@@ -225,7 +225,7 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
   const visibleNotifications = showAllNotifications ? notifications : recentNotifications;
 
   return (
-    <div ref={dropdownRef} className={`relative ${className}`}>
+    <div ref={dropdownRef} className={`relative flex h-9 w-9 items-center justify-center ${className}`}>
       <button
         type="button"
         onClick={handleBellClick}
@@ -234,11 +234,11 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
         }
         aria-expanded={isMobile ? undefined : isOpen}
         aria-controls={isMobile ? undefined : "notification-dropdown"}
-        className="relative"
+        className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg p-1 text-txt-secondary transition-colors duration-200 hover:bg-bg-surface hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
       >
         <MdNotifications
           aria-hidden="true"
-          className="h-7 w-7 text-txt-secondary transition-colors duration-200 hover:text-txt-primary"
+          className="h-7 w-7"
         />
 
         {unreadCount > 0 && (
