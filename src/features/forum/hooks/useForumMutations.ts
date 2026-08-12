@@ -1,102 +1,227 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+import { useAuth } from "@/features/auth/hooks/useAuth";
+
 import {
-    createThread,
-    updateThread,
-    deleteThread,
-    createReply,
-    updateReply,
-    deleteReply,
-    incrementThreadViews,
-} from "@/features/forum/services/forumService";
-import type { ForumThread, CreateThreadParams, CreateReplyParams } from "@/features/forum/types/forum";
+  createThread,
+  updateThread,
+  deleteThread,
+  createReply,
+  updateReply,
+  deleteReply,
+  incrementThreadViews,
+} from "../services/forumService";
+
+import type {
+  CreateThreadInput,
+  CreateThreadData,
+  UpdateThreadInput,
+  CreateReplyInput,
+  CreateReplyData,
+  UpdateReplyInput,
+} from "../types/forum";
 
 export const useCreateThread = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
+  const { currentUser } = useAuth();
 
-    return useMutation<string, Error, CreateThreadParams>({
-        mutationFn: createThread,
-        onSuccess: () => {
-            // Invalidate and refetch threads
-            queryClient.invalidateQueries({ queryKey: ["forum-threads"] });
-            queryClient.invalidateQueries({ queryKey: ["forum-categories"] });
-        },
-    });
+  return useMutation<string, Error, CreateThreadInput>({
+    mutationFn: async (input) => {
+      if (!currentUser) {
+        throw new Error("You must be logged in to create a thread");
+      }
+
+      const data: CreateThreadData = {
+        ...input,
+        authorId: currentUser.uid,
+        authorName: currentUser.displayName ?? "Anonymous",
+        authorPhotoURL: currentUser.photoURL ?? undefined,
+      };
+
+      return createThread(data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["forum-threads"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["forum-categories"],
+      });
+    },
+  });
 };
 
-export const useUpdateThread = () => {
-    const queryClient = useQueryClient();
+interface UpdateThreadMutation {
+  threadId: string;
+  data: UpdateThreadInput;
+}
 
-    return useMutation<string, Error, { threadId: string; data: Partial<ForumThread> }>({
-        mutationFn: ({ threadId, data }) => updateThread(threadId, data),
-        onSuccess: (_, { threadId }) => {
-            // Invalidate specific thread and threads list
-            queryClient.invalidateQueries({ queryKey: ["forum-thread", threadId] });
-            queryClient.invalidateQueries({ queryKey: ["forum-threads"] });
-        },
-    });
+export const useUpdateThread = () => {
+  const queryClient = useQueryClient();
+  const { currentUser } = useAuth();
+
+  return useMutation<string, Error, UpdateThreadMutation>({
+    mutationFn: async ({ threadId, data }) => {
+      if (!currentUser) {
+        throw new Error("You must be logged in to update a thread");
+      }
+
+      return updateThread(threadId, data);
+    },
+    onSuccess: (_, { threadId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["forum-thread", threadId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["forum-threads"],
+      });
+    },
+  });
 };
 
 export const useDeleteThread = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
+  const { currentUser } = useAuth();
 
-    return useMutation<string, Error, { threadId: string; authorId: string }>({
-        mutationFn: ({ threadId, authorId }) => deleteThread(threadId, authorId),
-        onSuccess: () => {
-            // Invalidate all forum queries
-            queryClient.invalidateQueries({ queryKey: ["forum-threads"] });
-            queryClient.invalidateQueries({ queryKey: ["forum-categories"] });
-        },
-    });
+  return useMutation<string, Error, string>({
+    mutationFn: async (threadId) => {
+      if (!currentUser) {
+        throw new Error("You must be logged in to delete a thread");
+      }
+
+      return deleteThread(threadId);
+    },
+    onSuccess: (_, threadId) => {
+      queryClient.removeQueries({
+        queryKey: ["forum-thread", threadId],
+      });
+
+      queryClient.removeQueries({
+        queryKey: ["forum-replies", threadId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["forum-threads"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["forum-categories"],
+      });
+    },
+  });
 };
 
 export const useCreateReply = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
+  const { currentUser } = useAuth();
 
-    return useMutation<string, Error, CreateReplyParams>({
-        mutationFn: createReply,
-        onSuccess: (_, { threadId }) => {
-            // Invalidate thread and replies
-            queryClient.invalidateQueries({ queryKey: ["forum-thread", threadId] });
-            queryClient.invalidateQueries({ queryKey: ["forum-replies", threadId] });
-            queryClient.invalidateQueries({ queryKey: ["forum-threads"] });
-        },
-    });
+  return useMutation<string, Error, CreateReplyInput>({
+    mutationFn: async (input) => {
+      if (!currentUser) {
+        throw new Error("You must be logged in to reply");
+      }
+
+      const data: CreateReplyData = {
+        ...input,
+        authorId: currentUser.uid,
+        authorName: currentUser.displayName ?? "Anonymous",
+        authorPhotoURL: currentUser.photoURL ?? undefined,
+      };
+
+      return createReply(data);
+    },
+    onSuccess: (_, { threadId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["forum-thread", threadId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["forum-replies"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["forum-threads"],
+      });
+    },
+  });
 };
+
+interface UpdateReplyMutation {
+  replyId: string;
+  threadId: string;
+  data: UpdateReplyInput;
+}
 
 export const useUpdateReply = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
+  const { currentUser } = useAuth();
 
-    return useMutation<string, Error, { replyId: string; data: Record<string, unknown>; authorId: string }>({
-        mutationFn: ({ replyId, data, authorId }) => updateReply(replyId, data, authorId),
-        onSuccess: () => {
-            // Invalidate all replies queries
-            queryClient.invalidateQueries({ queryKey: ["forum-replies"] });
-        },
-    });
+  return useMutation<string, Error, UpdateReplyMutation>({
+    mutationFn: async ({ replyId, data }) => {
+      if (!currentUser) {
+        throw new Error("You must be logged in to update a reply");
+      }
+
+      return updateReply(replyId, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["forum-replies"],
+      });
+    },
+  });
 };
 
-export const useDeleteReply = () => {
-    const queryClient = useQueryClient();
+interface DeleteReplyMutation {
+  replyId: string;
+  threadId: string;
+}
 
-    return useMutation<string, Error, { replyId: string; threadId: string }>({
-        mutationFn: ({ replyId, threadId }) => deleteReply(replyId, threadId),
-        onSuccess: (_, { threadId }) => {
-            // Invalidate thread and replies
-            queryClient.invalidateQueries({ queryKey: ["forum-thread", threadId] });
-            queryClient.invalidateQueries({ queryKey: ["forum-replies", threadId] });
-            queryClient.invalidateQueries({ queryKey: ["forum-threads"] });
-        },
-    });
+export const useDeleteReply = () => {
+  const queryClient = useQueryClient();
+  const { currentUser } = useAuth();
+
+  return useMutation<string, Error, DeleteReplyMutation>({
+    mutationFn: async ({ replyId, threadId }) => {
+      if (!currentUser) {
+        throw new Error("You must be logged in to delete a reply");
+      }
+
+      return deleteReply(replyId, threadId);
+    },
+    onSuccess: (_, { threadId }) => {
+      queryClient.invalidateQueries({
+        queryKey: ["forum-thread", threadId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["forum-replies"],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["forum-threads"],
+      });
+    },
+  });
 };
 
 export const useIncrementThreadViews = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    return useMutation<void, Error, string>({
-        mutationFn: incrementThreadViews,
-        onSuccess: (_, threadId) => {
-            // Invalidate specific thread
-            queryClient.invalidateQueries({ queryKey: ["forum-thread", threadId] });
-        },
-    });
-}; 
+  return useMutation<void, Error, string>({
+    mutationFn: (threadId) => {
+      return incrementThreadViews(threadId);
+    },
+    onSuccess: (_, threadId) => {
+      queryClient.invalidateQueries({
+        queryKey: ["forum-thread", threadId],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ["forum-threads"],
+      });
+    },
+  });
+};
