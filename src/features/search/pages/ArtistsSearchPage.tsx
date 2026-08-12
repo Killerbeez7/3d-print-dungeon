@@ -1,9 +1,10 @@
 import { FiltersProvider } from "@/features/search-filters/providers/filtersProvider";
+import { ArtistsFilters } from "@/features/search-filters/components/ArtistsFilters";
+
 import { SearchResults } from "../components/SearchResults";
 import { SearchInput } from "../components/SearchInput";
 import { SearchTabs } from "../components/SearchTabs";
 import { SearchEmptyState } from "../components/SearchEmptyState";
-import { ArtistsFilters } from "@/features/search-filters/components/ArtistsFilters";
 import { useArtistsSearchPage } from "../hooks/useArtistsSearchPage";
 
 export const ArtistsSearchPage = () => {
@@ -20,36 +21,27 @@ export const ArtistsSearchPage = () => {
   return (
     <FiltersProvider>
       <div className="min-h-screen text-txt-primary">
-        <div className="bg-bg-secondary py-12 px-6 pb-0">
-          <div className="">
-            <SearchInput
-              value={localQuery}
-              onChange={handleInputChange}
-              onClear={handleClear}
-            />
-          </div>
+        <div className="bg-bg-secondary px-6 pb-0 py-12">
+          <SearchInput
+            value={localQuery}
+            onChange={handleInputChange}
+            onClear={handleClear}
+          />
 
-          {/* Tabs with layout handling */}
           <div className="flex justify-center">
             <SearchTabs activeTab={activeTab} onTabSwitch={handleTabSwitch} />
           </div>
         </div>
 
-        {/* Filters and Results Section */}
         <div className="p-6">
-          {/* Filters */}
           <div className="mb-8">
             <ArtistsFilters />
           </div>
 
-          {/* Results */}
           {noSearchNoFilters ? (
             <SearchEmptyState />
           ) : (
-            <SearchResults
-              search={debouncedQuery}
-              activeTab={activeTab as "artworks" | "artists"}
-            />
+            <SearchResults search={debouncedQuery} activeTab={activeTab} />
           )}
         </div>
       </div>

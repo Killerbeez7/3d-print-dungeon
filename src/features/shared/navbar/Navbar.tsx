@@ -3,12 +3,12 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 // hooks
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useUserRole } from "@/features/auth/hooks/useUserRole";
-import { useSearch } from "@/features/search/hooks/useSearch";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { useModal } from "@/features/shared/modal/hooks/useModal"; // NEW
 // configs
 import { NAV_SECTIONS } from "@/config/navConfig";
 import { STATIC_ASSETS } from "@/config/assetsConfig";
+import { ROUTES } from "@/constants/routeConstants";
 // components
 import { AuthButtons } from "./AuthButtons";
 import { GlobalSearch } from "@/features/search/components/GlobalSearch";
@@ -60,7 +60,6 @@ const navItemIcons: Record<string, IconType> = {
 export const Navbar = (): React.ReactNode => {
   const { isAdmin } = useUserRole();
   const { currentUser, publicProfile, handleSignOut, loading } = useAuth();
-  const { setShowDropdown } = useSearch();
   const { open } = useModal("auth");
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
@@ -78,8 +77,7 @@ export const Navbar = (): React.ReactNode => {
     setActiveDropdown(null);
     setMobileDropdown(null);
     setIsMobileMenuOpen(false);
-    setShowDropdown(false);
-  }, [setShowDropdown]);
+  }, []);
 
   const handleLogoClick = (): void => {
     if (location.pathname === "/") {
@@ -118,7 +116,7 @@ export const Navbar = (): React.ReactNode => {
   };
 
   const handleSearchClick = (): void => {
-    navigate("/search?query=");
+    navigate(`${ROUTES.SEARCH}?sort_by=relevance`);
   };
 
   // Outside click and route change cleanup.
@@ -427,7 +425,7 @@ export const Navbar = (): React.ReactNode => {
         )}
 
         {/* Mobile Search */}
-        <div className="p-4 divider-top" onClick={() => setShowDropdown(false)}>
+        <div className="p-4 divider-top">
           <GlobalSearch />
         </div>
 

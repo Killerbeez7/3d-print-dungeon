@@ -1,22 +1,26 @@
 import { ArtworksTab } from "./ArtworksTab";
 import { ArtistsTab } from "./ArtistsTab";
 
-export const SearchResults = ({ 
-    search, 
-    activeTab,
-    onResultsCount
-}: { 
-    search: string; 
-    activeTab: "artworks" | "artists";
-    onResultsCount?: (count: number) => void;
-}) => {
-    return (
-        <>
-            {activeTab === "artworks" ? (
-                <ArtworksTab search={search} onResultsCount={onResultsCount} />
-            ) : (
-                <ArtistsTab search={search} />
-            )}
-        </>
-    );
+import type { SearchTab } from "../types/search";
+
+interface SearchResultProps {
+  search: string;
+  activeTab: SearchTab;
+  onResultsCount?: (count: number) => void;
+}
+
+export const SearchResults = ({
+  search,
+  activeTab,
+  onResultsCount,
+}: SearchResultProps) => {
+  if (activeTab === "artists") {
+    return <ArtistsTab search={search} />;
+  }
+
+  return (
+    <>
+      <ArtworksTab search={search} onResultsCount={onResultsCount} />
+    </>
+  );
 };
