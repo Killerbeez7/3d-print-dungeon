@@ -11,7 +11,7 @@ import { AlertModal } from "../AlertModal";
 import { CookieSettingsModal } from "@/features/cookies/components/CookieSettingsModal";
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/constants/routeConstants";
-import { FORUM_HOME_PATH } from "@/features/forum/constants/forumPaths";
+import { FORUM_PATHS } from "@/features/forum/constants/forumPaths";
 
 export const Footer = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -82,7 +82,7 @@ export const Footer = () => {
                     Events
                   </Link>
                   <Link
-                    to={FORUM_HOME_PATH}
+                    to={FORUM_PATHS.HOME}
                     className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
                   >
                     Forum
