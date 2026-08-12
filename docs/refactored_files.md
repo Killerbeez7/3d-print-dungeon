@@ -33,7 +33,11 @@ keep code clean and readable, refactor only the business logic and leave UI for 
 ## Search
 - [x] **Architecture/business logic**
 - [ ] **UI/UX polish**
-- [ ] 
+
+## Forum
+- [x] **Architecture/business logic**
+- [ ] **UI/UX polish**
+  
 ---
 
 # User

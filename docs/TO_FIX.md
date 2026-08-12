@@ -8,6 +8,7 @@
 8. [ ] - on model like the text change from "like" to "likes" moves the favorite icon/text
 9. [ ] - add small "x" button in user notifications to be able to delete them from the dropdown, and handle the click notification logic better
 10. [ ] - when using search artworks and set sort filter then delete the query and i get all models, it should be empty
+11. [ ] - decide if forum categories should live on firestore or in conf file
 
 ## Backend / Cloud Functions audit
 
