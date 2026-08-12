@@ -3,7 +3,6 @@ import { collection, query, limit, getDocs, getDoc, doc } from "firebase/firesto
 import type { ArtistData } from "@/features/artists/types/artists";
 import type { PublicProfileView } from "@/features/user/profile";
 
-// Search for artists using the new user schema
 export async function searchArtists(
   searchTerm: string,
   limitCount: number = 5
@@ -13,11 +12,7 @@ export async function searchArtists(
       return [];
     }
 
-    // Get all users first, then filter by isArtist in public profile
-    const usersQuery = query(
-      collection(db, "users"),
-      limit(100) // Get more to filter from
-    );
+    const usersQuery = query(collection(db, "users"), limit(100));
 
     const usersSnap = await getDocs(usersQuery);
     const userUids = usersSnap.docs.map((doc) => doc.id);
@@ -26,10 +21,8 @@ export async function searchArtists(
       return [];
     }
 
-    // Fetch public profiles for all users and filter for artists
     const publicProfiles: PublicProfileView[] = [];
 
-    // Process in batches to avoid too many concurrent requests
     const batchSize = 10;
     for (let i = 0; i < userUids.length; i += batchSize) {
       const batch = userUids.slice(i, i + batchSize);
@@ -55,7 +48,6 @@ export async function searchArtists(
       publicProfiles.push(...(batchResults.filter(Boolean) as PublicProfileView[]));
     }
 
-    // Filter by search term
     const searchLower = searchTerm.toLowerCase();
     console.log("Search service - Searching for:", searchLower);
     console.log(
@@ -77,7 +69,6 @@ export async function searchArtists(
     console.log("Search service - Total artists found:", publicProfiles.length);
     console.log("Search service - Filtered artists:", filteredArtists.length);
 
-    // Convert to ArtistData format and limit results
     const artistResults: ArtistData[] = filteredArtists
       .slice(0, limitCount)
       .map((artist) => ({
@@ -96,17 +87,12 @@ export async function searchArtists(
   }
 }
 
-// Get all artists for pagination (used in artists list page)
 export async function fetchArtistsForSearch(
   searchTerm?: string,
   limitCount: number = 32
 ): Promise<ArtistData[]> {
   try {
-    // Get all users first, then filter by isArtist in public profile
-    const usersQuery = query(
-      collection(db, "users"),
-      limit(200) // Get more to filter from
-    );
+    const usersQuery = query(collection(db, "users"), limit(200));
 
     const usersSnap = await getDocs(usersQuery);
     const userUids = usersSnap.docs.map((doc) => doc.id);
@@ -115,10 +101,8 @@ export async function fetchArtistsForSearch(
       return [];
     }
 
-    // Fetch public profiles for all users and filter for artists
     const publicProfiles: PublicProfileView[] = [];
 
-    // Process in batches
     const batchSize = 10;
     for (let i = 0; i < userUids.length; i += batchSize) {
       const batch = userUids.slice(i, i + batchSize);
@@ -128,7 +112,6 @@ export async function fetchArtistsForSearch(
           const publicSnap = await getDoc(publicRef);
           if (publicSnap.exists()) {
             const data = publicSnap.data() as PublicProfileView;
-            // Only include users who are artists
             if (data.isArtist) {
               return { ...data, uid };
             }
@@ -144,7 +127,6 @@ export async function fetchArtistsForSearch(
       publicProfiles.push(...(batchResults.filter(Boolean) as PublicProfileView[]));
     }
 
-    // Filter by search term if provided
     let filteredArtists = publicProfiles;
     if (searchTerm?.trim()) {
       const searchLower = searchTerm.toLowerCase();
@@ -157,7 +139,6 @@ export async function fetchArtistsForSearch(
       });
     }
 
-    // Convert to ArtistData format and limit results
     const artistResults: ArtistData[] = filteredArtists
       .slice(0, limitCount)
       .map((artist) => ({

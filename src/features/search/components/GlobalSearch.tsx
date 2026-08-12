@@ -1,211 +1,221 @@
+import { useState, useEffect, useRef, type FormEvent, type ChangeEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
-import {
-    useState,
-    useEffect,
-    useRef,
-    type ChangeEvent,
-    type FormEvent,
-    type MouseEvent,
-} from "react";
-import { useNavigate } from "react-router-dom";
-import { useSearch } from "@/features/search/hooks/useSearch";
+
+import { ROUTES } from "@/constants/routeConstants";
 import { searchArtists } from "@/features/search/services/searchService";
+import type { SearchTab } from "../types/search";
 import type { ArtistData } from "@/features/artists/types/artists";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
 
 export function GlobalSearch() {
-    const {
-        searchTerm,
-        setSearchTerm,
-        setActiveTab,
-        showDropdown,
-        setShowDropdown,
-        handleClearSearch,
-    } = useSearch();
-    const [artistResults, setArtistResults] = useState<ArtistData[]>([]);
-    const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
-    const containerRef = useRef<HTMLFormElement>(null);
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    // Check for mobile screen size
-    useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth < 768);
-            if (window.innerWidth < 768) {
-                setShowDropdown(false);
-            }
-        };
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [artistResults, setArtistResults] = useState<ArtistData[]>([]);
+  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
 
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, [setShowDropdown]);
+  const containerRef = useRef<HTMLFormElement>(null);
 
-    // Update global search term as the user types.
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
-    };
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
 
-    // Fetch top 5 artists for the dropdown while user types.
-    useEffect(() => {
-        if (!showDropdown) return;
-        if (!searchTerm.trim()) {
-            setArtistResults([]);
-            return;
-        }
-        const timer = setTimeout(async () => {
-            try {
-                const artists = await searchArtists(searchTerm, 5);
-                setArtistResults(artists);
-            } catch (err) {
-                console.error("Error fetching artists:", err);
-                setArtistResults([]);
-            }
-        }, 300);
-        return () => clearTimeout(timer);
-    }, [showDropdown, searchTerm]);
+      setIsMobile(mobile);
 
-    // On submit, update URL (static query) and clear the global input.
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        const queryValue = searchTerm.trim();
-
-        // Only add query parameter if there's actually a query
-        if (queryValue) {
-            navigate(`/search?sort_by=relevance&query=${encodeURIComponent(queryValue)}`);
-        } else {
-            navigate(`/search?sort_by=relevance`);
-        }
-
-        setActiveTab("artworks");
-        setSearchTerm("");
+      if (mobile) {
         setShowDropdown(false);
-        if (document.activeElement instanceof HTMLElement) {
-            document.activeElement.blur();
-        }
+      }
     };
 
-    // Clicking a preset link sets the active tab accordingly,
-    // navigates to Dynamic Search with the current query, and clears the global input.
-    const handlePresetClick = (preset: string) => {
-        setActiveTab(preset);
-        const currentQuery = searchTerm.trim();
+    window.addEventListener("resize", handleResize);
 
-        // Navigate to the appropriate route based on the preset
-        if (preset === "artworks") {
-            if (currentQuery) {
-                navigate(
-                    `/search?sort_by=relevance&query=${encodeURIComponent(currentQuery)}`
-                );
-            } else {
-                navigate(`/search?sort_by=relevance`);
-            }
-        } else {
-            if (currentQuery) {
-                navigate(
-                    `/search/artists?sort_by=followers&query=${encodeURIComponent(
-                        currentQuery
-                    )}`
-                );
-            } else {
-                navigate(`/search/artists?sort_by=followers`);
-            }
-        }
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-        setSearchTerm("");
-        setShowDropdown(false);
+  useEffect(() => {
+    if (!showDropdown) {
+      return;
+    }
+
+    if (!searchTerm.trim()) {
+      setArtistResults([]);
+
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      try {
+        const artists = await searchArtists(searchTerm, 5);
+
+        setArtistResults(artists);
+      } catch (error) {
+        console.error("Error fetching artists:", error);
+
+        setArtistResults([]);
+      }
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [showDropdown, searchTerm]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!containerRef.current) {
+        return;
+      }
+
+      if (containerRef.current.contains(event.target as Node)) {
+        return;
+      }
+
+      setShowDropdown(false);
     };
 
-    // Close dropdown on click outside (but do not reset the input).
-    useEffect(() => {
-        function handleClickOutside(e: MouseEvent | globalThis.MouseEvent) {
-            if (
-                containerRef.current &&
-                !containerRef.current.contains(e.target as Node)
-            ) {
-                setShowDropdown(false);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [setShowDropdown]);
+    document.addEventListener("mousedown", handleClickOutside);
 
-    const handleFocus = () => {
-        if (!isMobile) {
-            setShowDropdown(true);
-        }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
     };
+  }, []);
 
-    // Clicking on an artist in the dropdown navigates to their profile.
-    const handleArtistSelect = (artist: ArtistData) => {
-        const urlSafeUsername = toUrlSafeUsername(artist.username);
-        navigate(`/${urlSafeUsername}`);
-        setShowDropdown(false);
-        setSearchTerm("");
-    };
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
 
-    return (
-        <form
-            onSubmit={handleSubmit}
-            className="relative w-full max-w-[1000px]"
-            ref={containerRef}
+  const handleClearSearch = () => {
+    setSearchTerm("");
+    setArtistResults([]);
+    setShowDropdown(false);
+
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    const query = searchTerm.trim();
+
+    if (query) {
+      navigate(`${ROUTES.SEARCH}?sort_by=relevance&query=${encodeURIComponent(query)}`);
+    } else {
+      navigate(`${ROUTES.SEARCH}?sort_by=relevance`);
+    }
+
+    handleClearSearch();
+  };
+
+  const handlePresetClick = (tab: SearchTab) => {
+    const query = searchTerm.trim();
+
+    if (tab === "artworks") {
+      if (query) {
+        navigate(`${ROUTES.SEARCH}?sort_by=relevance&query=${encodeURIComponent(query)}`);
+      } else {
+        navigate(`${ROUTES.SEARCH}?sort_by=relevance`);
+      }
+
+      handleClearSearch();
+
+      return;
+    }
+
+    if (query) {
+      navigate(
+        `${ROUTES.SEARCH_ARTISTS}?sort_by=followers&query=${encodeURIComponent(query)}`
+      );
+    } else {
+      navigate(`${ROUTES.SEARCH_ARTISTS}?sort_by=followers`);
+    }
+
+    handleClearSearch();
+  };
+
+  const handleFocus = () => {
+    if (isMobile) {
+      return;
+    }
+
+    setShowDropdown(true);
+  };
+
+  const handleArtistSelect = (artist: ArtistData) => {
+    const username = toUrlSafeUsername(artist.username);
+
+    navigate(`/${username}`);
+
+    handleClearSearch();
+  };
+
+  return (
+    <form
+      ref={containerRef}
+      onSubmit={handleSubmit}
+      className="relative w-full max-w-[1000px]"
+    >
+      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted pointer-events-none">
+        <FontAwesomeIcon icon={faSearch} />
+      </span>
+
+      <input
+        type="text"
+        placeholder="Search"
+        value={searchTerm}
+        onChange={handleInputChange}
+        onFocus={handleFocus}
+        className="h-10 w-full rounded-full border border-br-secondary/80 bg-bg-primary/70 py-2 pl-10 pr-10 text-sm text-txt-primary placeholder:text-txt-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
+      />
+
+      {searchTerm && (
+        <button
+          type="button"
+          onClick={handleClearSearch}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-muted hover:text-txt-secondary"
         >
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted pointer-events-none">
-                <FontAwesomeIcon icon={faSearch} />
-            </span>
-            <input
-                type="text"
-                placeholder="Search"
-                value={searchTerm}
-                onChange={handleInputChange}
-                onFocus={handleFocus}
-                className="h-10 w-full rounded-full border border-br-secondary/80 bg-bg-primary/70 py-2 pl-10 pr-10 text-sm text-txt-primary placeholder:text-txt-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
-            />
-            {searchTerm && (
-                <button
-                    type="button"
-                    onClick={handleClearSearch}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-muted hover:text-txt-secondary"
-                >
-                    <FontAwesomeIcon icon={faTimes} />
-                </button>
+          <FontAwesomeIcon icon={faTimes} />
+        </button>
+      )}
+
+      {/* Search dropdown */}
+      {!isMobile && showDropdown && (
+        <div className="absolute left-0 top-[110%] z-50 mt-1 w-full rounded-lg border border-br-secondary bg-surface-elevated text-txt-primary shadow-lg">
+          <ul className="py-2 max-h-80 overflow-auto text-sm">
+            {searchTerm.trim() && artistResults.length > 0 && (
+              <>
+                {/* Search results */}
+                {artistResults.map((artist) => (
+                  <li
+                    key={`artist-${artist.uid}`}
+                    onMouseDown={() => handleArtistSelect(artist)}
+                    className="cursor-pointer px-3 py-2 hover:bg-bg-surface"
+                  >
+                    <div className="font-medium">{artist.displayName}</div>
+                    <div className="text-xs text-txt-muted">Artist</div>
+                  </li>
+                ))}
+                <hr className="my-2 border-br-secondary" />
+              </>
             )}
-            {!isMobile && showDropdown && (
-                <div className="absolute left-0 top-[110%] z-50 mt-1 w-full rounded-lg border border-br-secondary bg-surface-elevated text-txt-primary shadow-lg">
-                    <ul className="py-2 max-h-80 overflow-auto text-sm">
-                        {searchTerm.trim() && artistResults.length > 0 && (
-                            <>
-                                {artistResults.map((a) => (
-                                    <li
-                                        key={`artist-${a.uid}`}
-                                        onMouseDown={() => handleArtistSelect(a)}
-                                        className="cursor-pointer px-3 py-2 hover:bg-bg-surface"
-                                    >
-                                        <div className="font-medium">{a.displayName}</div>
-                                        <div className="text-xs text-txt-muted">
-                                            Artist
-                                        </div>
-                                    </li>
-                                ))}
-                                <hr className="my-2 border-br-secondary" />
-                            </>
-                        )}
-                        {/* Preset links */}
-                        <li
-                            onMouseDown={() => handlePresetClick("artworks")}
-                            className={`px-3 py-2 cursor-pointer flex justify-between items-center text-txt-secondary hover:text-txt-primary`}
-                        >
-                            <span>Search Artworks</span>
-                        </li>
-                        <li
-                            onMouseDown={() => handlePresetClick("artists")}
-                            className={`px-3 py-2 cursor-pointer flex justify-between items-center text-txt-secondary hover:text-txt-primary`}
-                        >
-                            <span>Search Artists</span>
-                        </li>
-                    </ul>
-                </div>
-            )}
-        </form>
-    );
+            {/* Preset links */}
+            <li
+              onMouseDown={() => handlePresetClick("artworks")}
+              className={`px-3 py-2 cursor-pointer flex justify-between items-center text-txt-secondary hover:text-txt-primary`}
+            >
+              <span>Search Artworks</span>
+            </li>
+            <li
+              onMouseDown={() => handlePresetClick("artists")}
+              className={`px-3 py-2 cursor-pointer flex justify-between items-center text-txt-secondary hover:text-txt-primary`}
+            >
+              <span>Search Artists</span>
+            </li>
+          </ul>
+        </div>
+      )}
+    </form>
+  );
 }

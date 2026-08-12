@@ -1,31 +1,39 @@
 import { useState, useEffect, type ChangeEvent } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import { useSearch } from "./useSearch";
+import { useNavigate, useSearchParams } from "react-router-dom";
+
+import { ROUTES } from "@/constants/routeConstants";
+import type { SearchTab } from "../types/search";
 
 export const useArtistsSearchPage = () => {
   const navigate = useNavigate();
-
-  const { activeTab, setActiveTab } = useSearch();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [localQuery, setLocalQuery] = useState(() => searchParams.get("query") ?? "");
-  const [debouncedQuery, setDebouncedQuery] = useState(
-    () => searchParams.get("query") ?? ""
-  );
 
-  // Ensure the artists tab has default sort
+  const queryParam = searchParams.get("query") ?? "";
+
+  const [localQuery, setLocalQuery] = useState<string>(queryParam);
+  const [debouncedQuery, setDebouncedQuery] = useState<string>(queryParam.trim());
+
+  const activeTab: SearchTab = "artists";
+
   useEffect(() => {
-    if (activeTab === "artists" && !searchParams.has("sort_by")) {
-      setSearchParams((current) => {
-        const next = new URLSearchParams(current);
-
-        next.set("sort_by", "followers");
-
-        return next;
-      });
+    if (searchParams.has("sort_by")) {
+      return;
     }
-  }, [activeTab, searchParams, setSearchParams]);
 
-  // Debounce search input and sync it with the URL
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+
+      next.set("sort_by", "followers");
+
+      return next;
+    });
+  }, [searchParams, setSearchParams]);
+
+  useEffect(() => {
+    setLocalQuery(queryParam);
+    setDebouncedQuery(queryParam.trim());
+  }, [queryParam]);
+
   useEffect(() => {
     const timer = window.setTimeout(() => {
       const query = localQuery.trim();
@@ -52,26 +60,31 @@ export const useArtistsSearchPage = () => {
 
   const noSearchNoFilters = !debouncedQuery.trim();
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setLocalQuery(e.target.value);
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setLocalQuery(event.target.value);
   };
 
   const handleClear = () => {
     setLocalQuery("");
-  };
-
-  const handleTabSwitch = (tab: string) => {
-    setActiveTab(tab);
-
-    setLocalQuery("");
     setDebouncedQuery("");
 
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+
+      next.delete("query");
+
+      return next;
+    });
+  };
+
+  const handleTabSwitch = (tab: SearchTab) => {
     if (tab === "artworks") {
-      navigate("/search?sort_by=relevance");
+      navigate(`${ROUTES.SEARCH}?sort_by=relevance`);
+
       return;
     }
 
-    navigate("/search/artists?sort_by=followers");
+    navigate(`${ROUTES.SEARCH_ARTISTS}?sort_by=followers`);
   };
 
   return {
