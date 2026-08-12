@@ -1,14 +1,11 @@
 import { lazy, Suspense } from "react";
-import { ForumProvider } from "@/features/forum/providers/forumProvider";
 import { withProtected } from "@/helpers/routeHelpers";
 import type { RouteObject } from "react-router-dom";
 
-// Layout
 const ForumLayout = lazy(() =>
   import("../components/Layout").then((m) => ({ default: m.ForumLayout }))
 );
 
-// Pages and Components
 const ForumHome = lazy(() =>
   import("../pages/ForumHome").then((m) => ({ default: m.ForumHome }))
 );
@@ -54,11 +51,9 @@ export const forumRoutes: RouteObject[] = [
   {
     path: FORUM_ROUTES.FORUM,
     element: (
-      <ForumProvider>
-        <Suspense>
-          <ForumLayout />
-        </Suspense>
-      </ForumProvider>
+      <Suspense>
+        <ForumLayout />
+      </Suspense>
     ),
     children: [
       {
