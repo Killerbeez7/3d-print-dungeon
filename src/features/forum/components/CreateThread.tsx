@@ -1,66 +1,62 @@
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useForum } from "@/features/forum/hooks/useForum";
+
+import { FORUM_CATEGORIES } from "@/config/forumCategories";
+
+import { FORUM_PATHS } from "../constants/forumPaths";
+import { useCreateThread, useFetchCategories } from "../hooks";
+
 import { ThreadEditor } from "./ThreadEditor";
-import { useState, type FC } from "react";
-import { FORUM_HOME_PATH } from "@/features/forum/constants/forumPaths";
 
-export const CreateThread: FC = () => {
-    const [searchParams] = useSearchParams();
-    const navigate = useNavigate();
+import type { CreateThreadInput } from "../types/forum";
 
-    const { categories, createThread, loading } = useForum();
-    const [submitError, setSubmitError] = useState<string | null>(null);
+export const CreateThread = () => {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
-    const newThreadData = {
-        title: "",
-        content: "",
-        categoryId: searchParams.get("category") || "",
-    };
+  const { data: fetchedCategories = [] } = useFetchCategories();
 
-    const handleNewThreadSubmit = async (data: {
-        title?: string;
-        content?: string;
-        categoryId?: string;
-        authorId?: string;
-        authorName?: string;
-        authorPhotoURL?: string;
-        createdAt?: Date;
-        lastActivity?: Date;
-        views?: number;
-        replyCount?: number;
-        isPinned?: boolean;
-        isLocked?: boolean;
-        tags?: string[];
-    }) => {
-        setSubmitError(null);
-        try {
-            const threadId = await createThread(data);
-            navigate(`/forum/thread/${threadId}`);
-        } catch (error) {
-            console.error("Error creating thread:", error);
-            setSubmitError(
-                error instanceof Error
-                    ? error.message
-                    : "Unable to create the thread. Please try again."
-            );
-        }
-    };
+  const { mutateAsync: createThread, isPending, error } = useCreateThread();
 
-    return (
-        <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
-            <h1 className="text-2xl font-bold mb-6">Create New Thread</h1>
-            {submitError && (
-                <div className="mb-4 rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">
-                    {submitError}
-                </div>
-            )}
-            <ThreadEditor
-                initialData={newThreadData}
-                categories={categories}
-                onSubmit={handleNewThreadSubmit}
-                onCancel={() => navigate(FORUM_HOME_PATH)}
-                isLoading={loading}
-            />
+  const categories = fetchedCategories.length > 0 ? fetchedCategories : FORUM_CATEGORIES;
+
+  const initialData: CreateThreadInput = {
+    title: "",
+    content: "",
+    categoryId: searchParams.get("category") ?? "",
+    tags: [],
+  };
+
+  const handleSubmit = async (data: CreateThreadInput): Promise<void> => {
+    try {
+      const threadId = await createThread(data);
+
+      navigate(FORUM_PATHS.THREAD(threadId));
+    } catch {
+      // The mutation error is rendered below.
+    }
+  };
+
+  const handleCancel = () => {
+    navigate(FORUM_PATHS.HOME);
+  };
+
+  return (
+    <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+      <h1 className="text-2xl font-bold mb-6">Create New Thread</h1>
+
+      {error && (
+        <div className="mb-4 rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">
+          {error.message}
         </div>
-    );
+      )}
+
+      <ThreadEditor
+        initialData={initialData}
+        categories={categories}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        isLoading={isPending}
+      />
+    </div>
+  );
 };

@@ -1,137 +1,154 @@
-import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useForum } from "@/features/forum/hooks/useForum";
+import { useNavigate, useParams } from "react-router-dom";
+
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { ThreadEditor } from "./ThreadEditor";
+import { useFetchCategories, useFetchThread, useUpdateThread } from "../hooks";
+
+import { FORUM_CATEGORIES } from "@/config/forumCategories";
+import { FORUM_PATHS } from "../constants/forumPaths";
+
 import Skeleton from "@/features/shared/Skeleton";
-import { FORUM_PATHS, FORUM_HOME_PATH } from "@/features/forum/constants/forumPaths";
-import type { FC } from "react";
+import { ThreadEditor } from "./ThreadEditor";
 
-export const EditThread: FC = () => {
-    const { threadId } = useParams<Record<string, string | undefined>>();
-    const navigate = useNavigate();
-    const { currentUser } = useAuth();
+import type { CreateThreadInput } from "../types/forum";
 
-    const { loadThread, updateThread, currentThread, categories, loading, error } =
-        useForum();
+export const EditThread = () => {
+  const navigate = useNavigate();
+  const { threadId } = useParams();
+  const { currentUser } = useAuth();
 
-    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const { data: thread, isLoading, error: threadError } = useFetchThread(threadId);
+  const { data: fetchedCategories = [] } = useFetchCategories();
+  const { mutateAsync: updateThread, isPending, error: updateError } = useUpdateThread();
 
-    useEffect(() => {
-        if (threadId) {
-            loadThread(threadId);
-        }
-    }, [threadId, loadThread]);
+  const categories = fetchedCategories.length > 0 ? fetchedCategories : FORUM_CATEGORIES;
 
-    const handleEditThreadSubmit = async (data: {
-        title?: string;
-        content?: string;
-        categoryId?: string;
-        tags?: string[];
-    }) => {
-        if (!threadId) return;
-
-        setIsSubmitting(true);
-        try {
-            await updateThread(threadId, data);
-            navigate(FORUM_PATHS.THREAD(threadId));
-        } catch (error) {
-            console.error("Error updating thread:", error);
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
-
-    const handleCancel = () => {
-        if (threadId) {
-            navigate(FORUM_PATHS.THREAD(threadId));
-        } else {
-            navigate(FORUM_HOME_PATH);
-        }
-    };
-
-    // Loading state
-    if (loading && !currentThread) {
-        return (
-            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
-                <Skeleton className="h-8 w-3/4 mb-6" />
-                <Skeleton className="h-4 w-full mb-4" />
-                <Skeleton className="h-4 w-3/4 mb-4" />
-                <Skeleton className="h-32 w-full mb-4" />
-                <Skeleton className="h-4 w-1/2" />
-            </div>
-        );
+  const handleSubmit = async (data: CreateThreadInput): Promise<void> => {
+    if (!threadId) {
+      return;
     }
 
-    // Error state
-    if (error) {
-        return (
-            <div className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg text-red-700 dark:text-red-400">
-                <h2 className="text-lg font-semibold mb-2">Error Loading Thread</h2>
-                <p>{error}</p>
-                <button
-                    onClick={() => navigate(FORUM_HOME_PATH)}
-                    className="mt-4 inline-block text-[var(--accent)] hover:underline"
-                >
-                    Return to Forum
-                </button>
-            </div>
-        );
+    try {
+      await updateThread({
+        threadId,
+        data,
+      });
+
+      navigate(FORUM_PATHS.THREAD(threadId));
+    } catch {
+      // Mutation error is rendered below.
+    }
+  };
+
+  const handleCancel = () => {
+    if (threadId) {
+      navigate(FORUM_PATHS.THREAD(threadId));
+      return;
     }
 
-    // No thread found
-    if (!currentThread) {
-        return (
-            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
-                <h2 className="text-xl font-semibold mb-4">Thread Not Found</h2>
-                <p className="text-[var(--txt-secondary)] mb-6">
-                    The thread you&apos;re looking for may have been moved or deleted.
-                </p>
-                <button
-                    onClick={() => navigate(FORUM_HOME_PATH)}
-                    className="inline-block px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
-                >
-                    Return to Forum
-                </button>
-            </div>
-        );
-    }
+    navigate(FORUM_PATHS.HOME);
+  };
 
-    const editThreadData = {
-        title: currentThread.title,
-        content: currentThread.content,
-        categoryId: currentThread.categoryId,
-        tags: currentThread.tags || [],
-    };
-
-    if (currentUser?.uid !== currentThread.authorId) {
-        return (
-            <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-3">Cannot edit this thread</h2>
-                <p className="text-[var(--txt-secondary)] mb-6">
-                    You can only edit threads that you created.
-                </p>
-                <button
-                    onClick={() => navigate(FORUM_PATHS.THREAD(currentThread.id))}
-                    className="inline-block px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
-                >
-                    Back to Thread
-                </button>
-            </div>
-        );
-    }
-
+  if (isLoading) {
     return (
-        <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
-            <h1 className="text-2xl font-bold mb-6">Edit Thread</h1>
-            <ThreadEditor
-                initialData={editThreadData}
-                categories={categories}
-                onSubmit={handleEditThreadSubmit}
-                onCancel={handleCancel}
-                isLoading={isSubmitting}
-                isEdit={true}
-            />
-        </div>
+      <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+        <Skeleton className="h-8 w-3/4 mb-6" />
+        <Skeleton className="h-4 w-full mb-4" />
+        <Skeleton className="h-4 w-3/4 mb-4" />
+        <Skeleton className="h-32 w-full mb-4" />
+        <Skeleton className="h-4 w-1/2" />
+      </div>
     );
+  }
+
+  if (threadError) {
+    return (
+      <div className="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg text-red-700 dark:text-red-400">
+        <h2 className="text-lg font-semibold mb-2">Error Loading Thread</h2>
+
+        <p>{threadError.message}</p>
+
+        <button
+          type="button"
+          onClick={() => {
+            navigate(FORUM_PATHS.HOME);
+          }}
+          className="mt-4 inline-block text-[var(--accent)] hover:underline"
+        >
+          Return to Forum
+        </button>
+      </div>
+    );
+  }
+
+  if (!threadId || !thread) {
+    return (
+      <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
+        <h2 className="text-xl font-semibold mb-4">Thread Not Found</h2>
+
+        <p className="text-[var(--txt-secondary)] mb-6">
+          The thread you&apos;re looking for may have been moved or deleted.
+        </p>
+
+        <button
+          type="button"
+          onClick={() => {
+            navigate(FORUM_PATHS.HOME);
+          }}
+          className="inline-block px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
+        >
+          Return to Forum
+        </button>
+      </div>
+    );
+  }
+
+  if (currentUser?.uid !== thread.authorId) {
+    return (
+      <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-3">Cannot edit this thread</h2>
+
+        <p className="text-[var(--txt-secondary)] mb-6">
+          You can only edit threads that you created.
+        </p>
+
+        <button
+          type="button"
+          onClick={() => {
+            navigate(FORUM_PATHS.THREAD(thread.id));
+          }}
+          className="inline-block px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
+        >
+          Back to Thread
+        </button>
+      </div>
+    );
+  }
+
+  const initialData: CreateThreadInput = {
+    title: thread.title,
+    content: thread.content,
+    categoryId: thread.categoryId,
+    tags: thread.tags ?? [],
+  };
+
+  return (
+    <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+      <h1 className="text-2xl font-bold mb-6">Edit Thread</h1>
+
+      {updateError && (
+        <div className="mb-4 rounded-lg border border-red-500/40 bg-red-500/10 p-3 text-sm text-red-300">
+          {updateError.message}
+        </div>
+      )}
+
+      <ThreadEditor
+        initialData={initialData}
+        categories={categories}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        isLoading={isPending}
+        isEdit
+      />
+    </div>
+  );
 };
