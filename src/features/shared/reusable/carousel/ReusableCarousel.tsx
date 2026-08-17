@@ -31,7 +31,7 @@ const NextArrow = ({ className, style, onClick }: ArrowProps) => (
     }}
     onClick={onClick}
   >
-    <FaArrowRight style={{ color: "var(--txt-highlight)", fontSize: "20px" }} />
+    <FaArrowRight className="text-xl text-white" />
   </div>
 );
 
@@ -55,7 +55,7 @@ const PrevArrow = ({ className, style, onClick }: ArrowProps) => (
     }}
     onClick={onClick}
   >
-    <FaArrowLeft style={{ color: "var(--txt-highlight)", fontSize: "20px" }} />
+    <FaArrowLeft className="text-xl text-white" />
   </div>
 );
 

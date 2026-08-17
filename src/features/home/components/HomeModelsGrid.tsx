@@ -39,18 +39,18 @@ export const HomeModelsGrid = ({
             </div>
 
             {/* Hover metadata */}
-            <div className="pointer-events-none absolute inset-0 flex items-end rounded-lg bg-gradient-to-t from-page/95 via-page/55 to-transparent p-3 text-txt-highlight opacity-0 translate-y-3 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100">
+            <div className="pointer-events-none absolute inset-0 flex translate-y-3 items-end rounded-lg bg-gradient-to-t from-surface-overlay via-surface-overlay/35 to-transparent p-3 text-white opacity-0 transition-all duration-300 ease-out group-hover:translate-y-0 group-hover:opacity-100">
               <div className="w-full">
                 <div>
-                  <p className="mb-0.5 truncate text-sm font-bold leading-tight text-txt-highlight drop-shadow-lg md:text-[0.95rem]">
+                  <p className="mb-0.5 truncate text-sm font-bold leading-tight text-white drop-shadow-lg md:text-[0.95rem]">
                     {m.name}
                   </p>
                   <div className="flex items-center gap-1.5">
-                    <span className="truncate text-[0.72rem] font-medium text-txt-highlight/78">
+                    <span className="truncate text-[0.72rem] font-medium text-white/80">
                       by {m.uploaderDisplayName}
                     </span>
-                    <div className="h-0.5 w-0.5 rounded-full bg-txt-highlight/55"></div>
-                    <span className="text-[0.65rem] text-txt-highlight/58">3D Model</span>
+                    <div className="h-0.5 w-0.5 rounded-full bg-white/55" />
+                    <span className="text-[0.65rem] text-white/60">3D Model</span>
                   </div>
                 </div>
               </div>

@@ -35,7 +35,7 @@ export const TrendingCarousel: FC<TrendingCarouselProps> = ({ items }) => {
         </div>
 
         {/* Overlay Content */}
-        <div className="absolute inset-0 bg-gradient-to-t from-page/70 to-transparent flex flex-col justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-t from-surface-overlay to-transparent flex flex-col justify-between p-4 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
           {/* Top Content - Mature Badge */}
           {item.mature && (
             <div className="self-start rounded bg-error px-2 py-1 text-xs font-semibold text-txt-highlight">

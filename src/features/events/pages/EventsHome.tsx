@@ -47,7 +47,7 @@ export const EventsHome = () => {
             <button
               key={key}
               onClick={() => setType(key as EventType | "all")}
-              className={`flex-1 px-2 sm:px-4 py-2 rounded font-semibold transition text-center text-sm sm:text-base
+              className={`flex-1 px-2 sm:px-4 py-2 rounded font-semibold transition text-center text-sm sm:text-base hover:cursor-pointer
                     ${
                       type === key
                         ? "bg-btn-primary text-btn-primary-text"
@@ -63,7 +63,16 @@ export const EventsHome = () => {
         </div>
         {/* Create Event button below, same width as a tab */}
         <div className="flex mt-2">
-          <Button onClick={() => setShowCreate(true)}>Create Event</Button>
+          <div className="mt-2 w-full">
+            <Button
+              type="button"
+              onClick={() => setShowCreate(true)}
+              fullWidth
+              className="bg-success hover:bg-success/80 text-txt-inverse"
+            >
+              + Create Event
+            </Button>
+          </div>
         </div>
       </div>
 

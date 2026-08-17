@@ -160,6 +160,7 @@ h6 {
 
   --color-surface-card: var(--surface-card);
   --color-surface-elevated: var(--surface-elevated);
+  --color-surface-overlay: var(--surface-overlay);
 
   --color-txt-primary: var(--txt-primary);
   --color-txt-secondary: var(--txt-secondary);

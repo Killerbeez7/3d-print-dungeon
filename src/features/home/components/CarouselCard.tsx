@@ -62,8 +62,8 @@ export const CarouselCard = ({
         />
 
         {/* Base gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-page/82 via-page/25 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-b from-page/12 via-transparent to-transparent pointer-events-none" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-surface-overlay via-surface-overlay/20 to-transparent" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-transparent" />
 
         {/* Hover gradient overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(var(--accent-rgb),0.1),transparent_58%)] pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -80,14 +80,14 @@ export const CarouselCard = ({
         )}
 
         {/* Content */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 text-txt-highlight pointer-events-none">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 p-4 text-white">
           <div className="max-w-[92%]">
-            <h3 className="mb-1 line-clamp-2 text-[1.05rem] font-bold leading-[1.12] text-txt-highlight drop-shadow md:text-[1.15rem]!">
+            <h3 className="mb-1 line-clamp-2 text-[1.05rem] font-bold leading-[1.12] text-white drop-shadow md:text-[1.15rem]!">
               {item.title}
             </h3>
 
             {item.subtitle && (
-              <p className="text-sm font-medium leading-tight text-txt-highlight/80">
+              <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-white/65">
                 {item.subtitle}
               </p>
             )}
