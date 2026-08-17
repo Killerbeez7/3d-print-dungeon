@@ -77,7 +77,7 @@ export const SettingsPage = () => {
   return (
     <div className="max-w-7xl mx-auto min-h-[800px] p-4 flex gap-4 md:flex-row flex-col">
       {/* Sidebar */}
-      <aside className="md:w-1/4 p-4 bg-bg-surface shadow-md rounded-lg">
+      <aside className="md:w-1/4 p-4 bg-surface-card shadow-md rounded-lg">
         <div className="flex md:flex-col flex-row md:gap-1 gap-5 justify-center items-center text-center">
           <img
             src={avatarUrl}
@@ -106,7 +106,7 @@ export const SettingsPage = () => {
                   className={`w-full text-left px-4 py-3 rounded-md font-medium transition-colors ${
                     activeTab === tab.id
                       ? "bg-accent text-white shadow-sm"
-                      : "text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
+                      : "text-txt-secondary hover:bg-section hover:text-txt-primary"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -122,7 +122,7 @@ export const SettingsPage = () => {
       </aside>
 
       {/* Main Content */}
-      <section className="md:w-3/4 p-6 bg-bg-surface shadow-md rounded-lg flex-grow">
+      <section className="md:w-3/4 p-6 bg-surface-card shadow-md rounded-lg flex-grow">
         {renderActiveTab()}
       </section>
     </div>

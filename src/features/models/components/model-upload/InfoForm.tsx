@@ -6,7 +6,7 @@ import {
 } from "@/features/search-filters/services/categoryService";
 import { TiDelete } from "react-icons/ti";
 import { ImagesUpload } from "./ImagesUpload";
-import { FormLabel, H3 } from "@/components/index";
+
 import type { ModelUploadData } from "@/features/models/types/model";
 
 interface InfoFormProps {
@@ -67,15 +67,15 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
 
         <form className="space-y-4">
           <div>
-            <FormLabel as="div" className="block mb-1">
+            <div className="mb-1 block text-sm font-medium text-txt-secondary">
               Model Name <span className="text-error">*</span>
-            </FormLabel>
+            </div>
             <input
               type="text"
               name="name"
               value={typeof modelData.name === "string" ? modelData.name : ""}
               onChange={handleModelDataChange}
-              className="w-full p-3 border border-br-secondary rounded-md bg-bg-surface text-txt-primary placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+              className="w-full p-3 border border-br-secondary rounded-md bg-surface-card text-txt-primary placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
               placeholder="Enter model name"
               required
             />
@@ -83,9 +83,9 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
 
           {/* Category multi-select */}
           <div>
-            <FormLabel as="div" className="block mb-1">
+            <div className="mb-1 block text-sm font-medium text-txt-secondary">
               Categories <span className="text-error">*</span>
-            </FormLabel>
+            </div>
             <select
               multiple
               value={modelData.categoryIds ?? []}
@@ -93,7 +93,7 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
                 const vals = Array.from(e.target.selectedOptions).map((o) => o.value);
                 setModelData((prev) => ({ ...prev, categoryIds: vals }));
               }}
-              className="w-full p-3 border border-br-secondary rounded-md bg-bg-surface h-40 text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+              className="w-full p-3 border border-br-secondary rounded-md bg-surface-card h-40 text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
             >
               {categories?.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -104,16 +104,16 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
           </div>
 
           <div>
-            <FormLabel as="div" className="block mb-1">
+            <div className="mb-1 block text-sm font-medium text-txt-secondary">
               Description <span className="text-error">*</span>
-            </FormLabel>
+            </div>
             <textarea
               name="description"
               value={
                 typeof modelData.description === "string" ? modelData.description : ""
               }
               onChange={handleModelDataChange}
-              className="w-full p-3 border border-br-secondary rounded-md bg-bg-surface text-txt-primary placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+              className="w-full p-3 border border-br-secondary rounded-md bg-surface-card text-txt-primary placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
               placeholder="Enter model description"
               required
             />
@@ -129,21 +129,21 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
               }
               className="accent-accent h-4 w-4"
             />
-            <FormLabel as="div">Model is AI-generated</FormLabel>
+            <div className="mb-1 block text-sm font-medium text-txt-secondary">
+              Model is AI-generated
+            </div>
           </div>
 
           {/* Tags Section */}
-          <div className="border border-br-secondary rounded-lg p-4 bg-bg-secondary">
-            <H3 size="base" className="mb-3">
-              Add Tags
-            </H3>
+          <div className="border border-br-secondary rounded-lg p-4 bg-section">
+            <h3 className="mb-3">Add Tags</h3>
             <input
               type="text"
               value={newTag}
               onChange={handleTagInputChange}
               onKeyDown={handleTagAdd}
               placeholder="Press enter to add tags"
-              className="w-full px-4 py-2 text-sm border border-br-secondary rounded-md mb-3 bg-bg-surface text-txt-primary placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
+              className="w-full px-4 py-2 text-sm border border-br-secondary rounded-md mb-3 bg-surface-card text-txt-primary placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
             />
             <div className="flex flex-wrap gap-2">
               {Array.isArray(modelData.tags) &&

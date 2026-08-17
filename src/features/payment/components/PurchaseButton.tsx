@@ -72,9 +72,9 @@ export const PurchaseButton = ({ model, className = "" }: PurchaseButtonProps) =
   const hasPurchased = userPurchases.includes(model.id);
   const isFree = !model.isPaid || model.price === 0;
   const primaryActionClasses =
-    "flex items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3 text-btn-primary-text transition-colors hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 focus:ring-offset-bg-primary disabled:cursor-not-allowed disabled:opacity-50";
+    "flex items-center justify-center gap-2 rounded-lg bg-accent px-6 py-3 text-btn-primary-text transition-colors hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 focus:ring-offset-bg-page disabled:cursor-not-allowed disabled:opacity-50";
   const successActionClasses =
-    "flex items-center justify-center gap-2 rounded-lg bg-success px-6 py-3 text-txt-inverse transition-colors hover:bg-success-hover focus:outline-none focus:ring-2 focus:ring-success focus:ring-offset-2 focus:ring-offset-bg-primary disabled:cursor-not-allowed disabled:opacity-50";
+    "flex items-center justify-center gap-2 rounded-lg bg-success px-6 py-3 text-txt-inverse transition-colors hover:bg-success-hover focus:outline-none focus:ring-2 focus:ring-success focus:ring-offset-2 focus:ring-offset-bg-page disabled:cursor-not-allowed disabled:opacity-50";
 
   if (isOwner) {
     return (

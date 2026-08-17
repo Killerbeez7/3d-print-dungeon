@@ -130,13 +130,13 @@ export const ForumThread = () => {
   if (isThreadLoading) {
     return (
       <div className="space-y-6">
-        <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+        <div className="bg-surface-card text-txt-primary rounded-lg shadow p-6">
           <Skeleton className="h-8 w-3/4 mb-4" />
           <Skeleton className="h-5 w-full mb-2" />
           <Skeleton className="h-5 w-full mb-2" />
           <Skeleton className="h-5 w-3/4 mb-4" />
 
-          <div className="flex gap-4 text-sm text-[var(--txt-muted)]">
+          <div className="flex gap-4 text-sm text-txt-muted">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-4 w-32" />
           </div>
@@ -154,7 +154,7 @@ export const ForumThread = () => {
 
         <Link
           to={FORUM_PATHS.HOME}
-          className="mt-4 inline-block text-[var(--accent)] hover:underline"
+          className="mt-4 inline-block text-accent hover:underline"
         >
           Return to Forum
         </Link>
@@ -164,16 +164,16 @@ export const ForumThread = () => {
 
   if (!threadId || !thread) {
     return (
-      <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
+      <div className="bg-surface-card text-txt-primary rounded-lg shadow p-6 text-center">
         <h2 className="text-xl font-semibold mb-4">Thread Not Found</h2>
 
-        <p className="text-[var(--txt-secondary)] mb-6">
+        <p className="text-txt-secondary mb-6">
           The thread you&apos;re looking for may have been moved or deleted.
         </p>
 
         <Link
           to={FORUM_PATHS.HOME}
-          className="inline-block px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
+          className="inline-block px-4 py-2 rounded-lg font-semibold bg-accent text-txt-highlight hover:bg-accent-hover transition"
         >
           Return to Forum
         </Link>
@@ -186,17 +186,14 @@ export const ForumThread = () => {
   return (
     <div className="space-y-6">
       {/* Thread metadata */}
-      <div className="flex gap-2 text-sm text-[var(--txt-muted)]">
-        <Link to={FORUM_PATHS.HOME} className="hover:text-[var(--accent)]">
+      <div className="flex gap-2 text-sm text-txt-muted">
+        <Link to={FORUM_PATHS.HOME} className="hover:text-accent">
           Forum
         </Link>
 
         <span>&gt;</span>
 
-        <Link
-          to={FORUM_PATHS.CATEGORY(thread.categoryId)}
-          className="hover:text-[var(--accent)]"
-        >
+        <Link to={FORUM_PATHS.CATEGORY(thread.categoryId)} className="hover:text-accent">
           {categories.find((category) => {
             return category.id === thread.categoryId;
           })?.name ?? "Category"}
@@ -204,7 +201,7 @@ export const ForumThread = () => {
       </div>
 
       {/* Thread content */}
-      <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow">
+      <div className="bg-surface-card text-txt-primary rounded-lg shadow">
         <div className="p-6">
           <h1 className="text-2xl font-bold mb-4">
             {thread.title}
@@ -224,7 +221,7 @@ export const ForumThread = () => {
 
           <div className="prose dark:prose-invert max-w-none mb-4">{thread.content}</div>
 
-          <div className="flex flex-wrap items-center gap-x-4 text-sm text-[var(--txt-muted)]">
+          <div className="flex flex-wrap items-center gap-x-4 text-sm text-txt-muted">
             <div className="flex items-center">
               <FaUser className="mr-1" size={12} />
 
@@ -252,14 +249,14 @@ export const ForumThread = () => {
         )}
 
         {/* Thread actions */}
-        <div className="px-6 py-3 border-t border-[var(--br-secondary)] flex flex-wrap gap-2 bg-[var(--bg-tertiary)]">
+        <div className="px-6 py-3 border-t border-br-secondary flex flex-wrap gap-2 bg-muted">
           {currentUser && !thread.isLocked && (
             <button
               type="button"
               onClick={() => {
                 setIsReplying(true);
               }}
-              className="inline-flex items-center px-3 py-1.5 text-sm rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
+              className="inline-flex items-center px-3 py-1.5 text-sm rounded-lg font-semibold bg-accent text-txt-highlight hover:bg-accent-hover transition"
             >
               <FaReply className="mr-1" size={12} />
               Reply
@@ -272,7 +269,7 @@ export const ForumThread = () => {
               onClick={() => {
                 open({ mode: "login" });
               }}
-              className="inline-flex items-center px-3 py-1.5 text-sm rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
+              className="inline-flex items-center px-3 py-1.5 text-sm rounded-lg font-semibold bg-accent text-txt-highlight hover:bg-accent-hover transition"
             >
               <FaReply className="mr-1" size={12} />
               Sign in to Reply
@@ -280,7 +277,7 @@ export const ForumThread = () => {
           )}
 
           {thread.isLocked && (
-            <span className="text-sm text-[var(--txt-muted)]">
+            <span className="text-sm text-txt-muted">
               This thread is locked, so new replies are closed.
             </span>
           )}
@@ -289,7 +286,7 @@ export const ForumThread = () => {
             <>
               <Link
                 to={FORUM_PATHS.THREAD_EDIT(threadId)}
-                className="inline-flex items-center px-3 py-1.5 text-sm rounded-lg font-semibold bg-[var(--bg-surface)] text-[var(--txt-primary)] hover:bg-[var(--bg-tertiary)] border border-[var(--br-secondary)] transition"
+                className="inline-flex items-center px-3 py-1.5 text-sm rounded-lg font-semibold bg-surface-card text-txt-primary hover:bg-muted border border-br-secondary transition"
               >
                 <FaEdit className="mr-1" size={12} />
                 Edit
@@ -312,7 +309,7 @@ export const ForumThread = () => {
 
       {/* Reply form */}
       {isReplying && (
-        <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+        <div className="bg-surface-card text-txt-primary rounded-lg shadow p-6">
           <h3 className="text-lg font-medium mb-4">Post a Reply</h3>
 
           <ReplyEditor
@@ -349,7 +346,7 @@ export const ForumThread = () => {
               return (
                 <div
                   key={item}
-                  className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6"
+                  className="bg-surface-card text-txt-primary rounded-lg shadow p-6"
                 >
                   <Skeleton className="h-5 w-full mb-2" />
                   <Skeleton className="h-5 w-2/3 mb-4" />
@@ -367,13 +364,13 @@ export const ForumThread = () => {
               return (
                 <div
                   key={reply.id}
-                  className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6"
+                  className="bg-surface-card text-txt-primary rounded-lg shadow p-6"
                 >
                   <div className="prose dark:prose-invert max-w-none mb-4">
                     {reply.content}
                   </div>
 
-                  <div className="flex flex-wrap items-center justify-between gap-y-2 text-sm text-[var(--txt-muted)]">
+                  <div className="flex flex-wrap items-center justify-between gap-y-2 text-sm text-txt-muted">
                     <div className="flex items-center gap-x-4">
                       <div className="flex items-center">
                         <FaUser className="mr-1" size={12} />
@@ -396,7 +393,7 @@ export const ForumThread = () => {
                       <div className="flex gap-2">
                         <Link
                           to={FORUM_PATHS.REPLY_EDIT(reply.id)}
-                          className="inline-flex items-center text-xs px-2 py-1 rounded bg-[var(--bg-surface)] text-[var(--txt-primary)] hover:bg-[var(--bg-tertiary)] border border-[var(--br-secondary)] transition"
+                          className="inline-flex items-center text-xs px-2 py-1 rounded bg-surface-card text-txt-primary hover:bg-muted border border-br-secondary transition"
                         >
                           <FaEdit className="mr-1" size={10} />
                           Edit
@@ -435,10 +432,10 @@ export const ForumThread = () => {
             )}
           </div>
         ) : (
-          <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+          <div className="bg-surface-card text-txt-primary rounded-lg shadow p-6">
             <h3 className="font-semibold mb-2">No replies yet</h3>
 
-            <p className="text-[var(--txt-muted)] mb-4">
+            <p className="text-txt-muted mb-4">
               {thread.isLocked
                 ? "This thread is locked and no longer accepts replies."
                 : "Add the first response if you can answer the question or move the discussion forward."}
@@ -455,7 +452,7 @@ export const ForumThread = () => {
 
                   setIsReplying(true);
                 }}
-                className="px-4 py-2 rounded-lg bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)]"
+                className="px-4 py-2 rounded-lg bg-accent text-txt-highlight hover:bg-accent-hover"
               >
                 {currentUser ? "Post Reply" : "Sign in to Reply"}
               </button>

@@ -1,5 +1,4 @@
 import type { PublicProfile } from "../types/profile";
-import { H2, H3, H4, StatValueSecondary, Badge } from "@/components/index";
 
 interface UserPortfolioProps {
   user: PublicProfile;
@@ -7,24 +6,20 @@ interface UserPortfolioProps {
 
 export const UserPortfolio = ({ user }: UserPortfolioProps) => {
   return (
-    <div className="bg-bg-secondary rounded-lg p-6 shadow-md">
-      <H2 size="2xl" className="text-txt-primary mb-6">
-        Portfolio
-      </H2>
+    <div className="bg-section rounded-lg p-6 shadow-md">
+      <h2 className="text-2xl text-txt-primary mb-6">Portfolio</h2>
 
       {/* Featured Works */}
       {user.featuredWorks && user.featuredWorks.length > 0 && (
         <div className="mb-8">
-          <H3 size="lg" className="text-txt-primary mb-4">
-            Featured Works
-          </H3>
+          <h3 className="text-lg text-txt-primary mb-4">Featured Works</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {user.featuredWorks.map((workId, index) => (
               <div
                 key={workId}
-                className="bg-bg-surface rounded-lg p-4 hover:shadow-md transition-shadow"
+                className="bg-surface-card rounded-lg p-4 hover:shadow-md transition-shadow"
               >
-                <div className="aspect-square bg-bg-primary rounded-md mb-3 flex items-center justify-center">
+                <div className="aspect-square bg-page rounded-md mb-3 flex items-center justify-center">
                   <span className="text-txt-secondary">Work {index + 1}</span>
                 </div>
                 <p className="text-txt-primary font-medium">Featured Work</p>
@@ -37,18 +32,15 @@ export const UserPortfolio = ({ user }: UserPortfolioProps) => {
       {/* Categories */}
       {user.artistCategories && user.artistCategories.length > 0 && (
         <div className="mb-8">
-          <H3 size="lg" className="text-txt-primary mb-4">
-            Categories
-          </H3>
+          <h3 className="text-lg text-txt-primary mb-4">Categories</h3>
           <div className="flex flex-wrap gap-2">
             {user.artistCategories.map((category) => (
-              <Badge
+              <span
                 key={category}
-                as="span"
-                className="px-3 py-1 bg-bg-primary rounded-full"
+                className="rounded-full bg-page px-3 py-1 text-xs font-semibold text-txt-primary"
               >
                 {category}
-              </Badge>
+              </span>
             ))}
           </div>
         </div>
@@ -57,33 +49,25 @@ export const UserPortfolio = ({ user }: UserPortfolioProps) => {
       {/* Commission Rates */}
       {user.publicCommissionRates && (
         <div>
-          <H3 size="lg" className="text-txt-primary mb-4">
-            Commission Rates
-          </H3>
+          <h3 className="text-lg text-txt-primary mb-4">Commission Rates</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-bg-surface rounded-lg p-4 text-center">
-              <H4 size="base" className="text-txt-primary mb-2">
-                Small
-              </H4>
-              <StatValueSecondary as="p">
+            <div className="bg-surface-card rounded-lg p-4 text-center">
+              <h4 className="text-txt-primary mb-2">Small</h4>
+              <p className="text-2xl font-bold text-txt-primary">
                 ${user.publicCommissionRates.small}
-              </StatValueSecondary>
+              </p>
             </div>
-            <div className="bg-bg-surface rounded-lg p-4 text-center">
-              <H4 size="base" className="text-txt-primary mb-2">
-                Medium
-              </H4>
-              <StatValueSecondary as="p">
+            <div className="bg-surface-card rounded-lg p-4 text-center">
+              <h4 className="text-txt-primary mb-2">Medium</h4>
+              <p className="text-2xl font-bold text-txt-primary">
                 ${user.publicCommissionRates.medium}
-              </StatValueSecondary>
+              </p>
             </div>
-            <div className="bg-bg-surface rounded-lg p-4 text-center">
-              <H4 size="base" className="text-txt-primary mb-2">
-                Large
-              </H4>
-              <StatValueSecondary as="p">
+            <div className="bg-surface-card rounded-lg p-4 text-center">
+              <h4 className="text-txt-primary mb-2">Large</h4>
+              <p className="text-2xl font-bold text-txt-primary">
                 ${user.publicCommissionRates.large}
-              </StatValueSecondary>
+              </p>
             </div>
           </div>
         </div>

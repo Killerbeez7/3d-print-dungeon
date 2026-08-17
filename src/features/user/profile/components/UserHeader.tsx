@@ -1,5 +1,4 @@
 import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
-import { H1, Description, Label, StatValueSecondary } from "@/components/index";
 
 import { FaFacebook, FaInstagram, FaXTwitter, FaGlobe } from "react-icons/fa6";
 import { FaExternalLinkAlt } from "react-icons/fa";
@@ -64,11 +63,11 @@ export const UserHeader = ({ user }: UserHeaderProps) => {
   const hasSocialLinks = availableSocialLinks.length > 0;
 
   return (
-    <div className="bg-bg-secondary rounded-lg p-4 sm:p-6 shadow-md">
+    <div className="bg-section rounded-lg p-4 sm:p-6 shadow-md">
       <div className="flex items-start space-x-6">
         {/* User Avatar */}
         <div className="flex-shrink-0">
-          <div className="w-24 h-24 rounded-full overflow-hidden bg-bg-surface">
+          <div className="w-24 h-24 rounded-full overflow-hidden bg-surface-card">
             <img
               src={avatarUrl}
               alt={user.displayName || "User Avatar"}
@@ -81,39 +80,31 @@ export const UserHeader = ({ user }: UserHeaderProps) => {
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <div>
-              <H1 size="3xl" className="mb-2">
-                {user.displayName}
-              </H1>
+              <h1 className="mb-2 text-3xl">{user.displayName}</h1>
               <div className="text-txt-secondary text-sm">@{user.username}</div>
-              {user.bio && <Description className="mb-4">{user.bio}</Description>}
+              {user.bio && <p className="mb-6 text-lg text-txt-secondary">{user.bio}</p>}
             </div>
           </div>
 
           {/* User Stats */}
           <div className="flex space-x-4 sm:space-x-6 md:space-x-8 mt-4">
             <div className="text-center">
-              <StatValueSecondary as="div" className="mb-1">
+              <div className="mb-1 text-2xl font-bold text-txt-primary">
                 {user.stats.uploadsCount}
-              </StatValueSecondary>
-              <Label as="div" className="text-xs sm:text-sm">
-                Uploads
-              </Label>
+              </div>
+              <div className="text-xs text-txt-secondary sm:text-sm">Uploads</div>
             </div>
             <div className="text-center">
-              <StatValueSecondary as="div" className="mb-1">
+              <div className="mb-1 text-2xl font-bold text-txt-primary">
                 {user.stats.followersCount}
-              </StatValueSecondary>
-              <Label as="div" className="text-xs sm:text-sm">
-                Followers
-              </Label>
+              </div>
+              <div className="text-xs text-txt-secondary sm:text-sm">Followers</div>
             </div>
             <div className="text-center">
-              <StatValueSecondary as="div" className="mb-1">
+              <div className="mb-1 text-2xl font-bold text-txt-primary">
                 {user.stats.likesCount}
-              </StatValueSecondary>
-              <Label as="div" className="text-xs sm:text-sm">
-                Likes
-              </Label>
+              </div>
+              <div className="text-xs text-txt-secondary sm:text-sm">Likes</div>
             </div>
           </div>
 

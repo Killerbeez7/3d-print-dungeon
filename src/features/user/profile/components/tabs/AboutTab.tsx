@@ -70,7 +70,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
   return (
     <div className="space-y-8">
       {/* Bio Section */}
-      <div className="bg-bg-secondary rounded-lg p-6">
+      <div className="bg-section rounded-lg p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
             <i className="fas fa-user text-white text-sm"></i>
@@ -84,7 +84,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
       </div>
 
       {/* Personal Information */}
-      <div className="bg-bg-secondary rounded-lg p-6">
+      <div className="bg-section rounded-lg p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-8 bg-success rounded-full flex items-center justify-center">
             <i className="fas fa-info text-white text-sm"></i>
@@ -93,7 +93,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {userData?.location && (
-            <div className="flex items-center gap-3 p-3 bg-bg-surface rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-surface-card rounded-lg">
               <i className="fas fa-map-marker-alt text-accent"></i>
               <div>
                 <div className="text-sm text-txt-secondary">Location</div>
@@ -102,7 +102,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
             </div>
           )}
           {userData?.website && (
-            <div className="flex items-center gap-3 p-3 bg-bg-surface rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-surface-card rounded-lg">
               <i className="fas fa-globe text-accent"></i>
               <div>
                 <div className="text-sm text-txt-secondary">Website</div>
@@ -118,7 +118,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
             </div>
           )}
           {userData?.joinDate && (
-            <div className="flex items-center gap-3 p-3 bg-bg-surface rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-surface-card rounded-lg">
               <i className="fas fa-calendar-alt text-accent"></i>
               <div>
                 <div className="text-sm text-txt-secondary">Member Since</div>
@@ -133,7 +133,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
             </div>
           )}
           {userData?.lastActive && (
-            <div className="flex items-center gap-3 p-3 bg-bg-surface rounded-lg">
+            <div className="flex items-center gap-3 p-3 bg-surface-card rounded-lg">
               <i className="fas fa-clock text-accent"></i>
               <div>
                 <div className="text-sm text-txt-secondary">Last Active</div>
@@ -152,7 +152,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
 
       {/* Social Links Section - Beautiful UI with Icons */}
       {hasAnySocialLinks && (
-        <div className="bg-bg-secondary rounded-lg p-6">
+        <div className="bg-section rounded-lg p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
               <i className="fas fa-share-alt text-white text-sm"></i>
@@ -203,7 +203,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
       )}
 
       {/* Skills & Interests */}
-      <div className="bg-bg-secondary rounded-lg p-6">
+      <div className="bg-section rounded-lg p-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center">
             <i className="fas fa-tools text-white text-sm"></i>
@@ -235,7 +235,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
 
       {/* Badges & Achievements */}
       {userData?.badges && userData.badges.length > 0 && (
-        <div className="bg-bg-secondary rounded-lg p-6">
+        <div className="bg-section rounded-lg p-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
               <i className="fas fa-trophy text-white text-sm"></i>
@@ -248,7 +248,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
             {userData.badges.map((badge, index) => (
               <div
                 key={index}
-                className="flex flex-col items-center gap-2 p-4 bg-bg-surface rounded-lg"
+                className="flex flex-col items-center gap-2 p-4 bg-surface-card rounded-lg"
               >
                 <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center">
                   <i className="fas fa-medal text-white text-lg"></i>

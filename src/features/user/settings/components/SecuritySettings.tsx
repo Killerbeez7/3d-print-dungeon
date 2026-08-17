@@ -7,6 +7,7 @@ import {
   validatePassword,
 } from "@/features/auth/utils/authUtils";
 import { useSystemAlert } from "@/features/system-alerts";
+import { Button } from "@/components";
 
 type PasswordErrorField = "currentPassword" | "newPassword" | "confirmPassword" | "";
 
@@ -146,7 +147,7 @@ export const SecuritySettings = () => {
           </p>
         </div>
 
-        <div className="bg-bg-surface rounded-lg border border-br-secondary p-6">
+        <div className="bg-surface-card rounded-lg border border-br-secondary p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-2">Password</h3>
 
           <p className="text-sm text-txt-secondary">
@@ -168,7 +169,7 @@ export const SecuritySettings = () => {
         </p>
       </div>
 
-      <div className="bg-bg-surface rounded-lg border border-br-secondary overflow-hidden">
+      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">Change Password</h3>
 
@@ -187,7 +188,7 @@ export const SecuritySettings = () => {
                   id="currentPassword"
                   value={currentPassword}
                   onChange={(event) => setCurrentPassword(event.target.value)}
-                  className={`w-full px-3 py-2 rounded-md bg-bg-secondary text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent border ${
+                  className={`w-full px-3 py-2 rounded-md bg-section text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent border ${
                     errorField === "currentPassword"
                       ? "border-error"
                       : "border-br-secondary"
@@ -211,7 +212,7 @@ export const SecuritySettings = () => {
                   id="newPassword"
                   value={newPassword}
                   onChange={(event) => setNewPassword(event.target.value)}
-                  className={`w-full px-3 py-2 rounded-md bg-bg-secondary text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent border ${
+                  className={`w-full px-3 py-2 rounded-md bg-section text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent border ${
                     errorField === "newPassword" ? "border-error" : "border-br-secondary"
                   }`}
                   placeholder="Enter new password"
@@ -234,7 +235,7 @@ export const SecuritySettings = () => {
                 id="confirmPassword"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
-                className={`w-full px-3 py-2 rounded-md bg-bg-secondary text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent border ${
+                className={`w-full px-3 py-2 rounded-md bg-section text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent border ${
                   errorField === "confirmPassword"
                     ? "border-error"
                     : "border-br-secondary"
@@ -252,15 +253,9 @@ export const SecuritySettings = () => {
             )}
 
             <div className="flex justify-start">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className={`px-6 py-2 cta-button ${
-                  isLoading ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
+              <Button type="submit" disabled={isLoading}>
                 {isLoading ? "Updating..." : "Change Password"}
-              </button>
+              </Button>
             </div>
           </form>
         </div>

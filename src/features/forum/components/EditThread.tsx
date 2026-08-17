@@ -50,7 +50,7 @@ export const EditThread = () => {
 
   if (isLoading) {
     return (
-      <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+      <div className="bg-surface-card text-txt-primary rounded-lg shadow p-6">
         <Skeleton className="h-8 w-3/4 mb-6" />
         <Skeleton className="h-4 w-full mb-4" />
         <Skeleton className="h-4 w-3/4 mb-4" />
@@ -72,7 +72,7 @@ export const EditThread = () => {
           onClick={() => {
             navigate(FORUM_PATHS.HOME);
           }}
-          className="mt-4 inline-block text-[var(--accent)] hover:underline"
+          className="mt-4 inline-block text-accent hover:underline"
         >
           Return to Forum
         </button>
@@ -82,10 +82,10 @@ export const EditThread = () => {
 
   if (!threadId || !thread) {
     return (
-      <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6 text-center">
+      <div className="bg-surface-card text-txt-primary rounded-lg shadow p-6 text-center">
         <h2 className="text-xl font-semibold mb-4">Thread Not Found</h2>
 
-        <p className="text-[var(--txt-secondary)] mb-6">
+        <p className="text-txt-secondary mb-6">
           The thread you&apos;re looking for may have been moved or deleted.
         </p>
 
@@ -94,7 +94,7 @@ export const EditThread = () => {
           onClick={() => {
             navigate(FORUM_PATHS.HOME);
           }}
-          className="inline-block px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
+          className="inline-block px-4 py-2 rounded-lg font-semibold bg-accent text-txt-highlight hover:bg-accent-hover transition"
         >
           Return to Forum
         </button>
@@ -104,10 +104,10 @@ export const EditThread = () => {
 
   if (currentUser?.uid !== thread.authorId) {
     return (
-      <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+      <div className="bg-surface-card text-txt-primary rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-3">Cannot edit this thread</h2>
 
-        <p className="text-[var(--txt-secondary)] mb-6">
+        <p className="text-txt-secondary mb-6">
           You can only edit threads that you created.
         </p>
 
@@ -116,7 +116,7 @@ export const EditThread = () => {
           onClick={() => {
             navigate(FORUM_PATHS.THREAD(thread.id));
           }}
-          className="inline-block px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
+          className="inline-block px-4 py-2 rounded-lg font-semibold bg-accent text-txt-highlight hover:bg-accent-hover transition"
         >
           Back to Thread
         </button>
@@ -132,7 +132,7 @@ export const EditThread = () => {
   };
 
   return (
-    <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+    <div className="bg-surface-card text-txt-primary rounded-lg shadow p-6">
       <h1 className="text-2xl font-bold mb-6">Edit Thread</h1>
 
       {updateError && (

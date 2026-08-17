@@ -114,7 +114,7 @@
 //                 "py-2",
 //                 "text-md",
 //                 "text-txt-secondary",
-//                 "hover:bg-bg-secondary",
+//                 "hover:bg-section",
 //                 "hover:text-txt-primary"
 //             );
 //         });

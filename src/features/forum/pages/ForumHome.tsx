@@ -96,11 +96,11 @@ export const ForumHome: FC = () => {
   };
 
   const ThreadCard = ({ thread, categories }: ThreadCardProps) => (
-    <div className="rounded-lg bg-[var(--bg-surface)] p-6 text-[var(--txt-primary)] shadow">
+    <div className="rounded-lg bg-surface-card p-6 text-txt-primary shadow">
       <div className="flex items-start justify-between">
         <Link
           to={`/forum/thread/${thread.id}`}
-          className="text-lg font-medium hover:text-[var(--accent)]"
+          className="text-lg font-medium hover:text-accent"
         >
           {thread.title}
           {isThreadNew(thread) && (
@@ -111,11 +111,11 @@ export const ForumHome: FC = () => {
         </Link>
       </div>
 
-      <div className="mt-2 text-sm text-[var(--txt-muted)]">
+      <div className="mt-2 text-sm text-txt-muted">
         Posted in{" "}
         <Link
           to={`/forum/category/${thread.categoryId}`}
-          className="text-[var(--accent)] hover:underline"
+          className="text-accent hover:underline"
         >
           {categories.find((c) => c.id === thread.categoryId)?.name || "Unknown Category"}
         </Link>
@@ -143,7 +143,7 @@ export const ForumHome: FC = () => {
     actionLabel = "Create Thread"
   ) => (
     <div className="flex flex-1 flex-col">
-      <h2 className="mb-4 text-lg font-medium text-[var(--txt-primary)]">
+      <h2 className="mb-4 text-lg font-medium text-txt-primary">
         {activeTab === "recent" && !searchQuery && "Recent Discussions"}
         {activeTab === "popular" && !searchQuery && "Popular Discussions"}
         {activeTab === "unanswered" && !searchQuery && "Unanswered Discussions"}
@@ -151,16 +151,16 @@ export const ForumHome: FC = () => {
       </h2>
 
       <div className="flex min-h-[320px] flex-1 items-start">
-        <div className="w-full rounded-lg bg-[var(--bg-surface)] p-6 text-[var(--txt-primary)] shadow">
+        <div className="w-full rounded-lg bg-surface-card p-6 text-txt-primary shadow">
           <h3 className="mb-2 text-3xl font-medium">{title}</h3>
-          <p className="mb-6 max-w-2xl text-[var(--txt-muted)]">{description}</p>
+          <p className="mb-6 max-w-2xl text-txt-muted">{description}</p>
 
           <div className="flex flex-wrap gap-3">
             {searchQuery ? (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="rounded-lg border border-[var(--br-secondary)] px-4 py-2 text-[var(--txt-primary)] hover:bg-[var(--bg-tertiary)]"
+                className="rounded-lg border border-br-secondary px-4 py-2 text-txt-primary hover:bg-muted"
               >
                 Clear Search
               </button>
@@ -169,7 +169,7 @@ export const ForumHome: FC = () => {
             <button
               type="button"
               onClick={handleCreateThread}
-              className="rounded-lg bg-[var(--accent)] px-4 py-2 text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)]"
+              className="rounded-lg bg-accent px-4 py-2 text-txt-highlight hover:bg-accent-hover"
             >
               {actionLabel}
             </button>
@@ -193,13 +193,13 @@ export const ForumHome: FC = () => {
       return (
         <div className="mt-6 flex flex-1 flex-col">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-medium text-[var(--txt-primary)]">
+            <h2 className="text-lg font-medium text-txt-primary">
               Search results for &quot;{searchQuery.trim()}&quot;
             </h2>
             <button
               type="button"
               onClick={() => setSearchQuery("")}
-              className="text-sm text-[var(--accent)] hover:underline"
+              className="text-sm text-accent hover:underline"
             >
               Clear search
             </button>
@@ -245,7 +245,7 @@ export const ForumHome: FC = () => {
 
     return (
       <div className="mt-6 flex flex-1 flex-col">
-        <h2 className="mb-4 text-lg font-medium text-[var(--txt-primary)]">
+        <h2 className="mb-4 text-lg font-medium text-txt-primary">
           {activeTab === "recent" && "Recent Discussions"}
           {activeTab === "popular" && "Popular Discussions"}
           {activeTab === "unanswered" && "Unanswered Discussions"}
@@ -319,11 +319,11 @@ export const ForumHome: FC = () => {
         <form onSubmit={handleSearch} className="max-w-md flex-1">
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <FaSearch className="text-[var(--txt-muted)]" />
+              <FaSearch className="text-txt-muted" />
             </div>
             <input
               type="search"
-              className="block w-full rounded-lg border border-[var(--br-secondary)] bg-[var(--bg-surface)] p-2.5 pl-10 text-sm text-[var(--txt-primary)] focus:border-[var(--accent)] focus:ring-[var(--accent)]"
+              className="block w-full rounded-lg border border-br-secondary bg-surface-card p-2.5 pl-10 text-sm text-txt-primary focus:border-accent focus:ring-accent"
               placeholder="Search discussions..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -331,7 +331,7 @@ export const ForumHome: FC = () => {
             />
             <button
               type="submit"
-              className="absolute right-1 bottom-1 top-1 rounded bg-[var(--accent)] px-3 text-[var(--txt-highlight)] transition hover:bg-[var(--accent-hover)] focus:outline-none"
+              className="absolute right-1 bottom-1 top-1 rounded bg-accent px-3 text-txt-highlight transition hover:bg-accent-hover focus:outline-none"
               disabled={searchLoading || !searchQuery.trim()}
             >
               {searchLoading ? "..." : "Search"}
@@ -340,23 +340,23 @@ export const ForumHome: FC = () => {
         </form>
 
         <button
-          className="flex items-center gap-2 whitespace-nowrap rounded-[15px] border border-[var(--br-secondary)] px-4 py-2.5 font-semibold text-[var(--txt-highlight)] transition-colors hover:bg-[var(--accent-hover)]"
+          className="flex items-center gap-2 whitespace-nowrap rounded-[15px] border border-br-secondary px-4 py-2.5 font-semibold text-txt-highlight transition-colors hover:bg-accent-hover"
           onClick={handleCreateThread}
         >
-          <FaPlusSquare size={16} className="text-[var(--accent)]" />
+          <FaPlusSquare size={16} className="text-accent" />
           <span className="hidden sm:inline">New Thread</span>
           <span className="sm:hidden">New</span>
         </button>
       </div>
 
-      <div className="mt-6 border-b border-[var(--br-secondary)]">
+      <div className="mt-6 border-b border-br-secondary">
         <nav className="flex space-x-8">
           <button
             onClick={() => setActiveTab("recent")}
             className={`border-b-2 px-1 py-4 text-center text-sm font-medium ${
               activeTab === "recent"
-                ? "border-[var(--accent)] text-[var(--accent)]"
-                : "border-transparent text-[var(--txt-muted)] hover:border-[var(--br-secondary)] hover:text-[var(--txt-primary)]"
+                ? "border-accent text-accent"
+                : "border-transparent text-muted hover:border-br-secondary hover:text-txt-primary"
             }`}
           >
             Recent
@@ -365,8 +365,8 @@ export const ForumHome: FC = () => {
             onClick={() => setActiveTab("popular")}
             className={`border-b-2 px-1 py-4 text-center text-sm font-medium ${
               activeTab === "popular"
-                ? "border-[var(--accent)] text-[var(--accent)]"
-                : "border-transparent text-[var(--txt-muted)] hover:border-[var(--br-secondary)] hover:text-[var(--txt-primary)]"
+                ? "border-accent text-accent"
+                : "border-transparent text-muted hover:border-br-secondary hover:text-txt-primary"
             }`}
           >
             Popular
@@ -375,8 +375,8 @@ export const ForumHome: FC = () => {
             onClick={() => setActiveTab("unanswered")}
             className={`border-b-2 px-1 py-4 text-center text-sm font-medium ${
               activeTab === "unanswered"
-                ? "border-[var(--accent)] text-[var(--accent)]"
-                : "border-transparent text-[var(--txt-muted)] hover:border-[var(--br-secondary)] hover:text-[var(--txt-primary)]"
+                ? "border-accent text-accent"
+                : "border-transparent text-muted hover:border-br-secondary hover:text-txt-primary"
             }`}
           >
             Unanswered

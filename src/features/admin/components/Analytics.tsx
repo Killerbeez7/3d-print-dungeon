@@ -204,7 +204,7 @@ export const Analytics = () => {
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
                 timeRange === range
                   ? "bg-accent text-white"
-                  : "bg-bg-secondary text-txt-secondary hover:text-txt-primary"
+                  : "bg-section text-txt-secondary hover:text-txt-primary"
               }`}
             >
               Last {range}
@@ -223,7 +223,7 @@ export const Analytics = () => {
 
       {/* Stats Overview */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-bg-secondary rounded-lg p-6">
+        <div className="bg-section rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-txt-secondary">Total Users</p>
@@ -233,7 +233,7 @@ export const Analytics = () => {
           </div>
         </div>
 
-        <div className="bg-bg-secondary rounded-lg p-6">
+        <div className="bg-section rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-txt-secondary">Total Models</p>
@@ -243,7 +243,7 @@ export const Analytics = () => {
           </div>
         </div>
 
-        <div className="bg-bg-secondary rounded-lg p-6">
+        <div className="bg-section rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-txt-secondary">Total Views</p>
@@ -253,7 +253,7 @@ export const Analytics = () => {
           </div>
         </div>
 
-        <div className="bg-bg-secondary rounded-lg p-6">
+        <div className="bg-section rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-txt-secondary">Total Likes</p>
@@ -267,7 +267,7 @@ export const Analytics = () => {
       {/* Detailed Stats */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Uploads */}
-        <div className="bg-bg-secondary rounded-lg p-6">
+        <div className="bg-section rounded-lg p-6">
           <h3 className="text-lg font-bold mb-4 text-white/90">Recent Uploads</h3>
           <div className="space-y-4">
             {stats.recentUploads.map((model) => (
@@ -275,7 +275,7 @@ export const Analytics = () => {
                 <img
                   src={model.thumbnail as string}
                   alt={model.name as string}
-                  className="w-16 h-16 rounded object-cover bg-bg-surface"
+                  className="w-16 h-16 rounded object-cover bg-surface-card"
                 />
                 <div>
                   <p className="text-txt-primary font-medium">{model.name as string}</p>
@@ -294,7 +294,7 @@ export const Analytics = () => {
         </div>
 
         {/* Popular Models */}
-        <div className="bg-bg-secondary rounded-lg p-6">
+        <div className="bg-section rounded-lg p-6">
           <h3 className="text-lg font-bold mb-4 text-white/90">Popular Models</h3>
           <div className="space-y-4">
             {stats.popularModels.map((model) => (
@@ -303,7 +303,7 @@ export const Analytics = () => {
                   <img
                     src={model.thumbnail as string}
                     alt={model.name as string}
-                    className="w-16 h-16 rounded object-cover bg-bg-surface"
+                    className="w-16 h-16 rounded object-cover bg-surface-card"
                   />
                   <div>
                     <p className="text-txt-primary font-medium">{model.name as string}</p>
@@ -322,7 +322,7 @@ export const Analytics = () => {
         </div>
 
         {/* Active Users */}
-        <div className="bg-bg-secondary rounded-lg p-6">
+        <div className="bg-section rounded-lg p-6">
           <h3 className="text-lg font-bold mb-4 text-white/90">Most Active Users</h3>
           <div className="space-y-4">
             {stats.activeUsers.map((user) => (
@@ -331,7 +331,7 @@ export const Analytics = () => {
                   <img
                     src={(user.photoURL as string) || "/default-avatar.png"}
                     alt={user.displayName as string}
-                    className="w-10 h-10 rounded-full bg-bg-surface"
+                    className="w-10 h-10 rounded-full bg-surface-card"
                   />
                   <div>
                     <p className="text-txt-primary font-medium">

@@ -89,12 +89,10 @@ export const ForumHelp: FC = () => {
       {/* Header */}
       <div className="text-center space-y-6">
         <div className="flex items-center justify-center gap-3">
-          <FaQuestionCircle className="text-[var(--txt-secondary)]" size={28} />
-          <h1 className="text-4xl font-bold text-[var(--txt-primary)]">
-            Forum Help & Guidelines
-          </h1>
+          <FaQuestionCircle className="text-txt-secondary" size={28} />
+          <h1 className="text-4xl font-bold text-txt-primary">Forum Help & Guidelines</h1>
         </div>
-        <p className="text-lg text-[var(--txt-secondary)] max-w-2xl mx-auto leading-relaxed">
+        <p className="text-lg text-txt-secondary max-w-2xl mx-auto leading-relaxed">
           Welcome to our community forum! This guide will help you get started and make
           the most of your forum experience.
         </p>
@@ -102,30 +100,28 @@ export const ForumHelp: FC = () => {
 
       {/* Quick Navigation */}
       <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-[var(--txt-primary)]">
-          Quick Navigation
-        </h2>
+        <h2 className="text-2xl font-semibold text-txt-primary">Quick Navigation</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Link
             to={FORUM_PATHS.HOME}
-            className="group p-6 border border-[var(--br-secondary)] rounded-xl hover:border-[var(--br-primary)] hover:bg-[var(--bg-tertiary)] transition-all duration-200"
+            className="group p-6 border border-br-secondary rounded-xl hover:border-br-primary hover:bg-muted transition-all duration-200"
           >
-            <h3 className="font-semibold text-[var(--txt-primary)] mb-3 group-hover:text-[var(--accent)] transition-colors">
+            <h3 className="font-semibold text-txt-primary mb-3 group-hover:text-accent transition-colors">
               Forum Home
             </h3>
-            <p className="text-sm text-[var(--txt-secondary)] leading-relaxed">
+            <p className="text-sm text-txt-secondary leading-relaxed">
               Browse recent discussions and popular threads
             </p>
           </Link>
-          <div className="p-6 border border-[var(--br-secondary)] rounded-xl bg-[var(--bg-tertiary)]">
-            <h3 className="font-semibold text-[var(--txt-primary)] mb-3">My Threads</h3>
-            <p className="text-sm text-[var(--txt-secondary)] leading-relaxed">
+          <div className="p-6 border border-br-secondary rounded-xl bg-muted">
+            <h3 className="font-semibold text-txt-primary mb-3">My Threads</h3>
+            <p className="text-sm text-txt-secondary leading-relaxed">
               View and manage your own discussions
             </p>
           </div>
-          <div className="p-6 border border-[var(--br-secondary)] rounded-xl bg-[var(--bg-tertiary)]">
-            <h3 className="font-semibold text-[var(--txt-primary)] mb-3">Categories</h3>
-            <p className="text-sm text-[var(--txt-secondary)] leading-relaxed">
+          <div className="p-6 border border-br-secondary rounded-xl bg-muted">
+            <h3 className="font-semibold text-txt-primary mb-3">Categories</h3>
+            <p className="text-sm text-txt-secondary leading-relaxed">
               Explore discussions by topic
             </p>
           </div>
@@ -134,21 +130,19 @@ export const ForumHelp: FC = () => {
 
       {/* Community Guidelines */}
       <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-[var(--txt-primary)]">
-          Community Guidelines
-        </h2>
+        <h2 className="text-2xl font-semibold text-txt-primary">Community Guidelines</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {tips.map((tip, index) => (
             <div
               key={index}
-              className="flex gap-4 p-6 border border-[var(--br-secondary)] rounded-xl hover:border-[var(--br-primary)] transition-colors"
+              className="flex gap-4 p-6 border border-br-secondary rounded-xl hover:border-br-primary transition-colors"
             >
               <div className="flex-shrink-0 mt-1">
-                <tip.icon className="text-[var(--txt-secondary)]" size={20} />
+                <tip.icon className="text-txt-secondary" size={20} />
               </div>
               <div className="space-y-2">
-                <h3 className="font-semibold text-[var(--txt-primary)]">{tip.title}</h3>
-                <p className="text-sm text-[var(--txt-secondary)] leading-relaxed">
+                <h3 className="font-semibold text-txt-primary">{tip.title}</h3>
+                <p className="text-sm text-txt-secondary leading-relaxed">
                   {tip.description}
                 </p>
               </div>
@@ -159,19 +153,17 @@ export const ForumHelp: FC = () => {
 
       {/* Frequently Asked Questions */}
       <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-[var(--txt-primary)]">
+        <h2 className="text-2xl font-semibold text-txt-primary">
           Frequently Asked Questions
         </h2>
         <div className="space-y-8">
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="p-6 border border-[var(--br-secondary)] rounded-xl hover:border-[var(--br-primary)] transition-colors"
+              className="p-6 border border-br-secondary rounded-xl hover:border-br-primary transition-colors"
             >
-              <h3 className="font-semibold text-[var(--txt-primary)] mb-3">
-                {faq.question}
-              </h3>
-              <p className="text-[var(--txt-secondary)] leading-relaxed">{faq.answer}</p>
+              <h3 className="font-semibold text-txt-primary mb-3">{faq.question}</h3>
+              <p className="text-txt-secondary leading-relaxed">{faq.answer}</p>
             </div>
           ))}
         </div>
@@ -179,47 +171,39 @@ export const ForumHelp: FC = () => {
 
       {/* Getting Started */}
       <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-[var(--txt-primary)]">
-          Getting Started
-        </h2>
+        <h2 className="text-2xl font-semibold text-txt-primary">Getting Started</h2>
         <div className="space-y-8">
           <div className="flex gap-6">
-            <div className="flex-shrink-0 w-10 h-10 bg-[var(--bg-tertiary)] text-[var(--txt-secondary)] rounded-full flex items-center justify-center font-semibold border border-[var(--br-secondary)]">
+            <div className="flex-shrink-0 w-10 h-10 bg-muted text-txt-secondary rounded-full flex items-center justify-center font-semibold border border-br-secondary">
               1
             </div>
             <div className="space-y-2">
-              <h3 className="font-semibold text-[var(--txt-primary)]">
-                Explore the Forum
-              </h3>
-              <p className="text-[var(--txt-secondary)] leading-relaxed">
+              <h3 className="font-semibold text-txt-primary">Explore the Forum</h3>
+              <p className="text-txt-secondary leading-relaxed">
                 Browse through existing threads to get familiar with the community and
                 topics being discussed.
               </p>
             </div>
           </div>
           <div className="flex gap-6">
-            <div className="flex-shrink-0 w-10 h-10 bg-[var(--bg-tertiary)] text-[var(--txt-secondary)] rounded-full flex items-center justify-center font-semibold border border-[var(--br-secondary)]">
+            <div className="flex-shrink-0 w-10 h-10 bg-muted text-txt-secondary rounded-full flex items-center justify-center font-semibold border border-br-secondary">
               2
             </div>
             <div className="space-y-2">
-              <h3 className="font-semibold text-[var(--txt-primary)]">
-                Join Discussions
-              </h3>
-              <p className="text-[var(--txt-secondary)] leading-relaxed">
+              <h3 className="font-semibold text-txt-primary">Join Discussions</h3>
+              <p className="text-txt-secondary leading-relaxed">
                 Reply to existing threads to share your thoughts and connect with other
                 members.
               </p>
             </div>
           </div>
           <div className="flex gap-6">
-            <div className="flex-shrink-0 w-10 h-10 bg-[var(--bg-tertiary)] text-[var(--txt-secondary)] rounded-full flex items-center justify-center font-semibold border border-[var(--br-secondary)]">
+            <div className="flex-shrink-0 w-10 h-10 bg-muted text-txt-secondary rounded-full flex items-center justify-center font-semibold border border-br-secondary">
               3
             </div>
             <div className="space-y-2">
-              <h3 className="font-semibold text-[var(--txt-primary)]">
-                Start Your Own Thread
-              </h3>
-              <p className="text-[var(--txt-secondary)] leading-relaxed">
+              <h3 className="font-semibold text-txt-primary">Start Your Own Thread</h3>
+              <p className="text-txt-secondary leading-relaxed">
                 Create new discussions on topics you&apos;re passionate about or questions
                 you have.
               </p>
@@ -229,21 +213,19 @@ export const ForumHelp: FC = () => {
       </div>
 
       {/* Contact & Support */}
-      <div className="text-center space-y-6 p-8 border border-[var(--br-secondary)] rounded-xl bg-[var(--bg-tertiary)]">
-        <h2 className="text-2xl font-semibold text-[var(--txt-primary)]">
-          Need More Help?
-        </h2>
-        <p className="text-[var(--txt-secondary)] max-w-md mx-auto leading-relaxed">
+      <div className="text-center space-y-6 p-8 border border-br-secondary rounded-xl bg-muted">
+        <h2 className="text-2xl font-semibold text-txt-primary">Need More Help?</h2>
+        <p className="text-txt-secondary max-w-md mx-auto leading-relaxed">
           If you need additional assistance or have questions not covered here, please
           don&apos;t hesitate to reach out.
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <button className="px-6 py-3 bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg hover:bg-[var(--bg-primary)] border border-[var(--br-secondary)] transition-colors">
+          <button className="px-6 py-3 bg-surface-card text-txt-primary rounded-lg hover:bg-page border border-br-secondary transition-colors">
             Contact Support
           </button>
           <Link
             to={FORUM_PATHS.HOME}
-            className="px-6 py-3 bg-[var(--accent)] text-[var(--txt-highlight)] rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
+            className="px-6 py-3 bg-accent text-txt-highlight rounded-lg hover:bg-accent-hover transition-colors"
           >
             Back to Forum
           </Link>

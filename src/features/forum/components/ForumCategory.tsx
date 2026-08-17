@@ -30,16 +30,16 @@ export const ForumCategory = () => {
 
   if (!categoryId || !currentCategory) {
     return (
-      <div className="rounded-xl border border-[var(--br-secondary)] bg-[var(--bg-surface)] p-8 text-center text-[var(--txt-primary)] shadow-sm">
+      <div className="rounded-xl border border-br-secondary bg-surface-card p-8 text-center text-txt-primary shadow-sm">
         <h2 className="mb-3 text-xl font-semibold">Category Not Found</h2>
 
-        <p className="mb-6 text-[var(--txt-secondary)]">
+        <p className="mb-6 text-txt-secondary">
           The category you&apos;re looking for does not exist.
         </p>
 
         <Link
           to={FORUM_PATHS.HOME}
-          className="inline-block rounded-lg bg-[var(--accent)] px-4 py-2 font-semibold text-[var(--txt-highlight)] transition hover:bg-[var(--accent-hover)]"
+          className="inline-block rounded-lg bg-accent px-4 py-2 font-semibold text-txt-highlight transition hover:bg-accent-hover"
         >
           Return to Forum
         </Link>
@@ -49,26 +49,19 @@ export const ForumCategory = () => {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border border-[var(--br-secondary)] bg-[var(--bg-surface)] p-6 shadow-sm">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[var(--txt-muted)]">
+      <div className="rounded-xl border border-br-secondary bg-surface-card p-6 shadow-sm">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-txt-muted">
           Forum Category
         </p>
 
-        <h1 className="text-2xl font-bold text-[var(--txt-primary)]">
-          {currentCategory.name}
-        </h1>
+        <h1 className="text-2xl font-bold text-txt-primary">{currentCategory.name}</h1>
 
-        <p className="mt-2 max-w-3xl text-[var(--txt-secondary)]">
-          {currentCategory.description}
-        </p>
+        <p className="mt-2 max-w-3xl text-txt-secondary">{currentCategory.description}</p>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-[var(--br-secondary)] bg-[var(--bg-surface)] p-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-br-secondary bg-surface-card p-4">
         <div className="flex items-center gap-2">
-          <label
-            htmlFor="sortBy"
-            className="text-sm font-medium text-[var(--txt-secondary)]"
-          >
+          <label htmlFor="sortBy" className="text-sm font-medium text-txt-secondary">
             Sort by
           </label>
 
@@ -76,7 +69,7 @@ export const ForumCategory = () => {
             id="sortBy"
             value={sortBy}
             onChange={handleSortChange}
-            className="rounded-lg border border-[var(--br-secondary)] bg-[var(--bg-primary)] px-3 py-2 text-sm text-[var(--txt-primary)] focus:border-[var(--accent)] focus:outline-none"
+            className="rounded-lg border border-br-secondary bg-page px-3 py-2 text-sm text-txt-primary focus:border-accent focus:outline-none"
           >
             <option value="lastActivity">Last Activity</option>
 
@@ -90,7 +83,7 @@ export const ForumCategory = () => {
 
         <Link
           to={FORUM_PATHS.NEW_THREAD_FOR_CATEGORY(categoryId)}
-          className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--txt-highlight)] transition hover:bg-[var(--accent-hover)]"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-txt-highlight transition hover:bg-accent-hover"
         >
           New Thread
         </Link>

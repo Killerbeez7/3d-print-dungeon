@@ -14,7 +14,7 @@ export function PersonalizedRecommendations({
   recommendations,
 }: PersonalizedRecommendationsProps) {
   const fallbackContent = (
-    <div className="rounded-lg border border-br-subtle bg-bg-section p-6">
+    <div className="rounded-lg border border-br-subtle bg-section p-6">
       <p className="mb-2 text-lg font-semibold text-txt-primary">
         Personalized Recommendations
       </p>
@@ -24,7 +24,7 @@ export function PersonalizedRecommendations({
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className="rounded-lg bg-bg-surface p-4">
+          <div key={index} className="rounded-lg bg-surface-card p-4">
             <div className="w-full h-32 bg-br-secondary/30 rounded-lg mb-3"></div>
             <div className="h-4 bg-br-secondary/30 rounded mb-2"></div>
             <div className="h-3 bg-br-secondary/30 rounded w-1/2"></div>
@@ -40,13 +40,13 @@ export function PersonalizedRecommendations({
       fallbackContent={fallbackContent}
       showSettingsButton={true}
     >
-      <div className="rounded-lg border border-br-subtle bg-bg-section p-6">
+      <div className="rounded-lg border border-br-subtle bg-section p-6">
         <p className="mb-4 text-lg font-semibold text-txt-primary">Recommended for You</p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {recommendations.map((item) => (
             <div
               key={item.id}
-              className="rounded-lg border border-br-subtle bg-bg-surface p-4 transition-colors hover:border-accent/35"
+              className="rounded-lg border border-br-subtle bg-surface-card p-4 transition-colors hover:border-accent/35"
             >
               <div className="w-full h-32 bg-br-secondary/20 rounded-lg mb-3 flex items-center justify-center">
                 <span className="text-txt-secondary text-sm">Product Image</span>

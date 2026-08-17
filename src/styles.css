@@ -1,8 +1,4 @@
-@import "./styles/tokens.css";
-@import "./styles/layout.css";
-@import "./styles/buttons.css";
 @import "./styles/utilities.css";
-
 @import "tailwindcss";
 
 html {
@@ -16,7 +12,7 @@ body {
   box-sizing: border-box;
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
   font-size: 16px;
-  background-color: var(--bg-primary);
+  background-color: var(--bg-page);
   background-image: var(--ambient-brand);
   background-attachment: fixed;
 }
@@ -36,157 +32,12 @@ h6 {
   font-family: "Michroma", sans-serif;
 }
 
-/* Responsive heading sizes using CSS Custom Properties */
-h1 {
-  font-size: var(--heading-h1-mobile, 1.125rem);
-}
-
-h2 {
-  font-size: var(--heading-h2-mobile, 1rem);
-}
-
-h3 {
-  font-size: var(--heading-h3-mobile, 0.875rem);
-}
-
-h4 {
-  font-size: var(--heading-h4-mobile, 0.75rem);
-}
-
-h5 {
-  font-size: var(--heading-h5-mobile, 0.75rem);
-}
-
-h6 {
-  font-size: var(--heading-h6-mobile, 0.75rem);
-}
-
-/* Responsive breakpoints for headings */
-@media (min-width: 640px) {
-  h1 {
-    font-size: var(--heading-h1-sm, 1.25rem);
-  }
-  h2 {
-    font-size: var(--heading-h2-sm, 1.125rem);
-  }
-  h3 {
-    font-size: var(--heading-h3-sm, 1rem);
-  }
-  h4 {
-    font-size: var(--heading-h4-sm, 0.875rem);
-  }
-  h5 {
-    font-size: var(--heading-h5-sm, 0.875rem);
-  }
-  h6 {
-    font-size: var(--heading-h6-sm, 0.875rem);
-  }
-}
-
-@media (min-width: 768px) {
-  h1 {
-    font-size: var(--heading-h1-md, 1.5rem);
-  }
-  h2 {
-    font-size: var(--heading-h2-md, 1.25rem);
-  }
-  h3 {
-    font-size: var(--heading-h3-md, 1.125rem);
-  }
-  h4 {
-    font-size: var(--heading-h4-md, 1rem);
-  }
-  h5 {
-    font-size: var(--heading-h5-md, 1rem);
-  }
-  h6 {
-    font-size: var(--heading-h6-md, 1rem);
-  }
-}
-
-@media (min-width: 1024px) {
-  h1 {
-    font-size: var(--heading-h1-lg, 1.875rem);
-  }
-  h2 {
-    font-size: var(--heading-h2-lg, 1.5rem);
-  }
-  h3 {
-    font-size: var(--heading-h3-lg, 1.25rem);
-  }
-  h4 {
-    font-size: var(--heading-h4-lg, 1.125rem);
-  }
-  h5 {
-    font-size: var(--heading-h5-lg, 1.125rem);
-  }
-  h6 {
-    font-size: var(--heading-h6-lg, 1.125rem);
-  }
-}
-
-@media (min-width: 1280px) {
-  h1 {
-    font-size: var(--heading-h1-xl, 2.25rem);
-  }
-  h2 {
-    font-size: var(--heading-h2-xl, 1.875rem);
-  }
-  h3 {
-    font-size: var(--heading-h3-xl, 1.5rem);
-  }
-  h4 {
-    font-size: var(--heading-h4-xl, 1.25rem);
-  }
-  h5 {
-    font-size: var(--heading-h5-xl, 1.25rem);
-  }
-  h6 {
-    font-size: var(--heading-h6-xl, 1.25rem);
-  }
-}
-
-@media (min-width: 1536px) {
-  h1 {
-    font-size: var(--heading-h1-2xl, 2.25rem);
-  }
-  h2 {
-    font-size: var(--heading-h2-2xl, 2rem);
-  }
-  h3 {
-    font-size: var(--heading-h3-2xl, 1.75rem);
-  }
-  h4 {
-    font-size: var(--heading-h4-2xl, 1.5rem);
-  }
-  h5 {
-    font-size: var(--heading-h5-2xl, 1.5rem);
-  }
-  h6 {
-    font-size: var(--heading-h6-2xl, 1.5rem);
-  }
-}
-
 :root {
-  /*
-     * Color usage rules:
-     * - Neutral surfaces are the default foundation. Do not use accent color for full
-     *   sections, page backgrounds, or large card surfaces.
-     * - Violet is reserved for action, focus, active, link, selected, badge, and
-     *   small highlight states.
-     * - `--accent-soft` is for compact highlights only. It should not be used as
-     *   a full-section or large-card background.
-     * - `--surface-card` is the default card/input surface.
-     * - `--surface-elevated` is for modals, dropdowns, popovers, and overlays.
-     * - `--bg-section` is for large layout sections and persistent chrome.
-     */
-  --background-main-rgb: 247, 248, 250;
-  --background-second-rgb: 255, 255, 255;
-
   --bg-page: #f7f8fa;
   --bg-section: #ffffff;
   --bg-muted: #eef0f3;
   --bg-inverse: #0b0c0f;
+
   --surface-card: #ffffff;
   --surface-elevated: #f3f4f6;
   --surface-overlay: rgba(11, 12, 15, 0.64);
@@ -195,12 +46,6 @@ h6 {
     rgba(112, 93, 214, 0.035),
     transparent 58%
   );
-
-  --bg-primary: var(--bg-page);
-  --bg-secondary: var(--bg-section);
-  --bg-surface: var(--surface-card);
-  --bg-tertiary: var(--bg-muted);
-  --bg-reverse: var(--bg-inverse);
 
   --txt-primary: #15171c;
   --txt-secondary: #4b5563;
@@ -248,13 +93,11 @@ h6 {
 }
 
 [data-theme="dark"] {
-  --background-main-rgb: 11, 11, 15;
-  --background-second-rgb: 17, 18, 24;
-
   --bg-page: #0b0b0f;
   --bg-section: #111218;
   --bg-muted: #151821;
   --bg-inverse: #f7f8fa;
+
   --surface-card: #1a1d26;
   --surface-elevated: #212432;
   --surface-overlay: rgba(11, 11, 15, 0.78);
@@ -263,12 +106,6 @@ h6 {
     rgba(139, 122, 246, 0.06),
     transparent 58%
   );
-
-  --bg-primary: var(--bg-page);
-  --bg-secondary: var(--bg-section);
-  --bg-surface: var(--surface-card);
-  --bg-tertiary: var(--bg-muted);
-  --bg-reverse: var(--bg-inverse);
 
   --txt-primary: #f4f4f5;
   --txt-secondary: #c3c7cf;
@@ -285,11 +122,6 @@ h6 {
   --accent-rgb: 139, 122, 246;
   --logo-accent-filter: brightness(0) saturate(100%) invert(61%) sepia(72%)
     saturate(1375%) hue-rotate(214deg) brightness(99%) contrast(94%);
-  --atmosphere: radial-gradient(
-    1000px circle at 50% 0%,
-    rgba(139, 122, 246, 0.06),
-    transparent 62%
-  );
 
   --btn-primary: var(--accent);
   --btn-primary-hover: var(--accent-dark);
@@ -321,22 +153,16 @@ h6 {
 }
 
 @theme {
-  --color-bg-page: var(--bg-page);
-  --color-bg-section: var(--bg-section);
-  --color-bg-muted: var(--bg-muted);
-  --color-bg-inverse: var(--bg-inverse);
+  --color-page: var(--bg-page);
+  --color-section: var(--bg-section);
+  --color-muted: var(--bg-muted);
+  --color-inverse: var(--bg-inverse);
+
   --color-surface-card: var(--surface-card);
   --color-surface-elevated: var(--surface-elevated);
 
-  --color-bg-primary: var(--bg-primary);
-  --color-bg-secondary: var(--bg-secondary);
-  --color-bg-surface: var(--bg-surface);
-  --color-bg-tertiary: var(--bg-tertiary);
-  --color-bg-reverse: var(--bg-reverse);
-
   --color-txt-primary: var(--txt-primary);
   --color-txt-secondary: var(--txt-secondary);
-  --color-txt-highlighted: var(--txt-highlight);
   --color-txt-highlight: var(--txt-highlight);
   --color-txt-muted: var(--txt-muted);
   --color-txt-inverse: var(--txt-inverse);
@@ -375,11 +201,6 @@ h6 {
   --color-info: var(--info);
 
   --color-model-viewer-background: var(--model-viewer-background);
-
-  --color-auth-modal-error: var(--error);
-  --color-auth-modal-error-text: var(--txt-muted);
-  --color-auth-modal-text-primary: var(--txt-secondary);
-  --color-auth-modal-text-secondary: var(--txt-muted);
 }
 
 /* Custom Divider */
@@ -390,13 +211,6 @@ h6 {
     var(--br-primary) 50%,
     rgba(0, 0, 0, 0) 90%
   );
-  background-position: top;
-  background-repeat: no-repeat;
-  background-size: 100% 1px;
-}
-
-.divider-top-left {
-  background-image: linear-gradient(to right, var(--br-primary), rgba(0, 0, 0, 0) 65%);
   background-position: top;
   background-repeat: no-repeat;
   background-size: 100% 1px;

@@ -8,7 +8,7 @@ export interface PrintedFigure {
 }
 
 export const PrintedFigureCard: FC<{ figure: PrintedFigure }> = ({ figure }) => (
-    <div className="bg-bg-surface rounded shadow p-2 flex flex-col items-center">
+    <div className="bg-surface-card rounded shadow p-2 flex flex-col items-center">
         <img
             src={figure.image}
             alt={figure.name}

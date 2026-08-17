@@ -29,7 +29,7 @@ export const EventEntryForm = ({
     };
 
     return (
-        <form className="max-w-xl mx-auto py-8 px-6 bg-[var(--bg-surface)] rounded-lg shadow text-center" onSubmit={handleSubmit}>
+        <form className="max-w-xl mx-auto py-8 px-6 bg-surface-card rounded-lg shadow text-center" onSubmit={handleSubmit}>
             <h2 className="text-2xl font-bold mb-4">Submit Your Entry</h2>
             {error && <div className="mb-2 text-red-600">{error}</div>}
             <div className="mb-3">
@@ -38,7 +38,7 @@ export const EventEntryForm = ({
                     type="text"
                     value={userName}
                     onChange={(e) => setUserName(e.target.value)}
-                    className="w-full border border-br-secondary rounded px-2 py-2 bg-bg-surface text-txt-primary focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition"
+                    className="w-full border border-br-secondary rounded px-2 py-2 bg-surface-card text-txt-primary focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition"
                     required
                 />
             </div>
@@ -48,7 +48,7 @@ export const EventEntryForm = ({
                     type="url"
                     value={imageUrl}
                     onChange={(e) => setImageUrl(e.target.value)}
-                    className="w-full border border-br-secondary rounded px-2 py-2 bg-bg-surface text-txt-primary focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition"
+                    className="w-full border border-br-secondary rounded px-2 py-2 bg-surface-card text-txt-primary focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition"
                     required
                 />
             </div>
@@ -57,13 +57,13 @@ export const EventEntryForm = ({
                 <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full border border-br-secondary rounded px-2 py-2 bg-bg-surface text-txt-primary focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition"
+                    className="w-full border border-br-secondary rounded px-2 py-2 bg-surface-card text-txt-primary focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition"
                     required
                 />
             </div>
             <button
                 type="submit"
-                className="mt-4 px-6 py-2 bg-[var(--accent)] text-white rounded font-semibold hover:bg-[var(--accent-hover)] transition"
+                className="mt-4 px-6 py-2 bg-accent text-white rounded font-semibold hover:bg-accent-hover transition"
             >
                 Submit Entry
             </button>

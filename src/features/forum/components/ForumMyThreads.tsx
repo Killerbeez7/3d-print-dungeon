@@ -181,15 +181,13 @@ export const ForumMyThreads = () => {
     return (
       <div className="max-w-6xl mx-auto space-y-8">
         <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold text-[var(--txt-primary)]">My Threads</h1>
+          <h1 className="text-3xl font-bold text-txt-primary">My Threads</h1>
 
-          <p className="text-[var(--txt-secondary)]">
-            Please log in to view your threads.
-          </p>
+          <p className="text-txt-secondary">Please log in to view your threads.</p>
 
           <Link
             to={FORUM_PATHS.HOME}
-            className="inline-block px-6 py-3 bg-[var(--accent)] text-[var(--txt-highlight)] rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
+            className="inline-block px-6 py-3 bg-accent text-txt-highlight rounded-lg hover:bg-accent-hover transition-colors"
           >
             Back to Forum
           </Link>
@@ -202,120 +200,114 @@ export const ForumMyThreads = () => {
     <div className="max-w-6xl mx-auto space-y-8">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-[var(--txt-primary)]">My Threads</h1>
+        <h1 className="text-4xl font-bold text-txt-primary">My Threads</h1>
 
-        <p className="text-lg text-[var(--txt-secondary)] max-w-2xl mx-auto leading-relaxed">
+        <p className="text-lg text-txt-secondary max-w-2xl mx-auto leading-relaxed">
           Manage and track your forum contributions, engagement, and community impact.
         </p>
       </div>
 
       {/* Statistics Dashboard */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div className="p-6 border border-[var(--br-secondary)] rounded-xl bg-[var(--bg-tertiary)] text-center">
-          <div className="text-2xl font-bold text-[var(--txt-primary)] mb-2">
+        <div className="p-6 border border-br-secondary rounded-xl bg-muted text-center">
+          <div className="text-2xl font-bold text-txt-primary mb-2">
             {stats.totalThreads}
           </div>
 
-          <div className="text-sm text-[var(--txt-secondary)]">Total Threads</div>
+          <div className="text-sm text-txt-secondary">Total Threads</div>
         </div>
 
-        <div className="p-6 border border-[var(--br-secondary)] rounded-xl bg-[var(--bg-tertiary)] text-center">
-          <div className="text-2xl font-bold text-[var(--txt-primary)] mb-2">
+        <div className="p-6 border border-br-secondary rounded-xl bg-muted text-center">
+          <div className="text-2xl font-bold text-txt-primary mb-2">
             {stats.totalViews}
           </div>
 
-          <div className="text-sm text-[var(--txt-secondary)]">Total Views</div>
+          <div className="text-sm text-txt-secondary">Total Views</div>
         </div>
 
-        <div className="p-6 border border-[var(--br-secondary)] rounded-xl bg-[var(--bg-tertiary)] text-center">
-          <div className="text-2xl font-bold text-[var(--txt-primary)] mb-2">
+        <div className="p-6 border border-br-secondary rounded-xl bg-muted text-center">
+          <div className="text-2xl font-bold text-txt-primary mb-2">
             {stats.totalRepliesReceived}
           </div>
 
-          <div className="text-sm text-[var(--txt-secondary)]">Replies Received</div>
+          <div className="text-sm text-txt-secondary">Replies Received</div>
         </div>
 
-        <div className="p-6 border border-[var(--br-secondary)] rounded-xl bg-[var(--bg-tertiary)] text-center">
-          <div className="text-2xl font-bold text-[var(--txt-primary)] mb-2">
+        <div className="p-6 border border-br-secondary rounded-xl bg-muted text-center">
+          <div className="text-2xl font-bold text-txt-primary mb-2">
             {stats.avgViewsPerThread}
           </div>
 
-          <div className="text-sm text-[var(--txt-secondary)]">Avg Views/Thread</div>
+          <div className="text-sm text-txt-secondary">Avg Views/Thread</div>
         </div>
       </div>
 
       {/* Advanced Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-6 border border-[var(--br-secondary)] rounded-xl">
+        <div className="p-6 border border-br-secondary rounded-xl">
           <div className="flex items-center gap-3 mb-4">
-            <FaChartLine className="text-[var(--txt-secondary)]" size={20} />
+            <FaChartLine className="text-txt-secondary" size={20} />
 
-            <h3 className="font-semibold text-[var(--txt-primary)]">
-              Engagement Metrics
-            </h3>
+            <h3 className="font-semibold text-txt-primary">Engagement Metrics</h3>
           </div>
 
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-sm text-[var(--txt-secondary)]">
-                Avg Views/Thread
-              </span>
+              <span className="text-sm text-txt-secondary">Avg Views/Thread</span>
 
-              <span className="font-semibold text-[var(--txt-primary)]">
+              <span className="font-semibold text-txt-primary">
                 {stats.avgViewsPerThread}
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-sm text-[var(--txt-secondary)]">
-                Avg Replies/Thread
-              </span>
+              <span className="text-sm text-txt-secondary">Avg Replies/Thread</span>
 
-              <span className="font-semibold text-[var(--txt-primary)]">
+              <span className="font-semibold text-txt-primary">
                 {stats.avgRepliesPerThread}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="p-6 border border-[var(--br-secondary)] rounded-xl">
+        <div className="p-6 border border-br-secondary rounded-xl">
           <div className="flex items-center gap-3 mb-4">
-            <FaThumbtack className="text-[var(--txt-secondary)]" size={20} />
+            <FaThumbtack className="text-txt-secondary" size={20} />
 
-            <h3 className="font-semibold text-[var(--txt-primary)]">Thread Status</h3>
+            <h3 className="font-semibold text-txt-primary">Thread Status</h3>
           </div>
 
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-sm text-[var(--txt-secondary)]">Pinned Threads</span>
+              <span className="text-sm text-txt-secondary">Pinned Threads</span>
 
-              <span className="font-semibold text-[var(--txt-primary)]">
+              <span className="font-semibold text-txt-primary">
                 {stats.pinnedThreads}
               </span>
             </div>
 
             <div className="flex justify-between">
-              <span className="text-sm text-[var(--txt-secondary)]">Locked Threads</span>
+              <span className="text-sm text-txt-secondary">Locked Threads</span>
 
-              <span className="font-semibold text-[var(--txt-primary)]">
+              <span className="font-semibold text-txt-primary">
                 {stats.lockedThreads}
               </span>
             </div>
           </div>
         </div>
 
-        <div className="p-6 border border-[var(--br-secondary)] rounded-xl">
+        <div className="p-6 border border-br-secondary rounded-xl">
           <div className="flex items-center gap-3 mb-4">
-            <FaStar className="text-[var(--txt-secondary)]" size={20} />
+            <FaStar className="text-txt-secondary" size={20} />
 
-            <h3 className="font-semibold text-[var(--txt-primary)]">Activity Summary</h3>
+            <h3 className="font-semibold text-txt-primary">Activity Summary</h3>
           </div>
 
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-sm text-[var(--txt-secondary)]">This Week</span>
+              <span className="text-sm text-txt-secondary">This Week</span>
 
-              <span className="font-semibold text-[var(--txt-primary)]">
+              <span className="font-semibold text-txt-primary">
                 {
                   allThreads.filter((thread) => {
                     const daysSinceCreated =
@@ -329,9 +321,9 @@ export const ForumMyThreads = () => {
             </div>
 
             <div className="flex justify-between">
-              <span className="text-sm text-[var(--txt-secondary)]">This Month</span>
+              <span className="text-sm text-txt-secondary">This Month</span>
 
-              <span className="font-semibold text-[var(--txt-primary)]">
+              <span className="font-semibold text-txt-primary">
                 {
                   allThreads.filter((thread) => {
                     const daysSinceCreated =
@@ -359,11 +351,11 @@ export const ForumMyThreads = () => {
               onChange={(event) => {
                 setSearchQuery(event.target.value);
               }}
-              className="pl-10 pr-4 py-2 border border-[var(--br-secondary)] rounded-lg bg-[var(--bg-surface)] text-[var(--txt-primary)] focus:outline-none focus:border-[var(--br-primary)]"
+              className="pl-10 pr-4 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:outline-none focus:border-br-primary"
             />
 
             <FaFilter
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--txt-secondary)]"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-txt-secondary"
               size={14}
             />
           </div>
@@ -374,7 +366,7 @@ export const ForumMyThreads = () => {
             onChange={(event) => {
               setFilterBy(event.target.value as FilterOption);
             }}
-            className="px-4 py-2 border border-[var(--br-secondary)] rounded-lg bg-[var(--bg-surface)] text-[var(--txt-primary)] focus:outline-none focus:border-[var(--br-primary)]"
+            className="px-4 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:outline-none focus:border-br-primary"
           >
             <option value="all">All Threads</option>
 
@@ -393,7 +385,7 @@ export const ForumMyThreads = () => {
             onChange={(event) => {
               setSortBy(event.target.value as SortOption);
             }}
-            className="px-4 py-2 border border-[var(--br-secondary)] rounded-lg bg-[var(--bg-surface)] text-[var(--txt-primary)] focus:outline-none focus:border-[var(--br-primary)]"
+            className="px-4 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:outline-none focus:border-br-primary"
           >
             <option value="newest">Newest First</option>
 
@@ -407,7 +399,7 @@ export const ForumMyThreads = () => {
           </select>
         </div>
 
-        <div className="text-sm text-[var(--txt-secondary)]">
+        <div className="text-sm text-txt-secondary">
           {filteredThreads.length} of {allThreads.length} threads
         </div>
       </div>
@@ -423,10 +415,7 @@ export const ForumMyThreads = () => {
         {threadsLoading ? (
           [...Array(3)].map((_, index) => {
             return (
-              <div
-                key={index}
-                className="p-6 border border-[var(--br-secondary)] rounded-xl"
-              >
+              <div key={index} className="p-6 border border-br-secondary rounded-xl">
                 <Skeleton className="h-6 w-3/4 mb-3" />
                 <Skeleton className="h-4 w-full mb-2" />
                 <Skeleton className="h-4 w-2/3 mb-4" />
@@ -448,7 +437,7 @@ export const ForumMyThreads = () => {
               onClick={() => {
                 window.location.reload();
               }}
-              className="px-4 py-2 bg-[var(--accent)] text-[var(--txt-highlight)] rounded-lg"
+              className="px-4 py-2 bg-accent text-txt-highlight rounded-lg"
             >
               Retry
             </button>
@@ -462,14 +451,14 @@ export const ForumMyThreads = () => {
               return (
                 <div
                   key={thread.id}
-                  className="p-6 border border-[var(--br-secondary)] rounded-xl hover:border-[var(--br-primary)] transition-colors"
+                  className="p-6 border border-br-secondary rounded-xl hover:border-br-primary transition-colors"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <Link
                           to={FORUM_PATHS.THREAD(thread.id)}
-                          className="text-lg font-semibold text-[var(--txt-primary)] hover:text-[var(--accent)] transition-colors"
+                          className="text-lg font-semibold text-txt-primary hover:text-accent transition-colors"
                         >
                           {thread.title}
                         </Link>
@@ -481,11 +470,11 @@ export const ForumMyThreads = () => {
                         {thread.isLocked && <FaLock className="text-red-500" size={14} />}
                       </div>
 
-                      <p className="text-[var(--txt-secondary)] mb-4 line-clamp-2">
+                      <p className="text-txt-secondary mb-4 line-clamp-2">
                         {thread.content}
                       </p>
 
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-[var(--txt-secondary)]">
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-txt-secondary">
                         <div className="flex items-center gap-1">
                           <FaCalendar size={12} />
 
@@ -505,7 +494,7 @@ export const ForumMyThreads = () => {
                         </div>
 
                         <div className="flex items-center gap-1">
-                          <span className="px-2 py-1 bg-[var(--bg-tertiary)] rounded-full text-xs">
+                          <span className="px-2 py-1 bg-muted rounded-full text-xs">
                             {categories.find((category) => {
                               return category.id === thread.categoryId;
                             })?.name ?? "Category"}
@@ -517,7 +506,7 @@ export const ForumMyThreads = () => {
                     <div className="flex gap-2">
                       <Link
                         to={FORUM_PATHS.THREAD_EDIT(thread.id)}
-                        className="p-2 text-[var(--txt-secondary)] hover:text-[var(--accent)] hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors"
+                        className="p-2 text-txt-secondary hover:text-accent hover:bg-muted rounded-lg transition-colors"
                         title="Edit Thread"
                       >
                         <FaEdit size={14} />
@@ -529,7 +518,7 @@ export const ForumMyThreads = () => {
                           void handleDeleteThread(thread);
                         }}
                         disabled={isDeletingThisThread}
-                        className="p-2 text-[var(--txt-secondary)] hover:text-red-500 hover:bg-[var(--bg-tertiary)] rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                        className="p-2 text-txt-secondary hover:text-red-500 hover:bg-muted rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-60"
                         title="Delete Thread"
                       >
                         {isDeletingThisThread ? (
@@ -552,7 +541,7 @@ export const ForumMyThreads = () => {
                     void fetchNextPage();
                   }}
                   disabled={isFetchingNextPage}
-                  className="px-6 py-3 bg-[var(--accent)] text-[var(--txt-highlight)] rounded-lg hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50"
+                  className="px-6 py-3 bg-accent text-txt-highlight rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
                 >
                   {isFetchingNextPage ? "Loading..." : "Load More"}
                 </button>
@@ -561,11 +550,11 @@ export const ForumMyThreads = () => {
           </>
         ) : (
           <div className="text-center py-12">
-            <h3 className="text-xl font-semibold text-[var(--txt-primary)] mb-2">
+            <h3 className="text-xl font-semibold text-txt-primary mb-2">
               {searchQuery || filterBy !== "all" ? "No threads found" : "No threads yet"}
             </h3>
 
-            <p className="text-[var(--txt-secondary)] mb-6">
+            <p className="text-txt-secondary mb-6">
               {searchQuery || filterBy !== "all"
                 ? "Try adjusting your search or filter criteria."
                 : "Start your first discussion to see it here!"}
@@ -579,7 +568,7 @@ export const ForumMyThreads = () => {
                     setSearchQuery("");
                     setFilterBy("all");
                   }}
-                  className="px-6 py-3 border border-[var(--br-secondary)] text-[var(--txt-primary)] rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors"
+                  className="px-6 py-3 border border-br-secondary text-txt-primary rounded-lg hover:bg-muted transition-colors"
                 >
                   Clear Filters
                 </button>
@@ -587,7 +576,7 @@ export const ForumMyThreads = () => {
 
               <Link
                 to={FORUM_PATHS.NEW_THREAD}
-                className="inline-block px-6 py-3 bg-[var(--accent)] text-[var(--txt-highlight)] rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
+                className="inline-block px-6 py-3 bg-accent text-txt-highlight rounded-lg hover:bg-accent-hover transition-colors"
               >
                 Create Thread
               </Link>

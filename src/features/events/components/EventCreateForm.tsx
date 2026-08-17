@@ -74,7 +74,7 @@ export const EventCreateForm = ({
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-surface text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
+                    className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
                     required
                 />
             </div>
@@ -83,7 +83,7 @@ export const EventCreateForm = ({
                 <select
                     value={type}
                     onChange={(e) => setType(e.target.value as EventType)}
-                    className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-surface text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
+                    className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
                 >
                     <option value="competition">Competition</option>
                     <option value="meetup">Meetup</option>
@@ -95,7 +95,7 @@ export const EventCreateForm = ({
                 <textarea
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-surface text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
+                    className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
                     rows={3}
                     required
                 />
@@ -106,7 +106,7 @@ export const EventCreateForm = ({
                     type="url"
                     value={bannerUrl}
                     onChange={(e) => setBannerUrl(e.target.value)}
-                    className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-surface text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
+                    className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
                     required
                 />
             </div>
@@ -117,7 +117,7 @@ export const EventCreateForm = ({
                         type="date"
                         value={startDate}
                         onChange={(e) => setStartDate(e.target.value)}
-                        className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-surface text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
+                        className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
                         required
                     />
                 </div>
@@ -127,7 +127,7 @@ export const EventCreateForm = ({
                         type="date"
                         value={endDate}
                         onChange={(e) => setEndDate(e.target.value)}
-                        className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-surface text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
+                        className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
                         required
                     />
                 </div>
@@ -139,7 +139,7 @@ export const EventCreateForm = ({
                         type="text"
                         value={prizes}
                         onChange={(e) => setPrizes(e.target.value)}
-                        className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-surface text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
+                        className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
                         required={type === "competition"}
                     />
                 </div>
@@ -149,7 +149,7 @@ export const EventCreateForm = ({
                 <textarea
                     value={rules}
                     onChange={(e) => setRules(e.target.value)}
-                    className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-surface text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
+                    className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
                     rows={3}
                 />
             </div>
@@ -160,7 +160,7 @@ export const EventCreateForm = ({
                         type="text"
                         value={location}
                         onChange={(e) => setLocation(e.target.value)}
-                        className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-surface text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
+                        className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent transition-colors"
                     />
                 </div>
             )}

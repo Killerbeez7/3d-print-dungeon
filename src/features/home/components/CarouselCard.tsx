@@ -40,9 +40,9 @@ export const CarouselCard = ({
       className="group block"
     >
       <div
-        className="relative overflow-hidden rounded-xl bg-bg-surface 
-                border border-br-subtle/70 shadow-token-sm transition-all duration-300 
-                hover:border-accent/30 hover:shadow-token-lg"
+        className="relative overflow-hidden rounded-xl bg-surface-card
+                border border-br-subtle/70 shadow-sm transition-all duration-300
+                hover:border-accent/30 hover:shadow-lg"
         style={{ height }}
       >
         {/* Image */}
@@ -62,8 +62,8 @@ export const CarouselCard = ({
         />
 
         {/* Base gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-bg-page/82 via-bg-page/25 to-transparent pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-b from-bg-page/12 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-page/82 via-page/25 to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-page/12 via-transparent to-transparent pointer-events-none" />
 
         {/* Hover gradient overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_100%,rgba(var(--accent-rgb),0.1),transparent_58%)] pointer-events-none opacity-0 transition-opacity duration-300 group-hover:opacity-100" />

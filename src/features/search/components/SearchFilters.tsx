@@ -12,7 +12,7 @@ export const SearchFilters = () => {
   };
 
   return (
-    <div className="mx-auto max-w-xl rounded-lg border border-br-secondary bg-bg-surface p-4">
+    <div className="mx-auto max-w-xl rounded-lg border border-br-secondary bg-surface-card p-4">
       <div className="mb-3 flex items-center justify-between">
         <h3 className="text-sm font-medium text-txt-secondary">Filters</h3>
 

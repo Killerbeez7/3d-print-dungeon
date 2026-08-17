@@ -28,7 +28,7 @@ export const RisingModelsPage = () => {
             className={
               period === 7
                 ? "rounded-full bg-accent px-4 py-2 text-btn-primary-text"
-                : "rounded-full bg-bg-surface px-4 py-2 text-txt-secondary hover:text-txt-primary"
+                : "rounded-full bg-surface-card px-4 py-2 text-txt-secondary hover:text-txt-primary"
             }
           >
             Last 7 days
@@ -42,7 +42,7 @@ export const RisingModelsPage = () => {
             className={
               period === 30
                 ? "rounded-full bg-accent px-4 py-2 text-btn-primary-text"
-                : "rounded-full bg-bg-surface px-4 py-2 text-txt-secondary hover:text-txt-primary"
+                : "rounded-full bg-surface-card px-4 py-2 text-txt-secondary hover:text-txt-primary"
             }
           >
             Last 30 days

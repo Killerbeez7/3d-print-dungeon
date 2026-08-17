@@ -5,7 +5,7 @@ import FocusLock from "react-focus-lock";
 import { createPortal } from "react-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faXmark, faUndo } from "@fortawesome/free-solid-svg-icons";
-
+import { Button } from "@/components";
 import { getCroppedImg } from "./cropUtils";
 
 export interface ImageCropModalProps {
@@ -75,12 +75,12 @@ export const ImageCropModal: FC<ImageCropModalProps> = ({
     <div className="fixed inset-0 z-[11000] flex items-center justify-center animate-fade-in">
       <div className="absolute inset-0 bg-black/60" onClick={onClose} />
       <FocusLock returnFocus>
-        <div className="relative bg-bg-secondary rounded-2xl shadow-xl border border-br-secondary w-[90vw] max-w-5xl h-[90vh] max-h-[90vh] mx-4 flex flex-col">
+        <div className="relative bg-section rounded-2xl shadow-xl border border-br-secondary w-[90vw] max-w-5xl h-[90vh] max-h-[90vh] mx-4 flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-br-secondary">
             <h2 className="text-xl font-bold text-txt-primary">Adjust Image</h2>
             <button
-              className="p-2 rounded-full hover:bg-bg-surface transition-colors text-txt-secondary"
+              className="p-2 rounded-full hover:bg-surface-card transition-colors text-txt-secondary"
               onClick={onClose}
               aria-label="Close"
             >
@@ -89,7 +89,7 @@ export const ImageCropModal: FC<ImageCropModalProps> = ({
           </div>
 
           {/* Cropper */}
-          <div className="relative flex-grow min-h-0 flex items-center justify-center bg-bg-primary overflow-hidden p-6">
+          <div className="relative flex-grow min-h-0 flex items-center justify-center bg-page overflow-hidden p-6">
             <Cropper
               image={imageUrl}
               crop={crop}
@@ -111,43 +111,37 @@ export const ImageCropModal: FC<ImageCropModalProps> = ({
             {/* Aspect Ratio */}
             <div className="flex justify-center items-center gap-2">
               {aspectRatios.map(({ label, value }) => (
-                <button
+                <Button
                   key={label}
+                  type="button"
+                  size="sm"
+                  variant={aspect === value ? "primary" : "secondary"}
                   onClick={() => setAspect(value)}
-                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
-                    aspect === value
-                      ? "cta-button shadow-lg hover:shadow-xl hover:scale-105 transform transition-transform duration-150"
-                      : "secondary-button shadow hover:shadow-lg hover:scale-105 transform transition-transform duration-150"
-                  }`}
+                  aria-pressed={aspect === value}
+                  className="transition-transform duration-150 hover:scale-105"
                 >
                   {label}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
 
           {/* Footer */}
-          <div className="flex justify-between items-center gap-3 p-4 bg-bg-surface border-t border-br-secondary rounded-b-2xl">
-            <button
-              className="secondary-button px-4 py-2 rounded-lg flex items-center gap-2 shadow-md hover:shadow-lg hover:scale-105 transform transition-transform duration-150 transition-colors"
-              onClick={handleReset}
-            >
+          <div className="flex justify-between items-center gap-3 p-4 bg-surface-card border-t border-br-secondary rounded-b-2xl">
+            <Button onClick={handleReset}>
               <FontAwesomeIcon icon={faUndo} /> Reset
-            </button>
+            </Button>
             <div className="flex gap-3">
-              <button
-                className="secondary-button px-4 py-2 rounded-lg shadow hover:shadow-lg hover:scale-105 transform transition-transform duration-150 transition-colors"
-                onClick={onClose}
-              >
+              <Button variant="secondary" onClick={onClose}>
                 Cancel
-              </button>
-              <button
-                className="cta-button px-4 py-2 rounded-lg flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 transform transition-transform duration-150 transition-colors disabled:opacity-50"
+              </Button>
+              <Button
                 onClick={handleApply}
                 disabled={!croppedAreaPixels}
+                leftIcon={<FontAwesomeIcon icon={faCheck} />}
               >
-                <FontAwesomeIcon icon={faCheck} /> Apply
-              </button>
+                Apply
+              </Button>
             </div>
           </div>
         </div>

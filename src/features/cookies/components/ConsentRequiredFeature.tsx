@@ -31,7 +31,7 @@ export function ConsentRequiredFeature({
         <button
           type="button"
           onClick={openSettings}
-          className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+          className="mt-4 rounded-lg bg-page px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-page/90"
         >
           Manage Cookie Preferences
         </button>

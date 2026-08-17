@@ -225,7 +225,10 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
   const visibleNotifications = showAllNotifications ? notifications : recentNotifications;
 
   return (
-    <div ref={dropdownRef} className={`relative flex h-9 w-9 items-center justify-center ${className}`}>
+    <div
+      ref={dropdownRef}
+      className={`relative flex h-9 w-9 items-center justify-center ${className}`}
+    >
       <button
         type="button"
         onClick={handleBellClick}
@@ -234,12 +237,9 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
         }
         aria-expanded={isMobile ? undefined : isOpen}
         aria-controls={isMobile ? undefined : "notification-dropdown"}
-        className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg p-1 text-txt-secondary transition-colors duration-200 hover:bg-bg-surface hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
+        className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg p-1 text-txt-secondary transition-colors duration-200 hover:bg-surface-card hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
       >
-        <MdNotifications
-          aria-hidden="true"
-          className="h-7 w-7"
-        />
+        <MdNotifications aria-hidden="true" className="h-7 w-7" />
 
         {unreadCount > 0 && (
           <span
@@ -256,13 +256,13 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
           id="notification-dropdown"
           role="region"
           aria-label="Notifications"
-          className="absolute right-0 top-12 z-50 w-80 rounded-xl border border-br-secondary bg-bg-secondary shadow-xl"
+          className="absolute right-0 top-12 z-50 w-80 rounded-xl border border-br-secondary bg-section shadow-xl"
         >
           <div className="border-b border-br-secondary/30 p-3">
             <button
               type="button"
               onClick={handleOpenNotificationsCenter}
-              className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm text-txt-secondary transition-colors hover:bg-bg-surface hover:text-txt-primary"
+              className="flex w-full items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm text-txt-secondary transition-colors hover:bg-surface-card hover:text-txt-primary"
             >
               <Settings className="h-4 w-4" aria-hidden="true" />
               <span>Notifications Center</span>
@@ -290,7 +290,7 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
                     key={notification.id}
                     type="button"
                     onClick={() => handleNotificationClick(notification)}
-                    className="flex w-full items-center gap-3 rounded-lg border border-transparent p-2 text-left transition-all duration-200 hover:border-br-primary/30 hover:bg-bg-surface/50"
+                    className="flex w-full items-center gap-3 rounded-lg border border-transparent p-2 text-left transition-all duration-200 hover:border-br-primary/30 hover:bg-surface-card/50"
                   >
                     <img
                       src={getAvatarUrlWithCacheBust(getNotificationAvatar(notification))}
@@ -318,7 +318,7 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
               <button
                 type="button"
                 onClick={handleViewAll}
-                className="flex w-full items-center justify-center rounded-lg px-3 py-2 text-sm text-txt-secondary transition-colors hover:bg-bg-surface hover:text-txt-primary"
+                className="flex w-full items-center justify-center rounded-lg px-3 py-2 text-sm text-txt-secondary transition-colors hover:bg-surface-card hover:text-txt-primary"
               >
                 {showAllNotifications ? "Show Less" : "View All"}
               </button>

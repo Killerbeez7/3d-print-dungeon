@@ -72,7 +72,7 @@ export const AuthModal = () => {
           onMouseUp={handleMouseUp}
           className={`
                         fixed z-[11001] w-full max-w-md
-                        bg-bg-surface text-txt-primary
+                        bg-surface-card text-txt-primary
                         border border-br-secondary rounded-none md:rounded-2xl shadow-2xl
                         left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
                         transition-all duration-300 ease-out
@@ -83,7 +83,7 @@ export const AuthModal = () => {
           <div className="relative p-6 pb-4">
             {/* Close button */}
             <button
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-bg-tertiary transition-colors duration-200 text-txt-muted hover:text-txt-primary"
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted transition-colors duration-200 text-txt-muted hover:text-txt-primary"
               onClick={handleClose}
               onMouseDown={(e) => e.stopPropagation()}
               onMouseUp={(e) => e.stopPropagation()}

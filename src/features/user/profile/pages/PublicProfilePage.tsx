@@ -9,7 +9,6 @@ import { UserStats } from "../components/UserStats";
 import { ProfileSettingsPanel } from "../components/ProfileSettingsPanel";
 import { PrivateStats } from "../components/PrivateStats";
 import { Spinner } from "@/features/shared/reusable/Spinner";
-import { H1 } from "@/components/ResponsiveHeading";
 
 export const PublicProfilePage = () => {
   const { username } = useParams<{ username: string }>();
@@ -29,9 +28,7 @@ export const PublicProfilePage = () => {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
-          <H1 size="2xl" className="text-txt-primary mb-4">
-            User Not Found
-          </H1>
+          <h1 className="text-2xl text-txt-primary mb-4">User Not Found</h1>
 
           <p className="text-txt-secondary">
             {isError
@@ -46,7 +43,7 @@ export const PublicProfilePage = () => {
   const isOwner = currentUser?.uid === profile.uid;
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <div className="min-h-screen bg-page">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <UserHeader user={profile} />
 

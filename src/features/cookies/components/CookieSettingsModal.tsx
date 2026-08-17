@@ -187,7 +187,7 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
         role="dialog"
         aria-modal="true"
         aria-labelledby="cookie-settings-title"
-        className="flex max-h-[82vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-br-secondary bg-bg-secondary shadow-2xl"
+        className="flex max-h-[82vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-br-secondary bg-section shadow-2xl"
       >
         {/* Header */}
         <div className="flex-shrink-0 border-b border-br-secondary px-5 py-4">
@@ -210,7 +210,7 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
               type="button"
               onClick={onClose}
               aria-label="Close cookie settings"
-              className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-br-secondary bg-bg-surface text-sm text-txt-secondary transition-all hover:border-br-primary hover:text-txt-primary"
+              className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-br-secondary bg-surface-card text-sm text-txt-secondary transition-all hover:border-br-primary hover:text-txt-primary"
             >
               ✕
             </button>
@@ -218,7 +218,7 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
         </div>
 
         {/* Cookie Categories */}
-        <div className="custom-scrollbar-md flex-1 overflow-y-auto bg-bg-primary/60 p-3">
+        <div className="custom-scrollbar-md flex-1 overflow-y-auto bg-page/60 p-3">
           <div className="space-y-2">
             {categoryEntries.map(([category, info]) => {
               const isExpanded = expandedSections.has(category);
@@ -227,7 +227,7 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
               return (
                 <div
                   key={category}
-                  className="overflow-hidden rounded-xl border border-br-secondary bg-bg-secondary transition-colors hover:border-br-primary"
+                  className="overflow-hidden rounded-xl border border-br-secondary bg-section transition-colors hover:border-br-primary"
                 >
                   {/* Category Header */}
                   <div className="px-3 py-2.5">
@@ -237,7 +237,7 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
                         onClick={() => toggleSection(category)}
                         aria-label={`${isExpanded ? "Collapse" : "Expand"} ${info.title}`}
                         aria-expanded={isExpanded}
-                        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-br-secondary bg-bg-surface text-lg font-medium leading-none text-primary transition-all hover:border-primary/40 hover:bg-primary/10"
+                        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-br-secondary bg-surface-card text-lg font-medium leading-none text-primary transition-all hover:border-primary/40 hover:bg-page/10"
                       >
                         {isExpanded ? "−" : "+"}
                       </button>
@@ -275,7 +275,7 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
 
                   {/* Expanded Details */}
                   {isExpanded && (
-                    <div className="space-y-3 border-t border-br-secondary bg-bg-surface/40 px-4 py-3">
+                    <div className="space-y-3 border-t border-br-secondary bg-surface-card/40 px-4 py-3">
                       <div>
                         <h4 className="mb-1.5 text-xs font-medium text-txt-primary">
                           What these cookies do
@@ -308,7 +308,7 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
                         </ul>
                       </div>
 
-                      <div className="rounded-lg border border-br-secondary bg-bg-primary/50 p-2.5">
+                      <div className="rounded-lg border border-br-secondary bg-page/50 p-2.5">
                         <h4 className="mb-1 text-xs font-medium text-txt-primary">
                           Impact of disabling
                         </h4>
@@ -326,12 +326,12 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
         </div>
 
         {/* Footer */}
-        <div className="flex-shrink-0 border-t border-br-secondary bg-bg-secondary px-4 py-3">
+        <div className="flex-shrink-0 border-t border-br-secondary bg-section px-4 py-3">
           <div className="flex flex-wrap items-center justify-center gap-2">
             <button
               type="button"
               onClick={handleDeclineNonEssentials}
-              className="min-w-[135px] rounded-lg border border-br-secondary px-4 py-2 text-xs font-medium text-txt-secondary transition-colors hover:border-br-primary hover:bg-bg-surface hover:text-txt-primary"
+              className="min-w-[135px] rounded-lg border border-br-secondary px-4 py-2 text-xs font-medium text-txt-secondary transition-colors hover:border-br-primary hover:bg-surface-card hover:text-txt-primary"
             >
               Decline
             </button>
@@ -339,7 +339,7 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
             <button
               type="button"
               onClick={handleSaveSettings}
-              className="min-w-[135px] rounded-lg border border-primary/40 bg-primary/10 px-4 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/15"
+              className="min-w-[135px] rounded-lg border border-primary/40 bg-page/10 px-4 py-2 text-xs font-medium text-primary transition-colors hover:bg-page/15"
             >
               Save Preferences
             </button>
@@ -347,7 +347,7 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
             <button
               type="button"
               onClick={handleAcceptAll}
-              className="min-w-[135px] rounded-lg bg-primary px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-primary/90"
+              className="min-w-[135px] rounded-lg bg-page px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-page/90"
             >
               Accept All
             </button>

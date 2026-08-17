@@ -326,7 +326,7 @@ export const AccountSettings = () => {
 
       <div className="relative ml-4">
         <div
-          className="relative cursor-pointer border border-br-secondary pl-3 pr-8 py-2 rounded-md text-txt-primary bg-bg-secondary min-w-[120px]"
+          className="relative cursor-pointer border border-br-secondary pl-3 pr-8 py-2 rounded-md text-txt-primary bg-section min-w-[120px]"
           onClick={() => setIsOpen(!isOpen)}
           role="button"
           tabIndex={0}
@@ -355,11 +355,11 @@ export const AccountSettings = () => {
         </div>
 
         {isOpen && (
-          <div className="absolute right-0 mt-1 w-64 rounded-md shadow-lg bg-bg-secondary border border-br-secondary z-50 max-h-60 overflow-y-auto">
+          <div className="absolute right-0 mt-1 w-64 rounded-md shadow-lg bg-section border border-br-secondary z-50 max-h-60 overflow-y-auto">
             {options.map((option) => (
               <button
                 key={option.id}
-                className="block w-full text-left px-4 py-2 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary transition-colors"
+                className="block w-full text-left px-4 py-2 text-sm text-txt-secondary hover:bg-surface-card hover:text-txt-primary transition-colors"
                 type="button"
                 onClick={() => onSelect(option)}
               >
@@ -392,7 +392,7 @@ export const AccountSettings = () => {
         </p>
       </div>
 
-      <div className="bg-bg-surface rounded-lg border border-br-secondary overflow-hidden">
+      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">
             Display & Language

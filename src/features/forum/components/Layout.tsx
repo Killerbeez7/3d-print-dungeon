@@ -22,7 +22,7 @@ export const ForumLayout = () => {
   const sidebarWidth = isSidebarOpen ? FORUM_EXPANDED_WIDTH : FORUM_RAIL_WIDTH;
 
   return (
-    <div className="relative flex min-h-screen bg-[var(--bg-page)]">
+    <div className="relative flex min-h-screen bg-page">
       <ForumSidebar
         isSidebarOpen={isSidebarOpen}
         toggleSidebar={toggleSidebar}

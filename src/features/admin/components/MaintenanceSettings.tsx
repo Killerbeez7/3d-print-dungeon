@@ -151,7 +151,7 @@ export const MaintenanceSettings = () => {
     <div className="space-y-8">
       <div className="grid grid-cols-1 gap-6">
         {/* Current Maintenance Status */}
-        <div className="rounded-lg bg-bg-secondary p-6">
+        <div className="rounded-lg bg-section p-6">
           <div
             className="flex cursor-pointer items-center justify-between"
             onClick={() => setShowCurrentSettings((current) => !current)}
@@ -192,7 +192,7 @@ export const MaintenanceSettings = () => {
                     className="peer sr-only"
                   />
 
-                  <div className="peer h-6 w-11 rounded-full bg-bg-surface after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:content-[''] after:transition-all peer-checked:bg-accent peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/25" />
+                  <div className="peer h-6 w-11 rounded-full bg-surface-card after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:content-[''] after:transition-all peer-checked:bg-accent peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/25" />
                 </label>
               </div>
 
@@ -211,7 +211,7 @@ export const MaintenanceSettings = () => {
                           maintenanceMessage: event.target.value,
                         }))
                       }
-                      className="min-h-[100px] w-full rounded-lg bg-bg-surface px-4 py-2 text-txt-primary"
+                      className="min-h-[100px] w-full rounded-lg bg-surface-card px-4 py-2 text-txt-primary"
                       placeholder="Enter maintenance message..."
                     />
                   </div>
@@ -230,7 +230,7 @@ export const MaintenanceSettings = () => {
                           maintenanceEndTime: event.target.value,
                         }))
                       }
-                      className="w-full rounded-lg bg-bg-surface px-4 py-2 text-txt-primary"
+                      className="w-full rounded-lg bg-surface-card px-4 py-2 text-txt-primary"
                     />
                   </div>
                 </>
@@ -240,7 +240,7 @@ export const MaintenanceSettings = () => {
         </div>
 
         {/* Scheduled Maintenance */}
-        <div className="rounded-lg bg-bg-secondary p-6">
+        <div className="rounded-lg bg-section p-6">
           <div
             className="flex cursor-pointer items-center justify-between"
             onClick={() => setShowScheduledSettings((current) => !current)}
@@ -286,7 +286,7 @@ export const MaintenanceSettings = () => {
                     className="peer sr-only"
                   />
 
-                  <div className="peer h-6 w-11 rounded-full bg-bg-surface after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:content-[''] after:transition-all peer-checked:bg-accent peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/25" />
+                  <div className="peer h-6 w-11 rounded-full bg-surface-card after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:content-[''] after:transition-all peer-checked:bg-accent peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/25" />
                 </label>
               </div>
 
@@ -309,7 +309,7 @@ export const MaintenanceSettings = () => {
                           },
                         }))
                       }
-                      className="w-full rounded-lg bg-bg-surface px-4 py-2 text-txt-primary"
+                      className="w-full rounded-lg bg-surface-card px-4 py-2 text-txt-primary"
                     />
                   </div>
 
@@ -330,7 +330,7 @@ export const MaintenanceSettings = () => {
                           },
                         }))
                       }
-                      className="w-full rounded-lg bg-bg-surface px-4 py-2 text-txt-primary"
+                      className="w-full rounded-lg bg-surface-card px-4 py-2 text-txt-primary"
                     />
                   </div>
 
@@ -350,7 +350,7 @@ export const MaintenanceSettings = () => {
                           },
                         }))
                       }
-                      className="min-h-[100px] w-full rounded-lg bg-bg-surface px-4 py-2 text-txt-primary"
+                      className="min-h-[100px] w-full rounded-lg bg-surface-card px-4 py-2 text-txt-primary"
                       placeholder="Enter scheduled maintenance message..."
                     />
                   </div>

@@ -26,7 +26,7 @@ export function CookieConsentRoute({
         <div className="relative">
           {children}
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-            <div className="bg-bg-secondary rounded-xl shadow-2xl max-w-md w-full mx-4 p-6 border border-br-primary">
+            <div className="bg-section rounded-xl shadow-2xl max-w-md w-full mx-4 p-6 border border-br-primary">
               <h2 className="text-xl font-bold text-txt-primary mb-4">
                 Cookie Consent Required
               </h2>
@@ -46,7 +46,7 @@ export function CookieConsentRoute({
                 </button>
                 <button
                   onClick={() => (window.location.href = fallbackPath)}
-                  className="flex-1 px-4 py-2 text-sm bg-primary text-white hover:bg-primary/90 transition-colors rounded-lg"
+                  className="flex-1 px-4 py-2 text-sm bg-page text-white hover:bg-page/90 transition-colors rounded-lg"
                 >
                   Go Back
                 </button>

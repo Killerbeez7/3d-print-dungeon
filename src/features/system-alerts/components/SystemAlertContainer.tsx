@@ -58,7 +58,7 @@ export function SystemAlertContainer() {
         return (
           <div
             key={alert.id}
-            className={`flex items-start gap-3 rounded-lg border-l-4 bg-bg-surface p-4 text-txt-primary shadow-lg transition-all duration-300 ease-in-out animate-in slide-in-from-right-2 ${borderClass}`}
+            className={`flex items-start gap-3 rounded-lg border-l-4 bg-surface-card p-4 text-txt-primary shadow-lg transition-all duration-300 ease-in-out animate-in slide-in-from-right-2 ${borderClass}`}
           >
             <Icon
               className={`mt-0.5 h-5 w-5 flex-shrink-0 ${iconClass}`}

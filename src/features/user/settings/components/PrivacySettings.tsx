@@ -114,7 +114,7 @@ const DropdownSelector = <T extends string>({
       value={value}
       onChange={(event) => onChange(event.target.value as T)}
       disabled={disabled}
-      className="ml-4 px-3 py-1 border border-br-secondary rounded-md bg-bg-secondary text-txt-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent min-w-[140px]"
+      className="ml-4 px-3 py-1 border border-br-secondary rounded-md bg-section text-txt-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent min-w-[140px]"
     >
       {options.map((option) => (
         <option key={option.id} value={option.id}>
@@ -226,7 +226,7 @@ export const PrivacySettings = () => {
       </div>
 
       {/* Profile Visibility */}
-      <div className="bg-bg-surface rounded-lg border border-br-secondary overflow-hidden">
+      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">
             Profile Visibility
@@ -253,7 +253,7 @@ export const PrivacySettings = () => {
       </div>
 
       {/* Information Sharing */}
-      <div className="bg-bg-surface rounded-lg border border-br-secondary overflow-hidden">
+      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">
             Information Sharing
@@ -283,7 +283,7 @@ export const PrivacySettings = () => {
       </div>
 
       {/* Privacy Information */}
-      <div className="bg-bg-secondary rounded-lg border border-br-secondary p-4">
+      <div className="bg-section rounded-lg border border-br-secondary p-4">
         <div className="flex items-start">
           <div className="flex-shrink-0">
             <svg

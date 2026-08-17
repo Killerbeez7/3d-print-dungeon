@@ -14,7 +14,6 @@ import {
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { H2, H3 } from "@/components/ResponsiveHeading";
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 import { ROUTES } from "@/constants/routeConstants";
 
@@ -112,7 +111,7 @@ const ModelCarouselCard = ({ model, priority = false }: ModelCarouselCardProps) 
       onMouseDown={handleMouseDown}
       onClick={handleClick}
     >
-      <article className="relative bg-bg-surface rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ease-out w-full">
+      <article className="relative bg-surface-card rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ease-out w-full">
         {/* Image container with zoom effect */}
         <div className="overflow-hidden" style={{ height: 160 }}>
           <div className="w-full h-full transform transition-transform duration-500 ease-out group-hover:scale-110">
@@ -137,9 +136,9 @@ const ModelCarouselCard = ({ model, priority = false }: ModelCarouselCardProps) 
 
         {/* Enhanced overlay with slide-up animation */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/50 to-transparent flex items-end opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out transform translate-y-4 group-hover:translate-y-0 rounded-lg pointer-events-none">
-          <div className="text-bg-reverse p-3 w-full">
+          <div className="text-inverse p-3 w-full">
             <div className="mb-1.5">
-              <h6 className="font-bold text-xs leading-tight mb-0.5 truncate text-bg-reverse drop-shadow-lg">
+              <h6 className="font-bold text-xs leading-tight mb-0.5 truncate text-inverse drop-shadow-lg">
                 {model.name}
               </h6>
 
@@ -160,18 +159,18 @@ const ModelCarouselCard = ({ model, priority = false }: ModelCarouselCardProps) 
                 <div className="flex items-center gap-1">
                   <FontAwesomeIcon
                     icon={faHeart}
-                    className="w-2.5 h-2.5 text-bg-reverse"
+                    className="w-2.5 h-2.5 text-inverse"
                   />
 
-                  <span className="text-[10px] text-bg-reverse font-medium">
+                  <span className="text-[10px] text-inverse font-medium">
                     {model.likes || 0}
                   </span>
                 </div>
 
                 <div className="flex items-center gap-1">
-                  <FontAwesomeIcon icon={faEye} className="w-2.5 h-2.5 text-bg-reverse" />
+                  <FontAwesomeIcon icon={faEye} className="w-2.5 h-2.5 text-inverse" />
 
-                  <span className="text-[10px] text-bg-reverse font-medium">
+                  <span className="text-[10px] text-inverse font-medium">
                     {model.views || 0}
                   </span>
                 </div>
@@ -180,7 +179,7 @@ const ModelCarouselCard = ({ model, priority = false }: ModelCarouselCardProps) 
               <div className="w-5 h-5 bg-txt-muted bg-opacity-20 rounded-full flex items-center justify-center">
                 <FontAwesomeIcon
                   icon={faChevronRight}
-                  className="w-2.5 h-2.5 text-bg-reverse"
+                  className="w-2.5 h-2.5 text-inverse"
                 />
               </div>
             </div>
@@ -205,11 +204,11 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
     switch (activeTab) {
       case "uploads":
         return (
-          <div className="bg-bg-surface rounded-lg p-6">
+          <div className="bg-surface-card rounded-lg p-6">
             <div className="flex justify-between items-center mb-4">
-              <H3 size="lg" className="text-txt-primary">
+              <h3 className="text-lg text-txt-primary">
                 My Uploads ({user.stats.uploadsCount})
-              </H3>
+              </h3>
 
               <Link
                 to="/upload"
@@ -292,10 +291,10 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
 
       case "likes":
         return (
-          <div className="bg-bg-surface rounded-lg p-6">
-            <H3 size="lg" className="text-txt-primary mb-4">
+          <div className="bg-surface-card rounded-lg p-6">
+            <h3 className="text-lg text-txt-primary mb-4">
               Liked Models ({user.stats.likesCount})
-            </H3>
+            </h3>
 
             <p className="text-txt-secondary mb-6">
               Your liked models. Organize them into collections or remove likes you no
@@ -324,13 +323,13 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
 
       case "stats":
         return (
-          <div className="bg-bg-surface rounded-lg p-6">
+          <div className="bg-surface-card rounded-lg p-6">
             <h3 className="text-xl font-semibold text-txt-primary mb-4">
               Private Statistics
             </h3>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-              <div className="text-center p-3 bg-bg-secondary rounded">
+              <div className="text-center p-3 bg-section rounded">
                 <div className="text-lg font-bold text-txt-primary">
                   {user.stats.viewsCount}
                 </div>
@@ -338,7 +337,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
                 <div className="text-xs text-txt-secondary">Total Views</div>
               </div>
 
-              <div className="text-center p-3 bg-bg-secondary rounded">
+              <div className="text-center p-3 bg-section rounded">
                 <div className="text-lg font-bold text-txt-primary">
                   {user.stats.followersCount}
                 </div>
@@ -346,7 +345,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
                 <div className="text-xs text-txt-secondary">Followers</div>
               </div>
 
-              <div className="text-center p-3 bg-bg-secondary rounded">
+              <div className="text-center p-3 bg-section rounded">
                 <div className="text-lg font-bold text-txt-primary">
                   {user.stats.followingCount}
                 </div>
@@ -354,7 +353,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
                 <div className="text-xs text-txt-secondary">Following</div>
               </div>
 
-              <div className="text-center p-3 bg-bg-secondary rounded">
+              <div className="text-center p-3 bg-section rounded">
                 <div className="text-lg font-bold text-txt-primary">
                   {user.isPremium ? "Premium" : "Free"}
                 </div>
@@ -371,12 +370,12 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
 
       case "achievements":
         return (
-          <div className="bg-bg-surface rounded-lg p-6">
+          <div className="bg-surface-card rounded-lg p-6">
             <h3 className="text-xl font-semibold text-txt-primary mb-4">Achievements</h3>
 
             {/* TODO: Replace placeholder achievements with real achievement data. */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="bg-bg-secondary rounded-lg p-4 border border-br-secondary">
+              <div className="bg-section rounded-lg p-4 border border-br-secondary">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
                     <FontAwesomeIcon icon={faTrophy} className="text-white" />
@@ -392,7 +391,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
                 </div>
               </div>
 
-              <div className="bg-bg-secondary rounded-lg p-4 border border-br-secondary">
+              <div className="bg-section rounded-lg p-4 border border-br-secondary">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
                     <FontAwesomeIcon icon={faHeart} className="text-white" />
@@ -406,7 +405,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
                 </div>
               </div>
 
-              <div className="bg-bg-secondary rounded-lg p-4 border border-br-secondary">
+              <div className="bg-section rounded-lg p-4 border border-br-secondary">
                 <div className="flex items-center space-x-3">
                   <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
                     <FontAwesomeIcon icon={faUser} className="text-white" />
@@ -426,13 +425,11 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
   };
 
   return (
-    <div className="bg-bg-secondary rounded-lg p-6 shadow-md">
+    <div className="bg-section rounded-lg p-6 shadow-md">
       {/* Settings Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <H2 size="2xl" className="text-txt-primary">
-            Profile Management
-          </H2>
+          <h2 className="text-2xl text-txt-primary">Profile Management</h2>
 
           <p className="text-sm text-txt-secondary">Welcome back, {user.displayName}!</p>
         </div>
@@ -466,7 +463,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
               <span>{tab.label}</span>
 
               {typeof tab.count === "number" && (
-                <span className="bg-bg-surface text-txt-secondary text-xs px-2 py-1 rounded-full">
+                <span className="bg-surface-card text-txt-secondary text-xs px-2 py-1 rounded-full">
                   {tab.count}
                 </span>
               )}

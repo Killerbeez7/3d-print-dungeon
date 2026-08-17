@@ -18,7 +18,7 @@ export function CookiePolicyPage() {
   const { openSettings } = useCookies();
 
   return (
-    <main className="min-h-screen bg-bg-primary">
+    <main className="min-h-screen bg-page">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Breadcrumb Navigation */}
         <nav className="mb-6">
@@ -39,11 +39,11 @@ export function CookiePolicyPage() {
           </ol>
         </nav>
 
-        <div className="bg-bg-secondary rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-section rounded-xl shadow-lg overflow-hidden">
           {/* Header Section */}
           <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-8 border-b border-br-secondary">
             <div className="flex items-center gap-4 mb-4">
-              <div className="p-3 bg-primary/10 rounded-lg">
+              <div className="p-3 bg-page/10 rounded-lg">
                 <FaShieldAlt className="text-primary text-2xl" />
               </div>
               <div>
@@ -62,7 +62,7 @@ export function CookiePolicyPage() {
 
           <div className="p-8 space-y-8">
             {/* What are Cookies */}
-            <section className="bg-bg-secondary rounded-lg p-6">
+            <section className="bg-section rounded-lg p-6">
               <h2 className="text-2xl font-semibold text-txt-primary mb-4 flex items-center gap-3">
                 <FaCog className="text-primary" />
                 What are Cookies?
@@ -73,32 +73,32 @@ export function CookiePolicyPage() {
                 a better experience by:
               </p>
               <div className="grid gap-3 md:grid-cols-2">
-                <div className="flex items-start gap-3 p-3 bg-bg-primary rounded-lg">
-                  <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                <div className="flex items-start gap-3 p-3 bg-page rounded-lg">
+                  <div className="w-2 h-2 bg-page rounded-full mt-2 flex-shrink-0"></div>
                   <span className="text-txt-secondary">
                     Remembering your preferences and settings
                   </span>
                 </div>
-                <div className="flex items-start gap-3 p-3 bg-bg-primary rounded-lg">
-                  <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                <div className="flex items-start gap-3 p-3 bg-page rounded-lg">
+                  <div className="w-2 h-2 bg-page rounded-full mt-2 flex-shrink-0"></div>
                   <span className="text-txt-secondary">
                     Analyzing how you use our website
                   </span>
                 </div>
-                <div className="flex items-start gap-3 p-3 bg-bg-primary rounded-lg">
-                  <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                <div className="flex items-start gap-3 p-3 bg-page rounded-lg">
+                  <div className="w-2 h-2 bg-page rounded-full mt-2 flex-shrink-0"></div>
                   <span className="text-txt-secondary">
                     Providing personalized content and advertisements
                   </span>
                 </div>
-                <div className="flex items-start gap-3 p-3 bg-bg-primary rounded-lg">
-                  <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                <div className="flex items-start gap-3 p-3 bg-page rounded-lg">
+                  <div className="w-2 h-2 bg-page rounded-full mt-2 flex-shrink-0"></div>
                   <span className="text-txt-secondary">
                     Ensuring secure payment processing
                   </span>
                 </div>
-                <div className="flex items-start gap-3 p-3 bg-bg-primary rounded-lg md:col-span-2">
-                  <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                <div className="flex items-start gap-3 p-3 bg-page rounded-lg md:col-span-2">
+                  <div className="w-2 h-2 bg-page rounded-full mt-2 flex-shrink-0"></div>
                   <span className="text-txt-secondary">
                     Improving website performance and functionality
                   </span>
@@ -128,7 +128,7 @@ export function CookiePolicyPage() {
                     cannot be disabled. They enable basic functions like page navigation,
                     access to secure areas, and shopping cart functionality.
                   </p>
-                  <div className="bg-bg-primary p-4 rounded-lg">
+                  <div className="bg-page p-4 rounded-lg">
                     <h4 className="font-medium text-txt-primary mb-3">Examples:</h4>
                     <div className="space-y-2 text-sm text-txt-secondary">
                       <div className="flex items-center gap-2">
@@ -166,7 +166,7 @@ export function CookiePolicyPage() {
                     website by collecting and reporting information anonymously. This
                     helps us improve our website and user experience.
                   </p>
-                  <div className="bg-bg-primary p-4 rounded-lg">
+                  <div className="bg-page p-4 rounded-lg">
                     <h4 className="font-medium text-txt-primary mb-3">Examples:</h4>
                     <div className="space-y-2 text-sm text-txt-secondary">
                       <div className="flex items-center gap-2">
@@ -200,7 +200,7 @@ export function CookiePolicyPage() {
                     relevant and engaging advertisements. They help us provide you with
                     personalized content and offers.
                   </p>
-                  <div className="bg-bg-primary p-4 rounded-lg">
+                  <div className="bg-page p-4 rounded-lg">
                     <h4 className="font-medium text-txt-primary mb-3">Examples:</h4>
                     <div className="space-y-2 text-sm text-txt-secondary">
                       <div className="flex items-center gap-2">
@@ -234,7 +234,7 @@ export function CookiePolicyPage() {
                     transaction management. They ensure your payment information is
                     handled securely.
                   </p>
-                  <div className="bg-bg-primary p-4 rounded-lg">
+                  <div className="bg-page p-4 rounded-lg">
                     <h4 className="font-medium text-txt-primary mb-3">Examples:</h4>
                     <div className="space-y-2 text-sm text-txt-secondary">
                       <div className="flex items-center gap-2">
@@ -256,13 +256,13 @@ export function CookiePolicyPage() {
             </section>
 
             {/* How to Manage Cookies */}
-            <section className="bg-bg-secondary rounded-lg p-6">
+            <section className="bg-section rounded-lg p-6">
               <h2 className="text-2xl font-semibold text-txt-primary mb-6 flex items-center gap-3">
                 <FaCog className="text-primary" />
                 How to Manage Cookies
               </h2>
               <div className="grid gap-6 md:grid-cols-2">
-                <div className="bg-bg-primary p-6 rounded-lg">
+                <div className="bg-page p-6 rounded-lg">
                   <h3 className="text-lg font-semibold text-txt-primary mb-3">
                     Browser Settings
                   </h3>
@@ -272,8 +272,8 @@ export function CookiePolicyPage() {
                     website.
                   </p>
                   <div className="space-y-3 text-sm">
-                    <div className="flex items-center gap-3 p-3 bg-bg-secondary rounded-lg">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <div className="flex items-center gap-3 p-3 bg-section rounded-lg">
+                      <div className="w-2 h-2 bg-page rounded-full"></div>
                       <div>
                         <span className="font-medium text-txt-primary">Chrome:</span>
                         <p className="text-txt-secondary">
@@ -281,8 +281,8 @@ export function CookiePolicyPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 bg-bg-secondary rounded-lg">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <div className="flex items-center gap-3 p-3 bg-section rounded-lg">
+                      <div className="w-2 h-2 bg-page rounded-full"></div>
                       <div>
                         <span className="font-medium text-txt-primary">Firefox:</span>
                         <p className="text-txt-secondary">
@@ -290,8 +290,8 @@ export function CookiePolicyPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 bg-bg-secondary rounded-lg">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <div className="flex items-center gap-3 p-3 bg-section rounded-lg">
+                      <div className="w-2 h-2 bg-page rounded-full"></div>
                       <div>
                         <span className="font-medium text-txt-primary">Safari:</span>
                         <p className="text-txt-secondary">
@@ -299,8 +299,8 @@ export function CookiePolicyPage() {
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 p-3 bg-bg-secondary rounded-lg">
-                      <div className="w-2 h-2 bg-primary rounded-full"></div>
+                    <div className="flex items-center gap-3 p-3 bg-section rounded-lg">
+                      <div className="w-2 h-2 bg-page rounded-full"></div>
                       <div>
                         <span className="font-medium text-txt-primary">Edge:</span>
                         <p className="text-txt-secondary">
@@ -311,7 +311,7 @@ export function CookiePolicyPage() {
                   </div>
                 </div>
 
-                <div className="bg-bg-primary p-6 rounded-lg">
+                <div className="bg-page p-6 rounded-lg">
                   <h3 className="text-lg font-semibold text-txt-primary mb-3">
                     Our Cookie Settings
                   </h3>
@@ -322,7 +322,7 @@ export function CookiePolicyPage() {
                   <button
                     type="button"
                     onClick={openSettings}
-                    className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-white transition-colors hover:bg-primary/90"
+                    className="inline-flex items-center gap-2 rounded-lg bg-page px-6 py-3 text-white transition-colors hover:bg-page/90"
                   >
                     <FaCog />
                     Manage Cookie Settings
@@ -342,7 +342,7 @@ export function CookiePolicyPage() {
                 personal data and cookie usage:
               </p>
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="flex items-start gap-3 p-4 bg-bg-primary rounded-lg">
+                <div className="flex items-start gap-3 p-4 bg-page rounded-lg">
                   <FaEye className="text-primary mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-medium text-txt-primary mb-1">
@@ -353,7 +353,7 @@ export function CookiePolicyPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-4 bg-bg-primary rounded-lg">
+                <div className="flex items-start gap-3 p-4 bg-page rounded-lg">
                   <FaCog className="text-primary mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-medium text-txt-primary mb-1">
@@ -364,7 +364,7 @@ export function CookiePolicyPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-4 bg-bg-primary rounded-lg">
+                <div className="flex items-start gap-3 p-4 bg-page rounded-lg">
                   <FaEye className="text-primary mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-medium text-txt-primary mb-1">Right to Access</h4>
@@ -373,7 +373,7 @@ export function CookiePolicyPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-4 bg-bg-primary rounded-lg">
+                <div className="flex items-start gap-3 p-4 bg-page rounded-lg">
                   <FaTrash className="text-primary mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-medium text-txt-primary mb-1">
@@ -384,7 +384,7 @@ export function CookiePolicyPage() {
                     </p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-4 bg-bg-primary rounded-lg md:col-span-2">
+                <div className="flex items-start gap-3 p-4 bg-page rounded-lg md:col-span-2">
                   <FaBan className="text-primary mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-medium text-txt-primary mb-1">Right to Object</h4>
@@ -397,7 +397,7 @@ export function CookiePolicyPage() {
             </section>
 
             {/* Contact Information */}
-            <section className="rounded-lg bg-bg-secondary p-6">
+            <section className="rounded-lg bg-section p-6">
               <h2 className="mb-4 text-2xl font-semibold text-txt-primary">Contact Us</h2>
 
               <p className="mb-4 text-txt-secondary">
@@ -415,7 +415,7 @@ export function CookiePolicyPage() {
           </div>
 
           {/* Footer Links */}
-          <div className="bg-bg-primary p-6 border-t border-br-secondary">
+          <div className="bg-page p-6 border-t border-br-secondary">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div className="text-sm text-txt-secondary">
                 <p>This Cookie Policy is part of our broader Privacy Policy.</p>

@@ -7,98 +7,98 @@ USED IN:
 
 /* Tiny scrollbar (6px) */
 .custom-scrollbar::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 3px;
+  background: transparent;
+  border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 3px;
-    transition: background 0.3s ease;
+  background: transparent;
+  border-radius: 3px;
+  transition: background 0.3s ease;
 }
 
 .custom-scrollbar:hover::-webkit-scrollbar-thumb {
-    background: var(--br-primary);
+  background: var(--br-primary);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: var(--br-secondary);
+  background: var(--br-secondary);
 }
 
 /* Small scrollbar (8px) */
 .custom-scrollbar-sm::-webkit-scrollbar {
-    width: 8px;
+  width: 8px;
 }
 
 .custom-scrollbar-sm::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 4px;
+  background: transparent;
+  border-radius: 4px;
 }
 
 .custom-scrollbar-sm::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 4px;
-    transition: background 0.3s ease;
+  background: transparent;
+  border-radius: 4px;
+  transition: background 0.3s ease;
 }
 
 .custom-scrollbar-sm:hover::-webkit-scrollbar-thumb {
-    background: var(--br-primary);
+  background: var(--br-primary);
 }
 
 .custom-scrollbar-sm::-webkit-scrollbar-thumb:hover {
-    background: var(--br-secondary);
+  background: var(--br-secondary);
 }
 
 /* Medium scrollbar (12px) */
 .custom-scrollbar-md::-webkit-scrollbar {
-    width: 12px;
+  width: 12px;
 }
 
 .custom-scrollbar-md::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 6px;
+  background: transparent;
+  border-radius: 6px;
 }
 
 .custom-scrollbar-md::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 6px;
-    transition: background 0.3s ease;
+  background: transparent;
+  border-radius: 6px;
+  transition: background 0.3s ease;
 }
 
 .custom-scrollbar-md:hover::-webkit-scrollbar-thumb {
-    background: var(--br-primary);
+  background: var(--br-primary);
 }
 
 .custom-scrollbar-md::-webkit-scrollbar-thumb:hover {
-    background: var(--br-secondary);
+  background: var(--br-secondary);
 }
 
 /* Large scrollbar (16px) */
 .custom-scrollbar-lg::-webkit-scrollbar {
-    width: 16px;
+  width: 16px;
 }
 
 .custom-scrollbar-lg::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 8px;
+  background: transparent;
+  border-radius: 8px;
 }
 
 .custom-scrollbar-lg::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 8px;
-    transition: background 0.3s ease;
+  background: transparent;
+  border-radius: 8px;
+  transition: background 0.3s ease;
 }
 
 .custom-scrollbar-lg:hover::-webkit-scrollbar-thumb {
-    background: var(--br-primary);
+  background: var(--br-primary);
 }
 
 .custom-scrollbar-lg::-webkit-scrollbar-thumb:hover {
-    background: var(--br-secondary);
+  background: var(--br-secondary);
 }
 
 /* Firefox scrollbar variants */
@@ -106,7 +106,7 @@ USED IN:
 .custom-scrollbar-sm,
 .custom-scrollbar-md,
 .custom-scrollbar-lg {
-    scrollbar-width: thin;
-    scrollbar-color: var(--br-primary) var(--bg-secondary);
-    scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: var(--br-primary) var(--bg-section);
+  scrollbar-gutter: stable;
 }

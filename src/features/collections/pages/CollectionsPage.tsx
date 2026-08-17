@@ -21,7 +21,7 @@ export const CollectionsPage = () => {
             Rising Models
           </Link>
 
-          <span className="cursor-default rounded-3xl bg-bg-muted px-4 py-2 text-txt-muted">
+          <span className="cursor-default rounded-3xl bg-muted px-4 py-2 text-txt-muted">
             Featured Models
           </span>
         </div>

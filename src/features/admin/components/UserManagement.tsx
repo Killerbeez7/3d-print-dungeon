@@ -178,7 +178,7 @@ export const UserManagement = () => {
       <input
         type="text"
         placeholder="Search users..."
-        className="w-full rounded-lg bg-bg-secondary px-4 py-2 text-txt-primary"
+        className="w-full rounded-lg bg-section px-4 py-2 text-txt-primary"
         value={searchQuery}
         onChange={(event) => setSearchQuery(event.target.value)}
       />
@@ -186,7 +186,7 @@ export const UserManagement = () => {
       <div className="overflow-x-auto">
         <div className="min-w-[700px]">
           {/* Header */}
-          <div className="grid grid-cols-[1.25fr_1.5fr_1fr_80px] items-center bg-bg-secondary px-4 py-3 text-xs font-medium uppercase text-txt-secondary">
+          <div className="grid grid-cols-[1.25fr_1.5fr_1fr_80px] items-center bg-section px-4 py-3 text-xs font-medium uppercase text-txt-secondary">
             <span>User</span>
             <span>Email</span>
             <span>Roles</span>
@@ -235,7 +235,7 @@ export const UserManagement = () => {
                             className={`rounded-full px-2 py-1 text-xs font-medium ${
                               roles.includes(role)
                                 ? ROLE_CLASSES[role]
-                                : "bg-bg-secondary text-txt-secondary"
+                                : "bg-section text-txt-secondary"
                             }`}
                           >
                             {role}
@@ -243,7 +243,7 @@ export const UserManagement = () => {
                         ))}
 
                         {roles.includes("superadmin") && (
-                          <span className="rounded-full bg-bg-secondary px-2 py-1 text-xs font-medium text-txt-secondary">
+                          <span className="rounded-full bg-section px-2 py-1 text-xs font-medium text-txt-secondary">
                             superadmin
                           </span>
                         )}

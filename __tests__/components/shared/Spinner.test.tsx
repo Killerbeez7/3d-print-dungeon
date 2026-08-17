@@ -13,7 +13,7 @@
 //             borderStyle: "solid",
 //         });
 
-//         // top border should be accent (variable), the others bg-primary
+//         // top border should be accent (variable), the others bg-page
 //         const borderTop = getComputedStyle(span).borderTopColor;
 //         const border = getComputedStyle(span).borderRightColor;
 //         expect(borderTop).not.toBe(border);

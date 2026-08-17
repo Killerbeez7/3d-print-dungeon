@@ -62,7 +62,7 @@ export function ClearAllConfirmModal({
         aria-modal="true"
         aria-labelledby="clear-notifications-title"
         aria-describedby="clear-notifications-description"
-        className="w-full max-w-md rounded-xl border border-br-primary bg-bg-secondary shadow-2xl"
+        className="w-full max-w-md rounded-xl border border-br-primary bg-section shadow-2xl"
       >
         <div className="flex items-center justify-between border-b border-br-secondary p-6">
           <h2
@@ -98,7 +98,7 @@ export function ClearAllConfirmModal({
           </div>
         </div>
 
-        <div className="border-t border-br-secondary bg-bg-primary p-6">
+        <div className="border-t border-br-secondary bg-page p-6">
           <div className="flex gap-3">
             <button
               type="button"

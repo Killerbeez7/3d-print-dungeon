@@ -149,7 +149,7 @@ export const NotificationSettings = () => {
       </div>
 
       {/* Notification Channels */}
-      <div className="bg-bg-surface rounded-lg border border-br-secondary overflow-hidden">
+      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">
             Notification Channels
@@ -179,7 +179,7 @@ export const NotificationSettings = () => {
       </div>
 
       {/* Social Notifications */}
-      <div className="bg-bg-surface rounded-lg border border-br-secondary overflow-hidden">
+      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">Social Activity</h3>
 
@@ -207,7 +207,7 @@ export const NotificationSettings = () => {
       </div>
 
       {/* Content Updates */}
-      <div className="bg-bg-surface rounded-lg border border-br-secondary overflow-hidden">
+      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">
             Content & Updates
@@ -223,7 +223,7 @@ export const NotificationSettings = () => {
       </div>
 
       {/* Notification Preferences Info */}
-      <div className="bg-bg-secondary rounded-lg border border-br-secondary p-4">
+      <div className="bg-section rounded-lg border border-br-secondary p-4">
         <div className="flex items-start">
           <div className="flex-shrink-0">
             <svg

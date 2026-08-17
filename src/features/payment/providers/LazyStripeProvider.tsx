@@ -28,7 +28,7 @@ const baseStripeOptions: StripeElementsOptions = {
         theme: "stripe" as const,
         variables: {
             colorPrimary: "var(--accent)",
-            colorBackground: "var(--bg-surface)",
+            colorBackground: "var(--surface-card)",
             colorText: "var(--txt-primary)",
             colorDanger: "var(--error)",
             fontFamily: "Inter, system-ui, sans-serif",

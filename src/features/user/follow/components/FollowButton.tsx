@@ -22,8 +22,8 @@ const sizeClasses = {
 
 const variantClasses = {
   primary: "bg-accent hover:bg-accent-hover text-white",
-  secondary: "bg-bg-secondary hover:bg-bg-tertiary text-txt-primary",
-  outline: "border border-br-primary hover:bg-bg-secondary text-txt-primary",
+  secondary: "bg-section hover:bg-muted text-txt-primary",
+  outline: "border border-br-primary hover:bg-section text-txt-primary",
 } as const;
 
 export const FollowButton = ({

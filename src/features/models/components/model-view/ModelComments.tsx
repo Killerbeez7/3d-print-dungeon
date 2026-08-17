@@ -130,7 +130,7 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
           value={newComment}
           onChange={(event) => setNewComment(event.target.value)}
           placeholder="Share your thoughts..."
-          className="min-h-20 w-full resize-y rounded-md border border-transparent bg-bg-primary p-3 text-sm leading-relaxed text-txt-primary placeholder:text-txt-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+          className="min-h-20 w-full resize-y rounded-md border border-transparent bg-page p-3 text-sm leading-relaxed text-txt-primary placeholder:text-txt-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
           rows={3}
         />
 
@@ -196,7 +196,7 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
                     <button
                       type="button"
                       onClick={cancelEditing}
-                      className="h-9 rounded-lg border border-br-secondary bg-bg-surface px-3 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-focus"
+                      className="h-9 rounded-lg border border-br-secondary bg-surface-card px-3 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-focus"
                     >
                       Cancel
                     </button>
@@ -209,7 +209,7 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
               <li key={comment.id} className="py-5">
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-bg-tertiary text-sm font-semibold text-txt-secondary">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-txt-secondary">
                       {comment.userName?.charAt(0)?.toUpperCase() || "A"}
                     </div>
 

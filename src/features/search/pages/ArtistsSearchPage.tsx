@@ -21,7 +21,7 @@ export const ArtistsSearchPage = () => {
   return (
     <FiltersProvider>
       <div className="min-h-screen text-txt-primary">
-        <div className="bg-bg-secondary px-6 pb-0 py-12">
+        <div className="bg-section px-6 pb-0 py-12">
           <SearchInput
             value={localQuery}
             onChange={handleInputChange}

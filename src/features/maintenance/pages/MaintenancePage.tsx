@@ -65,7 +65,7 @@ export const MaintenancePage = () => {
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center py-12">
-      <div className="mx-4 w-full max-w-lg rounded-xl border border-br-secondary bg-bg-surface p-8 text-center shadow-2xl">
+      <div className="mx-4 w-full max-w-lg rounded-xl border border-br-secondary bg-surface-card p-8 text-center shadow-2xl">
         <div className="mb-8">
           <img
             src="/logo.png"

@@ -12,6 +12,7 @@ import { CookieSettingsModal } from "@/features/cookies/components/CookieSetting
 import { Link } from "react-router-dom";
 import { ROUTES } from "@/constants/routeConstants";
 import { FORUM_PATHS } from "@/features/forum/constants/forumPaths";
+import { Button } from "@/components";
 
 export const Footer = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -30,7 +31,7 @@ export const Footer = () => {
 
   return (
     <>
-      <footer className="text-txt-secondary bg-bg-secondary z-10 min-h-[16rem]">
+      <footer className="text-txt-secondary bg-section z-10 min-h-[16rem]">
         {/* Footer Top Section */}
         <div className="pt-8 pb-6 sm:pt-15 sm:pb-10" role="footer-top">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -184,14 +185,9 @@ export const Footer = () => {
                     required
                     value={email}
                     onChange={handleEmailChange}
-                    className="px-3 py-2 rounded border border-br-primary focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent text-xs bg-bg-primary"
+                    className="px-3 py-2 rounded border border-br-primary focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent text-xs bg-page"
                   />
-                  <button
-                    type="submit"
-                    className="cta-button px-4 py-2 rounded font-bold text-xs"
-                  >
-                    SUBSCRIBE
-                  </button>
+                  <Button type="submit">SUBSCRIBE</Button>
                 </form>
               </div>
             </div>
@@ -199,12 +195,12 @@ export const Footer = () => {
         </div>
 
         {/* Footer Bottom Section */}
-        <div className="bg-bg-primary border-t border-br-secondary py-3">
+        <div className="bg-page border-t border-br-secondary py-3">
           <div className="container mx-auto px-4 sm:px-6">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
               {/* Copyright */}
               <div className="flex items-center gap-2">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 bg-primary rounded-full flex items-center justify-center">
+                <div className="w-5 h-5 sm:w-6 sm:h-6 bg-page rounded-full flex items-center justify-center">
                   <img
                     src="/assets/images/logo.png"
                     alt="Site Logo"

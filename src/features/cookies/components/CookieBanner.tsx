@@ -27,7 +27,7 @@ export function CookieBanner() {
         <div
           role="region"
           aria-label="Cookie preferences"
-          className="fixed bottom-0 left-0 right-0 z-50 border-t border-br-secondary bg-bg-secondary p-4 shadow-lg"
+          className="fixed bottom-0 left-0 right-0 z-50 border-t border-br-secondary bg-section p-4 shadow-lg"
         >
           <div className="mx-auto max-w-6xl">
             <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
@@ -47,7 +47,7 @@ export function CookieBanner() {
                 <button
                   type="button"
                   onClick={declineAll}
-                  className="rounded-lg bg-primary px-4 py-2 text-sm text-white transition-colors hover:bg-primary/90"
+                  className="rounded-lg bg-page px-4 py-2 text-sm text-white transition-colors hover:bg-page/90"
                 >
                   Decline Non-Essentials
                 </button>

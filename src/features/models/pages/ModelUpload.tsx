@@ -14,7 +14,6 @@ import { InfoForm } from "../components/model-upload/InfoForm";
 import { PricingForm } from "../components/model-upload/PricingForm";
 import { SellerVerification } from "@/features/payment/components/SellerVerification";
 import { paymentService } from "@/features/payment/services/paymentService";
-import { H1 } from "@/components/index";
 
 import type { ModelUploadData } from "@/features/models/types/model";
 
@@ -487,9 +486,7 @@ export function ModelUpload() {
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
       <div className="mb-8">
-        <H1 size="3xl" className="mb-4">
-          Upload Your 3D Model
-        </H1>
+        <h1 className="mb-4 text-3xl">Upload Your 3D Model</h1>
         <div className="flex items-center space-x-4 sm:space-x-6 md:space-x-8 mb-8">
           <StepIndicator stepNumber={1} label="Files" currentStep={step} />
           <StepIndicator stepNumber={2} label="Details" currentStep={step} />
@@ -504,7 +501,7 @@ export function ModelUpload() {
       )}
 
       {needsSellerVerification && (
-        <div className="mb-6 p-4 bg-surface-card border border-br-secondary rounded-lg shadow-token-sm">
+        <div className="mb-6 p-4 bg-surface-card border border-br-secondary rounded-lg shadow-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-8 h-8 bg-accent-soft border border-accent/25 rounded-full flex items-center justify-center">
@@ -539,7 +536,7 @@ export function ModelUpload() {
               {!hasPendingVerification ? (
                 <button
                   onClick={handleStartVerification}
-                  className="px-4 py-2 text-sm font-medium rounded-md transition-colors bg-btn-primary text-btn-primary-text hover:bg-btn-primary-hover shadow-accent-sm"
+                  className="px-4 py-2 text-sm font-medium rounded-md transition-colors bg-btn-primary text-btn-primary-text hover:bg-btn-primary-hover shadow-sm shadow-accent/20"
                 >
                   Verify Now
                 </button>
@@ -547,7 +544,7 @@ export function ModelUpload() {
                 <>
                   <button
                     onClick={handleStartVerification}
-                    className="px-4 py-2 text-sm font-medium rounded-md transition-colors bg-btn-primary text-btn-primary-text hover:bg-btn-primary-hover shadow-accent-sm"
+                    className="px-4 py-2 text-sm font-medium rounded-md transition-colors bg-btn-primary text-btn-primary-text hover:bg-btn-primary-hover shadow-sm shadow-accent/20"
                   >
                     Continue verification
                   </button>
@@ -565,7 +562,7 @@ export function ModelUpload() {
         </div>
       )}
 
-      <div className="bg-bg-secondary border border-br-subtle rounded-lg p-4 sm:p-6 shadow-token-md">
+      <div className="bg-section border border-br-subtle rounded-lg p-4 sm:p-6 shadow-md">
         {step === 1 && (
           <div>
             <FilesUpload step={step} files={files} setFiles={setFiles} />
@@ -573,7 +570,7 @@ export function ModelUpload() {
               <button
                 onClick={nextStep}
                 disabled={!canProceedToStep2}
-                className="px-6 py-2 bg-btn-primary text-btn-primary-text rounded-md hover:bg-btn-primary-hover disabled:opacity-50 transition-colors font-medium shadow-accent-sm"
+                className="px-6 py-2 bg-btn-primary text-btn-primary-text rounded-md hover:bg-btn-primary-hover disabled:opacity-50 transition-colors font-medium shadow-sm shadow-accent/20"
               >
                 Next: Add Details
               </button>
@@ -587,14 +584,14 @@ export function ModelUpload() {
             <div className="flex justify-between mt-6">
               <button
                 onClick={prevStep}
-                className="px-6 py-2 border border-br-secondary rounded-md text-txt-secondary hover:bg-bg-tertiary transition-colors font-medium"
+                className="px-6 py-2 border border-br-secondary rounded-md text-txt-secondary hover:bg-muted transition-colors font-medium"
               >
                 Back
               </button>
               <button
                 onClick={nextStep}
                 disabled={!canProceedToStep3}
-                className="px-6 py-2 bg-btn-primary text-btn-primary-text rounded-md hover:bg-btn-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-accent-sm"
+                className="px-6 py-2 bg-btn-primary text-btn-primary-text rounded-md hover:bg-btn-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-sm shadow-accent/20"
               >
                 Next: Set Pricing
               </button>
@@ -609,14 +606,14 @@ export function ModelUpload() {
               <button
                 type="button"
                 onClick={prevStep}
-                className="px-6 py-2 border border-br-secondary rounded-md text-txt-secondary hover:bg-bg-tertiary transition-colors font-medium"
+                className="px-6 py-2 border border-br-secondary rounded-md text-txt-secondary hover:bg-muted transition-colors font-medium"
               >
                 Back
               </button>
               <button
                 type="submit"
                 disabled={isUploading}
-                className="px-6 py-2 bg-btn-primary text-btn-primary-text rounded-md hover:bg-btn-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-accent-sm"
+                className="px-6 py-2 bg-btn-primary text-btn-primary-text rounded-md hover:bg-btn-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-sm shadow-accent/20"
               >
                 {isUploading ? (
                   <div className="flex items-center">
@@ -684,7 +681,7 @@ function StepIndicator({ stepNumber, label, currentStep }: StepIndicatorProps) {
             ? "bg-accent text-btn-primary-text shadow-lg shadow-accent/30 ring-2 ring-accent/20"
             : isCompleted
             ? "bg-success text-txt-inverse"
-            : "bg-bg-surface border border-br-secondary text-txt-secondary"
+            : "bg-surface-card border border-br-secondary text-txt-secondary"
         } font-bold`}
       >
         {isCompleted ? (

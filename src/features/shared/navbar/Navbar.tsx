@@ -60,9 +60,9 @@ const navItemIcons: Record<string, IconType> = {
 const NavbarAuthSkeleton = () => {
   return (
     <div className="flex h-10 items-center justify-end gap-3" aria-hidden="true">
-      <div className="h-7 w-7 animate-pulse rounded-lg bg-bg-surface" />
-      <div className="h-7 w-7 animate-pulse rounded-lg bg-bg-surface" />
-      <div className="h-7 w-7 animate-pulse rounded-full bg-bg-surface" />
+      <div className="h-7 w-7 animate-pulse rounded-lg bg-surface-card" />
+      <div className="h-7 w-7 animate-pulse rounded-lg bg-surface-card" />
+      <div className="h-7 w-7 animate-pulse rounded-full bg-surface-card" />
     </div>
   );
 };
@@ -151,7 +151,7 @@ export const Navbar = () => {
 
   return (
     <div className="sticky top-0 left-0 right-0 z-50">
-      <nav className="relative z-50 border-b border-br-subtle/80 bg-bg-section/90 shadow-sm backdrop-blur-md">
+      <nav className="relative z-50 border-b border-br-subtle/80 bg-section/90 shadow-sm backdrop-blur-md">
         <div className="h-[72px] px-4 sm:px-6 lg:px-8">
           <div
             className="
@@ -168,7 +168,7 @@ export const Navbar = () => {
               <button
                 id="hamburger-button"
                 type="button"
-                className="md:hidden p-[0.5px] rounded-lg text-txt-secondary hover:bg-bg-surface"
+                className="md:hidden p-[0.5px] rounded-lg text-txt-secondary hover:bg-surface-card"
                 onClick={toggleMobileMenu}
                 aria-label="Toggle mobile menu"
                 aria-expanded={isMobileMenuOpen}
@@ -221,7 +221,7 @@ export const Navbar = () => {
                   >
                     <button
                       type="button"
-                      className={`relative inline-flex h-10 items-center whitespace-nowrap px-1 text-sm font-medium transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-[var(--accent)] after:transition-opacity after:duration-200 hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+                      className={`relative inline-flex h-10 items-center whitespace-nowrap px-1 text-sm font-medium transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-accent after:transition-opacity after:duration-200 hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
                         activeDropdown === section.label
                           ? "text-txt-primary after:opacity-100"
                           : "text-txt-secondary after:opacity-0 group-hover:after:opacity-100"
@@ -250,7 +250,7 @@ export const Navbar = () => {
                               key={item.to}
                               to={item.to}
                               role="menuitem"
-                              className="group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-txt-secondary hover:bg-bg-surface hover:text-txt-primary hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
+                              className="group flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium text-txt-secondary hover:bg-surface-card hover:text-txt-primary hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
                               onClick={() => setActiveDropdown(null)}
                             >
                               {ItemIcon && (
@@ -283,7 +283,7 @@ export const Navbar = () => {
               <button
                 type="button"
                 onClick={handleSearchClick}
-                className="hidden md:block lg:hidden rounded-lg p-1 text-txt-secondary hover:bg-bg-surface hover:text-txt-primary focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-br-primary"
+                className="hidden md:block lg:hidden rounded-lg p-1 text-txt-secondary hover:bg-surface-card hover:text-txt-primary focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-br-primary"
                 title="Search"
                 aria-label="Search"
               >
@@ -308,7 +308,7 @@ export const Navbar = () => {
                   <div className="hidden items-center gap-3 md:flex">
                     <Link
                       to="/model/upload"
-                      className="rounded-lg p-1 text-txt-secondary hover:bg-bg-surface hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
+                      className="rounded-lg p-1 text-txt-secondary hover:bg-surface-card hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
                       title="Upload Model"
                       aria-label="Upload Model"
                     >
@@ -324,7 +324,7 @@ export const Navbar = () => {
                       id="profile-button"
                       type="button"
                       onClick={() => toggleDropdown("profile")}
-                      className="flex items-center text-txt-secondary hover:text-txt-primary cursor-pointer transition-colors duration-200 p-1 rounded-lg hover:bg-bg-surface"
+                      className="flex items-center text-txt-secondary hover:text-txt-primary cursor-pointer transition-colors duration-200 p-1 rounded-lg hover:bg-surface-card"
                       aria-label="Profile menu"
                       aria-haspopup="menu"
                       aria-expanded={activeDropdown === "profile"}
@@ -342,7 +342,7 @@ export const Navbar = () => {
                       }`}
                     >
                       {/* Header with user info */}
-                      <div className="px-4 py-3 border-b border-br-secondary bg-gradient-to-r from-bg-primary to-bg-secondary rounded-t-xl">
+                      <div className="px-4 py-3 border-b border-br-secondary bg-gradient-to-r from-page to-section rounded-t-xl">
                         <h6 className="text-sm font-semibold text-txt-primary mb-1">
                           {currentUser?.displayName || "Username"}
                         </h6>
@@ -357,7 +357,7 @@ export const Navbar = () => {
                           <Link
                             to="/admin-dashboard"
                             role="menuitem"
-                            className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
+                            className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-surface-card hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
                             onClick={() => setActiveDropdown(null)}
                           >
                             <FontAwesomeIcon
@@ -371,7 +371,7 @@ export const Navbar = () => {
                         <Link
                           to={`/${urlSafeUsername}`}
                           role="menuitem"
-                          className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
+                          className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-surface-card hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
                           onClick={() => setActiveDropdown(null)}
                         >
                           <FontAwesomeIcon
@@ -384,7 +384,7 @@ export const Navbar = () => {
                         <Link
                           to="/settings"
                           role="menuitem"
-                          className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
+                          className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-surface-card hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
                           onClick={() => setActiveDropdown(null)}
                         >
                           <FontAwesomeIcon
@@ -404,7 +404,7 @@ export const Navbar = () => {
                             setActiveDropdown(null);
                             handleLogout();
                           }}
-                          className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-bg-surface hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
+                          className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-surface-card hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
                         >
                           <FontAwesomeIcon
                             icon={faSignOutAlt}
@@ -433,7 +433,7 @@ export const Navbar = () => {
       {/* ---------- Mobile drawer ---------- */}
 
       <div
-        className={`md:hidden shadow-md divider-top bg-bg-section border-b border-br-subtle absolute inset-x-0 transition-all duration-300 ease-in-out transform z-30 ${
+        className={`md:hidden shadow-md divider-top bg-section border-b border-br-subtle absolute inset-x-0 transition-all duration-300 ease-in-out transform z-30 ${
           isMobileMenuOpen
             ? "translate-y-0 opacity-100 pointer-events-auto"
             : "-translate-y-full opacity-0 pointer-events-none"
@@ -466,9 +466,9 @@ export const Navbar = () => {
             <div key={section.label}>
               <button
                 type="button"
-                className={`w-full text-left px-4 py-2 text-txt-secondary hover:rounded-md hover:bg-bg-secondary hover:text-txt-primary flex items-center justify-between ${
+                className={`w-full text-left px-4 py-2 text-txt-secondary hover:rounded-md hover:bg-section hover:text-txt-primary flex items-center justify-between ${
                   mobileDropdown === section.label
-                    ? "bg-bg-surface rounded-md text-txt-primary font-semibold"
+                    ? "bg-surface-card rounded-md text-txt-primary font-semibold"
                     : ""
                 }`}
                 onClick={(e) => toggleMobileDropdown(section.label, e)}
@@ -493,7 +493,7 @@ export const Navbar = () => {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className="block px-6 py-2 text-md text-txt-secondary hover:bg-bg-secondary hover:text-txt-primary"
+                    className="block px-6 py-2 text-md text-txt-secondary hover:bg-section hover:text-txt-primary"
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       setMobileDropdown(null);

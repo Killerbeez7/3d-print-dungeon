@@ -25,7 +25,7 @@ export const NotificationsPage = () => {
 
   if (!currentUser) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-bg-primary">
+      <div className="flex min-h-screen items-center justify-center bg-page">
         <div className="text-center">
           <h1 className="mb-4 text-2xl font-bold text-txt-primary">Access Denied</h1>
 
@@ -36,7 +36,7 @@ export const NotificationsPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-bg-primary">
+    <div className="min-h-screen bg-page">
       <div className={`mx-auto max-w-4xl ${isMobile ? "px-3 py-4" : "px-4 py-8"}`}>
         <div className={isMobile ? "mb-4" : "mb-8"}>
           <div
@@ -46,7 +46,7 @@ export const NotificationsPage = () => {
           >
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-3">
-                <div className={`rounded-xl bg-primary/10 ${isMobile ? "p-2" : "p-3"}`}>
+                <div className={`rounded-xl bg-page/10 ${isMobile ? "p-2" : "p-3"}`}>
                   <FaBell
                     aria-hidden="true"
                     className={`text-primary ${isMobile ? "h-6 w-6" : "h-8 w-8"}`}
@@ -96,7 +96,7 @@ export const NotificationsPage = () => {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-br-secondary bg-bg-secondary shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-br-secondary bg-section shadow-sm">
           {isLoading ? (
             <div className={`text-center ${isMobile ? "p-8" : "p-16"}`}>
               <div className="mx-auto mb-6 h-16 w-16">
@@ -127,7 +127,7 @@ export const NotificationsPage = () => {
                 type="button"
                 onClick={() => void fetchNotifications()}
                 disabled={isLoading}
-                className="inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 font-medium text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-lg bg-page px-6 py-3 font-medium text-white transition-colors hover:bg-page/90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Try again
               </button>

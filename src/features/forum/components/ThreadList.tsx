@@ -65,7 +65,7 @@ export const ThreadList = ({
           return (
             <div
               key={item}
-              className="rounded-xl border border-[var(--br-secondary)] bg-[var(--bg-surface)] p-5 shadow-sm"
+              className="rounded-xl border border-br-secondary bg-surface-card p-5 shadow-sm"
             >
               <Skeleton className="mb-3 h-5 w-3/4" />
 
@@ -91,10 +91,10 @@ export const ThreadList = ({
 
   if (threads.length === 0) {
     return (
-      <div className="rounded-xl border border-[var(--br-secondary)] bg-[var(--bg-surface)] p-8 text-center text-[var(--txt-primary)] shadow-sm">
+      <div className="rounded-xl border border-br-secondary bg-surface-card p-8 text-center text-txt-primary shadow-sm">
         <h3 className="mb-2 text-lg font-semibold">No threads yet</h3>
 
-        <p className="mx-auto mb-5 max-w-xl text-sm text-[var(--txt-muted)]">
+        <p className="mx-auto mb-5 max-w-xl text-sm text-txt-muted">
           {categoryId
             ? "This category is ready for discussion. Start the first thread or browse another category."
             : "There are no discussions to show yet. Start a new thread to get the conversation going."}
@@ -103,7 +103,7 @@ export const ThreadList = ({
         <button
           type="button"
           onClick={handleCreateThread}
-          className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--txt-highlight)] transition hover:bg-[var(--accent-hover)]"
+          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-txt-highlight transition hover:bg-accent-hover"
         >
           {categoryId ? "Create Thread in This Category" : "Create Thread"}
         </button>
@@ -122,8 +122,8 @@ export const ThreadList = ({
           <article
             key={thread.id}
             className={[
-              "rounded-xl border bg-[var(--bg-surface)] text-[var(--txt-primary)] shadow-sm transition",
-              "border-[var(--br-secondary)] hover:border-[var(--br-primary)]",
+              "rounded-xl border bg-surface-card text-txt-primary shadow-sm transition",
+              "border-br-secondary hover:border-br-primary",
               thread.isPinned ? "border-l-4 border-l-yellow-400" : "",
               isCompact ? "p-3" : "p-5",
             ].join(" ")}
@@ -132,7 +132,7 @@ export const ThreadList = ({
               <div className="min-w-0 flex-1">
                 <Link
                   to={FORUM_PATHS.THREAD(thread.id)}
-                  className="text-lg font-semibold transition hover:text-[var(--accent)]"
+                  className="text-lg font-semibold transition hover:text-accent"
                 >
                   {thread.title}
                 </Link>
@@ -143,9 +143,9 @@ export const ThreadList = ({
                       return (
                         <span
                           key={tag}
-                          className="inline-flex items-center rounded-full bg-[var(--bg-tertiary)] px-2 py-1 text-xs text-[var(--txt-secondary)]"
+                          className="inline-flex items-center rounded-full bg-muted px-2 py-1 text-xs text-txt-secondary"
                         >
-                          <FaTag className="mr-1 text-[var(--txt-muted)]" size={10} />
+                          <FaTag className="mr-1 text-txt-muted" size={10} />
 
                           {tag}
                         </span>
@@ -164,7 +164,7 @@ export const ThreadList = ({
 
             <div
               className={[
-                "flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[var(--txt-muted)]",
+                "flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-txt-muted",
                 isCompact ? "mt-2" : "mt-4",
               ].join(" ")}
             >
@@ -193,7 +193,7 @@ export const ThreadList = ({
               {showCategory && (
                 <Link
                   to={FORUM_PATHS.CATEGORY(thread.categoryId)}
-                  className="ml-auto font-medium text-[var(--accent)] hover:underline"
+                  className="ml-auto font-medium text-accent hover:underline"
                 >
                   {categoryName ?? "Category"}
                 </Link>
@@ -211,7 +211,7 @@ export const ThreadList = ({
               void fetchNextPage();
             }}
             disabled={isFetchingNextPage}
-            className="rounded-lg border border-[var(--br-secondary)] bg-[var(--bg-surface)] px-5 py-2 text-sm font-semibold text-[var(--txt-primary)] transition hover:bg-[var(--bg-tertiary)] disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg border border-br-secondary bg-surface-card px-5 py-2 text-sm font-semibold text-txt-primary transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isFetchingNextPage ? <Spinner size={12} /> : "Load More"}
           </button>

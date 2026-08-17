@@ -1,148 +1,151 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Bell, MessageSquare } from "lucide-react";
+import { Bell, ChevronDown, ChevronUp, MessageSquare } from "lucide-react";
+
+import { Button } from "@/components";
 import { useNotificationTest } from "../scripts/testNotifications";
 
-export const SystemNotificationsTest = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [title, setTitle] = useState("Test System Alert");
-    const [message, setMessage] = useState("This is a test system alert message.");
-    const [duration, setDuration] = useState(5000);
+export function SystemNotificationsTest() {
+  const [isOpen, setIsOpen] = useState(false);
+  const [title, setTitle] = useState("Test System Alert");
+  const [message, setMessage] = useState("This is a test system alert message.");
+  const [duration, setDuration] = useState(5000);
 
-    const { testNotification, testAllTypes, testPersistent, testLongMessage } =
-        useNotificationTest();
+  const { testNotification, testAllTypes, testPersistent, testLongMessage } =
+    useNotificationTest();
 
-    const handleTest = (type: "success" | "error" | "warning" | "info") => {
-        testNotification({ type, title, message, duration });
-    };
+  const handleTest = (type: "success" | "error" | "warning" | "info") => {
+    testNotification({
+      type,
+      title,
+      message,
+      duration,
+    });
+  };
 
-    const handleTestAll = () => {
-        testAllTypes(title, message, duration);
-    };
+  const handleTestAll = () => {
+    testAllTypes(title, message, duration);
+  };
 
-    const handleTestPersistent = () => {
-        testPersistent(title, message);
-    };
+  const handleTestPersistent = () => {
+    testPersistent(title, message);
+  };
 
-    const handleTestLong = () => {
-        testLongMessage(title, message);
-    };
+  const handleTestLong = () => {
+    testLongMessage(title, message);
+  };
 
-    return (
-        <div className="mb-4">
+  return (
+    <div className="mb-4">
+      <Button variant="secondary" onClick={() => setIsOpen(!isOpen)}>
+        <Bell className="size-5 text-accent" aria-hidden="true" />
+
+        <span>System Alerts Testing</span>
+
+        {isOpen ? (
+          <ChevronUp className="size-5" aria-hidden="true" />
+        ) : (
+          <ChevronDown className="size-5" aria-hidden="true" />
+        )}
+      </Button>
+
+      {isOpen && (
+        <div className="mt-2 rounded-lg border border-br-secondary bg-section p-4">
+          <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-txt-secondary">
+                Title
+              </label>
+
+              <input
+                type="text"
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                className="w-full rounded-lg border border-br-secondary bg-page px-3 py-2 text-txt-primary transition-colors"
+                placeholder="Alert title"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-txt-secondary">
+                Duration (ms)
+              </label>
+
+              <input
+                type="number"
+                value={duration}
+                onChange={(event) => {
+                  setDuration(Number(event.target.value));
+                }}
+                className="w-full rounded-lg border border-br-secondary bg-page px-3 py-2 text-txt-primary transition-colors"
+                placeholder="5000"
+                min="0"
+              />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <label className="mb-1 block text-sm font-medium text-txt-secondary">
+              Message
+            </label>
+
+            <textarea
+              value={message}
+              onChange={(event) => setMessage(event.target.value)}
+              rows={3}
+              className="w-full resize-none rounded-lg border border-br-secondary bg-page px-3 py-2 text-txt-primary transition-colors"
+              placeholder="Alert message"
+            />
+          </div>
+
+          <div className="mb-4 grid grid-cols-2 gap-2 md:grid-cols-4">
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center justify-between w-full p-3 bg-bg-secondary rounded-lg border border-br-secondary hover:bg-bg-primary transition-colors"
+              type="button"
+              onClick={() => handleTest("success")}
+              className="rounded-lg bg-success px-3 py-2 text-sm font-semibold text-txt-inverse transition-colors hover:bg-success-hover"
             >
-                <div className="flex items-center">
-                    <Bell className="w-5 h-5 mr-2 text-primary" />
-                    <span className="font-semibold text-txt-primary">
-                        System Alerts Testing
-                    </span>
-                </div>
-                {isOpen ? (
-                    <ChevronUp className="w-5 h-5" />
-                ) : (
-                    <ChevronDown className="w-5 h-5" />
-                )}
+              Success
             </button>
 
-            {isOpen && (
-                <div className="mt-2 p-4 bg-bg-secondary rounded-lg border border-br-secondary">
-                    {/* Input Fields */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label className="block text-sm font-medium text-txt-secondary mb-1">
-                                Title
-                            </label>
-                            <input
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-primary text-txt-primary focus:outline-none focus:ring-2 focus:ring-primary"
-                                placeholder="Alert title"
-                            />
-                        </div>
+            <button
+              type="button"
+              onClick={() => handleTest("error")}
+              className="rounded-lg bg-error px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-error-hover"
+            >
+              Error
+            </button>
 
-                        <div>
-                            <label className="block text-sm font-medium text-txt-secondary mb-1">
-                                Duration (ms)
-                            </label>
-                            <input
-                                type="number"
-                                value={duration}
-                                onChange={(e) => setDuration(Number(e.target.value))}
-                                className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-primary text-txt-primary focus:outline-none focus:ring-2 focus:ring-primary"
-                                placeholder="5000"
-                                min="0"
-                            />
-                        </div>
-                    </div>
+            <button
+              type="button"
+              onClick={() => handleTest("warning")}
+              className="rounded-lg bg-warning px-3 py-2 text-sm font-semibold text-txt-inverse transition-colors"
+            >
+              Warning
+            </button>
 
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-txt-secondary mb-1">
-                            Message
-                        </label>
-                        <textarea
-                            value={message}
-                            onChange={(e) => setMessage(e.target.value)}
-                            rows={3}
-                            className="w-full px-3 py-2 border border-br-secondary rounded-lg bg-bg-primary text-txt-primary focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                            placeholder="Alert message"
-                        />
-                    </div>
+            <Button onClick={() => handleTest("info")} size="sm">
+              Info
+            </Button>
+          </div>
 
-                    {/* Quick Test Buttons */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
-                        <button
-                            onClick={() => handleTest("success")}
-                            className="px-3 py-2 bg-success text-bg-reverse rounded-lg hover:bg-success/90 transition-colors text-sm"
-                        >
-                            Success
-                        </button>
-                        <button
-                            onClick={() => handleTest("error")}
-                            className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
-                        >
-                            Error
-                        </button>
-                        <button
-                            onClick={() => handleTest("warning")}
-                            className="px-3 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors text-sm"
-                        >
-                            Warning
-                        </button>
-                        <button
-                            onClick={() => handleTest("info")}
-                            className="cta-button px-3 py-2 rounded-lg text-sm"
-                        >
-                            Info
-                        </button>
-                    </div>
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+            <Button
+              onClick={handleTestAll}
+              size="sm"
+              leftIcon={<MessageSquare className="size-4" aria-hidden="true" />}
+            >
+              Test All Types
+            </Button>
 
-                    {/* Advanced Test Buttons */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <button
-                            onClick={handleTestAll}
-                            className="cta-button flex items-center justify-center px-3 py-2 rounded-lg text-sm"
-                        >
-                            <MessageSquare className="w-4 h-4 mr-1" />
-                            Test All Types
-                        </button>
-                        <button
-                            onClick={handleTestPersistent}
-                            className="secondary-button px-3 py-2 rounded-lg text-sm"
-                        >
-                            Persistent
-                        </button>
-                        <button
-                            onClick={handleTestLong}
-                            className="cta-button px-3 py-2 rounded-lg text-sm"
-                        >
-                            Long Message
-                        </button>
-                    </div>
-                </div>
-            )}
+            <Button variant="secondary" size="sm" onClick={handleTestPersistent}>
+              Persistent
+            </Button>
+
+            <Button size="sm" onClick={handleTestLong}>
+              Long Message
+            </Button>
+          </div>
         </div>
-    );
-};
+      )}
+    </div>
+  );
+}

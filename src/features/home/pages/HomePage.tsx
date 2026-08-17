@@ -6,7 +6,6 @@ import { useFetchModels } from "@/features/models/hooks/index";
 
 import { HomeModelsGrid } from "../components/HomeModelsGrid";
 import { Spinner } from "@/features/shared/reusable/Spinner";
-import { H3 } from "@/components/ResponsiveHeading";
 
 import { useState, useCallback, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -51,7 +50,7 @@ export const HomePage = (): React.ReactNode => {
   if (isError) return <div className="text-center text-error">Error loading models.</div>;
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-bg-primary text-txt-primary">
+    <div className="relative min-h-screen overflow-hidden bg-page text-txt-primary">
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-[520px] bg-[radial-gradient(ellipse_at_top,rgba(var(--accent-rgb),0.08),transparent_62%)] opacity-80"
         aria-hidden="true"
@@ -61,9 +60,7 @@ export const HomePage = (): React.ReactNode => {
       </div>
       <section className="relative px-4 pb-12 pt-8 md:px-6 md:pt-10 lg:px-8">
         <div className="mb-6 border-t border-br-subtle/70 pt-7">
-          <H3 size="2xl" className="leading-tight">
-            All Models
-          </H3>
+          <h3 className="text-lg leading-tight">All Models</h3>
         </div>
         <InfiniteScrollList
           items={models}

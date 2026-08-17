@@ -41,7 +41,7 @@ export const CreateThread = () => {
   };
 
   return (
-    <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+    <div className="bg-surface-card text-txt-primary rounded-lg shadow p-6">
       <h1 className="text-2xl font-bold mb-6">Create New Thread</h1>
 
       {error && (

@@ -69,8 +69,8 @@ export const Featured: FC<FeaturedProps> = ({ previewCount }) => {
 
   return (
     <section className="max-w-6xl mx-auto py-12 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-[var(--accent)]">Featured 3D Models</h1>
-      <p className="text-lg text-[var(--txt-secondary)] mb-8">
+      <h1 className="text-3xl font-bold mb-6 text-accent">Featured 3D Models</h1>
+      <p className="text-lg text-txt-secondary mb-8">
         Hand-picked STL files and 3D models selected by our team.
       </p>
 
@@ -87,7 +87,7 @@ export const Featured: FC<FeaturedProps> = ({ previewCount }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {modelsToShow.map((model) => (
             <Link key={model.id} to={`/model/${model.id}`}>
-              <article className="relative bg-bg-surface rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+              <article className="relative bg-surface-card rounded-md overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                 <div className="relative w-full aspect-square">
                   <LazyImage
                     src={

@@ -108,10 +108,7 @@ export const ThreadEditor = ({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Title */}
       <div>
-        <label
-          htmlFor="title"
-          className="block text-sm font-medium text-[var(--txt-primary)]"
-        >
+        <label htmlFor="title" className="block text-sm font-medium text-txt-primary">
           Thread Title
         </label>
         <input
@@ -121,7 +118,7 @@ export const ThreadEditor = ({
           value={formData.title}
           onChange={handleChange}
           disabled={isLoading}
-          className={`mt-1 block w-full rounded-lg border-[var(--br-secondary)] bg-[var(--bg-surface)] text-[var(--txt-primary)] shadow-sm focus:border-[var(--accent)] focus:ring-[var(--accent)] ${
+          className={`mt-1 block w-full rounded-lg border-br-secondary bg-surface-card text-txt-primary shadow-sm focus:border-accent focus:ring-accent ${
             errors.title ? "border-red-500" : ""
           }`}
           placeholder="Enter a descriptive title"
@@ -135,7 +132,7 @@ export const ThreadEditor = ({
       <div>
         <label
           htmlFor="categoryId"
-          className="block text-sm font-medium text-[var(--txt-primary)]"
+          className="block text-sm font-medium text-txt-primary"
         >
           Category
         </label>
@@ -145,7 +142,7 @@ export const ThreadEditor = ({
           value={formData.categoryId}
           onChange={handleChange}
           disabled={isLoading}
-          className={`mt-1 block w-full rounded-lg border-[var(--br-secondary)] bg-[var(--bg-surface)] text-[var(--txt-primary)] shadow-sm focus:border-[var(--accent)] focus:ring-[var(--accent)] ${
+          className={`mt-1 block w-full rounded-lg border-br-secondary bg-surface-card text-txt-primary shadow-sm focus:border-accent focus:ring-accent ${
             errors.categoryId ? "border-red-500" : ""
           }`}
         >
@@ -165,10 +162,7 @@ export const ThreadEditor = ({
 
       {/* Tags */}
       <div>
-        <label
-          htmlFor="tags"
-          className="block text-sm font-medium text-[var(--txt-primary)]"
-        >
+        <label htmlFor="tags" className="block text-sm font-medium text-txt-primary">
           Tags (comma separated)
         </label>
         <input
@@ -178,17 +172,14 @@ export const ThreadEditor = ({
           value={tags}
           onChange={handleTagsChange}
           disabled={isLoading}
-          className="mt-1 block w-full rounded-lg border-[var(--br-secondary)] bg-[var(--bg-surface)] text-[var(--txt-primary)] shadow-sm focus:border-[var(--accent)] focus:ring-[var(--accent)]"
+          className="mt-1 block w-full rounded-lg border-br-secondary bg-surface-card text-txt-primary shadow-sm focus:border-accent focus:ring-accent"
           placeholder="e.g., question, help, tutorial"
         />
       </div>
 
       {/* Content */}
       <div>
-        <label
-          htmlFor="content"
-          className="block text-sm font-medium text-[var(--txt-primary)]"
-        >
+        <label htmlFor="content" className="block text-sm font-medium text-txt-primary">
           Content
         </label>
         <textarea
@@ -198,7 +189,7 @@ export const ThreadEditor = ({
           onChange={handleChange}
           disabled={isLoading}
           rows={10}
-          className={`mt-1 block w-full rounded-lg border-[var(--br-secondary)] bg-[var(--bg-surface)] text-[var(--txt-primary)] shadow-sm focus:border-[var(--accent)] focus:ring-[var(--accent)] ${
+          className={`mt-1 block w-full rounded-lg border-br-secondary bg-surface-card text-txt-primary shadow-sm focus:border-accent focus:ring-accent ${
             errors.content ? "border-red-500" : ""
           }`}
           placeholder="Write your thread content here..."
@@ -206,7 +197,7 @@ export const ThreadEditor = ({
         {errors.content && (
           <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.content}</p>
         )}
-        <p className="mt-1 text-sm text-[var(--txt-muted)]">
+        <p className="mt-1 text-sm text-txt-muted">
           Basic formatting is supported: **bold**, *italic*, [link](url)
         </p>
       </div>
@@ -218,7 +209,7 @@ export const ThreadEditor = ({
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="inline-flex items-center px-4 py-2 rounded-lg font-semibold border border-[var(--br-secondary)] bg-[var(--bg-surface)] text-[var(--txt-primary)] hover:bg-[var(--bg-tertiary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+            className="inline-flex items-center px-4 py-2 rounded-lg font-semibold border border-br-secondary bg-surface-card text-txt-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-accent"
           >
             <FaTimes className="mr-2 -ml-1" />
             Cancel
@@ -228,7 +219,7 @@ export const ThreadEditor = ({
         <button
           type="submit"
           disabled={isLoading}
-          className="inline-flex items-center px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+          className="inline-flex items-center px-4 py-2 rounded-lg font-semibold bg-accent text-txt-highlight hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent"
         >
           <FaSave className="mr-2 -ml-1" />
           {isEdit ? "Save Changes" : "Create Thread"}

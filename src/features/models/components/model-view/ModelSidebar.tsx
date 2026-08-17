@@ -10,7 +10,6 @@ import { LikeButton } from "../../likes/components/likeButton";
 import { FavoritesButton } from "../../favorites/components/favoritesButton";
 import { PurchaseButton } from "@/features/payment/components/PurchaseButton";
 import { FollowButton } from "@/features/user/follow/components/FollowButton";
-import { H4, H5 } from "@/components/ResponsiveHeading";
 
 //types
 import type { CurrentUser } from "@/features/auth/types/auth";
@@ -168,7 +167,7 @@ export function ModelSidebar({
               <button
                 onClick={handleCancel}
                 disabled={isUpdating}
-                className="flex-1 rounded-lg border border-br-secondary bg-bg-surface px-4 py-2 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-focus disabled:opacity-60 lg:text-base"
+                className="flex-1 rounded-lg border border-br-secondary bg-surface-card px-4 py-2 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-focus disabled:opacity-60 lg:text-base"
               >
                 Cancel
               </button>
@@ -176,9 +175,9 @@ export function ModelSidebar({
           </>
         ) : (
           <>
-            <H4 className="mb-3 text-base font-bold text-txt-primary lg:text-lg">
+            <h4 className="mb-3 text-base font-bold text-txt-primary lg:text-lg">
               {formData.name}
-            </H4>
+            </h4>
             <p className="text-sm leading-relaxed text-txt-secondary lg:text-base">
               {formData.description}
             </p>
@@ -187,7 +186,7 @@ export function ModelSidebar({
                 {formData.tags.split(",").map((tag, i) => (
                   <span
                     key={i}
-                    className="rounded-full border border-br-subtle bg-bg-surface px-2.5 py-1 text-xs text-txt-secondary"
+                    className="rounded-full border border-br-subtle bg-surface-card px-2.5 py-1 text-xs text-txt-secondary"
                   >
                     {tag.trim()}
                   </span>
@@ -246,7 +245,7 @@ export function ModelSidebar({
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
                 <button
                   onClick={handleEdit}
-                  className="h-11 w-full rounded-lg border border-br-secondary bg-bg-surface px-4 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-focus"
+                  className="h-11 w-full rounded-lg border border-br-secondary bg-surface-card px-4 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-focus"
                 >
                   <span className="inline-flex items-center justify-center gap-2">
                     <Pencil className="h-4 w-4 lg:h-5 lg:w-5" aria-hidden="true" />
@@ -270,7 +269,7 @@ export function ModelSidebar({
                       <button
                         onClick={() => setShowDeleteConfirm(false)}
                         disabled={isDeleting}
-                        className="h-10 flex-1 rounded-lg border border-br-secondary bg-bg-surface px-4 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-bg-tertiary focus:outline-none focus:ring-2 focus:ring-focus disabled:opacity-70"
+                        className="h-10 flex-1 rounded-lg border border-br-secondary bg-surface-card px-4 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-focus disabled:opacity-70"
                       >
                         Cancel
                       </button>
@@ -306,14 +305,14 @@ export function ModelSidebar({
             }}
           />
           <div className="flex-1 min-w-0">
-            <H5 className="text-base font-semibold text-txt-primary">
+            <h5 className="text-base font-semibold text-txt-primary">
               <span
                 className="block truncate"
                 title={uploader?.displayName || "Anonymous"}
               >
                 {uploader?.displayName || "Anonymous"}
               </span>
-            </H5>
+            </h5>
             <p className="mt-1 text-xs text-txt-secondary">Senior 3D Artist</p>
             <div className="mt-3 flex items-center gap-2 lg:gap-3">
               {model.uploaderId && (

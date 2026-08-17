@@ -292,14 +292,14 @@ export const ProfileSettings = () => {
       </div>
 
       {error && (
-        <div className="p-4 bg-bg-reverse border border-error text-error rounded-md">
+        <div className="p-4 bg-inverse border border-error text-error rounded-md">
           {error}
         </div>
       )}
 
       <div className="space-y-6">
         {/* Profile Images */}
-        <div className="bg-bg-surface rounded-lg border border-br-secondary overflow-hidden">
+        <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
           <div className="p-6">
             <h3 className="text-lg font-semibold text-txt-primary mb-4">
               Profile Images
@@ -313,7 +313,7 @@ export const ProfileSettings = () => {
                 </label>
 
                 <div className="flex flex-col space-y-4">
-                  <div className="h-32 w-32 rounded-full overflow-hidden bg-bg-secondary border-2 border-br-secondary">
+                  <div className="h-32 w-32 rounded-full overflow-hidden bg-section border-2 border-br-secondary">
                     <img
                       src={avatarUrl}
                       alt="Profile avatar"
@@ -343,7 +343,7 @@ export const ProfileSettings = () => {
                 </div>
 
                 <div className="flex flex-col space-y-4">
-                  <div className="h-48 w-full overflow-hidden rounded-lg bg-bg-secondary border-2 border-br-secondary">
+                  <div className="h-48 w-full overflow-hidden rounded-lg bg-section border-2 border-br-secondary">
                     <div className="h-full w-full flex items-center justify-center text-txt-secondary text-sm">
                       Cover photo support is temporarily unavailable
                     </div>
@@ -367,7 +367,7 @@ export const ProfileSettings = () => {
         </div>
 
         {/* Basic Information */}
-        <div className="bg-bg-surface rounded-lg border border-br-secondary overflow-hidden">
+        <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
           <div className="p-6">
             <h3 className="text-lg font-semibold text-txt-primary mb-4">
               Basic Information
@@ -387,7 +387,7 @@ export const ProfileSettings = () => {
                   id="displayName"
                   value={displayName}
                   onChange={(event) => setDisplayName(event.target.value)}
-                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-bg-secondary text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-section text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   required
                 />
               </div>
@@ -405,7 +405,7 @@ export const ProfileSettings = () => {
                   id="email"
                   value={currentUser?.email ?? ""}
                   readOnly
-                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-bg-secondary text-txt-secondary cursor-not-allowed"
+                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-section text-txt-secondary cursor-not-allowed"
                 />
 
                 <p className="mt-2 text-xs text-txt-muted">
@@ -427,7 +427,7 @@ export const ProfileSettings = () => {
                 value={bio}
                 onChange={(event) => setBio(event.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 rounded-md border border-br-primary bg-bg-secondary text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                className="w-full px-3 py-2 rounded-md border border-br-primary bg-section text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                 placeholder="Tell us about yourself..."
               />
             </div>
@@ -435,7 +435,7 @@ export const ProfileSettings = () => {
         </div>
 
         {/* Location */}
-        <div className="bg-bg-surface rounded-lg border border-br-secondary overflow-hidden">
+        <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
           <div className="p-6">
             <h3 className="text-lg font-semibold text-txt-primary mb-4">Location</h3>
 
@@ -453,7 +453,7 @@ export const ProfileSettings = () => {
                   id="city"
                   value={city}
                   onChange={(event) => setCity(event.target.value)}
-                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-bg-secondary text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-section text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                 />
               </div>
 
@@ -469,7 +469,7 @@ export const ProfileSettings = () => {
                   id="country"
                   value={country}
                   onChange={(event) => setCountry(event.target.value)}
-                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-bg-secondary text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-section text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                 >
                   <option value="">Select a country</option>
 
@@ -485,7 +485,7 @@ export const ProfileSettings = () => {
         </div>
 
         {/* Social Media */}
-        <div className="bg-bg-surface rounded-lg border border-br-secondary overflow-hidden">
+        <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
           <div className="p-6">
             <h3 className="text-lg font-semibold text-txt-primary mb-4">Social Media</h3>
 
@@ -503,7 +503,7 @@ export const ProfileSettings = () => {
                   id="facebook"
                   value={facebook}
                   onChange={(event) => setFacebook(event.target.value)}
-                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-bg-secondary text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-section text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="https://facebook.com/username"
                 />
               </div>
@@ -521,7 +521,7 @@ export const ProfileSettings = () => {
                   id="twitter"
                   value={twitter}
                   onChange={(event) => setTwitter(event.target.value)}
-                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-bg-secondary text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-section text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="https://twitter.com/username"
                 />
               </div>
@@ -539,7 +539,7 @@ export const ProfileSettings = () => {
                   id="instagram"
                   value={instagram}
                   onChange={(event) => setInstagram(event.target.value)}
-                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-bg-secondary text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
+                  className="w-full px-3 py-2 rounded-md border border-br-primary bg-section text-txt-primary focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent"
                   placeholder="https://instagram.com/username"
                 />
               </div>

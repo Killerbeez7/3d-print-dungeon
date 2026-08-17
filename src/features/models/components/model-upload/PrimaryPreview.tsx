@@ -1,65 +1,70 @@
-import { FC } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faImage, faCrop, faXmark, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { faCrop, faImage, faUndo, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 interface PrimaryPreviewProps {
-    previewUrl?: string;
-    onSelect: () => void;
-    onRemove: () => void;
-    onCrop: () => void;
-    onRevert: () => void;
+  previewUrl?: string;
+  onSelect: () => void;
+  onRemove: () => void;
+  onCrop: () => void;
+  onRevert: () => void;
 }
 
-export const PrimaryPreview: FC<PrimaryPreviewProps> = ({
-    previewUrl,
-    onSelect,
-    onRemove,
-    onCrop,
-    onRevert,
-}) => {
-    if (!previewUrl) {
-        return (
-            <div
-                onClick={onSelect}
-                className="aspect-video flex flex-col items-center justify-center border-2 border-dashed border-br-primary rounded-lg cursor-pointer hover:border-accent hover:bg-accent-soft/40 hover:text-accent transition-colors"
-            >
-                <FontAwesomeIcon icon={faImage} className="text-4xl mb-3" />
-                <span className="font-medium">Add Primary Render</span>
-            </div>
-        );
-    }
-
+export function PrimaryPreview({
+  previewUrl,
+  onSelect,
+  onRemove,
+  onCrop,
+  onRevert,
+}: PrimaryPreviewProps) {
+  if (!previewUrl) {
     return (
-        <div className="relative aspect-video w-full rounded-lg overflow-hidden shadow-lg bg-bg-surface group">
-            <img
-                src={previewUrl}
-                alt="Primary render"
-                className="w-full h-full object-contain"
-            />
-
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-bg-reverse/40 backdrop-blur-sm transition-opacity flex items-center justify-center gap-4">
-                <button
-                    onClick={onCrop}
-                    aria-label="Resize / Crop"
-                    className="secondary-button p-3 rounded-full shadow hover:shadow-xl hover:scale-110 transform transition-all duration-150"
-                >
-                    <FontAwesomeIcon icon={faCrop} />
-                </button>
-                <button
-                    onClick={onRevert}
-                    aria-label="Revert to Original"
-                    className="secondary-button p-3 rounded-full shadow hover:shadow-xl hover:scale-110 transform transition-all duration-150"
-                >
-                    <FontAwesomeIcon icon={faUndo} />
-                </button>
-                <button
-                    onClick={onRemove}
-                    aria-label="Remove"
-                    className="contrast-button p-3 rounded-full shadow hover:shadow-xl hover:scale-110 transform transition-all duration-150"
-                >
-                    <FontAwesomeIcon icon={faXmark} />
-                </button>
-            </div>
-        </div>
+      <button
+        type="button"
+        onClick={onSelect}
+        className="flex aspect-video w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-br-primary transition-colors hover:border-accent hover:bg-accent-soft/40 hover:text-accent"
+      >
+        <FontAwesomeIcon icon={faImage} className="mb-3 text-4xl" />
+        <span className="font-medium">Add Primary Render</span>
+      </button>
     );
-};
+  }
+
+  return (
+    <div className="group relative aspect-video w-full overflow-hidden rounded-lg bg-surface-card shadow-lg">
+      <img
+        src={previewUrl}
+        alt="Primary render"
+        className="h-full w-full object-contain"
+      />
+
+      <div className="absolute inset-0 flex items-center justify-center gap-4 bg-inverse/40 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
+        <button
+          type="button"
+          onClick={onCrop}
+          aria-label="Resize / Crop"
+          className="inline-flex h-10 w-11 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--btn-main)_0%,var(--btn-secondary)_100%)] text-sm font-semibold text-txt-primary shadow transition-all duration-150 hover:-translate-y-0.5 hover:scale-110 hover:bg-[linear-gradient(135deg,var(--btn-secondary)_0%,var(--btn-hover)_100%)] hover:text-inverse hover:shadow-xl"
+        >
+          <FontAwesomeIcon icon={faCrop} />
+        </button>
+
+        <button
+          type="button"
+          onClick={onRevert}
+          aria-label="Revert to Original"
+          className="inline-flex h-10 w-11 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--btn-main)_0%,var(--btn-secondary)_100%)] text-sm font-semibold text-txt-primary shadow transition-all duration-150 hover:-translate-y-0.5 hover:scale-110 hover:bg-[linear-gradient(135deg,var(--btn-secondary)_0%,var(--btn-hover)_100%)] hover:text-inverse hover:shadow-xl"
+        >
+          <FontAwesomeIcon icon={faUndo} />
+        </button>
+
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label="Remove"
+          className="inline-flex h-10 w-11 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--contrast)_0%,var(--contrast-hover)_100%)] text-sm font-semibold text-txt-inverse shadow transition-all duration-150 hover:-translate-y-0.5 hover:scale-110 hover:bg-[linear-gradient(135deg,var(--contrast-hover)_0%,var(--contrast)_100%)] hover:shadow-xl"
+        >
+          <FontAwesomeIcon icon={faXmark} />
+        </button>
+      </div>
+    </div>
+  );
+}

@@ -1,14 +1,5 @@
 import type { Timestamp } from "firebase/firestore";
 
-import {
-  H2,
-  H3,
-  StatValue,
-  StatValueSecondary,
-  Label,
-  Metadata,
-} from "@/components/index";
-
 import type { PublicProfile } from "../types/profile";
 
 function formatDate(value: Timestamp | Date | undefined): string {
@@ -27,128 +18,98 @@ interface PrivateStatsProps {
 
 export const PrivateStats = ({ user }: PrivateStatsProps) => {
   return (
-    <div className="bg-bg-secondary rounded-lg p-4 sm:p-6 shadow-md">
-      <H2 size="2xl" className="text-txt-primary mb-4 sm:mb-6">
-        Private Statistics
-      </H2>
+    <div className="bg-section rounded-lg p-4 sm:p-6 shadow-md">
+      <h2 className="text-2xl text-txt-primary mb-4 sm:mb-6">Private Statistics</h2>
 
       {/* Enhanced Stats Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
         <div className="text-center">
-          <StatValue as="div" className="mb-1 sm:mb-2">
+          <div className="mb-1 text-3xl font-bold text-txt-highlight sm:mb-2">
             {user.stats.uploadsCount}
-          </StatValue>
-          <Label as="div" className="text-xs sm:text-sm">
-            Total Uploads
-          </Label>
+          </div>
+          <div className="text-xs text-txt-secondary sm:text-sm">Total Uploads</div>
         </div>
 
         <div className="text-center">
-          <StatValue as="div" className="mb-1 sm:mb-2">
+          <div className="mb-1 text-3xl font-bold text-txt-highlight sm:mb-2">
             {user.stats.likesCount}
-          </StatValue>
-          <Label as="div" className="text-xs sm:text-sm">
-            Total Likes
-          </Label>
+          </div>
+          <div className="text-xs text-txt-secondary sm:text-sm">Total Likes</div>
         </div>
 
         <div className="text-center">
-          <StatValue as="div" className="mb-1 sm:mb-2">
+          <div className="mb-1 text-3xl font-bold text-txt-highlight sm:mb-2">
             {user.stats.viewsCount}
-          </StatValue>
-          <Label as="div" className="text-xs sm:text-sm">
-            Total Views
-          </Label>
+          </div>
+          <div className="text-xs text-txt-secondary sm:text-sm">Total Views</div>
         </div>
 
         <div className="text-center">
-          <StatValue as="div" className="mb-1 sm:mb-2">
+          <div className="mb-1 text-3xl font-bold text-txt-highlight sm:mb-2">
             {user.stats.followersCount}
-          </StatValue>
-          <Label as="div" className="text-xs sm:text-sm">
-            Followers
-          </Label>
+          </div>
+          <div className="text-xs text-txt-secondary sm:text-sm">Followers</div>
         </div>
       </div>
 
       {/* Additional Private Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
         <div className="text-center">
-          <StatValueSecondary as="div" className="mb-1 sm:mb-2">
+          <div className="mb-1 text-2xl font-bold text-txt-primary">
             {user.stats.followingCount}
-          </StatValueSecondary>
-          <Label as="div" className="text-xs sm:text-sm">
-            Following
-          </Label>
+          </div>
+          <div className="text-xs text-txt-secondary sm:text-sm">Following</div>
         </div>
 
         <div className="text-center">
-          <StatValueSecondary as="div" className="mb-1 sm:mb-2">
-            -
-          </StatValueSecondary>
-          <Label as="div" className="text-xs sm:text-sm">
-            Collections
-          </Label>
+          <div className="mb-1 text-2xl font-bold text-txt-primary">-</div>
+          <div className="text-xs text-txt-secondary sm:text-sm">Collections</div>
         </div>
 
         <div className="text-center">
-          <StatValueSecondary as="div" className="mb-1 sm:mb-2">
+          <div className="mb-1 text-2xl font-bold text-txt-primary">
             {user.isPremium ? "Premium" : "Free"}
-          </StatValueSecondary>
-          <Label as="div" className="text-xs sm:text-sm">
-            Account Type
-          </Label>
+          </div>
+          <div className="text-xs text-txt-secondary sm:text-sm">Account Type</div>
         </div>
 
         <div className="text-center">
-          <StatValueSecondary as="div" className="mb-1 sm:mb-2">
+          <div className="mb-1 text-2xl font-bold text-txt-primary">
             {user.isVerified ? "✓" : "—"}
-          </StatValueSecondary>
-          <Label as="div" className="text-xs sm:text-sm">
-            Verified
-          </Label>
+          </div>
+          <div className="text-xs text-txt-secondary sm:text-sm">Verified</div>
         </div>
       </div>
 
       {/* Account Information */}
       <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-br-secondary">
-        <H3 size="lg" className="text-txt-primary mb-4">
-          Account Information
-        </H3>
+        <h3 className="text-lg text-txt-primary mb-4">Account Information</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-bg-surface rounded-lg p-4">
-            <Metadata as="div" className="mb-1">
-              Member Since
-            </Metadata>
+          <div className="bg-surface-card rounded-lg p-4">
+            <p className="text-xs text-txt-muted">Member Since</p>
             <div className="text-txt-primary font-medium">
               {formatDate(user.joinedAt)}
             </div>
           </div>
 
-          <div className="bg-bg-surface rounded-lg p-4">
-            <Metadata as="div" className="mb-1">
-              Last Active
-            </Metadata>
+          <div className="bg-surface-card rounded-lg p-4">
+            <p className="text-xs text-txt-muted">Last Active</p>
             <div className="text-txt-primary font-medium">
               {formatDate(user.lastActiveAt)}
             </div>
           </div>
 
           {user.location && (
-            <div className="bg-bg-surface rounded-lg p-4">
-              <Metadata as="div" className="mb-1">
-                Location
-              </Metadata>
+            <div className="bg-surface-card rounded-lg p-4">
+              <p className="text-xs text-txt-muted">Location</p>
               <div className="text-txt-primary font-medium">{user.location}</div>
             </div>
           )}
 
           {user.website && (
-            <div className="bg-bg-surface rounded-lg p-4">
-              <Metadata as="div" className="mb-1">
-                Website
-              </Metadata>
+            <div className="bg-surface-card rounded-lg p-4">
+              <p className="text-xs text-txt-muted">Website</p>
               <div className="text-txt-primary font-medium">
                 <a
                   href={user.website}

@@ -177,7 +177,7 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
               className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
                 selectedPeriod === period
                   ? "bg-accent text-white"
-                  : "bg-bg-secondary text-txt-secondary hover:text-txt-primary"
+                  : "bg-section text-txt-secondary hover:text-txt-primary"
               }`}
             >
               {period.charAt(0).toUpperCase() + period.slice(1)}
@@ -191,7 +191,7 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="bg-bg-secondary rounded-lg p-4 text-center hover:shadow-md transition-all duration-200"
+            className="bg-section rounded-lg p-4 text-center hover:shadow-md transition-all duration-200"
           >
             <div
               className={`w-12 h-12 rounded-full ${stat.bgColor} flex items-center justify-center mx-auto mb-3`}
@@ -205,7 +205,7 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
       </div>
 
       {/* Chart Section */}
-      <div className="bg-bg-secondary rounded-lg p-6">
+      <div className="bg-section rounded-lg p-6">
         <h4 className="text-lg font-semibold text-txt-primary mb-4">Activity Overview</h4>
         <div className="h-64 flex items-center justify-center text-txt-secondary">
           <div className="text-center">
@@ -217,7 +217,7 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
       </div>
 
       {/* Achievements Section */}
-      <div className="bg-bg-secondary rounded-lg p-6">
+      <div className="bg-section rounded-lg p-6">
         <h4 className="text-lg font-semibold text-txt-primary mb-4">Achievements</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {achievements.map((achievement, index) => (
@@ -226,7 +226,7 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
               className={`p-4 rounded-lg border transition-all duration-200 ${
                 achievement.achieved
                   ? "border-green-500 bg-green-50"
-                  : "border-br-primary bg-bg-surface"
+                  : "border-br-primary bg-surface-card"
               }`}
             >
               <div className="flex items-center gap-3">
@@ -234,7 +234,7 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
                   className={`w-10 h-10 rounded-full flex items-center justify-center ${
                     achievement.achieved
                       ? "bg-green-500 text-white"
-                      : "bg-bg-secondary text-txt-secondary"
+                      : "bg-section text-txt-secondary"
                   }`}
                 >
                   <i className={achievement.icon}></i>
@@ -253,7 +253,7 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
                         <span>Progress</span>
                         <span>{achievement.progress}%</span>
                       </div>
-                      <div className="w-full bg-bg-primary rounded-full h-2">
+                      <div className="w-full bg-page rounded-full h-2">
                         <div
                           className="bg-accent h-2 rounded-full transition-all duration-300"
                           style={{ width: `${achievement.progress}%` }}
@@ -269,7 +269,7 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
       </div>
 
       {/* Recent Activity */}
-      <div className="bg-bg-secondary rounded-lg p-6">
+      <div className="bg-section rounded-lg p-6">
         <h4 className="text-lg font-semibold text-txt-primary mb-4">Recent Activity</h4>
         <div className="space-y-3">
           {[
@@ -280,7 +280,7 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
           ].map((activity, index) => (
             <div
               key={index}
-              className="flex items-center gap-3 p-3 bg-bg-surface rounded-lg"
+              className="flex items-center gap-3 p-3 bg-surface-card rounded-lg"
             >
               <div className="w-2 h-2 bg-accent rounded-full"></div>
               <div className="flex-1">

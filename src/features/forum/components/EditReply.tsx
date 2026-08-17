@@ -52,7 +52,7 @@ export const EditReply = () => {
           onClick={() => {
             navigate(FORUM_PATHS.HOME);
           }}
-          className="mt-4 text-[var(--accent)] hover:underline"
+          className="mt-4 text-accent hover:underline"
         >
           Return to Forum
         </button>
@@ -70,7 +70,7 @@ export const EditReply = () => {
           onClick={() => {
             navigate(FORUM_PATHS.HOME);
           }}
-          className="mt-4 text-[var(--accent)] hover:underline"
+          className="mt-4 text-accent hover:underline"
         >
           Return to Forum
         </button>
@@ -80,10 +80,10 @@ export const EditReply = () => {
 
   if (currentUser?.uid !== reply.authorId) {
     return (
-      <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+      <div className="bg-surface-card text-txt-primary rounded-lg shadow p-6">
         <h2 className="text-xl font-semibold mb-3">Cannot edit this reply</h2>
 
-        <p className="text-[var(--txt-secondary)] mb-6">
+        <p className="text-txt-secondary mb-6">
           You can only edit replies that you posted.
         </p>
 
@@ -92,7 +92,7 @@ export const EditReply = () => {
           onClick={() => {
             navigate(FORUM_PATHS.THREAD(reply.threadId));
           }}
-          className="inline-block px-4 py-2 rounded-lg font-semibold bg-[var(--accent)] text-[var(--txt-highlight)] hover:bg-[var(--accent-hover)] transition"
+          className="inline-block px-4 py-2 rounded-lg font-semibold bg-accent text-txt-highlight hover:bg-accent-hover transition"
         >
           Back to Thread
         </button>
@@ -102,7 +102,7 @@ export const EditReply = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-[var(--bg-surface)] text-[var(--txt-primary)] rounded-lg shadow p-6">
+      <div className="bg-surface-card text-txt-primary rounded-lg shadow p-6">
         <h1 className="text-2xl font-bold mb-6">Edit Reply</h1>
 
         <ReplyEditor

@@ -1,3 +1,5 @@
+import { Button } from "@/components";
+
 interface SaveChangesProps {
   hasChanges: boolean;
   loading: boolean;
@@ -25,19 +27,14 @@ export const SaveChanges = ({
         type="button"
         onClick={onReset}
         disabled={loading}
-        className="px-4 py-2 text-sm border border-br-secondary rounded-md text-txt-secondary hover:bg-bg-secondary transition-colors disabled:opacity-50"
+        className="px-4 py-2 text-sm border border-br-secondary rounded-md text-txt-secondary hover:bg-section transition-colors disabled:opacity-50"
       >
         {resetText}
       </button>
 
-      <button
-        type="button"
-        onClick={onSave}
-        disabled={loading}
-        className="px-4 py-2 cta-button disabled:opacity-50 disabled:cursor-not-allowed"
-      >
+      <Button onClick={onSave} disabled={loading}>
         {loading ? "Saving..." : saveText}
-      </button>
+      </Button>
     </div>
   );
 };

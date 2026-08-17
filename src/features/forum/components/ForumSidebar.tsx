@@ -78,8 +78,8 @@ const SidebarLink = ({
       className={[
         "grid h-10 grid-cols-[40px_1fr] items-center rounded-lg text-sm transition-colors duration-200",
         isActive
-          ? "bg-[var(--bg-surface)] font-semibold text-[var(--txt-primary)] shadow-sm"
-          : "text-[var(--txt-secondary)] hover:bg-[var(--bg-surface)] hover:text-[var(--txt-primary)] overflow-hidden",
+          ? "bg-surface-card font-semibold text-txt-primary shadow-sm"
+          : "text-txt-secondary hover:bg-surface-card hover:text-txt-primary overflow-hidden",
       ].join(" ")}
     >
       <span className="flex h-10 w-10 items-center justify-center">
@@ -139,8 +139,8 @@ export const ForumSidebar = ({
     <aside
       className={[
         className ?? "",
-        "sticky top-20 hidden self-start shrink-0 overflow-hidden border-r border-[var(--br-secondary)]",
-        "bg-[var(--bg-primary)] text-[var(--txt-primary)] shadow-sm transition-[width] duration-300 ease-in-out md:flex md:flex-col",
+        "sticky top-20 hidden self-start shrink-0 overflow-hidden border-r border-br-secondary",
+        "bg-page text-txt-primary shadow-sm transition-[width] duration-300 ease-in-out md:flex md:flex-col",
       ].join(" ")}
       style={{
         width: isSidebarOpen ? FORUM_EXPANDED_WIDTH : FORUM_RAIL_WIDTH,
@@ -156,7 +156,7 @@ export const ForumSidebar = ({
           aria-label={
             isSidebarOpen ? "Collapse forum navigation" : "Expand forum navigation"
           }
-          className="flex h-10 w-10 items-center justify-center rounded-lg text-[var(--txt-secondary)] transition hover:bg-[var(--bg-surface)] hover:text-[var(--txt-primary)]"
+          className="flex h-10 w-10 items-center justify-center rounded-lg text-txt-secondary transition hover:bg-surface-card hover:text-txt-primary"
         >
           {isSidebarOpen ? <LuPanelLeftClose size={20} /> : <LuPanelLeftOpen size={20} />}
         </button>
@@ -171,10 +171,10 @@ export const ForumSidebar = ({
         </span>
       </div>
 
-      <nav className="flex min-h-0 flex-1 flex-col border-t border-[var(--br-secondary)] px-4 py-3">
+      <nav className="flex min-h-0 flex-1 flex-col border-t border-br-secondary px-4 py-3">
         {renderSection(MAIN_LINKS)}
 
-        <div className="my-4 border-t border-[var(--br-secondary)]" />
+        <div className="my-4 border-t border-br-secondary" />
 
         <div className="min-h-0 flex-1 overflow-y-auto">
           <div className="space-y-1">
@@ -199,7 +199,7 @@ export const ForumSidebar = ({
           </div>
         </div>
 
-        <div className="my-4 border-t border-[var(--br-secondary)]" />
+        <div className="my-4 border-t border-br-secondary" />
 
         {renderSection(INFO_LINKS)}
       </nav>

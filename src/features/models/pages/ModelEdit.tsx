@@ -115,7 +115,7 @@ export function ModelEdit() {
 
       <form
         onSubmit={handleSubmit}
-        className="mx-auto max-w-2xl rounded bg-bg-surface p-6 shadow"
+        className="mx-auto max-w-2xl rounded bg-surface-card p-6 shadow"
       >
         <div className="mb-4">
           <label htmlFor="name" className="mb-1 block text-txt-secondary">

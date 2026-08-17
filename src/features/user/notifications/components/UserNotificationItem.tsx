@@ -185,8 +185,8 @@ export function UserNotificationItem({
 
   const containerClasses =
     notification.status === "archived"
-      ? "bg-bg-secondary/80 opacity-75"
-      : "bg-bg-secondary hover:bg-bg-surface";
+      ? "bg-section/80 opacity-75"
+      : "bg-section hover:bg-surface-card";
 
   const spacingClasses = compact
     ? "gap-3 rounded-lg p-3"
@@ -201,7 +201,7 @@ export function UserNotificationItem({
       {isUnread && (
         <span
           aria-label="Unread"
-          className={`absolute h-3 w-3 animate-pulse rounded-full bg-primary ${
+          className={`absolute h-3 w-3 animate-pulse rounded-full bg-page ${
             compact || isMobile ? "right-2 top-2" : "right-3 top-3"
           }`}
         />

@@ -131,7 +131,7 @@ export const Scripts = () => {
         </div>
 
         {claims != null && (
-          <pre className="p-4 bg-bg-secondary rounded-lg overflow-auto mt-4">
+          <pre className="p-4 bg-section rounded-lg overflow-auto mt-4">
             {typeof claims === "string" ? claims : JSON.stringify(claims, null, 2)}
           </pre>
         )}

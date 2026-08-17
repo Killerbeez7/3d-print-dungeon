@@ -2,7 +2,6 @@ import { ReusableCarousel } from "@/features/shared/reusable/carousel/ReusableCa
 import { CarouselCard } from "./CarouselCard";
 import type { CarouselItem } from "../types/carousel";
 import { defaultCarouselSettings } from "@/features/shared/reusable/carousel/carouselSettings";
-import { H2 } from "@/components/ResponsiveHeading";
 
 interface FeaturedCarouselProps {
   items: CarouselItem[];
@@ -21,9 +20,7 @@ export const FeaturedCarousel = ({
     <section className={`relative pb-5 pt-6 lg:pt-7 ${className}`}>
       {title && (
         <div className="mb-5 px-4">
-          <H2 size="2xl" className="text-txt-primary">
-            {title}
-          </H2>
+          <h2 className="text-2xl text-txt-primary">{title}</h2>
         </div>
       )}
 

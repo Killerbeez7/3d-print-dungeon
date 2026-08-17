@@ -168,7 +168,7 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
   }, []);
 
   return (
-    <div className="bg-bg-secondary border border-br-secondary rounded-xl p-6 shadow-sm space-y-6">
+    <div className="bg-section border border-br-secondary rounded-xl p-6 shadow-sm space-y-6">
       <input
         type="file"
         ref={fileInputRef}

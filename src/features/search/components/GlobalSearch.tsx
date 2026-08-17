@@ -167,7 +167,7 @@ export function GlobalSearch() {
         value={searchTerm}
         onChange={handleInputChange}
         onFocus={handleFocus}
-        className="h-10 w-full rounded-full border border-br-secondary/80 bg-bg-primary/70 py-2 pl-10 pr-10 text-sm text-txt-primary placeholder:text-txt-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
+        className="h-10 w-full rounded-full border border-br-secondary/80 bg-page/70 py-2 pl-10 pr-10 text-sm text-txt-primary placeholder:text-txt-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
       />
 
       {searchTerm && (
@@ -191,7 +191,7 @@ export function GlobalSearch() {
                   <li
                     key={`artist-${artist.uid}`}
                     onMouseDown={() => handleArtistSelect(artist)}
-                    className="cursor-pointer px-3 py-2 hover:bg-bg-surface"
+                    className="cursor-pointer px-3 py-2 hover:bg-surface-card"
                   >
                     <div className="font-medium">{artist.displayName}</div>
                     <div className="text-xs text-txt-muted">Artist</div>

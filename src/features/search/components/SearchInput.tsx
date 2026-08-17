@@ -20,7 +20,7 @@ export const SearchInput = ({ value, onChange, onClear }: SearchInputProps) => {
         placeholder="Search models and artists"
         value={value}
         onChange={onChange}
-        className="w-full rounded-xl border border-br-secondary bg-bg-primary px-12 py-4 text-lg text-txt-primary transition-colors placeholder:text-txt-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
+        className="w-full rounded-xl border border-br-secondary bg-page px-12 py-4 text-lg text-txt-primary transition-colors placeholder:text-txt-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
       />
 
       {value && (

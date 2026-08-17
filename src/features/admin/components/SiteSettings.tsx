@@ -112,7 +112,7 @@ export const SiteSettings = () => {
     <div className="space-y-8">
       <div className="grid grid-cols-1 gap-6">
         {/* Site Status */}
-        <div className="bg-bg-secondary rounded-lg p-6">
+        <div className="bg-section rounded-lg p-6">
           <h3 className="text-lg font-bold mb-4 text-white">Site Status</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -132,14 +132,14 @@ export const SiteSettings = () => {
                   }
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-bg-surface peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/25 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                <div className="w-11 h-6 bg-surface-card rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
               </label>
             </div>
           </div>
         </div>
 
         {/* Upload Settings */}
-        <div className="bg-bg-secondary rounded-lg p-6">
+        <div className="bg-section rounded-lg p-6">
           <h3 className="text-lg font-bold mb-4 text-white">Upload Settings</h3>
           <div className="space-y-4">
             <div>
@@ -155,7 +155,7 @@ export const SiteSettings = () => {
                     maxUploadSizeMB: Number(e.target.value),
                   }))
                 }
-                className="w-full px-4 py-2 rounded-lg bg-bg-surface text-txt-primary"
+                className="w-full px-4 py-2 rounded-lg bg-surface-card text-txt-primary"
               />
             </div>
 
@@ -172,14 +172,14 @@ export const SiteSettings = () => {
                     defaultUserQuotaMB: Number(e.target.value),
                   }))
                 }
-                className="w-full px-4 py-2 rounded-lg bg-bg-surface text-txt-primary"
+                className="w-full px-4 py-2 rounded-lg bg-surface-card text-txt-primary"
               />
             </div>
           </div>
         </div>
 
         {/* Featured Categories */}
-        <div className="bg-bg-secondary rounded-lg p-6">
+        <div className="bg-section rounded-lg p-6">
           <h3 className="text-lg font-bold mb-4 text-white">Featured Categories</h3>
           <div className="space-y-4">
             <div className="flex gap-2">
@@ -198,7 +198,7 @@ export const SiteSettings = () => {
                   }
                 }}
                 placeholder="Enter category name"
-                className="flex-1 px-4 py-2 rounded-lg bg-bg-surface text-txt-primary"
+                className="flex-1 px-4 py-2 rounded-lg bg-surface-card text-txt-primary"
               />
               <button
                 onClick={handleAddCategory}
@@ -212,7 +212,7 @@ export const SiteSettings = () => {
               {settings.featuredCategories.map((category) => (
                 <div
                   key={category}
-                  className="flex items-center gap-2 px-3 py-1 bg-bg-surface rounded-full"
+                  className="flex items-center gap-2 px-3 py-1 bg-surface-card rounded-full"
                 >
                   <span className="text-txt-primary">{category}</span>
                   <button

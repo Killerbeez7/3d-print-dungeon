@@ -35,7 +35,7 @@ export const ProgressiveImage = ({
     return (
         <div
             className={`relative overflow-hidden ${className}`}
-            style={{ backgroundColor: "var(--bg-surface)" }}
+            style={{ backgroundColor: "var(--surface-card)" }}
             role="img"
             aria-label={alt}
         >

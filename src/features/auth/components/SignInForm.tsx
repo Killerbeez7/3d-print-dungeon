@@ -18,6 +18,7 @@ import {
   faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
 import { PasswordResetModal } from "./PasswordResetModal";
+import { Button } from "@/components";
 
 interface SignInFormProps {
   onSwitchToSignUp: () => void;
@@ -121,8 +122,8 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
               required
               spellCheck="false"
               autoComplete="email"
-              className="w-full pl-10 pr-4 py-3 border border-br-secondary rounded-xl bg-bg-surface text-txt-primary placeholder-txt-muted shadow-token-inner 
-                            focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:border-[var(--color-focus)] transition-all duration-200"
+              className="w-full pl-10 pr-4 py-3 border border-br-secondary rounded-xl bg-surface-card text-txt-primary placeholder-txt-muted shadow-inner
+                            focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition-all duration-200"
               placeholder="Enter your email"
             />
             <ValidityIndicator
@@ -140,7 +141,7 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
             />
           </div>
           {getFieldError("email") && (
-            <p className="mt-1 text-sm text-auth-modal-error">{getFieldError("email")}</p>
+            <p className="mt-1 text-sm text-error">{getFieldError("email")}</p>
           )}
         </div>
 
@@ -161,7 +162,7 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
               required
               spellCheck="false"
               autoComplete="current-password"
-              className="w-full pl-10 pr-12 py-3 border border-br-secondary rounded-xl bg-bg-surface text-txt-primary placeholder-txt-muted shadow-token-inner focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:border-[var(--color-focus)] transition-all duration-200"
+              className="w-full pl-10 pr-12 py-3 border border-br-secondary rounded-xl bg-surface-card text-txt-primary placeholder-txt-muted shadow-inner focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition-all duration-200"
               placeholder="Enter your password"
             />
             <button
@@ -187,9 +188,7 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
             />
           </div>
           {getFieldError("password") && (
-            <p className="mt-1 text-sm text-auth-modal-text-primary">
-              {getFieldError("password")}
-            </p>
+            <p className="mt-1 text-sm text-txt-secondary">{getFieldError("password")}</p>
           )}
         </div>
 
@@ -206,19 +205,14 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
 
         {/* Error message */}
         {error && (
-          <div className="flex items-center p-3 bg-bg-muted border border-error rounded-xl">
+          <div className="flex items-center p-3 bg-muted border border-error rounded-xl">
             <FontAwesomeIcon icon={faExclamationTriangle} className="text-error mr-2" />
-            <p className="text-auth-modal-text-primary text-sm font-medium">{error}</p>
+            <p className="text-txt-secondary text-sm font-medium">{error}</p>
           </div>
         )}
 
         {/* Submit button */}
-        <button
-          type="submit"
-          disabled={!isFormValid() || loading}
-          className="btn-action-primary w-full py-3 px-4 disabled:opacity-60 
-                    focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] focus:ring-offset-2"
-        >
+        <Button type="submit" size="lg" fullWidth disabled={!isFormValid() || loading}>
           {loading ? (
             <div className="flex items-center justify-center">
               <Spinner size={18} />
@@ -227,7 +221,7 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
           ) : (
             "Sign In"
           )}
-        </button>
+        </Button>
       </form>
 
       {/* Social login */}
@@ -242,9 +236,9 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
           <button
             onClick={() => handleOAuthSignIn("google")}
             disabled={loading}
-            className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 
-                        border border-br-secondary rounded-lg lg:rounded-xl text-txt-primary bg-bg-surface 
-                        hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 
+            className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4
+                        border border-br-secondary rounded-lg lg:rounded-xl text-txt-primary bg-surface-card
+                        hover:shadow-md hover:scale-[1.02] transition-all duration-200
                         disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             title="Continue with Google"
           >
@@ -255,9 +249,9 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
           <button
             onClick={() => handleOAuthSignIn("facebook")}
             disabled={loading}
-            className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 
-                        border border-br-secondary rounded-lg lg:rounded-xl text-txt-primary bg-bg-surface 
-                        hover:shadow-token-md hover:scale-[1.02] transition-all duration-200 
+            className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4
+                        border border-br-secondary rounded-lg lg:rounded-xl text-txt-primary bg-surface-card
+                        hover:shadow-md hover:scale-[1.02] transition-all duration-200
                         disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             title="Continue with Facebook"
           >
@@ -268,8 +262,8 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
           <button
             onClick={() => handleOAuthSignIn("twitter")}
             disabled={loading}
-            className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary 
-                        rounded-lg lg:rounded-xl text-txt-primary bg-bg-surface hover:shadow-token-md hover:scale-[1.02] 
+            className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary
+                        rounded-lg lg:rounded-xl text-txt-primary bg-surface-card hover:shadow-md hover:scale-[1.02]
                         transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             title="Continue with Twitter"
           >
