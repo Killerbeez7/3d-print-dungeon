@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
 import {
-  FaQuestionCircle,
-  FaExclamationTriangle,
-  FaStar,
-  FaUsers,
   FaEdit,
+  FaExclamationTriangle,
+  FaQuestionCircle,
   FaReply,
   FaSearch,
+  FaStar,
+  FaUsers,
 } from "react-icons/fa";
-import { FORUM_PATHS } from "@/features/forum/constants/forumPaths";
-import type { FC } from "react";
 
-export const ForumHelp: FC = () => {
+import { FORUM_PATHS } from "@/features/forum/constants/forumPaths";
+
+export function ForumHelp() {
   const faqs = [
     {
       question: "How do I create a new thread?",
@@ -85,152 +85,232 @@ export const ForumHelp: FC = () => {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto space-y-12">
+    <div className="mx-auto w-full max-w-5xl space-y-10">
       {/* Header */}
-      <div className="text-center space-y-6">
-        <div className="flex items-center justify-center gap-3">
-          <FaQuestionCircle className="text-txt-secondary" size={28} />
-          <h1 className="text-4xl font-bold text-txt-primary">Forum Help & Guidelines</h1>
-        </div>
-        <p className="text-lg text-txt-secondary max-w-2xl mx-auto leading-relaxed">
+      <header className="max-w-3xl">
+        {/* <div className="mb-4 flex size-12 items-center justify-center rounded-xl bg-accent-soft text-accent">
+          <FaQuestionCircle size={22} aria-hidden="true" />
+        </div> */}
+
+        {/* <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+          Forum Guide
+        </p> */}
+
+        <h1 className="text-3xl font-bold text-txt-primary sm:text-4xl">
+          Forum Help & Guidelines
+        </h1>
+
+        <p className="mt-3 text-lg leading-relaxed text-txt-secondary">
           Welcome to our community forum! This guide will help you get started and make
           the most of your forum experience.
         </p>
-      </div>
+      </header>
 
       {/* Quick Navigation */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-txt-primary">Quick Navigation</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-xl font-semibold text-txt-primary">Quick Navigation</h2>
+
+          <p className="mt-1 text-sm text-txt-muted">
+            Jump back into the main areas of the community.
+          </p>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-3">
           <Link
             to={FORUM_PATHS.HOME}
-            className="group p-6 border border-br-secondary rounded-xl hover:border-br-primary hover:bg-muted transition-all duration-200"
+            className="group rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm transition-all duration-200 hover:border-accent/30 hover:shadow-md"
           >
-            <h3 className="font-semibold text-txt-primary mb-3 group-hover:text-accent transition-colors">
+            <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
+              <FaQuestionCircle size={14} aria-hidden="true" />
+            </div>
+
+            <h3 className="font-semibold text-txt-primary transition-colors group-hover:text-accent">
               Forum Home
             </h3>
-            <p className="text-sm text-txt-secondary leading-relaxed">
+
+            <p className="mt-2 text-sm leading-relaxed text-txt-secondary">
               Browse recent discussions and popular threads
             </p>
           </Link>
-          <div className="p-6 border border-br-secondary rounded-xl bg-muted">
-            <h3 className="font-semibold text-txt-primary mb-3">My Threads</h3>
-            <p className="text-sm text-txt-secondary leading-relaxed">
+
+          <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
+            <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
+              <FaEdit size={14} aria-hidden="true" />
+            </div>
+
+            <h3 className="font-semibold text-txt-primary">My Threads</h3>
+
+            <p className="mt-2 text-sm leading-relaxed text-txt-secondary">
               View and manage your own discussions
             </p>
           </div>
-          <div className="p-6 border border-br-secondary rounded-xl bg-muted">
-            <h3 className="font-semibold text-txt-primary mb-3">Categories</h3>
-            <p className="text-sm text-txt-secondary leading-relaxed">
+
+          <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
+            <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
+              <FaSearch size={14} aria-hidden="true" />
+            </div>
+
+            <h3 className="font-semibold text-txt-primary">Categories</h3>
+
+            <p className="mt-2 text-sm leading-relaxed text-txt-secondary">
               Explore discussions by topic
             </p>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Community Guidelines */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-txt-primary">Community Guidelines</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {tips.map((tip, index) => (
-            <div
-              key={index}
-              className="flex gap-4 p-6 border border-br-secondary rounded-xl hover:border-br-primary transition-colors"
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-xl font-semibold text-txt-primary">Community Guidelines</h2>
+
+          <p className="mt-1 text-sm text-txt-muted">
+            A few habits that make discussions more useful for everyone.
+          </p>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2">
+          {tips.map((tip) => {
+            const Icon = tip.icon;
+
+            return (
+              <article
+                key={tip.title}
+                className="flex gap-4 rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm transition-colors hover:border-accent/25"
+              >
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
+                  <Icon size={16} aria-hidden="true" />
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-txt-primary">{tip.title}</h3>
+
+                  <p className="mt-1.5 text-sm leading-relaxed text-txt-secondary">
+                    {tip.description}
+                  </p>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Frequently Asked Questions */}
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-xl font-semibold text-txt-primary">
+            Frequently Asked Questions
+          </h2>
+
+          <p className="mt-1 text-sm text-txt-muted">
+            Common questions about using the forum.
+          </p>
+        </div>
+
+        <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card shadow-sm">
+          {faqs.map((faq) => (
+            <article
+              key={faq.question}
+              className="border-b border-br-subtle p-5 last:border-b-0 sm:p-6"
             >
-              <div className="flex-shrink-0 mt-1">
-                <tip.icon className="text-txt-secondary" size={20} />
+              <h3 className="font-semibold text-txt-primary">{faq.question}</h3>
+
+              <p className="mt-2 leading-relaxed text-txt-secondary">{faq.answer}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* Getting Started */}
+      <section className="space-y-4">
+        <div>
+          <h2 className="text-xl font-semibold text-txt-primary">Getting Started</h2>
+
+          <p className="mt-1 text-sm text-txt-muted">
+            Three simple steps for joining the conversation.
+          </p>
+        </div>
+
+        <div className="rounded-xl border border-br-subtle bg-surface-card p-6 shadow-sm">
+          <div className="space-y-6">
+            <div className="flex gap-4">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent">
+                1
               </div>
-              <div className="space-y-2">
-                <h3 className="font-semibold text-txt-primary">{tip.title}</h3>
-                <p className="text-sm text-txt-secondary leading-relaxed">
-                  {tip.description}
+
+              <div>
+                <h3 className="font-semibold text-txt-primary">Explore the Forum</h3>
+
+                <p className="mt-1.5 leading-relaxed text-txt-secondary">
+                  Browse through existing threads to get familiar with the community and
+                  topics being discussed.
                 </p>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Frequently Asked Questions */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-txt-primary">
-          Frequently Asked Questions
-        </h2>
-        <div className="space-y-8">
-          {faqs.map((faq, index) => (
-            <div
-              key={index}
-              className="p-6 border border-br-secondary rounded-xl hover:border-br-primary transition-colors"
-            >
-              <h3 className="font-semibold text-txt-primary mb-3">{faq.question}</h3>
-              <p className="text-txt-secondary leading-relaxed">{faq.answer}</p>
-            </div>
-          ))}
-        </div>
-      </div>
+            <div className="ml-5 h-4 border-l border-br-subtle" />
 
-      {/* Getting Started */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-semibold text-txt-primary">Getting Started</h2>
-        <div className="space-y-8">
-          <div className="flex gap-6">
-            <div className="flex-shrink-0 w-10 h-10 bg-muted text-txt-secondary rounded-full flex items-center justify-center font-semibold border border-br-secondary">
-              1
+            <div className="flex gap-4">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent">
+                2
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-txt-primary">Join Discussions</h3>
+
+                <p className="mt-1.5 leading-relaxed text-txt-secondary">
+                  Reply to existing threads to share your thoughts and connect with other
+                  members.
+                </p>
+              </div>
             </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold text-txt-primary">Explore the Forum</h3>
-              <p className="text-txt-secondary leading-relaxed">
-                Browse through existing threads to get familiar with the community and
-                topics being discussed.
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-6">
-            <div className="flex-shrink-0 w-10 h-10 bg-muted text-txt-secondary rounded-full flex items-center justify-center font-semibold border border-br-secondary">
-              2
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold text-txt-primary">Join Discussions</h3>
-              <p className="text-txt-secondary leading-relaxed">
-                Reply to existing threads to share your thoughts and connect with other
-                members.
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-6">
-            <div className="flex-shrink-0 w-10 h-10 bg-muted text-txt-secondary rounded-full flex items-center justify-center font-semibold border border-br-secondary">
-              3
-            </div>
-            <div className="space-y-2">
-              <h3 className="font-semibold text-txt-primary">Start Your Own Thread</h3>
-              <p className="text-txt-secondary leading-relaxed">
-                Create new discussions on topics you&apos;re passionate about or questions
-                you have.
-              </p>
+
+            <div className="ml-5 h-4 border-l border-br-subtle" />
+
+            <div className="flex gap-4">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent">
+                3
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-txt-primary">Start Your Own Thread</h3>
+
+                <p className="mt-1.5 leading-relaxed text-txt-secondary">
+                  Create new discussions on topics you&apos;re passionate about or
+                  questions you have.
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Contact & Support */}
-      <div className="text-center space-y-6 p-8 border border-br-secondary rounded-xl bg-muted">
-        <h2 className="text-2xl font-semibold text-txt-primary">Need More Help?</h2>
-        <p className="text-txt-secondary max-w-md mx-auto leading-relaxed">
+      <section className="rounded-xl border border-br-subtle bg-muted/60 p-7 text-center sm:p-8">
+        <h2 className="text-xl font-semibold text-txt-primary">Need More Help?</h2>
+
+        <p className="mx-auto mt-2 max-w-lg leading-relaxed text-txt-secondary">
           If you need additional assistance or have questions not covered here, please
           don&apos;t hesitate to reach out.
         </p>
-        <div className="flex flex-wrap justify-center gap-4">
-          <button className="px-6 py-3 bg-surface-card text-txt-primary rounded-lg hover:bg-page border border-br-secondary transition-colors">
+
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <button
+            type="button"
+            className="rounded-lg border border-br-secondary bg-surface-card px-5 py-2.5 text-sm font-semibold text-txt-primary transition-colors hover:bg-muted"
+          >
             Contact Support
           </button>
+
           <Link
             to={FORUM_PATHS.HOME}
-            className="px-6 py-3 bg-accent text-txt-highlight rounded-lg hover:bg-accent-hover transition-colors"
+            className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover"
           >
             Back to Forum
           </Link>
         </div>
-      </div>
+      </section>
     </div>
   );
-};
+}

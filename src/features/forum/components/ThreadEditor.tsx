@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-
 import { FaSave, FaTimes } from "react-icons/fa";
+
+import { Button } from "@/components";
 
 import type { CreateThreadInput, ForumCategory } from "../types/forum";
 
@@ -13,23 +14,23 @@ interface ThreadEditorProps {
   isEdit?: boolean;
 }
 
-export const ThreadEditor = ({
+export function ThreadEditor({
   initialData,
   categories,
   onSubmit,
   onCancel,
   isLoading = false,
   isEdit = false,
-}: ThreadEditorProps) => {
+}: ThreadEditorProps) {
   const [formData, setFormData] = useState<CreateThreadInput>(initialData);
 
-  const [tags, setTags] = useState<string>(initialData.tags?.join(", ") ?? "");
+  const [tags, setTags] = useState(initialData.tags?.join(", ") ?? "");
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  ): void => {
     const { name, value } = event.target;
 
     setFormData((current) => {
@@ -50,7 +51,7 @@ export const ThreadEditor = ({
     }
   };
 
-  const handleTagsChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleTagsChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setTags(event.target.value);
   };
 
@@ -78,7 +79,7 @@ export const ThreadEditor = ({
     return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
 
     if (!validateForm()) {
@@ -111,24 +112,25 @@ export const ThreadEditor = ({
         <label htmlFor="title" className="block text-sm font-medium text-txt-primary">
           Thread Title
         </label>
+
         <input
-          type="text"
           id="title"
           name="title"
+          type="text"
           value={formData.title}
           onChange={handleChange}
           disabled={isLoading}
-          className={`mt-1 block w-full rounded-lg border-br-secondary bg-surface-card text-txt-primary shadow-sm focus:border-accent focus:ring-accent ${
-            errors.title ? "border-red-500" : ""
-          }`}
           placeholder="Enter a descriptive title"
+          aria-invalid={Boolean(errors.title)}
+          className={`mt-2 block w-full rounded-lg border bg-surface-card px-3 py-2.5 text-sm text-txt-primary shadow-sm outline-none transition placeholder:text-txt-muted focus:border-focus focus:ring-2 focus:ring-focus/15 disabled:cursor-not-allowed disabled:opacity-60 ${
+            errors.title ? "border-error" : "border-br-secondary"
+          }`}
         />
-        {errors.title && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.title}</p>
-        )}
+
+        {errors.title && <p className="mt-2 text-sm text-error">{errors.title}</p>}
       </div>
 
-      {/* Category Selection */}
+      {/* Category */}
       <div>
         <label
           htmlFor="categoryId"
@@ -136,45 +138,50 @@ export const ThreadEditor = ({
         >
           Category
         </label>
+
         <select
           id="categoryId"
           name="categoryId"
           value={formData.categoryId}
           onChange={handleChange}
           disabled={isLoading}
-          className={`mt-1 block w-full rounded-lg border-br-secondary bg-surface-card text-txt-primary shadow-sm focus:border-accent focus:ring-accent ${
-            errors.categoryId ? "border-red-500" : ""
+          aria-invalid={Boolean(errors.categoryId)}
+          className={`mt-2 block w-full rounded-lg border bg-surface-card px-3 py-2.5 text-sm text-txt-primary shadow-sm outline-none transition focus:border-focus focus:ring-2 focus:ring-focus/15 disabled:cursor-not-allowed disabled:opacity-60 ${
+            errors.categoryId ? "border-error" : "border-br-secondary"
           }`}
         >
           <option value="">Select a category</option>
+
           {categories.map((category) => (
             <option key={category.id} value={category.id}>
               {category.name}
             </option>
           ))}
         </select>
+
         {errors.categoryId && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-            {errors.categoryId}
-          </p>
+          <p className="mt-2 text-sm text-error">{errors.categoryId}</p>
         )}
       </div>
 
       {/* Tags */}
       <div>
         <label htmlFor="tags" className="block text-sm font-medium text-txt-primary">
-          Tags (comma separated)
+          Tags
         </label>
+
         <input
-          type="text"
           id="tags"
           name="tags"
+          type="text"
           value={tags}
           onChange={handleTagsChange}
           disabled={isLoading}
-          className="mt-1 block w-full rounded-lg border-br-secondary bg-surface-card text-txt-primary shadow-sm focus:border-accent focus:ring-accent"
-          placeholder="e.g., question, help, tutorial"
+          placeholder="e.g. question, help, tutorial"
+          className="mt-2 block w-full rounded-lg border border-br-secondary bg-surface-card px-3 py-2.5 text-sm text-txt-primary shadow-sm outline-none transition placeholder:text-txt-muted focus:border-focus focus:ring-2 focus:ring-focus/15 disabled:cursor-not-allowed disabled:opacity-60"
         />
+
+        <p className="mt-2 text-xs text-txt-muted">Separate tags with commas.</p>
       </div>
 
       {/* Content */}
@@ -182,6 +189,7 @@ export const ThreadEditor = ({
         <label htmlFor="content" className="block text-sm font-medium text-txt-primary">
           Content
         </label>
+
         <textarea
           id="content"
           name="content"
@@ -189,42 +197,43 @@ export const ThreadEditor = ({
           onChange={handleChange}
           disabled={isLoading}
           rows={10}
-          className={`mt-1 block w-full rounded-lg border-br-secondary bg-surface-card text-txt-primary shadow-sm focus:border-accent focus:ring-accent ${
-            errors.content ? "border-red-500" : ""
-          }`}
           placeholder="Write your thread content here..."
+          aria-invalid={Boolean(errors.content)}
+          className={`mt-2 block w-full resize-y rounded-lg border bg-surface-card px-4 py-3 text-sm leading-relaxed text-txt-primary shadow-sm outline-none transition placeholder:text-txt-muted focus:border-focus focus:ring-2 focus:ring-focus/15 disabled:cursor-not-allowed disabled:opacity-60 ${
+            errors.content ? "border-error" : "border-br-secondary"
+          }`}
         />
-        {errors.content && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.content}</p>
-        )}
-        <p className="mt-1 text-sm text-txt-muted">
+
+        {errors.content && <p className="mt-2 text-sm text-error">{errors.content}</p>}
+
+        <p className="mt-2 text-xs text-txt-muted">
           Basic formatting is supported: **bold**, *italic*, [link](url)
         </p>
       </div>
 
       {/* Actions */}
-      <div className="flex justify-end gap-3">
+      <div className="flex flex-wrap justify-end gap-3 border-t border-br-subtle pt-5">
         {onCancel && (
-          <button
+          <Button
             type="button"
+            variant="secondary"
             onClick={onCancel}
             disabled={isLoading}
-            className="inline-flex items-center px-4 py-2 rounded-lg font-semibold border border-br-secondary bg-surface-card text-txt-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-accent"
+            leftIcon={<FaTimes size={12} aria-hidden="true" />}
           >
-            <FaTimes className="mr-2 -ml-1" />
             Cancel
-          </button>
+          </Button>
         )}
 
-        <button
+        <Button
           type="submit"
           disabled={isLoading}
-          className="inline-flex items-center px-4 py-2 rounded-lg font-semibold bg-accent text-txt-highlight hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent"
+          isLoading={isLoading}
+          leftIcon={<FaSave size={12} aria-hidden="true" />}
         >
-          <FaSave className="mr-2 -ml-1" />
           {isEdit ? "Save Changes" : "Create Thread"}
-        </button>
+        </Button>
       </div>
     </form>
   );
-};
+}

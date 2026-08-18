@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-
 import { FaReply, FaTimes } from "react-icons/fa";
+
+import { Button } from "@/components";
 
 import { useCreateReply, useUpdateReply } from "../hooks";
 
@@ -13,15 +14,15 @@ export interface ReplyEditorProps {
   replyId?: string | null;
 }
 
-export const ReplyEditor = ({
+export function ReplyEditor({
   threadId,
   initialContent = "",
   onSuccess,
   onCancel,
   isEdit = false,
   replyId = null,
-}: ReplyEditorProps) => {
-  const [content, setContent] = useState<string>(initialContent);
+}: ReplyEditorProps) {
+  const [content, setContent] = useState(initialContent);
   const [validationError, setValidationError] = useState<string | null>(null);
 
   const {
@@ -39,7 +40,7 @@ export const ReplyEditor = ({
   const isPending = isCreating || isUpdating;
   const mutationError = isEdit ? updateError : createError;
 
-  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>): void => {
     setContent(event.target.value);
 
     if (validationError) {
@@ -52,13 +53,11 @@ export const ReplyEditor = ({
 
     if (!trimmedContent) {
       setValidationError("Reply content is required");
-
       return false;
     }
 
     if (trimmedContent.length < 5) {
       setValidationError("Reply must be at least 5 characters");
-
       return false;
     }
 
@@ -78,7 +77,6 @@ export const ReplyEditor = ({
       if (isEdit) {
         if (!replyId) {
           setValidationError("Reply ID is required");
-
           return;
         }
 
@@ -114,48 +112,44 @@ export const ReplyEditor = ({
           onChange={handleChange}
           disabled={isPending}
           rows={5}
-          className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-            validationError ? "border-red-500" : ""
-          }`}
           placeholder="Write your reply here..."
+          aria-invalid={Boolean(validationError || mutationError)}
+          className={`block w-full resize-y rounded-lg border bg-surface-card px-4 py-3 text-sm leading-relaxed text-txt-primary shadow-sm outline-none transition placeholder:text-txt-muted focus:border-focus focus:ring-2 focus:ring-focus/15 disabled:cursor-not-allowed disabled:opacity-60 ${
+            validationError || mutationError ? "border-error" : "border-br-secondary"
+          }`}
         />
 
-        {validationError && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">{validationError}</p>
-        )}
+        {validationError && <p className="mt-2 text-sm text-error">{validationError}</p>}
 
         {mutationError && (
-          <p className="mt-1 text-sm text-red-600 dark:text-red-400">
-            {mutationError.message}
-          </p>
+          <p className="mt-2 text-sm text-error">{mutationError.message}</p>
         )}
 
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p className="mt-2 text-xs text-txt-muted">
           Basic formatting is supported: **bold**, *italic*, [link](url)
         </p>
       </div>
 
-      <div className="flex justify-end gap-3">
-        <button
+      <div className="flex flex-wrap justify-end gap-3">
+        <Button
           type="button"
+          variant="secondary"
           onClick={onCancel}
           disabled={isPending}
-          className="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          leftIcon={<FaTimes size={12} aria-hidden="true" />}
         >
-          <FaTimes className="mr-2 -ml-1" />
           Cancel
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="submit"
           disabled={isPending}
-          className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-blue-300 disabled:cursor-not-allowed"
+          isLoading={isPending}
+          leftIcon={<FaReply size={12} aria-hidden="true" />}
         >
-          <FaReply className="mr-2 -ml-1" />
-
-          {isPending ? "Submitting..." : isEdit ? "Update Reply" : "Post Reply"}
-        </button>
+          {isEdit ? "Update Reply" : "Post Reply"}
+        </Button>
       </div>
     </form>
   );
-};
+}

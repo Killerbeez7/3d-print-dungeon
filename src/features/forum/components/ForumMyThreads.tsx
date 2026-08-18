@@ -1,20 +1,21 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  FaEye,
-  FaStar,
-  FaEdit,
-  FaLock,
-  FaTrash,
-  FaFilter,
-  FaComment,
   FaCalendar,
   FaChartLine,
+  FaComment,
+  FaEdit,
+  FaEye,
+  FaFilter,
+  FaLock,
+  FaStar,
   FaThumbtack,
+  FaTrash,
 } from "react-icons/fa";
 
 import Skeleton from "@/features/shared/Skeleton";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+
 import { FORUM_PATHS } from "../constants/forumPaths";
 import { formatRelativeTime } from "../utils/threadUtils";
 import { useDeleteThread, useFetchCategories, useFetchThreads } from "../hooks";
@@ -22,9 +23,10 @@ import { useDeleteThread, useFetchCategories, useFetchThreads } from "../hooks";
 import type { FetchThreadsOptions, ForumThread } from "../types/forum";
 
 type SortOption = "newest" | "oldest" | "mostViews" | "mostReplies" | "lastActivity";
+
 type FilterOption = "all" | "recent" | "popular" | "unanswered" | "pinned";
 
-export const ForumMyThreads = () => {
+export function ForumMyThreads() {
   const { currentUser } = useAuth();
 
   const {
@@ -35,9 +37,11 @@ export const ForumMyThreads = () => {
   } = useDeleteThread();
 
   const { data: categories = [] } = useFetchCategories();
+
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [filterBy, setFilterBy] = useState<FilterOption>("all");
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
+
   const getThreadFilters = (): FetchThreadsOptions => {
     const filters: FetchThreadsOptions = {
       authorId: currentUser?.uid ?? "",
@@ -150,9 +154,7 @@ export const ForumMyThreads = () => {
     totalRepliesReceived,
     pinnedThreads,
     lockedThreads,
-
     avgViewsPerThread: totalThreads > 0 ? Math.round(totalViews / totalThreads) : 0,
-
     avgRepliesPerThread:
       totalThreads > 0 ? Math.round(totalRepliesReceived / totalThreads) : 0,
   };
@@ -179,89 +181,97 @@ export const ForumMyThreads = () => {
 
   if (!currentUser) {
     return (
-      <div className="max-w-6xl mx-auto space-y-8">
-        <div className="text-center space-y-4">
-          <h1 className="text-3xl font-bold text-txt-primary">My Threads</h1>
+      <div className="mx-auto max-w-4xl rounded-xl border border-br-subtle bg-surface-card p-8 text-center shadow-sm">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+          My Threads
+        </p>
 
-          <p className="text-txt-secondary">Please log in to view your threads.</p>
+        <h1 className="text-2xl font-bold text-txt-primary">
+          Sign in to manage your discussions
+        </h1>
 
-          <Link
-            to={FORUM_PATHS.HOME}
-            className="inline-block px-6 py-3 bg-accent text-txt-highlight rounded-lg hover:bg-accent-hover transition-colors"
-          >
-            Back to Forum
-          </Link>
-        </div>
+        <p className="mx-auto mt-2 max-w-xl text-txt-secondary">
+          Your threads, engagement statistics, and management tools will appear here.
+        </p>
+
+        <Link
+          to={FORUM_PATHS.HOME}
+          className="mt-6 inline-flex items-center justify-center rounded-lg border border-br-secondary bg-surface-card px-4 py-2 text-sm font-semibold text-txt-primary transition-colors hover:bg-muted"
+        >
+          Back to Forum
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="mx-auto w-full max-w-6xl space-y-8">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold text-txt-primary">My Threads</h1>
+      <header>
+        {/* <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
+          Your Activity
+        </p> */}
 
-        <p className="text-lg text-txt-secondary max-w-2xl mx-auto leading-relaxed">
-          Manage and track your forum contributions, engagement, and community impact.
+        <h1 className="text-3xl font-bold text-txt-primary">My Threads</h1>
+
+        <p className="mt-2 max-w-2xl text-txt-secondary">
+          Manage your discussions and see how the community is engaging with them.
         </p>
-      </div>
+      </header>
 
-      {/* Statistics Dashboard */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-        <div className="p-6 border border-br-secondary rounded-xl bg-muted text-center">
-          <div className="text-2xl font-bold text-txt-primary mb-2">
-            {stats.totalThreads}
-          </div>
+      {/* Main stats */}
+      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
+          <div className="text-2xl font-bold text-txt-primary">{stats.totalThreads}</div>
 
-          <div className="text-sm text-txt-secondary">Total Threads</div>
+          <div className="mt-1 text-sm text-txt-muted">Total Threads</div>
         </div>
 
-        <div className="p-6 border border-br-secondary rounded-xl bg-muted text-center">
-          <div className="text-2xl font-bold text-txt-primary mb-2">
-            {stats.totalViews}
-          </div>
+        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
+          <div className="text-2xl font-bold text-txt-primary">{stats.totalViews}</div>
 
-          <div className="text-sm text-txt-secondary">Total Views</div>
+          <div className="mt-1 text-sm text-txt-muted">Total Views</div>
         </div>
 
-        <div className="p-6 border border-br-secondary rounded-xl bg-muted text-center">
-          <div className="text-2xl font-bold text-txt-primary mb-2">
+        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
+          <div className="text-2xl font-bold text-txt-primary">
             {stats.totalRepliesReceived}
           </div>
 
-          <div className="text-sm text-txt-secondary">Replies Received</div>
+          <div className="mt-1 text-sm text-txt-muted">Replies Received</div>
         </div>
 
-        <div className="p-6 border border-br-secondary rounded-xl bg-muted text-center">
-          <div className="text-2xl font-bold text-txt-primary mb-2">
+        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
+          <div className="text-2xl font-bold text-txt-primary">
             {stats.avgViewsPerThread}
           </div>
 
-          <div className="text-sm text-txt-secondary">Avg Views/Thread</div>
+          <div className="mt-1 text-sm text-txt-muted">Avg Views / Thread</div>
         </div>
-      </div>
+      </section>
 
-      {/* Advanced Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="p-6 border border-br-secondary rounded-xl">
-          <div className="flex items-center gap-3 mb-4">
-            <FaChartLine className="text-txt-secondary" size={20} />
+      {/* Secondary insights */}
+      <section className="grid gap-4 md:grid-cols-3">
+        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex size-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
+              <FaChartLine size={14} aria-hidden="true" />
+            </div>
 
-            <h3 className="font-semibold text-txt-primary">Engagement Metrics</h3>
+            <h2 className="font-semibold text-txt-primary">Engagement</h2>
           </div>
 
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm text-txt-secondary">Avg Views/Thread</span>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between gap-4">
+              <span className="text-txt-secondary">Avg Views</span>
 
               <span className="font-semibold text-txt-primary">
                 {stats.avgViewsPerThread}
               </span>
             </div>
 
-            <div className="flex justify-between">
-              <span className="text-sm text-txt-secondary">Avg Replies/Thread</span>
+            <div className="flex justify-between gap-4">
+              <span className="text-txt-secondary">Avg Replies</span>
 
               <span className="font-semibold text-txt-primary">
                 {stats.avgRepliesPerThread}
@@ -270,42 +280,42 @@ export const ForumMyThreads = () => {
           </div>
         </div>
 
-        <div className="p-6 border border-br-secondary rounded-xl">
-          <div className="flex items-center gap-3 mb-4">
-            <FaThumbtack className="text-txt-secondary" size={20} />
-
-            <h3 className="font-semibold text-txt-primary">Thread Status</h3>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm text-txt-secondary">Pinned Threads</span>
-
-              <span className="font-semibold text-txt-primary">
-                {stats.pinnedThreads}
-              </span>
+        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex size-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
+              <FaThumbtack size={13} aria-hidden="true" />
             </div>
 
-            <div className="flex justify-between">
-              <span className="text-sm text-txt-secondary">Locked Threads</span>
+            <h2 className="font-semibold text-txt-primary">Thread Status</h2>
+          </div>
 
-              <span className="font-semibold text-txt-primary">
-                {stats.lockedThreads}
-              </span>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between gap-4">
+              <span className="text-txt-secondary">Pinned</span>
+
+              <span className="font-semibold text-warning">{stats.pinnedThreads}</span>
+            </div>
+
+            <div className="flex justify-between gap-4">
+              <span className="text-txt-secondary">Locked</span>
+
+              <span className="font-semibold text-error">{stats.lockedThreads}</span>
             </div>
           </div>
         </div>
 
-        <div className="p-6 border border-br-secondary rounded-xl">
-          <div className="flex items-center gap-3 mb-4">
-            <FaStar className="text-txt-secondary" size={20} />
+        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
+          <div className="mb-4 flex items-center gap-3">
+            <div className="flex size-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
+              <FaStar size={13} aria-hidden="true" />
+            </div>
 
-            <h3 className="font-semibold text-txt-primary">Activity Summary</h3>
+            <h2 className="font-semibold text-txt-primary">Recent Activity</h2>
           </div>
 
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-sm text-txt-secondary">This Week</span>
+          <div className="space-y-3 text-sm">
+            <div className="flex justify-between gap-4">
+              <span className="text-txt-secondary">This Week</span>
 
               <span className="font-semibold text-txt-primary">
                 {
@@ -320,8 +330,8 @@ export const ForumMyThreads = () => {
               </span>
             </div>
 
-            <div className="flex justify-between">
-              <span className="text-sm text-txt-secondary">This Month</span>
+            <div className="flex justify-between gap-4">
+              <span className="text-txt-secondary">This Month</span>
 
               <span className="font-semibold text-txt-primary">
                 {
@@ -337,107 +347,97 @@ export const ForumMyThreads = () => {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Controls */}
-      <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-        <div className="flex flex-col sm:flex-row gap-4">
-          {/* Search */}
-          <div className="relative">
+      <section className="flex flex-col gap-4 rounded-xl border border-br-subtle bg-surface-card p-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-1 flex-col gap-3 sm:flex-row">
+          <div className="relative flex-1 sm:max-w-xs">
+            <FaFilter
+              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted"
+              size={12}
+              aria-hidden="true"
+            />
+
             <input
-              type="text"
+              type="search"
               placeholder="Search your threads..."
               value={searchQuery}
               onChange={(event) => {
                 setSearchQuery(event.target.value);
               }}
-              className="pl-10 pr-4 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:outline-none focus:border-br-primary"
-            />
-
-            <FaFilter
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-txt-secondary"
-              size={14}
+              className="w-full rounded-lg border border-br-secondary bg-page py-2.5 pr-3 pl-9 text-sm text-txt-primary outline-none transition placeholder:text-txt-muted focus:border-focus focus:ring-2 focus:ring-focus/15"
             />
           </div>
 
-          {/* Filter */}
           <select
             value={filterBy}
             onChange={(event) => {
               setFilterBy(event.target.value as FilterOption);
             }}
-            className="px-4 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:outline-none focus:border-br-primary"
+            className="rounded-lg border border-br-secondary bg-page px-3 py-2.5 text-sm text-txt-primary outline-none transition focus:border-focus focus:ring-2 focus:ring-focus/15"
           >
             <option value="all">All Threads</option>
-
-            <option value="recent">Recent (7 days)</option>
-
+            <option value="recent">Recent</option>
             <option value="popular">Popular</option>
-
             <option value="unanswered">Unanswered</option>
-
             <option value="pinned">Pinned</option>
           </select>
 
-          {/* Sort */}
           <select
             value={sortBy}
             onChange={(event) => {
               setSortBy(event.target.value as SortOption);
             }}
-            className="px-4 py-2 border border-br-secondary rounded-lg bg-surface-card text-txt-primary focus:outline-none focus:border-br-primary"
+            className="rounded-lg border border-br-secondary bg-page px-3 py-2.5 text-sm text-txt-primary outline-none transition focus:border-focus focus:ring-2 focus:ring-focus/15"
           >
             <option value="newest">Newest First</option>
-
             <option value="oldest">Oldest First</option>
-
             <option value="mostViews">Most Views</option>
-
             <option value="mostReplies">Most Replies</option>
-
             <option value="lastActivity">Last Activity</option>
           </select>
         </div>
 
-        <div className="text-sm text-txt-secondary">
+        <span className="shrink-0 text-sm text-txt-muted">
           {filteredThreads.length} of {allThreads.length} threads
-        </div>
-      </div>
+        </span>
+      </section>
 
       {deleteThreadError && (
-        <div className="rounded-lg border border-red-500/40 bg-red-500/10 p-4 text-sm text-red-300">
+        <div className="rounded-xl border border-error/30 bg-error/10 p-4 text-sm text-error">
           {deleteThreadError.message}
         </div>
       )}
 
-      {/* Threads List */}
-      <div className="space-y-4">
+      {/* Threads */}
+      <section className="space-y-3">
         {threadsLoading ? (
-          [...Array(3)].map((_, index) => {
-            return (
-              <div key={index} className="p-6 border border-br-secondary rounded-xl">
-                <Skeleton className="h-6 w-3/4 mb-3" />
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-2/3 mb-4" />
+          [0, 1, 2].map((item) => (
+            <div
+              key={item}
+              className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm"
+            >
+              <Skeleton className="mb-3 h-6 w-3/4" />
+              <Skeleton className="mb-4 h-4 w-full" />
 
-                <div className="flex gap-4">
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-4 w-16" />
-                </div>
+              <div className="flex gap-4">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-16" />
               </div>
-            );
-          })
+            </div>
+          ))
         ) : threadsError ? (
-          <div className="text-center py-12">
-            <div className="text-red-500 mb-4">Error loading threads</div>
+          <div className="rounded-xl border border-error/30 bg-error/10 p-8 text-center">
+            <p className="mb-4 font-medium text-error">Error loading threads</p>
 
             <button
               type="button"
               onClick={() => {
                 window.location.reload();
               }}
-              className="px-4 py-2 bg-accent text-txt-highlight rounded-lg"
+              className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover"
             >
               Retry
             </button>
@@ -448,68 +448,75 @@ export const ForumMyThreads = () => {
               const isDeletingThisThread =
                 isDeletingThread && deletingThreadId === thread.id;
 
+              const categoryName =
+                categories.find((category) => {
+                  return category.id === thread.categoryId;
+                })?.name ?? "Category";
+
               return (
-                <div
+                <article
                   key={thread.id}
-                  className="p-6 border border-br-secondary rounded-xl hover:border-br-primary transition-colors"
+                  className="group rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm transition-all duration-200 hover:border-accent/30 hover:shadow-md"
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Link
-                          to={FORUM_PATHS.THREAD(thread.id)}
-                          className="text-lg font-semibold text-txt-primary hover:text-accent transition-colors"
-                        >
-                          {thread.title}
-                        </Link>
+                    <div className="min-w-0 flex-1">
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <span className="text-xs font-semibold uppercase tracking-wide text-accent">
+                          {categoryName}
+                        </span>
 
                         {thread.isPinned && (
-                          <FaThumbtack className="text-yellow-500" size={14} />
+                          <span className="inline-flex items-center gap-1 rounded-full bg-warning/10 px-2 py-1 text-xs font-medium text-warning">
+                            <FaThumbtack size={9} aria-hidden="true" />
+                            Pinned
+                          </span>
                         )}
 
-                        {thread.isLocked && <FaLock className="text-red-500" size={14} />}
+                        {thread.isLocked && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-error/10 px-2 py-1 text-xs font-medium text-error">
+                            <FaLock size={9} aria-hidden="true" />
+                            Locked
+                          </span>
+                        )}
                       </div>
 
-                      <p className="text-txt-secondary mb-4 line-clamp-2">
+                      <Link
+                        to={FORUM_PATHS.THREAD(thread.id)}
+                        className="text-lg font-semibold text-txt-primary transition-colors group-hover:text-accent"
+                      >
+                        {thread.title}
+                      </Link>
+
+                      <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-txt-secondary">
                         {thread.content}
                       </p>
 
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-txt-secondary">
-                        <div className="flex items-center gap-1">
-                          <FaCalendar size={12} />
+                      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-br-subtle pt-4 text-sm text-txt-muted">
+                        <span className="inline-flex items-center gap-1.5">
+                          <FaCalendar size={11} aria-hidden="true" />
+                          {formatRelativeTime(thread.createdAt)}
+                        </span>
 
-                          <span>{formatRelativeTime(thread.createdAt)}</span>
-                        </div>
+                        <span className="inline-flex items-center gap-1.5">
+                          <FaEye size={11} aria-hidden="true" />
+                          {thread.views} views
+                        </span>
 
-                        <div className="flex items-center gap-1">
-                          <FaEye size={12} />
-
-                          <span>{thread.views} views</span>
-                        </div>
-
-                        <div className="flex items-center gap-1">
-                          <FaComment size={12} />
-
-                          <span>{thread.replyCount} replies</span>
-                        </div>
-
-                        <div className="flex items-center gap-1">
-                          <span className="px-2 py-1 bg-muted rounded-full text-xs">
-                            {categories.find((category) => {
-                              return category.id === thread.categoryId;
-                            })?.name ?? "Category"}
-                          </span>
-                        </div>
+                        <span className="inline-flex items-center gap-1.5">
+                          <FaComment size={11} aria-hidden="true" />
+                          {thread.replyCount} replies
+                        </span>
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex shrink-0 items-center gap-1">
                       <Link
                         to={FORUM_PATHS.THREAD_EDIT(thread.id)}
-                        className="p-2 text-txt-secondary hover:text-accent hover:bg-muted rounded-lg transition-colors"
+                        className="flex size-9 items-center justify-center rounded-lg text-txt-secondary transition-colors hover:bg-muted hover:text-accent"
                         title="Edit Thread"
+                        aria-label={`Edit ${thread.title}`}
                       >
-                        <FaEdit size={14} />
+                        <FaEdit size={13} aria-hidden="true" />
                       </Link>
 
                       <button
@@ -518,30 +525,31 @@ export const ForumMyThreads = () => {
                           void handleDeleteThread(thread);
                         }}
                         disabled={isDeletingThisThread}
-                        className="p-2 text-txt-secondary hover:text-red-500 hover:bg-muted rounded-lg transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex size-9 items-center justify-center rounded-lg text-txt-secondary transition-colors hover:bg-error/10 hover:text-error disabled:cursor-not-allowed disabled:opacity-60"
                         title="Delete Thread"
+                        aria-label={`Delete ${thread.title}`}
                       >
                         {isDeletingThisThread ? (
                           <span className="text-xs">...</span>
                         ) : (
-                          <FaTrash size={14} />
+                          <FaTrash size={13} aria-hidden="true" />
                         )}
                       </button>
                     </div>
                   </div>
-                </div>
+                </article>
               );
             })}
 
             {hasNextPage && (
-              <div className="flex justify-center mt-6">
+              <div className="flex justify-center pt-4">
                 <button
                   type="button"
                   onClick={() => {
                     void fetchNextPage();
                   }}
                   disabled={isFetchingNextPage}
-                  className="px-6 py-3 bg-accent text-txt-highlight rounded-lg hover:bg-accent-hover transition-colors disabled:opacity-50"
+                  className="rounded-lg border border-br-secondary bg-surface-card px-5 py-2.5 text-sm font-semibold text-txt-primary shadow-sm transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {isFetchingNextPage ? "Loading..." : "Load More"}
                 </button>
@@ -549,18 +557,18 @@ export const ForumMyThreads = () => {
             )}
           </>
         ) : (
-          <div className="text-center py-12">
-            <h3 className="text-xl font-semibold text-txt-primary mb-2">
+          <div className="rounded-xl border border-br-subtle bg-surface-card p-8 text-center shadow-sm">
+            <h2 className="text-xl font-semibold text-txt-primary">
               {searchQuery || filterBy !== "all" ? "No threads found" : "No threads yet"}
-            </h3>
+            </h2>
 
-            <p className="text-txt-secondary mb-6">
+            <p className="mx-auto mt-2 max-w-xl text-sm text-txt-secondary">
               {searchQuery || filterBy !== "all"
                 ? "Try adjusting your search or filter criteria."
-                : "Start your first discussion to see it here!"}
+                : "Start your first discussion to see it here."}
             </p>
 
-            <div className="flex flex-wrap justify-center gap-3">
+            <div className="mt-6 flex flex-wrap justify-center gap-3">
               {(searchQuery || filterBy !== "all") && (
                 <button
                   type="button"
@@ -568,7 +576,7 @@ export const ForumMyThreads = () => {
                     setSearchQuery("");
                     setFilterBy("all");
                   }}
-                  className="px-6 py-3 border border-br-secondary text-txt-primary rounded-lg hover:bg-muted transition-colors"
+                  className="rounded-lg border border-br-secondary bg-surface-card px-4 py-2 text-sm font-semibold text-txt-primary transition-colors hover:bg-muted"
                 >
                   Clear Filters
                 </button>
@@ -576,14 +584,14 @@ export const ForumMyThreads = () => {
 
               <Link
                 to={FORUM_PATHS.NEW_THREAD}
-                className="inline-block px-6 py-3 bg-accent text-txt-highlight rounded-lg hover:bg-accent-hover transition-colors"
+                className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover"
               >
                 Create Thread
               </Link>
             </div>
           </div>
         )}
-      </div>
+      </section>
     </div>
   );
-};
+}
