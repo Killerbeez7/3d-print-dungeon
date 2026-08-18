@@ -97,14 +97,6 @@ export function ThreadList({
             ? "This category is ready for discussion. Start the first thread or browse another category."
             : "There are no discussions to show yet. Start a new thread to get the conversation going."}
         </p>
-
-        <button
-          type="button"
-          onClick={handleCreateThread}
-          className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-btn-primary-text shadow-sm transition-colors hover:bg-accent-hover"
-        >
-          {categoryId ? "Create Thread in This Category" : "Create Thread"}
-        </button>
       </div>
     );
   }
