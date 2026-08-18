@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from "react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 
@@ -15,6 +15,7 @@ export function ForumCategory() {
   const { categoryId } = useParams();
 
   const [sortBy, setSortBy] = useState<ForumThreadSortField>("lastActivity");
+  const [isSortOpen, setIsSortOpen] = useState(false);
 
   const { data: fetchedCategories = [] } = useFetchCategories();
 
@@ -24,9 +25,12 @@ export function ForumCategory() {
     return category.id === categoryId;
   });
 
-  const handleSortChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    setSortBy(event.target.value as ForumThreadSortField);
-  };
+  const sortOptions = [
+    { value: "lastActivity", label: "Last Activity" },
+    { value: "createdAt", label: "Newest" },
+    { value: "views", label: "Most Viewed" },
+    { value: "replyCount", label: "Most Replies" },
+  ] as const;
 
   if (!categoryId || !currentCategory) {
     return (
@@ -73,8 +77,74 @@ export function ForumCategory() {
       </header>
 
       {/* Controls */}
-      <div className="flex flex-col gap-3 rounded-xl border border-br-subtle bg-surface-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 rounded-xl p-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* <div className="flex flex-col gap-3 rounded-xl border border-br-subtle bg-surface-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"> */}
+
         <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-txt-secondary">Sort by</span>
+
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSortOpen((current) => {
+                  return !current;
+                });
+              }}
+              className="flex min-w-36 items-center justify-between gap-4 rounded-lg border border-br-secondary bg-page px-3 py-2 text-sm text-txt-primary outline-none transition hover:border-br-primary"
+              aria-haspopup="listbox"
+              aria-expanded={isSortOpen}
+            >
+              <span>
+                {
+                  sortOptions.find((option) => {
+                    return option.value === sortBy;
+                  })?.label
+                }
+              </span>
+
+              <span
+                className={`text-xs text-txt-muted transition-transform ${
+                  isSortOpen ? "rotate-180" : ""
+                }`}
+              >
+                ▼
+              </span>
+            </button>
+
+            {isSortOpen && (
+              <div
+                role="listbox"
+                className="absolute right-0 top-full z-20 mt-2 min-w-full overflow-hidden rounded-xl border border-br-subtle bg-surface-card p-1 shadow-lg"
+              >
+                {sortOptions.map((option) => {
+                  const isSelected = option.value === sortBy;
+
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      onClick={() => {
+                        setSortBy(option.value);
+                        setIsSortOpen(false);
+                      }}
+                      className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
+                        isSelected
+                          ? "bg-accent-soft font-medium text-accent"
+                          : "text-txt-primary hover:bg-muted"
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+        {/* <div className="flex items-center gap-3">
           <label htmlFor="sortBy" className="text-sm font-medium text-txt-secondary">
             Sort by
           </label>
@@ -90,7 +160,7 @@ export function ForumCategory() {
             <option value="views">Most Viewed</option>
             <option value="replyCount">Most Replies</option>
           </select>
-        </div>
+        </div> */}
 
         <Link
           to={FORUM_PATHS.NEW_THREAD_FOR_CATEGORY(categoryId)}

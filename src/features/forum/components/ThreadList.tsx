@@ -1,9 +1,7 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FaLock, FaTag, FaThumbtack } from "react-icons/fa";
 
-import { useAuth } from "@/features/auth/hooks/useAuth";
-import { useModal } from "@/features/shared/modal/hooks/useModal";
-import Skeleton from "@/features/shared/Skeleton";
+// import Skeleton from "@/features/shared/Skeleton";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 
 import { useFetchCategories, useFetchThreads } from "../hooks";
@@ -26,10 +24,6 @@ export function ThreadList({
   showCategory = false,
   isCompact = false,
 }: ThreadListProps) {
-  const { currentUser } = useAuth();
-  const { open } = useModal("auth");
-  const navigate = useNavigate();
-
   const { data: categories = [] } = useFetchCategories();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error } =
@@ -44,36 +38,24 @@ export function ThreadList({
       return page.threads;
     }) ?? [];
 
-  const newThreadPath = categoryId
-    ? FORUM_PATHS.NEW_THREAD_FOR_CATEGORY(categoryId)
-    : FORUM_PATHS.NEW_THREAD;
-
-  const handleCreateThread = (): void => {
-    if (!currentUser) {
-      open({ mode: "login" });
-      return;
-    }
-
-    navigate(newThreadPath);
-  };
-
   if (isLoading) {
     return (
-      <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card shadow-sm divide-y divide-br-subtle">
-        {[0, 1, 2, 3].map((item) => (
-          <div key={item} className="px-5 py-5 sm:px-6">
-            <Skeleton className="mb-3 h-4 w-24" />
-            <Skeleton className="mb-3 h-6 w-3/4" />
-            <Skeleton className="mb-4 h-4 w-full max-w-3xl" />
+      <Spinner size={24} />
+      // <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card shadow-sm divide-y divide-br-subtle">
+      //   {[0, 1, 2, 3].map((item) => (
+      //     <div key={item} className="px-5 py-5 sm:px-6">
+      //       <Skeleton className="mb-3 h-4 w-24" />
+      //       <Skeleton className="mb-3 h-6 w-3/4" />
+      //       <Skeleton className="mb-4 h-4 w-full max-w-3xl" />
 
-            <div className="flex gap-4">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-4 w-20" />
-              <Skeleton className="h-4 w-28" />
-            </div>
-          </div>
-        ))}
-      </div>
+      //       <div className="flex gap-4">
+      //         <Skeleton className="h-4 w-24" />
+      //         <Skeleton className="h-4 w-20" />
+      //         <Skeleton className="h-4 w-28" />
+      //       </div>
+      //     </div>
+      // ))}
+      // </div>
     );
   }
 
@@ -89,10 +71,12 @@ export function ThreadList({
 
   if (threads.length === 0) {
     return (
-      <div className="rounded-xl border border-br-subtle bg-surface-card p-6 shadow-sm">
-        <h3 className="mb-2 text-xl font-semibold text-txt-primary">No threads yet</h3>
+      <div className="p-6">
+        <h3 className="mb-2 text-xl font-semibold text-txt-primary text-center">
+          No threads yet
+        </h3>
 
-        <p className="mb-5 text-sm leading-relaxed text-txt-secondary">
+        <p className="mb-5 text-sm leading-relaxed text-txt-secondary text-center">
           {categoryId
             ? "This category is ready for discussion. Start the first thread or browse another category."
             : "There are no discussions to show yet. Start a new thread to get the conversation going."}
@@ -102,7 +86,7 @@ export function ThreadList({
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card shadow-sm divide-y divide-br-subtle">
+    <div className="overflow-hidden rounded-xl shadow-sm divide-y divide-br-subtle">
       {threads.map((thread) => {
         const categoryName =
           categories.find((category) => {
