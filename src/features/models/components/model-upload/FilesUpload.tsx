@@ -56,7 +56,7 @@ export const FilesUpload: FC<FilesUploadProps> = ({ step, files, setFiles }) => 
             icon={faCloudArrowUp}
             className="text-5xl text-accent transition-all duration-200 group-hover:scale-105 group-hover:text-accent-hover"
           />
-          <h2 className="text-lg text-center transition-colors group-hover:text-txt-highlight">
+          <h2 className="text-lg text-center text-txt-primary transition-colors group-hover:text-accent">
             Drag & Drop your files
           </h2>
           <p className="text-center text-sm text-txt-secondary transition-colors group-hover:text-accent-text">

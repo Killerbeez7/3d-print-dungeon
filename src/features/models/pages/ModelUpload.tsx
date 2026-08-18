@@ -486,7 +486,7 @@ export function ModelUpload() {
   return (
     <div className="max-w-4xl mx-auto py-8 px-4">
       <div className="mb-8">
-        <h1 className="mb-4 text-3xl">Upload Your 3D Model</h1>
+        <h1 className="mb-4 text-3xl text-txt-primary">Upload Your 3D Model</h1>
         <div className="flex items-center space-x-4 sm:space-x-6 md:space-x-8 mb-8">
           <StepIndicator stepNumber={1} label="Files" currentStep={step} />
           <StepIndicator stepNumber={2} label="Details" currentStep={step} />
@@ -548,13 +548,6 @@ export function ModelUpload() {
                   >
                     Continue verification
                   </button>
-                  {/* <button
-                                        onClick={forceRefreshStatus}
-                                        className="px-3 py-2 text-xs font-medium rounded-md bg-gray-600 text-white hover:bg-gray-700 transition-colors"
-                                        title="Force refresh status (webhook debugging)"
-                                    >
-                                        🔄 Refresh
-                                    </button> */}
                 </>
               )}
             </div>
