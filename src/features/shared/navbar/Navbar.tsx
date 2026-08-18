@@ -69,7 +69,7 @@ const NavbarAuthSkeleton = () => {
 
 export const Navbar = () => {
   const { isAdmin } = useUserRole();
-  const { currentUser, publicProfile, handleSignOut, loading } = useAuth();
+  const { authUser, currentUser, publicProfile, handleSignOut, loading } = useAuth();
   const { open } = useModal("auth");
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
@@ -148,6 +148,11 @@ export const Navbar = () => {
   }, [closeAll, location.pathname]);
 
   const urlSafeUsername = toUrlSafeUsername(publicProfile?.username);
+
+  const profileAvatarSrc = authUser?.photoURL ?? currentUser?.photoURL ?? null;
+  const profileDisplayName =
+    authUser?.username ?? authUser?.displayName ?? currentUser?.displayName ?? "User";
+  const profileEmail = authUser?.email ?? currentUser?.email ?? "";
 
   return (
     <div className="sticky top-0 left-0 right-0 z-50">
@@ -308,7 +313,7 @@ export const Navbar = () => {
                   <div className="hidden items-center gap-3 md:flex">
                     <Link
                       to="/model/upload"
-                      className="rounded-lg p-1 text-txt-secondary hover:bg-surface-card hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
+                      className="rounded-lg p-1 text-txt-secondary hover:bg-surface-card hover:text-txt-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
                       title="Upload Model"
                       aria-label="Upload Model"
                     >
@@ -323,94 +328,155 @@ export const Navbar = () => {
                     <button
                       id="profile-button"
                       type="button"
-                      onClick={() => toggleDropdown("profile")}
-                      className="flex items-center text-txt-secondary hover:text-txt-primary cursor-pointer transition-colors duration-200 p-1 rounded-lg hover:bg-surface-card"
+                      onClick={() => {
+                        toggleDropdown("profile");
+                      }}
+                      className={`flex items-center rounded-lg p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus/30 ${
+                        activeDropdown === "profile"
+                          ? "bg-muted text-txt-primary"
+                          : "text-txt-secondary hover:bg-muted hover:text-txt-primary"
+                      }`}
                       aria-label="Profile menu"
                       aria-haspopup="menu"
                       aria-expanded={activeDropdown === "profile"}
                     >
-                      <MdAccountCircle className="h-7 w-7" />
+                      <MdAccountCircle className="size-7" />
                     </button>
 
-                    {/*Profile Dropdown Options*/}
+                    {/* Profile dropdown */}
                     <div
                       role="menu"
-                      className={`absolute right-0 mt-3 w-64 rounded-xl shadow-2xl bg-surface-elevated border border-br-secondary transition-all duration-300 transform origin-top-right z-40 ${
+                      className={`absolute right-0 top-full z-50 mt-2 w-72 origin-top-right overflow-hidden rounded-xl border border-br-subtle bg-surface-elevated shadow-xl transition-[opacity,transform] duration-150 ease-out ${
                         activeDropdown === "profile"
-                          ? "opacity-100 visible scale-100"
-                          : "opacity-0 invisible scale-95"
+                          ? "visible translate-y-0 opacity-100"
+                          : "invisible translate-y-1 opacity-0"
                       }`}
                     >
-                      {/* Header with user info */}
-                      <div className="px-4 py-3 border-b border-br-secondary bg-gradient-to-r from-page to-section rounded-t-xl">
-                        <h6 className="text-sm font-semibold text-txt-primary mb-1">
-                          {currentUser?.displayName || "Username"}
-                        </h6>
-                        <p className="text-xs text-txt-secondary">
-                          {currentUser?.email || "user@example.com"}
-                        </p>
-                      </div>
-
-                      {/* Menu items */}
                       <div className="p-2">
-                        {isAdmin && (
+                        {/* User */}
+                        <div className="flex items-center gap-3 px-3 py-3">
+                          <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted text-txt-primary">
+                            {profileAvatarSrc ? (
+                              <img
+                                src={profileAvatarSrc}
+                                alt={`${profileDisplayName} profile`}
+                                referrerPolicy="no-referrer"
+                                className="size-full object-cover"
+                                onError={(event) => {
+                                  const image = event.currentTarget;
+
+                                  if (image.src.endsWith(STATIC_ASSETS.DEFAULT_AVATAR)) {
+                                    return;
+                                  }
+
+                                  image.src = STATIC_ASSETS.DEFAULT_AVATAR;
+                                }}
+                              />
+                            ) : (
+                              <MdAccountCircle className="size-8" />
+                            )}
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-semibold text-txt-primary">
+                              {profileDisplayName}
+                            </p>
+
+                            <p className="mt-0.5 truncate text-xs text-txt-muted">
+                              {profileEmail}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="my-1.5 border-t border-br-subtle" />
+
+                        {/* Account actions */}
+                        <div>
+                          {isAdmin && (
+                            <Link
+                              to="/admin-dashboard"
+                              role="menuitem"
+                              className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-txt-secondary transition-colors hover:bg-muted/60 hover:text-txt-primary"
+                              onClick={() => {
+                                setActiveDropdown(null);
+                              }}
+                            >
+                              <MdViewModule
+                                className="size-4 text-txt-muted"
+                                aria-hidden="true"
+                              />
+
+                              <span>Admin Dashboard</span>
+                            </Link>
+                          )}
+
                           <Link
-                            to="/admin-dashboard"
+                            to={`/${urlSafeUsername}`}
                             role="menuitem"
-                            className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-surface-card hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
-                            onClick={() => setActiveDropdown(null)}
+                            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-txt-secondary transition-colors hover:bg-muted/60 hover:text-txt-primary"
+                            onClick={() => {
+                              setActiveDropdown(null);
+                            }}
                           >
                             <FontAwesomeIcon
                               icon={faUser}
-                              className="mr-3 text-txt-secondary group-hover:text-txt-primary transition-colors"
+                              className="w-4 text-txt-muted"
                             />
-                            <span className="font-medium">Admin Dashboard</span>
+
+                            <span>View Profile</span>
                           </Link>
-                        )}
 
-                        <Link
-                          to={`/${urlSafeUsername}`}
-                          role="menuitem"
-                          className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-surface-card hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
-                          onClick={() => setActiveDropdown(null)}
-                        >
-                          <FontAwesomeIcon
-                            icon={faUser}
-                            className="mr-3 text-txt-secondary group-hover:text-txt-primary transition-colors"
-                          />
-                          <span className="font-medium">Profile</span>
-                        </Link>
+                          <Link
+                            to="/forum/help"
+                            role="menuitem"
+                            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-txt-secondary transition-colors hover:bg-muted/60 hover:text-txt-primary"
+                            onClick={() => {
+                              setActiveDropdown(null);
+                            }}
+                          >
+                            <MdForum
+                              className="size-4 text-txt-muted"
+                              aria-hidden="true"
+                            />
 
-                        <Link
-                          to="/settings"
-                          role="menuitem"
-                          className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-surface-card hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
-                          onClick={() => setActiveDropdown(null)}
-                        >
-                          <FontAwesomeIcon
-                            icon={faCog}
-                            className="mr-3 text-txt-secondary group-hover:text-txt-primary transition-colors"
-                          />
-                          <span className="font-medium">Settings</span>
-                        </Link>
+                            <span>Help Center</span>
+                          </Link>
 
-                        {/* Divider */}
-                        <div className="my-2 border-t border-br-secondary"></div>
+                          <Link
+                            to="/settings"
+                            role="menuitem"
+                            className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-txt-secondary transition-colors hover:bg-muted/60 hover:text-txt-primary"
+                            onClick={() => {
+                              setActiveDropdown(null);
+                            }}
+                          >
+                            <FontAwesomeIcon
+                              icon={faCog}
+                              className="w-4 text-txt-muted"
+                            />
 
+                            <span>Account Settings</span>
+                          </Link>
+                        </div>
+
+                        <div className="my-1.5 border-t border-br-subtle" />
+
+                        {/* Logout */}
                         <button
                           type="button"
                           role="menuitem"
                           onClick={() => {
                             setActiveDropdown(null);
-                            handleLogout();
+                            void handleLogout();
                           }}
-                          className="flex items-center w-full px-3 py-2.5 text-sm text-txt-secondary hover:bg-surface-card hover:text-txt-primary rounded-lg transition-all duration-200 hover:shadow-sm group"
+                          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-txt-secondary transition-colors hover:bg-error/10 hover:text-error"
                         >
                           <FontAwesomeIcon
                             icon={faSignOutAlt}
-                            className="mr-3 text-txt-secondary group-hover:text-white transition-colors"
+                            className="w-4 text-txt-muted"
                           />
-                          <span className="font-medium">Sign Out</span>
+
+                          <span>Log Out</span>
                         </button>
                       </div>
                     </div>

@@ -4,6 +4,7 @@ import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useSystemAlert } from "@/features/system-alerts";
 import { profileService } from "@/features/user/settings/services/profileService";
 
+import { STATIC_ASSETS } from "@/config/assetsConfig";
 import { countries } from "@/data/countries";
 import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
 
@@ -60,30 +61,28 @@ const parseLocation = (
 };
 
 export const ProfileSettings = () => {
-  const { currentUser, publicProfile } = useAuth();
+  const { authUser, currentUser, publicProfile } = useAuth();
 
   const { success, error: showError } = useSystemAlert();
 
   const profilePictureInputRef = useRef<HTMLInputElement>(null);
-
   const [displayName, setDisplayName] = useState("");
 
   const [city, setCity] = useState("");
-
   const [country, setCountry] = useState("");
-
   const [bio, setBio] = useState("");
 
   const [facebook, setFacebook] = useState("");
-
   const [twitter, setTwitter] = useState("");
-
   const [instagram, setInstagram] = useState("");
 
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [profilePicturePreviewUrl, setProfilePicturePreviewUrl] = useState<
+    string | null
+  >(null);
 
   const [photoURL, setPhotoURL] = useState<string | null>(
-    publicProfile?.photoURL ?? currentUser?.photoURL ?? null
+    authUser?.photoURL ?? currentUser?.photoURL ?? null
   );
 
   const [loading, setLoading] = useState(false);
@@ -94,8 +93,9 @@ export const ProfileSettings = () => {
     useState<OriginalProfileData>(EMPTY_PROFILE_DATA);
 
   const avatarUrl = getAvatarUrlWithCacheBust(
-    photoURL ?? publicProfile?.photoURL ?? currentUser?.photoURL
+    photoURL ?? authUser?.photoURL ?? publicProfile?.photoURL ?? currentUser?.photoURL
   );
+  const displayedAvatarUrl = profilePicturePreviewUrl ?? avatarUrl;
 
   const hasChanges =
     profilePicture !== null ||
@@ -164,6 +164,21 @@ export const ProfileSettings = () => {
 
     loadProfileData();
   }, [currentUser, showError]);
+
+  useEffect(() => {
+    if (!profilePicture) {
+      setProfilePicturePreviewUrl(null);
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(profilePicture);
+
+    setProfilePicturePreviewUrl(objectUrl);
+
+    return () => {
+      URL.revokeObjectURL(objectUrl);
+    };
+  }, [profilePicture]);
 
   const handleProfilePictureChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -315,8 +330,18 @@ export const ProfileSettings = () => {
                 <div className="flex flex-col space-y-4">
                   <div className="h-32 w-32 rounded-full overflow-hidden bg-section border-2 border-br-secondary">
                     <img
-                      src={avatarUrl}
+                      src={displayedAvatarUrl}
                       alt="Profile avatar"
+                      referrerPolicy="no-referrer"
+                      onError={(event) => {
+                        const image = event.currentTarget;
+
+                        if (image.src.endsWith(STATIC_ASSETS.DEFAULT_AVATAR)) {
+                          return;
+                        }
+
+                        image.src = STATIC_ASSETS.DEFAULT_AVATAR;
+                      }}
                       className="h-full w-full object-cover"
                     />
                   </div>

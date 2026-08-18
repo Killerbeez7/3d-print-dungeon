@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
+import { STATIC_ASSETS } from "@/config/assetsConfig";
 import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
 
 import { AccountSettings } from "../components/AccountSettings";
@@ -47,13 +48,15 @@ const SETTINGS_TABS: SettingsTab[] = [
 ];
 
 export const SettingsPage = () => {
-  const { currentUser, publicProfile } = useAuth();
+  const { authUser, currentUser } = useAuth();
 
   const [activeTab, setActiveTab] = useState<SettingsTabId>("profile");
 
   const avatarUrl = getAvatarUrlWithCacheBust(
-    publicProfile?.photoURL || currentUser?.photoURL
+    authUser?.photoURL ?? currentUser?.photoURL
   );
+  const displayName = authUser?.displayName ?? currentUser?.displayName ?? "Anonymous";
+  const email = authUser?.email ?? currentUser?.email ?? "No email";
 
   const renderActiveTab = () => {
     switch (activeTab) {
@@ -81,18 +84,26 @@ export const SettingsPage = () => {
         <div className="flex md:flex-col flex-row md:gap-1 gap-5 justify-center items-center text-center">
           <img
             src={avatarUrl}
-            alt="User avatar"
+            alt={`${displayName} profile`}
+            referrerPolicy="no-referrer"
+            onError={(event) => {
+              const image = event.currentTarget;
+
+              if (image.src.endsWith(STATIC_ASSETS.DEFAULT_AVATAR)) {
+                return;
+              }
+
+              image.src = STATIC_ASSETS.DEFAULT_AVATAR;
+            }}
             className="w-24 h-24 rounded-full border-2 border-br-primary object-cover"
           />
 
           <div>
             <h2 className="mt-2 text-lg font-semibold text-txt-primary">
-              {publicProfile?.displayName || currentUser?.displayName || "Anonymous"}
+              {displayName}
             </h2>
 
-            <p className="text-sm text-txt-secondary">
-              {currentUser?.email || "No email"}
-            </p>
+            <p className="text-sm text-txt-secondary">{email}</p>
           </div>
         </div>
 
