@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import { HomeModelsGrid } from "@/features/home/components/HomeModelsGrid";
 import { Spinner } from "@/features/shared/reusable/Spinner";
-import { useFilters } from "@/features/search-filters/hooks/useFilters";
+import { useFilters } from "@/features/search/hooks/useFilters";
 
 import { useArtworks } from "../hooks/useArtworks";
 import { SearchNotFound } from "./SearchNotFound";

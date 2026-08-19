@@ -1,9 +1,8 @@
 import { useState } from "react";
 
-import { FiltersProvider } from "@/features/search-filters/providers/filtersProvider";
-import { SearchFilters } from "@/features/search-filters/components/SearchFilters";
-import { useFilters } from "@/features/search-filters/hooks/useFilters";
-
+import { FiltersProvider } from "@/features/search/providers/filtersProvider";
+import { SearchFilters } from "../components/SearchFilters";
+import { useFilters } from "@/features/search/hooks/useFilters";
 import { SearchResults } from "../components/SearchResults";
 import { SearchInput } from "../components/SearchInput";
 import { SearchTabs } from "../components/SearchTabs";
@@ -50,7 +49,8 @@ const SearchPageContent = () => {
         </div>
 
         {shouldShowEmptyState ? (
-          <SearchEmptyState />
+          // <SearchEmptyState />
+          <SearchEmptyState description="Search by keyword or use the filters to discover models." />
         ) : (
           <>
             <div className="mb-4">

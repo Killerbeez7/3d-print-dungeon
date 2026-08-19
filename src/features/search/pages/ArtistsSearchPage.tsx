@@ -1,5 +1,5 @@
-import { FiltersProvider } from "@/features/search-filters/providers/filtersProvider";
-import { ArtistsFilters } from "@/features/search-filters/components/ArtistsFilters";
+import { FiltersProvider } from "@/features/search/providers/filtersProvider";
+import { ArtistsFilters } from "@/features/search/components/ArtistsFilters";
 
 import { SearchResults } from "../components/SearchResults";
 import { SearchInput } from "../components/SearchInput";
@@ -39,7 +39,8 @@ export const ArtistsSearchPage = () => {
           </div>
 
           {noSearchNoFilters ? (
-            <SearchEmptyState />
+            // <SearchEmptyState />
+            <SearchEmptyState description="Search by keyword or use the filters to discover artists." />
           ) : (
             <SearchResults search={debouncedQuery} activeTab={activeTab} />
           )}

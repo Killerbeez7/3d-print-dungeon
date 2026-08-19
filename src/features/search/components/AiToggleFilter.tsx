@@ -1,4 +1,4 @@
-import { useFilters } from "@/features/search-filters/hooks/useFilters";
+import { useFilters } from "@/features/search/hooks/useFilters";
 
 export const AiToggleFilter = () => {
   const { filters, setFilters } = useFilters();
@@ -15,4 +15,4 @@ export const AiToggleFilter = () => {
       <span className="text-txt-primary">Hide AI-generated</span>
     </label>
   );
-}; 
+};

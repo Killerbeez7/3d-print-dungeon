@@ -1,5 +1,5 @@
 import { useFetchModels } from "@/features/models/hooks/useFetchModels";
-import type { ProductFilters } from "@/features/search-filters/types/filterTypes";
+import type { ProductFilters } from "@/features/search/types/filterTypes";
 
 export const useArtworks = (filters: ProductFilters, search: string) => {
   return useFetchModels({
