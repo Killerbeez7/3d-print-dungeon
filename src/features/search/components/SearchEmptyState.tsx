@@ -1,7 +1,11 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 
-export const SearchEmptyState = () => {
+interface SearchEmptyStateProps {
+  description: string;
+}
+
+export const SearchEmptyState = ({ description }: SearchEmptyStateProps) => {
   return (
     <div className="flex flex-col items-center justify-center py-16 text-center">
       <FontAwesomeIcon
@@ -13,9 +17,7 @@ export const SearchEmptyState = () => {
         What would you like to search for?
       </h2>
 
-      <p className="max-w-md text-base text-txt-secondary">
-        Search by keyword or use the filters to discover models.
-      </p>
+      <p className="max-w-md text-base text-txt-secondary">{description}</p>
     </div>
   );
 };
