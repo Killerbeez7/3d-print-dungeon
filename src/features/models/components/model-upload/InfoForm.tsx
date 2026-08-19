@@ -1,11 +1,8 @@
 import { useState, ChangeEvent, KeyboardEvent, FC } from "react";
-import { useQuery } from "@tanstack/react-query";
-import {
-  fetchCategories,
-  type Category,
-} from "@/features/search-filters/services/categoryService";
 import { TiDelete } from "react-icons/ti";
+
 import { ImagesUpload } from "./ImagesUpload";
+import { MODEL_CATEGORIES } from "@/features/models/constants/modelCategories";
 
 import type { ModelUploadData } from "@/features/models/types/model";
 
@@ -16,11 +13,6 @@ interface InfoFormProps {
 
 export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
   const [newTag, setNewTag] = useState<string>("");
-
-  const { data: categories } = useQuery<Category[]>({
-    queryKey: ["categories"],
-    queryFn: fetchCategories,
-  });
 
   const handleTagInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setNewTag(e.target.value);
@@ -95,9 +87,9 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
               }}
               className="w-full p-3 border border-br-secondary rounded-md bg-surface-card h-40 text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
             >
-              {categories?.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
+              {MODEL_CATEGORIES.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
                 </option>
               ))}
             </select>
