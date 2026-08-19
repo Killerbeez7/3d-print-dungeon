@@ -4,6 +4,7 @@
 html {
   overflow-y: scroll;
 }
+
 html,
 body {
   margin: 0;
@@ -21,15 +22,6 @@ body {
 *::before,
 *::after {
   box-sizing: inherit;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: "Michroma", sans-serif;
 }
 
 :root {
@@ -153,6 +145,11 @@ h6 {
 }
 
 @theme {
+  /* Fonts */
+  --font-sans: "Inter", "Segoe UI", Arial, sans-serif;
+  --font-display: "Michroma", sans-serif;
+
+  /* Colors */
   --color-page: var(--bg-page);
   --color-section: var(--bg-section);
   --color-muted: var(--bg-muted);

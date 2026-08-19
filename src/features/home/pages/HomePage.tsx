@@ -30,7 +30,7 @@ export const HomePage = (): React.ReactNode => {
 
   useEffect(() => {
     hideFooter(hasNextPage ?? false);
-    // Reset on component unmount
+
     return () => hideFooter(false);
   }, [hasNextPage, hideFooter]);
 
@@ -58,9 +58,11 @@ export const HomePage = (): React.ReactNode => {
       <div className="relative">
         <FeaturedCarousel items={featuredCarouselItems} />
       </div>
-      <section className="relative px-4 pb-12 pt-8 md:px-6 md:pt-10 lg:px-8">
-        <div className="mb-6 border-t border-br-subtle/70 pt-7">
-          <h3 className="text-lg leading-tight">All Models</h3>
+      <section className="relative px-4 pb-12 md:px-6 lg:px-8">
+        <div className="mb-6 border-t border-br-subtle/70 pt-6">
+          <h2 className="font-display text-lg font-medium leading-tight text-txt-primary md:text-xl">
+            All Models
+          </h2>
         </div>
         <InfiniteScrollList
           items={models}

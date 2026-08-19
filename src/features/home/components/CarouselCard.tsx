@@ -82,7 +82,7 @@ export const CarouselCard = ({
         {/* Content */}
         <div className="pointer-events-none absolute inset-x-0 bottom-0 p-4 text-white">
           <div className="max-w-[92%]">
-            <h3 className="mb-1 line-clamp-2 text-[1.05rem] font-bold leading-[1.12] text-white drop-shadow md:text-[1.15rem]!">
+            <h3 className="mb-1 line-clamp-2 text-base font-semibold leading-tight text-white drop-shadow md:text-lg">
               {item.title}
             </h3>
 
