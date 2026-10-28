@@ -62,7 +62,7 @@ export const HomePage = (): React.ReactNode => {
   const renderModels = () => {
     if (isError) {
       return (
-        <div className="flex flex-col items-center rounded-xl border border-br-subtle bg-surface-card px-6 py-12 text-center">
+        <div className="m-3 flex flex-col items-center rounded-xl border border-br-subtle bg-surface-card px-6 py-12 text-center sm:m-5">
           <p className="text-base font-semibold text-txt-primary">We couldn&apos;t load models</p>
           <p className="mt-1 text-sm text-txt-secondary">
             Check your connection and try again.
@@ -85,7 +85,7 @@ export const HomePage = (): React.ReactNode => {
 
     if (!models.length) {
       return (
-        <div className="flex flex-col items-center rounded-xl border border-dashed border-br-secondary px-6 py-12 text-center">
+        <div className="bg-buildplate m-3 flex flex-col items-center rounded-xl border border-dashed border-br-secondary px-6 py-16 text-center sm:m-5">
           <p className="text-base font-semibold text-txt-primary">
             {category ? `No models in ${category.name} yet` : "No models yet"}
           </p>
@@ -128,18 +128,24 @@ export const HomePage = (): React.ReactNode => {
     <div className="bg-page text-txt-primary">
       <HomeHero onBrowse={scrollToModels} />
 
-      <section
-        id="models"
-        aria-labelledby="models-heading"
-        className="mx-auto max-w-[1600px] scroll-mt-20 px-4 pb-16 pt-8 sm:px-6 md:pt-10 lg:px-8"
-      >
-        <h2 id="models-heading" className="mb-4 text-xl font-semibold text-txt-primary md:text-2xl">
-          {category ? category.name : "Latest models"}
-        </h2>
+      <section id="models" aria-labelledby="models-heading" className="scroll-mt-16 pb-16">
+        {/* Sticky filter bar under the header, like a gallery toolbar. */}
+        <div className="sticky top-16 z-30 border-b border-br-subtle bg-page/85 backdrop-blur-xl">
+          <div className="flex items-center gap-4 px-4 py-2.5 sm:px-6 lg:px-8">
+            <h2
+              id="models-heading"
+              className="hidden shrink-0 text-sm font-semibold uppercase tracking-tight text-txt-primary md:block"
+            >
+              {category ? category.name : "Latest"}
+            </h2>
+            <span className="hidden h-5 w-px bg-br-secondary md:block" aria-hidden="true" />
+            <div className="min-w-0 flex-1">
+              <CategoryChips selectedId={category?.id ?? null} onSelect={selectCategory} />
+            </div>
+          </div>
+        </div>
 
-        <CategoryChips selectedId={category?.id ?? null} onSelect={selectCategory} />
-
-        <div className="mt-6">{renderModels()}</div>
+        <div className="px-1 pt-1">{renderModels()}</div>
       </section>
     </div>
   );

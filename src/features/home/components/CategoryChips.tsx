@@ -1,3 +1,4 @@
+import { buttonClassName } from "@/components";
 import { MODEL_CATEGORIES } from "@/features/models/constants/modelCategories";
 
 interface CategoryChipsProps {
@@ -6,18 +7,19 @@ interface CategoryChipsProps {
 }
 
 const chipClass = (isSelected: boolean) =>
-  `inline-flex h-9 shrink-0 items-center rounded-full border px-4 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
-    isSelected
-      ? "border-transparent bg-btn-primary text-btn-primary-text"
-      : "border-br-secondary bg-surface-card text-txt-secondary hover:border-br-primary hover:text-txt-primary"
-  }`;
+  buttonClassName({
+    variant: isSelected ? "primary" : "ghost",
+    size: "sm",
+    className: `shrink-0 [--cut:6px] ${isSelected ? "" : "text-txt-secondary"}`,
+  });
 
+/** One sideways-scrolling row of category filters. */
 export const CategoryChips = ({ selectedId, onSelect }: CategoryChipsProps) => {
   return (
     <div
       role="group"
       aria-label="Filter by category"
-      className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden"
+      className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       <button
         type="button"
