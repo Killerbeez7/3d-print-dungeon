@@ -1,6 +1,6 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart as solidHeart } from "@fortawesome/free-solid-svg-icons";
-import { faHeart as regularHeart } from "@fortawesome/free-regular-svg-icons";
+import { Heart } from "lucide-react";
+
+import { buttonClassName } from "@/components";
 
 import type { CurrentUser } from "@/features/auth/types/auth";
 import { useModelLike } from "../hooks/useModelLike";
@@ -12,9 +12,6 @@ export interface LikeButtonProps {
   openAuthModal?: () => void;
 }
 
-const formatLikesCount = (count: number): string => {
-  return count === 1 ? "1 Like" : `${count} Likes`;
-};
 
 export const LikeButton = ({
   modelId,
@@ -45,16 +42,19 @@ export const LikeButton = ({
       disabled={isLoading || isMutating}
       aria-pressed={liked}
       aria-label={liked ? "Unlike model" : "Like model"}
-      className="inline-flex items-center gap-2 cursor-pointer"
+      className={buttonClassName({
+        variant: "secondary",
+        className: `flex-1 ${liked ? "[--btn-edge:var(--ember)]" : ""}`,
+      })}
     >
-      <span className="flex items-center justify-center">
-        <FontAwesomeIcon
-          icon={liked ? solidHeart : regularHeart}
-          className={liked ? "text-red-500 text-xl" : "text-gray-400 text-xl"}
-        />
-      </span>
-
-      <span>{formatLikesCount(likesCount)}</span>
+      <Heart
+        className={`size-4 transition-transform duration-300 ${
+          liked ? "scale-110 fill-ember-fill text-ember-fill" : ""
+        }`}
+        aria-hidden="true"
+      />
+      <span>{liked ? "Liked" : "Like"}</span>
+      <span className="font-mono text-xs text-txt-muted">{likesCount}</span>
     </button>
   );
 };

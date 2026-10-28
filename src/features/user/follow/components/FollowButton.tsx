@@ -1,4 +1,7 @@
 import { clsx } from "clsx";
+import { Check, Plus } from "lucide-react";
+
+import { buttonClassName } from "@/components";
 
 import { useAuth } from "@/features/auth";
 import { useFollow } from "../hooks/useFollow";
@@ -14,16 +17,10 @@ interface FollowButtonProps {
   openAuthModal?: () => void;
 }
 
-const sizeClasses = {
-  sm: "px-2 py-1 text-xs",
-  md: "px-3 py-1.5 text-sm",
-  lg: "px-4 py-2 text-base",
-} as const;
-
-const variantClasses = {
-  primary: "bg-btn-primary hover:bg-btn-primary-hover text-white",
-  secondary: "bg-section hover:bg-muted text-txt-primary",
-  outline: "border border-br-primary hover:bg-section text-txt-primary",
+const variantMap = {
+  primary: "primary",
+  secondary: "secondary",
+  outline: "secondary",
 } as const;
 
 export const FollowButton = ({
@@ -68,10 +65,12 @@ export const FollowButton = ({
         onClick={handleClick}
         disabled={loading}
         className={clsx(
-          "flex items-center justify-center gap-2 rounded-full font-medium transition-all duration-200",
-          sizeClasses[size],
-          variantClasses[variant],
-          loading ? "opacity-50 cursor-not-allowed" : "hover:scale-105",
+          buttonClassName({
+            // Once followed, the button calms down to the secondary style.
+            variant: isFollowing ? "secondary" : variantMap[variant],
+            size,
+          }),
+          loading && "opacity-60",
           className
         )}
         title={
@@ -80,6 +79,11 @@ export const FollowButton = ({
             : `Follow ${targetUserName || "user"}`
         }
       >
+        {isFollowing ? (
+          <Check className="size-4" aria-hidden="true" />
+        ) : (
+          <Plus className="size-4" aria-hidden="true" />
+        )}
         {isFollowing ? "Following" : "Follow"}
       </button>
       {showCount && (
@@ -87,7 +91,7 @@ export const FollowButton = ({
           {followersCount} {followersCount === 1 ? "follower" : "followers"}
         </span>
       )}
-      {error && <span className="mt-1 text-xs text-red-500">{error}</span>}
+      {error && <span className="mt-1 text-xs text-error">{error}</span>}
     </div>
   );
 };

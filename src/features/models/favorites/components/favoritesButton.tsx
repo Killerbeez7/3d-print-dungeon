@@ -1,6 +1,6 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStar as solidStar } from "@fortawesome/free-solid-svg-icons";
-import { faStar as regularStar } from "@fortawesome/free-regular-svg-icons";
+import { Bookmark } from "lucide-react";
+
+import { buttonClassName } from "@/components";
 
 import type { CurrentUser } from "@/features/auth/types/auth";
 import { useModelFavorite } from "../hooks/useModelFavorite";
@@ -38,14 +38,16 @@ export const FavoritesButton = ({
       disabled={isLoading || isMutating}
       aria-pressed={favorited}
       aria-label={favorited ? "Remove from favorites" : "Add to favorites"}
-      className="inline-flex items-center gap-2 cursor-pointer"
+      className={buttonClassName({
+        variant: "secondary",
+        className: `flex-1 ${favorited ? "[--btn-edge:var(--accent)]" : ""}`,
+      })}
     >
-      <FontAwesomeIcon
-        icon={favorited ? solidStar : regularStar}
-        className={favorited ? "text-yellow-500 text-xl" : "text-gray-400 text-xl"}
+      <Bookmark
+        className={`size-4 ${favorited ? "fill-accent text-accent" : ""}`}
+        aria-hidden="true"
       />
-
-      <span className="text-sm">{favorited ? "Favorited" : "Favorite"}</span>
+      <span>{favorited ? "Saved" : "Save"}</span>
     </button>
   );
 };

@@ -5,6 +5,7 @@ import { paymentService } from "@/features/payment/services/paymentService";
 import { PaymentModal } from "./PaymentModal";
 import type { PurchaseButtonProps } from "@/features/payment/types/payment";
 import { useModal } from "@/features/shared/modal/hooks/useModal";
+import { Button } from "@/components";
 
 export const PurchaseButton = ({ model, className = "" }: PurchaseButtonProps) => {
   const { currentUser } = useAuth();
@@ -71,92 +72,41 @@ export const PurchaseButton = ({ model, className = "" }: PurchaseButtonProps) =
   const isOwner = currentUser?.uid === model.uploaderId;
   const hasPurchased = userPurchases.includes(model.id);
   const isFree = !model.isPaid || model.price === 0;
-  const primaryActionClasses =
-    "flex items-center justify-center gap-2 rounded-lg bg-btn-primary px-6 py-3 text-btn-primary-text transition-colors hover:bg-btn-primary-hover focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-2 focus:ring-offset-bg-page disabled:cursor-not-allowed disabled:opacity-50";
-  const successActionClasses =
-    "flex items-center justify-center gap-2 rounded-lg bg-success px-6 py-3 text-txt-inverse transition-colors hover:bg-success-hover focus:outline-none focus:ring-2 focus:ring-success focus:ring-offset-2 focus:ring-offset-bg-page disabled:cursor-not-allowed disabled:opacity-50";
+  const downloadIcon = <Download className="size-5" aria-hidden="true" />;
 
-  if (isOwner) {
+  if (isOwner || hasPurchased || isFree) {
+    const label = isOwner ? "Download your file" : isFree && !hasPurchased ? "Download free" : "Download";
+
     return (
-      <button
+      <Button
         onClick={handleDownload}
-        disabled={isLoading}
-        className={`${successActionClasses} ${className}`}
+        isLoading={isLoading}
+        variant={isOwner ? "secondary" : "primary"}
+        size="lg"
+        leftIcon={downloadIcon}
+        className={className}
       >
-        {isLoading ? (
-          <div className="flex items-center gap-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-            Downloading...
-          </div>
-        ) : (
-          <>
-            <Download className="h-5 w-5" aria-hidden="true" />
-            Download (Owner)
-          </>
-        )}
-      </button>
+        {isLoading ? "Preparing…" : label}
+      </Button>
     );
   }
 
-  if (hasPurchased) {
-    return (
-      <button
-        onClick={handleDownload}
-        disabled={isLoading}
-        className={`${successActionClasses} ${className}`}
-      >
-        {isLoading ? (
-          <div className="flex items-center gap-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-            Downloading...
-          </div>
-        ) : (
-          <>
-            <Download className="h-5 w-5" aria-hidden="true" />
-            Download
-          </>
-        )}
-      </button>
-    );
-  }
-
-  if (isFree) {
-    return (
-      <button
-        onClick={handleDownload}
-        disabled={isLoading}
-        className={`${primaryActionClasses} ${className}`}
-      >
-        {isLoading ? (
-          <div className="flex items-center gap-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-            Downloading...
-          </div>
-        ) : (
-          <>
-            <Download className="h-5 w-5" aria-hidden="true" />
-            Free Download
-          </>
-        )}
-      </button>
-    );
-  }
+  const formattedPrice = new Intl.NumberFormat("en", {
+    style: "currency",
+    currency: (model.currency ?? "usd").toUpperCase(),
+  }).format(model.price);
 
   return (
     <>
-      <button
+      <Button
         onClick={handlePurchaseClick}
-        className={`${primaryActionClasses} ${className}`}
+        variant="ember"
+        size="lg"
+        leftIcon={<ShoppingCart className="size-5" aria-hidden="true" />}
+        className={className}
       >
-        <span className="grid grid-cols-[1.25rem_auto_1.25rem] items-center">
-          <span aria-hidden="true" className="w-5 h-5"></span>
-          <span className="inline-flex items-center justify-center gap-2">
-            <ShoppingCart className="h-5 w-5" aria-hidden="true" />
-            <span>Buy model</span>
-          </span>
-          <span aria-hidden="true" className="w-5 h-5"></span>
-        </span>
-      </button>
+        Buy for {formattedPrice}
+      </Button>
 
       {isPaymentModalOpen && (
         <PaymentModal

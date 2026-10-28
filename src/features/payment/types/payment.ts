@@ -2,6 +2,7 @@ export interface ModelPaymentInfo {
   id: string;
   name: string;
   price: number;
+  currency?: string;
   uploaderId: string;
   uploaderUsername?: string;
   uploaderDisplayName?: string;
