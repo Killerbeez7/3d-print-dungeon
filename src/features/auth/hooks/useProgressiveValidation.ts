@@ -166,16 +166,18 @@ export const useProgressiveValidation = ({
         }
       }
 
+      // Signing in only needs a password; strength rules are for new accounts.
       if (fieldName === "password" && mode === "signin") {
-        const finalResult: ValidationResult = {
-          isValid: result.isValid,
-        };
+        const isValid = value.length > 0;
+        const finalResult: ValidationResult = isValid
+          ? { isValid }
+          : { isValid, error: "Enter your password" };
 
         updateField(fieldName, {
           value,
-          hasError: false,
-          error: null,
-          isValid: result.isValid,
+          hasError: !isValid,
+          error: finalResult.error ?? null,
+          isValid,
           isChecking: false,
         });
 
@@ -237,10 +239,8 @@ export const useProgressiveValidation = ({
           isChecking: false,
         });
       } else if (fieldName === "password" && mode === "signin") {
-        const result = validateField(fieldName, value, context);
-
         updateField(fieldName, {
-          isValid: result.isValid,
+          isValid: value.length > 0,
           hasError: false,
           error: null,
           isChecking: false,

@@ -18,7 +18,7 @@ interface SignUpFormProps {
 export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
   const { handleEmailSignUp, handleGoogleSignIn } = useAuth();
 
-  const { fields, handleFieldChange, handleFieldBlur, isFormValid, getFieldError } =
+  const { fields, handleFieldChange, handleFieldBlur, validateAllFields, getFieldError } =
     useProgressiveValidation({
       initialValues: {
         email: "",
@@ -50,7 +50,10 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
 
-    if (!isFormValid()) {
+    // Validate on submit so a problem is always explained, never a silent no-op.
+    const results = await validateAllFields();
+    if (Object.values(results).some((result) => !result.isValid)) {
+      setError("Please fix the highlighted fields.");
       return;
     }
 
@@ -146,7 +149,7 @@ export const SignUpForm = ({ onSwitchToSignIn }: SignUpFormProps) => {
           size="lg"
           fullWidth
           isLoading={loading}
-          disabled={!isFormValid() || loading}
+          disabled={loading}
         >
           {loading ? "Creating account…" : "Create account"}
         </Button>
