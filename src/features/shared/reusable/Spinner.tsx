@@ -24,21 +24,11 @@ export function Spinner({ size = 24, className = "", delay = 300 }: SpinnerProps
     return null;
   }
 
-  const ring = `${size}px`;
-  const thickness = size / 8;
-
+  // A tiny build plate that prints bottom-up (see .skeleton-print).
   return (
     <span
-      className={`inline-block animate-spin ${className}`}
-      style={{
-        width: ring,
-        height: ring,
-        borderStyle: "solid",
-        borderWidth: thickness,
-        borderColor: "var(--bg-page)",
-        borderTopColor: "var(--accent)",
-        borderRadius: "50%",
-      }}
+      className={`skeleton-print chamfer inline-block ${className}`}
+      style={{ width: size, height: size, ["--cut" as string]: `${Math.round(size / 4)}px` }}
       role="status"
       aria-label="Loading"
     />
