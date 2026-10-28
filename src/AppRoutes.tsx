@@ -1,4 +1,4 @@
-import { Navigate, useRoutes, type RouteObject } from "react-router-dom";
+import { useRoutes, type RouteObject } from "react-router-dom";
 
 import { ROUTES } from "./constants/routeConstants";
 
@@ -18,6 +18,7 @@ import { marketplaceRoutes } from "./features/marketplace/routes/marketplaceRout
 import { printedFiguresRoutes } from "./features/printed-figures/routes/printedFiguresRoutes";
 
 import Layout from "@/features/shared/Layout";
+import { NotFoundPage } from "@/features/shared/pages/NotFoundPage";
 import { MaintenancePage } from "@/features/maintenance/pages/MaintenancePage";
 import { MaintenanceRoute } from "@/routes/guards/MaintenanceRoute";
 
@@ -36,7 +37,7 @@ const mainRoutes: RouteObject[] = [
   ...collectionsRoutes,
   ...marketplaceRoutes,
   ...printedFiguresRoutes,
-  { path: "*", element: <Navigate to={ROUTES.HOME} replace /> },
+  { path: "*", element: <NotFoundPage /> },
 ];
 
 const routesConfig: RouteObject[] = [
