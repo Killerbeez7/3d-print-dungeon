@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Button } from "@/components";
 import { useCookies } from "../hooks/useCookies";
 import { useCookieConsent } from "../hooks/useCookieConsent";
 import type { CookieCategory } from "../types/cookies";
@@ -28,13 +29,9 @@ export function ConsentRequiredFeature({
       {fallbackContent}
 
       {showSettingsButton && (
-        <button
-          type="button"
-          onClick={openSettings}
-          className="mt-4 rounded-lg bg-page px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-page/90"
-        >
-          Manage Cookie Preferences
-        </button>
+        <Button variant="secondary" size="sm" onClick={openSettings} className="mt-4">
+          Manage cookie preferences
+        </Button>
       )}
     </>
   );

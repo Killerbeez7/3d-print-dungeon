@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
+import { Button } from "@/components";
 import { useCookies } from "@/features/cookies";
 import { CookieCategory } from "@/features/cookies";
 
@@ -25,31 +26,28 @@ export function CookieConsentRoute({
       return (
         <div className="relative">
           {children}
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
-            <div className="bg-section rounded-xl shadow-2xl max-w-md w-full mx-4 p-6 border border-br-primary">
-              <h2 className="text-xl font-bold text-txt-primary mb-4">
-                Cookie Consent Required
+          <div className="fixed inset-0 z-[9999] flex items-end justify-center bg-surface-overlay backdrop-blur-sm md:items-center md:p-6">
+            <div
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="consent-required-title"
+              className="auth-panel w-full max-w-md rounded-t-2xl border border-br-secondary bg-surface-card p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-popover md:rounded-xl"
+            >
+              <p className="label-mono text-accent">Cookies</p>
+              <h2 id="consent-required-title" className="mt-1 text-xl font-bold">
+                This feature needs your consent
               </h2>
-              <p className="text-txt-secondary mb-6">
-                This feature requires your consent for the following cookies:{" "}
-                <span className="font-semibold">{requiredConsent.join(", ")}</span>
+              <p className="mt-2 text-sm leading-relaxed text-txt-secondary">
+                It uses these cookies:{" "}
+                <span className="font-semibold text-txt-primary">{requiredConsent.join(", ")}</span>
               </p>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    const event = new CustomEvent("openCookieSettings");
-                    window.dispatchEvent(event);
-                  }}
-                  className="flex-1 px-4 py-2 text-sm border border-br-secondary text-txt-secondary hover:text-txt-primary hover:border-br-primary transition-colors rounded-lg"
-                >
-                  Manage Cookies
-                </button>
-                <button
-                  onClick={() => (window.location.href = fallbackPath)}
-                  className="flex-1 px-4 py-2 text-sm bg-page text-white hover:bg-page/90 transition-colors rounded-lg"
-                >
-                  Go Back
-                </button>
+              <div className="mt-6 grid grid-cols-2 gap-2">
+                <Button variant="secondary" onClick={() => (window.location.href = fallbackPath)}>
+                  Go back
+                </Button>
+                <Button onClick={() => window.dispatchEvent(new CustomEvent("openCookieSettings"))}>
+                  Manage cookies
+                </Button>
               </div>
             </div>
           </div>
