@@ -124,7 +124,7 @@ export const NotificationSettings = () => {
         onClick={() => onChange(!enabled)}
         disabled={loading}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
-          enabled ? "bg-btn-primary" : "bg-br-secondary"
+          enabled ? "bg-btn-primary" : "bg-br-input"
         } ${loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
       >
         <span
@@ -149,7 +149,7 @@ export const NotificationSettings = () => {
       </div>
 
       {/* Notification Channels */}
-      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">
             Notification Channels
@@ -179,7 +179,7 @@ export const NotificationSettings = () => {
       </div>
 
       {/* Social Notifications */}
-      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">Social Activity</h3>
 
@@ -207,7 +207,7 @@ export const NotificationSettings = () => {
       </div>
 
       {/* Content Updates */}
-      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">
             Content & Updates

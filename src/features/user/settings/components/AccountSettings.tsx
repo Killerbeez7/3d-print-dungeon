@@ -392,7 +392,7 @@ export const AccountSettings = () => {
         </p>
       </div>
 
-      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">
             Display & Language

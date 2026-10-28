@@ -22,18 +22,13 @@ export const SaveChanges = ({
   }
 
   return (
-    <div className="flex justify-end gap-2 pt-4">
-      <button
-        type="button"
-        onClick={onReset}
-        disabled={loading}
-        className="px-4 py-2 text-sm border border-br-secondary rounded-md text-txt-secondary hover:bg-section transition-colors disabled:opacity-50"
-      >
+    <div className="sticky bottom-4 z-10 flex justify-end gap-2 rounded-xl border border-br-secondary bg-surface-elevated/95 p-3 shadow-2xl shadow-black/30 backdrop-blur">
+      <Button variant="ghost" onClick={onReset} disabled={loading}>
         {resetText}
-      </button>
+      </Button>
 
-      <Button onClick={onSave} disabled={loading}>
-        {loading ? "Saving..." : saveText}
+      <Button onClick={onSave} isLoading={loading}>
+        {loading ? "Saving…" : saveText}
       </Button>
     </div>
   );

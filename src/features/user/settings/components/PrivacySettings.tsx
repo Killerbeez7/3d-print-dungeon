@@ -83,7 +83,7 @@ const ToggleSwitch = ({ enabled, onChange, label, description }: ToggleSwitchPro
       type="button"
       onClick={() => onChange(!enabled)}
       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
-        enabled ? "bg-btn-primary" : "bg-br-secondary"
+        enabled ? "bg-btn-primary" : "bg-br-input"
       }`}
     >
       <span
@@ -114,7 +114,7 @@ const DropdownSelector = <T extends string>({
       value={value}
       onChange={(event) => onChange(event.target.value as T)}
       disabled={disabled}
-      className="ml-4 px-3 py-1 border border-br-secondary rounded-md bg-section text-txt-primary text-sm focus:outline-none focus:ring-2 focus:ring-accent min-w-[140px]"
+      className="ml-4 h-10 min-w-[140px] rounded-lg border border-br-input bg-page px-3 text-sm text-txt-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
     >
       {options.map((option) => (
         <option key={option.id} value={option.id}>
@@ -226,7 +226,7 @@ export const PrivacySettings = () => {
       </div>
 
       {/* Profile Visibility */}
-      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">
             Profile Visibility
@@ -253,7 +253,7 @@ export const PrivacySettings = () => {
       </div>
 
       {/* Information Sharing */}
-      <div className="bg-surface-card rounded-lg border border-br-secondary overflow-hidden">
+      <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card">
         <div className="p-6">
           <h3 className="text-lg font-semibold text-txt-primary mb-4">
             Information Sharing
