@@ -13,6 +13,7 @@ body {
   box-sizing: border-box;
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
   font-size: 16px;
+  color: var(--txt-primary);
   background-color: var(--bg-page);
   background-image: var(--ambient-brand);
   background-attachment: fixed;
