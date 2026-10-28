@@ -1,70 +1,75 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { TrendingUp } from "lucide-react";
 
+import { buttonClassName } from "@/components";
+import { ROUTES } from "@/constants/routeConstants";
+import { HomeModelsGrid, HomeModelsGridSkeleton } from "@/features/home/components/HomeModelsGrid";
+import { PageHeader } from "@/features/shared/components/PageHeader";
+import { StatePanel } from "@/features/shared/components/StatePanel";
 import { useRisingModels } from "../hooks/useRisingModels";
-import { RisingModelsGrid } from "../components/RisingModelsGrid";
-
-import { Spinner } from "@/features/shared/reusable/Spinner";
 
 import type { RisingModelsPeriod } from "../types/risingModels";
 
-export const RisingModelsPage = () => {
-  const [period, setPeriod] = useState<RisingModelsPeriod>(7);
+const PERIODS: { value: RisingModelsPeriod; label: string }[] = [
+  { value: 7, label: "7 days" },
+  { value: 30, label: "30 days" },
+];
 
-  const { data: models, isPending, isError } = useRisingModels(period);
+export const RisingModelsPage = () => {
+  const [period, setPeriod] = useState<RisingModelsPeriod>(30);
+  const { data: models = [], isPending, isError } = useRisingModels(period);
 
   return (
-    <main className="min-h-screen text-center text-txt-primary">
-      <div className="px-4 pt-8">
-        <h1 className="pb-2 font-bold">Rising Models</h1>
+    <div className="min-h-screen bg-page pb-16">
+      <PageHeader
+        eyebrow="Collections"
+        title="Rising models"
+        description={`The most-liked uploads from the last ${period} days.`}
+        aside={
+          <div role="group" aria-label="Time period" className="flex gap-1">
+            {PERIODS.map((item) => (
+              <button
+                key={item.value}
+                type="button"
+                aria-pressed={period === item.value}
+                onClick={() => setPeriod(item.value)}
+                className={buttonClassName({
+                  variant: period === item.value ? "primary" : "ghost",
+                  size: "sm",
+                  className: "font-mono [--cut:6px]",
+                })}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        }
+      />
 
-        <p className="pb-6 text-txt-secondary">Discover models gaining attention.</p>
-
-        <div className="mb-8 flex justify-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              setPeriod(7);
-            }}
-            className={
-              period === 7
-                ? "rounded-full bg-btn-primary px-4 py-2 text-btn-primary-text"
-                : "rounded-full bg-surface-card px-4 py-2 text-txt-secondary hover:text-txt-primary"
-            }
-          >
-            Last 7 days
-          </button>
-
-          <button
-            type="button"
-            onClick={() => {
-              setPeriod(30);
-            }}
-            className={
-              period === 30
-                ? "rounded-full bg-btn-primary px-4 py-2 text-btn-primary-text"
-                : "rounded-full bg-surface-card px-4 py-2 text-txt-secondary hover:text-txt-primary"
-            }
-          >
-            Last 30 days
-          </button>
-        </div>
-      </div>
-
-      <div className="mx-auto w-full max-w-[1600px] px-4 pb-10 sm:px-6 lg:px-8">
+      <div className="px-1 pt-1">
         {isPending ? (
-          <div className="flex justify-center py-12">
-            <Spinner size={24} />
-          </div>
-        ) : isError ? (
-          <div className="py-12 text-txt-secondary">Failed to load rising models.</div>
-        ) : models.length === 0 ? (
-          <div className="py-12 text-txt-secondary">
-            No rising models found for this period.
-          </div>
+          <HomeModelsGridSkeleton />
+        ) : isError || models.length === 0 ? (
+          <StatePanel
+            icon={TrendingUp}
+            headingLevel="h2"
+            className="min-h-[50vh]"
+            title={isError ? "Couldn't load rising models" : "Nothing rising yet"}
+            actions={
+              <Link to={ROUTES.HOME} className={buttonClassName()}>
+                Browse all models
+              </Link>
+            }
+          >
+            {isError
+              ? "Check your connection and refresh the page."
+              : `No models were uploaded in the last ${period} days.`}
+          </StatePanel>
         ) : (
-          <RisingModelsGrid models={models} />
+          <HomeModelsGrid models={models} />
         )}
       </div>
-    </main>
+    </div>
   );
 };
