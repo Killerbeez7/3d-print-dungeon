@@ -1,23 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import {
-  FaCalendar,
-  FaEdit,
-  FaEye,
-  FaLock,
-  FaReply,
-  FaThumbtack,
-  FaTrash,
-  FaUser,
-} from "react-icons/fa";
+import { Lock, MessageSquareOff, Pencil, Pin, Reply, Trash2 } from "lucide-react";
+
+import { Button, buttonClassName } from "@/components";
+import { StatePanel } from "@/features/shared/components/StatePanel";
 
 import { FORUM_CATEGORIES } from "@/config/forumCategories";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useModal } from "@/features/shared/modal/hooks/useModal";
-import Skeleton from "@/features/shared/Skeleton";
-import { Spinner } from "@/features/shared/reusable/Spinner";
 
 import { ReplyEditor } from "./ReplyEditor";
+import { ForumAlert, ForumAvatar, ForumBadge } from "./ForumUI";
 import { FORUM_PATHS } from "../constants/forumPaths";
 import { formatRelativeTime } from "../utils/threadUtils";
 
@@ -136,337 +129,244 @@ export function ForumThread() {
 
   if (isThreadLoading) {
     return (
-      <div className="space-y-5">
-        <div className="rounded-xl border border-br-subtle bg-surface-card p-6 shadow-sm">
-          <Skeleton className="mb-4 h-4 w-32" />
-          <Skeleton className="mb-4 h-8 w-3/4" />
-          <Skeleton className="mb-3 h-5 w-full" />
-          <Skeleton className="mb-3 h-5 w-full" />
-          <Skeleton className="mb-6 h-5 w-2/3" />
-
-          <div className="flex gap-4">
-            <Skeleton className="h-4 w-28" />
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-4 w-20" />
+      <div className="space-y-5" role="status" aria-label="Loading thread">
+        <div className="skeleton-print h-4 w-40" />
+        <div className="rounded-xl border border-br-subtle bg-surface-card p-6">
+          <div className="skeleton-print h-8 w-3/4" />
+          <div className="skeleton-print mt-4 h-4 w-1/3" />
+          <div className="mt-8 space-y-3">
+            <div className="skeleton-print h-4 w-full" />
+            <div className="skeleton-print h-4 w-full" />
+            <div className="skeleton-print h-4 w-2/3" />
           </div>
         </div>
       </div>
     );
   }
 
-  if (threadError) {
+  if (threadError || !threadId || !thread) {
     return (
-      <div className="rounded-xl border border-error/30 bg-error/10 p-6 text-error">
-        <h2 className="mb-2 text-lg font-semibold">Error Loading Thread</h2>
-
-        <p>{threadError.message}</p>
-
-        <Link
-          to={FORUM_PATHS.HOME}
-          className="mt-4 inline-block font-medium text-accent hover:text-accent-hover"
-        >
-          Return to Forum
-        </Link>
-      </div>
-    );
-  }
-
-  if (!threadId || !thread) {
-    return (
-      <div className="rounded-xl border border-br-subtle bg-surface-card p-8 text-center shadow-sm">
-        <h2 className="mb-3 text-xl font-semibold text-txt-primary">Thread Not Found</h2>
-
-        <p className="mb-6 text-txt-secondary">
-          The thread you&apos;re looking for may have been moved or deleted.
-        </p>
-
-        <Link
-          to={FORUM_PATHS.HOME}
-          className="inline-flex items-center justify-center rounded-lg bg-btn-primary px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
-        >
-          Return to Forum
-        </Link>
-      </div>
+      <StatePanel
+        icon={MessageSquareOff}
+        title={threadError ? "Couldn't load this thread" : "Thread not found"}
+        actions={
+          <Link to={FORUM_PATHS.HOME} className={buttonClassName()}>
+            Back to the forum
+          </Link>
+        }
+      >
+        {threadError
+          ? "Check your connection and refresh the page."
+          : "It may have been moved or deleted."}
+      </StatePanel>
     );
   }
 
   const categoryName =
-    categories.find((category) => {
-      return category.id === thread.categoryId;
-    })?.name ?? "Category";
+    categories.find((category) => category.id === thread.categoryId)?.name ?? "Category";
+  const isAuthor = currentUser?.uid === thread.authorId;
 
   return (
-    <div className="space-y-6">
-      {/* Breadcrumb */}
-      <nav
-        className="flex flex-wrap items-center gap-2 text-sm text-txt-muted"
-        aria-label="Breadcrumb"
-      >
+    <div className="mx-auto w-full max-w-4xl space-y-8">
+      <nav aria-label="Breadcrumb" className="label-mono flex flex-wrap items-center gap-2 text-txt-muted">
         <Link to={FORUM_PATHS.HOME} className="transition-colors hover:text-accent">
           Forum
         </Link>
-
         <span aria-hidden="true">/</span>
-
-        <Link
-          to={FORUM_PATHS.CATEGORY(thread.categoryId)}
-          className="transition-colors hover:text-accent"
-        >
+        <Link to={FORUM_PATHS.CATEGORY(thread.categoryId)} className="transition-colors hover:text-accent">
           {categoryName}
         </Link>
       </nav>
 
-      {/* Main thread */}
-      <article className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card shadow-sm">
-        <div className="p-6 sm:p-7">
-          {/* Status */}
+      {/* Opening post */}
+      <article className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card">
+        <div className="p-5 sm:p-7">
           {(thread.isPinned || thread.isLocked) && (
-            <div className="mb-4 flex flex-wrap gap-2">
+            <div className="mb-3 flex flex-wrap gap-2">
               {thread.isPinned && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-warning/10 px-2.5 py-1 text-xs font-semibold text-warning">
-                  <FaThumbtack size={9} aria-hidden="true" />
-                  Pinned
-                </span>
+                <ForumBadge tone="warning">
+                  <Pin className="size-3" aria-hidden="true" /> Pinned
+                </ForumBadge>
               )}
-
               {thread.isLocked && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-error/10 px-2.5 py-1 text-xs font-semibold text-error">
-                  <FaLock size={9} aria-hidden="true" />
-                  Locked
-                </span>
+                <ForumBadge tone="error">
+                  <Lock className="size-3" aria-hidden="true" /> Locked
+                </ForumBadge>
               )}
             </div>
           )}
 
-          <h1 className="text-2xl font-bold leading-tight text-txt-primary sm:text-3xl">
-            {thread.title}
-          </h1>
+          <h1 className="text-2xl font-bold leading-tight sm:text-3xl">{thread.title}</h1>
 
-          {/* Metadata */}
-          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-txt-muted">
-            <span className="inline-flex items-center">
-              <FaUser className="mr-1.5" size={11} aria-hidden="true" />
-              {thread.authorName}
-            </span>
-
-            <span className="inline-flex items-center">
-              <FaCalendar className="mr-1.5" size={11} aria-hidden="true" />
-              Posted {formatRelativeTime(thread.createdAt)}
-            </span>
-
-            <span className="inline-flex items-center">
-              <FaEye className="mr-1.5" size={11} aria-hidden="true" />
-              {thread.views} views
-            </span>
+          <div className="mt-5 flex items-center gap-3">
+            <ForumAvatar src={thread.authorPhotoURL} />
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-txt-primary">{thread.authorName}</p>
+              <p className="font-mono text-xs text-txt-muted">
+                {formatRelativeTime(thread.createdAt)} · {thread.views} views
+              </p>
+            </div>
           </div>
 
-          {/* Content */}
-          <div className="mt-7 whitespace-pre-wrap leading-7 text-txt-primary">
+          <div className="mt-6 whitespace-pre-wrap text-base leading-7 text-txt-primary">
             {thread.content}
           </div>
         </div>
 
         {deleteThreadError && (
-          <div className="mx-6 mb-4 rounded-lg border border-error/30 bg-error/10 p-3 text-sm text-error">
-            {deleteThreadError.message}
+          <div className="px-5 pb-4 sm:px-7">
+            <ForumAlert>{deleteThreadError.message}</ForumAlert>
           </div>
         )}
 
-        {/* Thread actions */}
-        <div className="flex flex-wrap items-center gap-2 border-t border-br-subtle bg-muted/50 px-6 py-3">
-          {!thread.isLocked && (
-            <button
-              type="button"
+        <div className="flex flex-wrap items-center gap-2 border-t border-br-subtle bg-section px-5 py-3 sm:px-7">
+          {thread.isLocked ? (
+            <span className="flex items-center gap-2 text-sm text-txt-muted">
+              <Lock className="size-4" aria-hidden="true" />
+              This thread is locked, so new replies are closed.
+            </span>
+          ) : (
+            <Button
+              size="sm"
               onClick={() => {
                 if (!currentUser) {
                   open({ mode: "login" });
                   return;
                 }
-
                 setIsReplying(true);
               }}
-              className="inline-flex items-center gap-2 rounded-lg bg-btn-primary px-3.5 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
+              leftIcon={<Reply className="size-4" aria-hidden="true" />}
             >
-              <FaReply size={11} aria-hidden="true" />
-              {currentUser ? "Reply" : "Sign in to Reply"}
-            </button>
+              {currentUser ? "Reply" : "Sign in to reply"}
+            </Button>
           )}
 
-          {thread.isLocked && (
-            <span className="text-sm text-txt-muted">
-              This thread is locked, so new replies are closed.
-            </span>
-          )}
-
-          {currentUser?.uid === thread.authorId && (
-            <>
+          {isAuthor && (
+            <div className="ml-auto flex gap-1">
               <Link
                 to={FORUM_PATHS.THREAD_EDIT(threadId)}
-                className="inline-flex items-center gap-2 rounded-lg border border-br-secondary bg-surface-card px-3.5 py-2 text-sm font-semibold text-txt-primary transition-colors hover:bg-muted"
+                className={buttonClassName({ variant: "ghost", size: "sm" })}
               >
-                <FaEdit size={11} aria-hidden="true" />
+                <Pencil className="size-4" aria-hidden="true" />
                 Edit
               </Link>
-
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={handleThreadDelete}
                 disabled={isDeletingThread}
-                className="inline-flex items-center gap-2 rounded-lg bg-error px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-error-hover disabled:cursor-not-allowed disabled:opacity-60"
+                className="text-error"
+                leftIcon={<Trash2 className="size-4" aria-hidden="true" />}
               >
-                <FaTrash size={11} aria-hidden="true" />
-                {isDeletingThread ? "Deleting..." : "Delete"}
-              </button>
-            </>
+                {isDeletingThread ? "Deleting…" : "Delete"}
+              </Button>
+            </div>
           )}
         </div>
       </article>
 
-      {/* Reply editor */}
       {isReplying && (
-        <section className="rounded-xl border border-br-subtle bg-surface-card p-6 shadow-sm">
-          <div className="mb-4">
-            <h2 className="text-lg font-semibold text-txt-primary">Post a Reply</h2>
-
-            <p className="mt-1 text-sm text-txt-muted">
-              Add something useful to the discussion.
-            </p>
-          </div>
-
+        <section className="rounded-xl border border-accent/50 bg-surface-card p-5 sm:p-6" aria-label="Write a reply">
+          <h2 className="mb-4 text-lg font-bold">Your reply</h2>
           <ReplyEditor
             threadId={threadId}
-            onSuccess={() => {
-              setIsReplying(false);
-            }}
-            onCancel={() => {
-              setIsReplying(false);
-            }}
+            onSuccess={() => setIsReplying(false)}
+            onCancel={() => setIsReplying(false)}
           />
         </section>
       )}
 
       {/* Replies */}
-      <section>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-txt-primary">Replies</h2>
-
-          <span className="text-sm text-txt-muted">
-            {thread.replyCount} {thread.replyCount === 1 ? "reply" : "replies"}
-          </span>
+      <section aria-labelledby="replies-heading">
+        <div className="mb-4 flex items-baseline justify-between gap-4">
+          <h2 id="replies-heading" className="text-xl font-bold">
+            Replies
+          </h2>
+          <span className="font-mono text-sm text-txt-muted">{thread.replyCount}</span>
         </div>
 
-        {repliesError && (
-          <div className="mb-4 rounded-lg border border-error/30 bg-error/10 p-4 text-sm text-error">
-            Error loading replies: {repliesError.message}
-          </div>
-        )}
-
-        {deleteReplyError && (
-          <div className="mb-4 rounded-lg border border-error/30 bg-error/10 p-4 text-sm text-error">
-            Unable to delete reply: {deleteReplyError.message}
-          </div>
-        )}
+        <div className="space-y-3">
+          {repliesError && <ForumAlert>Replies couldn&apos;t load. Refresh to try again.</ForumAlert>}
+          {deleteReplyError && <ForumAlert>Couldn&apos;t delete that reply: {deleteReplyError.message}</ForumAlert>}
+        </div>
 
         {areRepliesLoading ? (
-          <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card shadow-sm">
+          <div className="space-y-4" role="status" aria-label="Loading replies">
             {[0, 1].map((item) => (
-              <div key={item} className="border-b border-br-subtle p-6 last:border-b-0">
-                <Skeleton className="mb-4 h-4 w-32" />
-                <Skeleton className="mb-2 h-5 w-full" />
-                <Skeleton className="h-5 w-2/3" />
+              <div key={item} className="flex gap-3">
+                <div className="skeleton-print chamfer size-9 [--cut:7px]" />
+                <div className="flex-1 space-y-2">
+                  <div className="skeleton-print h-3 w-32" />
+                  <div className="skeleton-print h-4 w-full" />
+                  <div className="skeleton-print h-4 w-2/3" />
+                </div>
               </div>
             ))}
           </div>
         ) : replies.length > 0 ? (
           <>
-            <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card shadow-sm">
+            {/* Timeline: a print-layer line links the replies */}
+            <ol className="relative space-y-1 before:absolute before:bottom-6 before:left-[17px] before:top-6 before:w-px before:bg-br-subtle">
               {replies.map((reply) => {
-                const isDeletingThisReply =
-                  isDeletingReply && deletingReply?.replyId === reply.id;
+                const isDeletingThisReply = isDeletingReply && deletingReply?.replyId === reply.id;
+                const isReplyAuthor = currentUser?.uid === reply.authorId;
 
                 return (
-                  <article
-                    key={reply.id}
-                    className="border-b border-br-subtle p-5 last:border-b-0 sm:p-6"
-                  >
-                    {/* Author */}
-                    <div className="mb-4 flex items-center justify-between gap-4">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <div className="flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-txt-secondary">
-                          <FaUser size={13} aria-hidden="true" />
-                        </div>
-
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold text-txt-primary">
-                            {reply.authorName}
-                          </p>
-
-                          <p className="text-xs text-txt-muted">
-                            {reply.isEdited && reply.updatedAt
-                              ? `Edited ${formatRelativeTime(reply.updatedAt)}`
-                              : `${formatRelativeTime(reply.createdAt)}`}
-                          </p>
-                        </div>
+                  <li key={reply.id} className="group relative flex gap-3 rounded-lg py-3 pr-2">
+                    <ForumAvatar src={reply.authorPhotoURL} size="sm" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                        <span className="text-sm font-semibold text-txt-primary">{reply.authorName}</span>
+                        {reply.authorId === thread.authorId && <ForumBadge tone="accent">OP</ForumBadge>}
+                        <span className="font-mono text-xs text-txt-muted">
+                          {reply.isEdited && reply.updatedAt
+                            ? `edited ${formatRelativeTime(reply.updatedAt)}`
+                            : formatRelativeTime(reply.createdAt)}
+                        </span>
+                        {isReplyAuthor && (
+                          <span className="ml-auto flex gap-1 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+                            <Link
+                              to={FORUM_PATHS.REPLY_EDIT(reply.id)}
+                              aria-label="Edit reply"
+                              className="flex size-8 items-center justify-center rounded-md text-txt-muted transition-colors hover:bg-muted hover:text-txt-primary"
+                            >
+                              <Pencil className="size-3.5" aria-hidden="true" />
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={() => void handleReplyDelete(reply.id)}
+                              disabled={isDeletingThisReply}
+                              aria-label="Delete reply"
+                              className="flex size-8 items-center justify-center rounded-md text-txt-muted transition-colors hover:bg-error/10 hover:text-error disabled:opacity-50"
+                            >
+                              <Trash2 className="size-3.5" aria-hidden="true" />
+                            </button>
+                          </span>
+                        )}
                       </div>
-
-                      {currentUser?.uid === reply.authorId && (
-                        <div className="flex shrink-0 items-center gap-1">
-                          <Link
-                            to={FORUM_PATHS.REPLY_EDIT(reply.id)}
-                            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-txt-secondary transition-colors hover:bg-muted hover:text-txt-primary"
-                          >
-                            <FaEdit size={10} aria-hidden="true" />
-                            Edit
-                          </Link>
-
-                          <button
-                            type="button"
-                            onClick={() => {
-                              void handleReplyDelete(reply.id);
-                            }}
-                            disabled={isDeletingThisReply}
-                            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-error transition-colors hover:bg-error/10 disabled:cursor-not-allowed disabled:opacity-60"
-                          >
-                            <FaTrash size={10} aria-hidden="true" />
-                            {isDeletingThisReply ? "Deleting..." : "Delete"}
-                          </button>
-                        </div>
-                      )}
+                      <div className="mt-1.5 whitespace-pre-wrap text-[0.95rem] leading-7 text-txt-primary">
+                        {reply.content}
+                      </div>
                     </div>
-
-                    <div className="whitespace-pre-wrap pl-12 leading-7 text-txt-primary">
-                      {reply.content}
-                    </div>
-                  </article>
+                  </li>
                 );
               })}
-            </div>
+            </ol>
 
             {hasNextPage && (
               <div className="flex justify-center pt-5">
-                <button
-                  type="button"
-                  onClick={handleLoadMoreReplies}
-                  disabled={isFetchingNextPage}
-                  className="min-w-36 rounded-lg border border-br-secondary bg-surface-card px-5 py-2.5 text-sm font-semibold text-txt-primary shadow-sm transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isFetchingNextPage ? <Spinner size={12} /> : "Load More Replies"}
-                </button>
+                <Button variant="secondary" onClick={handleLoadMoreReplies} isLoading={isFetchingNextPage}>
+                  Load more replies
+                </Button>
               </div>
             )}
           </>
         ) : (
-          <div className="rounded-xl border border-br-subtle bg-surface-card p-8 text-center shadow-sm">
-            <h3 className="mb-2 text-lg font-semibold text-txt-primary">
-              No replies yet
-            </h3>
-
-            <p className="mx-auto mb-5 max-w-xl text-sm leading-relaxed text-txt-secondary">
-              {thread.isLocked
-                ? "This thread is locked and no longer accepts replies."
-                : "Add the first response if you can answer the question or move the discussion forward."}
-            </p>
-          </div>
+          <p className="rounded-xl border border-dashed border-br-secondary px-6 py-10 text-center text-sm text-txt-secondary">
+            {thread.isLocked
+              ? "This thread is locked and no longer accepts replies."
+              : "No replies yet. If you can answer or add something useful, be the first."}
+          </p>
         )}
       </section>
     </div>
