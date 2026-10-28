@@ -1,6 +1,6 @@
 # 3D Print Dungeon — project rules
 
-Marketplace and community for 3D-printable models. Live: https://printdungeon.com.
+Personal project: marketplace and community for 3D-printable models. Live: https://printdungeon.com.
 Stack: React 19 + TypeScript + Vite + Tailwind v4, Firebase (Auth, Firestore, Storage,
 Cloud Functions in `functions/`), Stripe. Hosted on Firebase Hosting (`firebase.json`).
 Site content is in English.
@@ -15,7 +15,7 @@ Site content is in English.
 - Before every push: `npm run lint`, `npm run type-check`, `npm run build`, then check
   changed pages at 390px and 1440px for console errors, broken links and horizontal scroll.
 - Never invent business facts (prices, reviews, ratings, stats, company details, service
-  promises). If a fact is unknown, hide that UI and add it to `CLIENT-TODO.md`.
+  promises). If a fact is unknown, hide that UI and add it to `TODO.md`.
 - Model files and images in the database are placeholders; model listings are real.
 
 ## Design system
