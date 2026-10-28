@@ -128,7 +128,7 @@ export const NotificationSettings = () => {
         } ${loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
       >
         <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+          className={`inline-block h-4 w-4 transform rounded-full bg-page transition-transform ${
             enabled ? "translate-x-6" : "translate-x-1"
           }`}
         />

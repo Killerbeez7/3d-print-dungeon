@@ -32,7 +32,7 @@ export const AlertModal: React.FC<AlertModalProps> = ({
       onClick={onClose}
     >
       {/* Background overlay */}
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-surface-overlay backdrop-blur-sm" />
 
       {/* Modal content */}
       <div

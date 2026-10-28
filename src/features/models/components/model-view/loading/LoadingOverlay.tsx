@@ -44,12 +44,12 @@ export const LoadingOverlay = ({ isVisible, isDownloading, downloadProgress }: L
             }`}
         >
             {isDownloading && showProgress ? (
-                <div className="rounded-lg border border-white/10 bg-black/60 p-5 backdrop-blur-sm">
-                    <p className="label-mono mb-3 flex justify-between gap-6 text-white/80">
+                <div className="rounded-lg border border-on-scrim/10 bg-scrim/60 p-5 backdrop-blur-sm">
+                    <p className="label-mono mb-3 flex justify-between gap-6 text-on-scrim/80">
                         <span>Loading model</span>
-                        <span className="text-white">{Math.round(downloadProgress * 100)}%</span>
+                        <span className="text-on-scrim">{Math.round(downloadProgress * 100)}%</span>
                     </p>
-                    <div className="h-1.5 w-56 overflow-hidden bg-white/15">
+                    <div className="h-1.5 w-56 overflow-hidden bg-on-scrim/15">
                         <div
                             className="h-full bg-gradient-to-r from-accent to-ember-fill transition-[width] duration-300"
                             style={{ width: `${downloadProgress * 100}%` }}

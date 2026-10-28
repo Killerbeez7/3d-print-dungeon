@@ -114,10 +114,10 @@ export const ModelCard = ({ model, priority = false }: ModelCardProps) => {
           </span>
         )}
 
-        <div className="tile-caption absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/45 to-transparent p-3 pt-12">
-          <h3 className="truncate text-sm font-semibold text-white">{model.name}</h3>
+        <div className="tile-caption absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim/85 via-scrim/45 to-transparent p-3 pt-12">
+          <h3 className="truncate text-sm font-semibold text-on-scrim">{model.name}</h3>
           {model.uploaderDisplayName && (
-            <p className="mt-0.5 truncate text-xs text-white/70">{model.uploaderDisplayName}</p>
+            <p className="mt-0.5 truncate text-xs text-on-scrim/70">{model.uploaderDisplayName}</p>
           )}
         </div>
       </div>

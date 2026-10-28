@@ -183,6 +183,9 @@ body {
 
 @theme inline {
   --shadow-popover: var(--popover-shadow);
+  /* Scrims sit on photos and the 3D viewer, so they stay dark in both themes. */
+  --color-scrim: #08080c;
+  --color-on-scrim: #ffffff;
   /* Fonts (self-hosted, imported in main.tsx) */
   --font-sans: "Geist Variable", "Segoe UI", system-ui, sans-serif;
   --font-display: "Unbounded Variable", "Geist Variable", system-ui, sans-serif;

@@ -79,7 +79,7 @@ export function SystemAlertContainer() {
               type="button"
               onClick={() => removeAlert(alert.id)}
               aria-label="Dismiss notification"
-              className="ml-2 flex-shrink-0 rounded-md p-1 text-txt-secondary transition-colors hover:bg-black/10 hover:text-txt-primary"
+              className="ml-2 flex-shrink-0 rounded-md p-1 text-txt-secondary transition-colors hover:bg-muted hover:text-txt-primary"
             >
               <X className="h-4 w-4" aria-hidden="true" />
             </button>

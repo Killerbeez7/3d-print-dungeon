@@ -144,7 +144,7 @@ export const ProfileMenu = ({
             >
               <span
                 className={`chamfer flex size-8 items-center justify-center [--cut:6px] ${
-                  featured ? "bg-btn-primary text-white" : "bg-muted text-txt-secondary group-hover:text-txt-primary"
+                  featured ? "bg-btn-primary text-btn-primary-text" : "bg-muted text-txt-secondary group-hover:text-txt-primary"
                 }`}
               >
                 <Icon className="size-4" aria-hidden="true" />
