@@ -1,23 +1,15 @@
-import { useState, FormEvent, ChangeEvent } from "react";
+import { useState, FormEvent } from "react";
 import { createPortal } from "react-dom";
 import FocusLock from "react-focus-lock";
+import { Mail, MailCheck, X } from "lucide-react";
+
+import { Button } from "@/components";
 import { resetPassword } from "@/features/auth/services/authService";
 import {
   handleAuthError,
   formatErrorForDisplay,
 } from "@/features/auth/utils/errorHandling";
-import { Spinner } from "@/features/shared/reusable/Spinner";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faXmark,
-  faEnvelope,
-  faCheckCircle,
-  faChevronDown,
-  faChevronUp,
-  faPhone,
-  faComments,
-  faShieldAlt,
-} from "@fortawesome/free-solid-svg-icons";
+import { AuthAlert } from "./AuthExtras";
 
 interface PasswordResetModalProps {
   isOpen: boolean;
@@ -29,8 +21,6 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
-  const [showAlternatives, setShowAlternatives] = useState<boolean>(false);
-  const [comingSoonMessage, setComingSoonMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
@@ -66,312 +56,96 @@ export const PasswordResetModal = ({ isOpen, onClose }: PasswordResetModalProps)
   if (!isOpen) return null;
 
   return createPortal(
-    <div
-      className={`fixed inset-0 z-[12000] transition-opacity duration-200 ${
-        isOpen ? "opacity-100" : "opacity-0"
-      }`}
-      onClick={handleClose}
-      style={{ pointerEvents: "auto" }}
-    >
-      {/* Backdrop with blur effect */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+    <div className="fixed inset-0 z-[12000]" onClick={handleClose}>
+      <div className="absolute inset-0 animate-[fade_0.2s_ease] bg-surface-overlay backdrop-blur-sm" />
 
       <FocusLock returnFocus>
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="reset-title"
           onClick={(e) => e.stopPropagation()}
-          className={`
-                        fixed z-[12001] w-full max-w-md
-                        bg-surface-card text-txt-primary
-                        border border-br-secondary rounded-none md:rounded-2xl shadow-2xl
-                        left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2
-                        transition-all duration-300 ease-out
-                        ${isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0"}
-                    `}
+          className="auth-panel fixed inset-x-0 bottom-0 z-[12001] rounded-t-2xl border border-br-secondary bg-surface-card p-6 text-txt-primary shadow-2xl md:inset-auto md:left-1/2 md:top-1/2 md:w-full md:max-w-md md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-xl md:p-8"
         >
-          {/* Header */}
-          <div className="relative p-6 pb-4">
-            {/* Close button */}
-            <button
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-muted transition-colors duration-200 text-txt-muted hover:text-txt-primary"
-              onClick={handleClose}
-              disabled={loading}
-              aria-label="Close modal"
-            >
-              <FontAwesomeIcon icon={faXmark} size="lg" />
-            </button>
+          <button
+            type="button"
+            className="absolute right-4 top-4 flex size-10 items-center justify-center rounded-lg text-txt-muted transition-colors hover:bg-muted hover:text-txt-primary"
+            onClick={handleClose}
+            disabled={loading}
+            aria-label="Close"
+          >
+            <X className="size-5" aria-hidden="true" />
+          </button>
 
-            {/* Title */}
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold mb-2 text-txt-primary">
-                {success ? "Check Your Email" : "Reset Password"}
-              </h2>
-              <p className="text-txt-secondary text-sm">
-                {success
-                  ? "We've sent you a password reset link"
-                  : "Enter your email to receive a password reset link"}
-              </p>
-            </div>
-
-            {/* Content */}
+          <span className="chamfer flex size-12 items-center justify-center bg-accent-soft text-accent [--cut:9px]">
             {success ? (
-              <div className="text-center space-y-4">
-                <div className="flex justify-center">
-                  <FontAwesomeIcon
-                    icon={faCheckCircle}
-                    className="text-green-500 text-4xl"
+              <MailCheck className="size-6" aria-hidden="true" />
+            ) : (
+              <Mail className="size-6" aria-hidden="true" />
+            )}
+          </span>
+
+          <h2 id="reset-title" className="mt-5 text-2xl font-bold">
+            {success ? "Check your inbox" : "Reset your password"}
+          </h2>
+
+          {success ? (
+            <div className="mt-2 space-y-4 text-sm text-txt-secondary">
+              <p>
+                If an account exists for{" "}
+                <span className="break-all font-medium text-txt-primary">{email}</span>, a
+                reset link is on its way.
+              </p>
+              <p className="rounded-lg border border-br-subtle bg-muted p-3">
+                Nothing after a few minutes? Check your spam folder, or try again.
+              </p>
+              <Button variant="secondary" size="lg" fullWidth onClick={handleClose}>
+                Back to sign in
+              </Button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="mt-2 space-y-4" noValidate>
+              <p className="text-sm text-txt-secondary">
+                Enter the email you signed up with and we&apos;ll send you a reset link.
+              </p>
+              <div>
+                <label
+                  htmlFor="reset-email"
+                  className="mb-1.5 block text-sm font-medium text-txt-secondary"
+                >
+                  Email
+                </label>
+                <div className="relative">
+                  <Mail
+                    className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-txt-muted"
+                    aria-hidden="true"
+                  />
+                  <input
+                    id="reset-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                    autoComplete="email"
+                    placeholder="you@example.com"
+                    className="h-12 w-full rounded-lg border border-br-input bg-page pl-10 pr-4 text-sm text-txt-primary transition-[border-color,box-shadow] placeholder:text-txt-muted hover:border-txt-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
                   />
                 </div>
-                <div className="space-y-3">
-                  <p className="text-txt-primary">
-                    We&apos;ve sent a password reset link to:
-                  </p>
-                  <p className="font-medium text-txt-primary break-all">{email}</p>
-                  <p className="text-sm text-txt-secondary">
-                    Click the link in your email to reset your password.
-                    <br />
-                    <span className="text-xs text-txt-muted">
-                      The link will take you to our secure password reset page.
-                    </span>
-                  </p>
-                  <div className="mt-4 p-3 bg-muted border border-br-secondary rounded-lg">
-                    <p className="text-sm text-txt-secondary">
-                      <span className="text-txt-muted">💡</span>{" "}
-                      <strong>Didn&apos;t receive the email?</strong> Check your spam or
-                      junk folder.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Try Another Method Section */}
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowAlternatives(!showAlternatives)}
-                    className="w-full flex items-center justify-between p-3 text-sm text-txt-secondary hover:text-txt-primary hover:bg-muted rounded-lg transition-colors duration-200"
-                  >
-                    <span className="font-medium">Try another method</span>
-                    <FontAwesomeIcon
-                      icon={showAlternatives ? faChevronUp : faChevronDown}
-                      className="text-txt-muted"
-                    />
-                  </button>
-
-                  {showAlternatives && (
-                    <div className="mt-2 space-y-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setComingSoonMessage("SMS Verification");
-                          setTimeout(() => setComingSoonMessage(null), 3000);
-                        }}
-                        className="w-full flex items-center p-3 text-left text-sm text-txt-primary hover:bg-muted hover:text-link rounded-lg transition-colors duration-200 border border-br-secondary"
-                      >
-                        <FontAwesomeIcon icon={faPhone} className="mr-3 text-info" />
-                        <div>
-                          <div className="font-medium">SMS Verification</div>
-                          <div className="text-xs text-txt-muted">
-                            Receive a code via text message
-                          </div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setComingSoonMessage("Live Chat Support");
-                          setTimeout(() => setComingSoonMessage(null), 3000);
-                        }}
-                        className="w-full flex items-center p-3 text-left text-sm text-txt-primary hover:bg-muted hover:text-success rounded-lg transition-colors duration-200 border border-br-secondary"
-                      >
-                        <FontAwesomeIcon
-                          icon={faComments}
-                          className="mr-3 text-green-500"
-                        />
-                        <div>
-                          <div className="font-medium">Live Chat Support</div>
-                          <div className="text-xs text-txt-muted">
-                            Get help from our support team
-                          </div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setComingSoonMessage("Security Questions");
-                          setTimeout(() => setComingSoonMessage(null), 3000);
-                        }}
-                        className="w-full flex items-center p-3 text-left text-sm text-txt-primary hover:bg-accent-soft hover:text-accent-text rounded-lg transition-colors duration-200 border border-br-secondary"
-                      >
-                        <FontAwesomeIcon
-                          icon={faShieldAlt}
-                          className="mr-3 text-accent"
-                        />
-                        <div>
-                          <div className="font-medium">Security Questions</div>
-                          <div className="text-xs text-txt-muted">
-                            Answer your security questions
-                          </div>
-                        </div>
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Coming Soon Message */}
-                {comingSoonMessage && (
-                  <div className="mt-4 p-3 bg-muted border border-br-secondary rounded-lg">
-                    <p className="text-sm text-link text-center">
-                      🚧 <strong>{comingSoonMessage}</strong> - Coming Soon!
-                    </p>
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  onClick={handleClose}
-                  className="w-full py-3 px-4 bg-btn-primary text-btn-primary-text rounded-xl hover:bg-btn-primary-hover transition-colors duration-200"
-                >
-                  Got it
-                </button>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Email field */}
-                <div className="relative">
-                  <div className="relative">
-                    <FontAwesomeIcon
-                      icon={faEnvelope}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted"
-                    />
-                    <input
-                      id="reset-email"
-                      name="email"
-                      type="email"
-                      value={email}
-                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                        setEmail(e.target.value)
-                      }
-                      required
-                      spellCheck="false"
-                      autoComplete="email"
-                      className="w-full pl-10 pr-4 py-3 border border-br-secondary rounded-xl bg-surface-card placeholder-txt-muted transition-all duration-200"
-                      placeholder="Enter your email"
-                      disabled={loading}
-                    />
-                  </div>
-                </div>
 
-                {/* Error message */}
-                {error && (
-                  <div className="flex items-center p-3 bg-muted border border-error rounded-xl">
-                    <p className="text-red-700 text-sm font-medium">{error}</p>
-                  </div>
-                )}
+              {error && <AuthAlert message={error} />}
 
-                {/* Submit button */}
-                <button
-                  type="submit"
-                  disabled={loading || !email.trim()}
-                  className="w-full py-3 px-4 bg-btn-primary text-btn-primary-text rounded-xl hover:bg-btn-primary-hover disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200"
-                >
-                  {loading ? (
-                    <div className="flex items-center justify-center">
-                      <Spinner size={18} />
-                      <span className="ml-2">Sending...</span>
-                    </div>
-                  ) : (
-                    "Send Reset Link"
-                  )}
-                </button>
-
-                {/* Alternative Methods */}
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowAlternatives(!showAlternatives)}
-                    className="w-full flex items-center justify-between p-3 text-sm text-txt-secondary hover:text-txt-primary hover:bg-muted rounded-lg transition-colors duration-200"
-                  >
-                    <span className="font-medium">Need help? Try another method</span>
-                    <FontAwesomeIcon
-                      icon={showAlternatives ? faChevronUp : faChevronDown}
-                      className="text-txt-muted"
-                    />
-                  </button>
-
-                  {showAlternatives && (
-                    <div className="mt-2 space-y-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setComingSoonMessage("SMS Verification");
-                          setTimeout(() => setComingSoonMessage(null), 3000);
-                        }}
-                        className="w-full flex items-center p-3 text-left text-sm text-txt-primary hover:bg-muted hover:text-link rounded-lg transition-colors duration-200 border border-br-secondary"
-                      >
-                        <FontAwesomeIcon icon={faPhone} className="mr-3 text-info" />
-                        <div>
-                          <div className="font-medium">SMS Verification</div>
-                          <div className="text-xs text-txt-muted">
-                            Receive a code via text message
-                          </div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setComingSoonMessage("Live Chat Support");
-                          setTimeout(() => setComingSoonMessage(null), 3000);
-                        }}
-                        className="w-full flex items-center p-3 text-left text-sm text-txt-primary hover:bg-muted hover:text-success rounded-lg transition-colors duration-200 border border-br-secondary"
-                      >
-                        <FontAwesomeIcon
-                          icon={faComments}
-                          className="mr-3 text-green-500"
-                        />
-                        <div>
-                          <div className="font-medium">Live Chat Support</div>
-                          <div className="text-xs text-txt-muted">
-                            Get help from our support team
-                          </div>
-                        </div>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setComingSoonMessage("Security Questions");
-                          setTimeout(() => setComingSoonMessage(null), 3000);
-                        }}
-                        className="w-full flex items-center p-3 text-left text-sm text-txt-primary hover:bg-accent-soft hover:text-accent-text rounded-lg transition-colors duration-200 border border-br-secondary"
-                      >
-                        <FontAwesomeIcon
-                          icon={faShieldAlt}
-                          className="mr-3 text-accent"
-                        />
-                        <div>
-                          <div className="font-medium">Security Questions</div>
-                          <div className="text-xs text-txt-muted">
-                            Answer your security questions
-                          </div>
-                        </div>
-                      </button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Coming Soon Message */}
-                {comingSoonMessage && (
-                  <div className="mt-4 p-3 bg-muted border border-br-secondary rounded-lg">
-                    <p className="text-sm text-link text-center">
-                      🚧 <strong>{comingSoonMessage}</strong> - Coming Soon!
-                    </p>
-                  </div>
-                )}
-              </form>
-            )}
-          </div>
+              <Button
+                type="submit"
+                size="lg"
+                fullWidth
+                isLoading={loading}
+                disabled={loading || !email.trim()}
+              >
+                {loading ? "Sending…" : "Send reset link"}
+              </Button>
+            </form>
+          )}
         </div>
       </FocusLock>
     </div>,
