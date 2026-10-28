@@ -509,6 +509,45 @@ body {
     }
   }
 
+  /* Gallery tile: a nozzle line sweeps down the image on hover. */
+  .tile-scan::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), 0.95), transparent);
+    box-shadow: 0 0 14px rgba(var(--accent-rgb), 0.8);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .group:hover .tile-scan::after {
+      animation: nozzle-sweep 0.9s var(--ease-forge) both;
+    }
+  }
+
+  /* Tile caption: always visible on touch, revealed on hover elsewhere. */
+  .tile-caption {
+    transition:
+      opacity 0.3s var(--ease-forge),
+      transform 0.3s var(--ease-forge);
+  }
+
+  @media (hover: hover) {
+    .tile-caption {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    .group:hover .tile-caption,
+    .group:focus-visible .tile-caption {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
   /* Header line that fills with page scroll, violet to molten. */
   .scroll-progress {
     position: absolute;
@@ -560,6 +599,20 @@ body {
   85%,
   100% {
     bottom: 100%;
+  }
+}
+
+@keyframes nozzle-sweep {
+  0% {
+    top: 0;
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
   }
 }
 
