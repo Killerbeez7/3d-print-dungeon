@@ -1,17 +1,14 @@
-import { Search } from "lucide-react";
+import { SearchX } from "lucide-react";
+
+import { StatePanel } from "@/features/shared/components/StatePanel";
 
 interface SearchNotFoundProps {
   msg: string;
+  hint?: string;
 }
 
-export const SearchNotFound = ({ msg }: SearchNotFoundProps) => {
-  return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <span className="chamfer mb-6 flex size-16 items-center justify-center bg-muted text-txt-muted [--cut:12px]">
-        <Search className="size-7" aria-hidden="true" />
-      </span>
-
-      <h2 className="text-xl font-medium text-txt-primary">{msg}</h2>
-    </div>
-  );
-};
+export const SearchNotFound = ({ msg, hint = "Try fewer words or another spelling." }: SearchNotFoundProps) => (
+  <StatePanel icon={SearchX} title={msg} headingLevel="h2" className="min-h-[40vh]">
+    {hint}
+  </StatePanel>
+);

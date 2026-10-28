@@ -20,7 +20,7 @@ export const ArtistsTab = ({ search }: ArtistsProps) => {
   }
 
   if (artists.length === 0) {
-    return <SearchNotFound msg={"No artists found."} />;
+    return <SearchNotFound msg={`No artists match “${search.trim()}”`} />;
   }
 
   return <ArtistListGrid artists={artists} />;

@@ -1,21 +1,34 @@
 import { Search } from "lucide-react";
 
-interface SearchEmptyStateProps {
-  description: string;
-}
+import { buttonClassName } from "@/components";
+import { MODEL_CATEGORIES } from "@/features/models/constants/modelCategories";
+import { StatePanel } from "@/features/shared/components/StatePanel";
+import { useFilters } from "../hooks/useFilters";
 
-export const SearchEmptyState = ({ description }: SearchEmptyStateProps) => {
+const QUICK_PICKS = 8;
+
+/** Before the first search: suggest categories as one-tap starting points. */
+export const SearchEmptyState = () => {
+  const { filters, setFilters } = useFilters();
+
   return (
-    <div className="flex flex-col items-center justify-center py-16 text-center">
-      <span className="chamfer mb-6 flex size-16 items-center justify-center bg-muted text-txt-muted [--cut:12px]">
-        <Search className="size-7" aria-hidden="true" />
-      </span>
-
-      <h2 className="mb-2 text-xl font-medium text-txt-primary">
-        What would you like to search for?
-      </h2>
-
-      <p className="max-w-md text-base text-txt-secondary">{description}</p>
-    </div>
+    <StatePanel
+      icon={Search}
+      headingLevel="h2"
+      className="min-h-[50vh]"
+      title="What are you printing next?"
+      actions={MODEL_CATEGORIES.slice(0, QUICK_PICKS).map((category) => (
+        <button
+          key={category.id}
+          type="button"
+          onClick={() => setFilters({ ...filters, categoryIds: [category.id] })}
+          className={buttonClassName({ variant: "secondary", size: "sm", className: "[--cut:6px]" })}
+        >
+          {category.name}
+        </button>
+      ))}
+    >
+      Type a name, a tag or a description, or start from a category.
+    </StatePanel>
   );
 };

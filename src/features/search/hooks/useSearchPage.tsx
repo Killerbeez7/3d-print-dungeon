@@ -76,13 +76,16 @@ export const useSearchPage = () => {
   };
 
   const handleTabSwitch = (tab: SearchTab) => {
+    // Keep what the user typed when moving between tabs.
+    const query = localQuery.trim() ? `&query=${encodeURIComponent(localQuery.trim())}` : "";
+
     if (tab === "artworks") {
-      navigate(`${ROUTES.SEARCH}?sort_by=relevance`);
+      navigate(`${ROUTES.SEARCH}?sort_by=relevance${query}`);
 
       return;
     }
 
-    navigate(`${ROUTES.SEARCH_ARTISTS}?sort_by=followers`);
+    navigate(`${ROUTES.SEARCH_ARTISTS}?sort_by=followers${query}`);
   };
 
   return {

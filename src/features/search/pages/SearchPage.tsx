@@ -1,80 +1,49 @@
-import { useState } from "react";
-
 import { FiltersProvider } from "@/features/search/providers/filtersProvider";
-import { SearchFilters } from "../components/SearchFilters";
 import { useFilters } from "@/features/search/hooks/useFilters";
+import { SearchFilters } from "../components/SearchFilters";
+import { SearchHeader } from "../components/SearchHeader";
 import { SearchResults } from "../components/SearchResults";
-import { SearchInput } from "../components/SearchInput";
-import { SearchTabs } from "../components/SearchTabs";
 import { SearchEmptyState } from "../components/SearchEmptyState";
 import { useSearchPage } from "../hooks/useSearchPage";
 
 const SearchPageContent = () => {
-  const {
-    localQuery,
-    debouncedQuery,
-    activeTab,
-    handleInputChange,
-    handleClear,
-    handleTabSwitch,
-  } = useSearchPage();
-
+  const { localQuery, debouncedQuery, activeTab, handleInputChange, handleClear, handleTabSwitch } =
+    useSearchPage();
   const { filters } = useFilters();
 
-  const [resultsCount, setResultsCount] = useState<number>(0);
-
-  const hasActiveFilters = Boolean(
-    filters.categoryIds?.length || filters.hideAI || filters.sortBy
-  );
-
+  const hasActiveFilters = Boolean(filters.categoryIds?.length || filters.hideAI);
   const shouldShowEmptyState = !debouncedQuery.trim() && !hasActiveFilters;
 
   return (
-    <div className="min-h-screen text-txt-primary">
-      <div className="bg-section px-6 pb-0 py-12">
-        <SearchInput
-          value={localQuery}
-          onChange={handleInputChange}
-          onClear={handleClear}
-        />
+    <div className="min-h-screen bg-page pb-16">
+      <SearchHeader
+        value={localQuery}
+        onChange={handleInputChange}
+        onClear={handleClear}
+        activeTab={activeTab}
+        onTabSwitch={handleTabSwitch}
+      />
 
-        <div className="flex justify-center">
-          <SearchTabs activeTab={activeTab} onTabSwitch={handleTabSwitch} />
+      {/* Filters stay under the header while scrolling results */}
+      <div className="sticky top-16 z-30 border-b border-br-subtle bg-page/85 backdrop-blur-xl">
+        <div className="mx-auto max-w-[1600px] px-4 py-2.5 sm:px-6 lg:px-8">
+          <SearchFilters />
         </div>
       </div>
 
-      <div className="p-6">
-        <div className="mb-14">
-          <SearchFilters />
-        </div>
-
+      <div className="px-1">
         {shouldShowEmptyState ? (
-          // <SearchEmptyState />
-          <SearchEmptyState description="Search by keyword or use the filters to discover models." />
+          <SearchEmptyState />
         ) : (
-          <>
-            <div className="mb-4">
-              <span className="text-sm text-txt-muted">
-                {resultsCount.toLocaleString()} results found
-              </span>
-            </div>
-
-            <SearchResults
-              search={debouncedQuery}
-              activeTab={activeTab}
-              onResultsCount={setResultsCount}
-            />
-          </>
+          <SearchResults search={debouncedQuery} activeTab={activeTab} />
         )}
       </div>
     </div>
   );
 };
 
-export const SearchPage = () => {
-  return (
-    <FiltersProvider>
-      <SearchPageContent />
-    </FiltersProvider>
-  );
-};
+export const SearchPage = () => (
+  <FiltersProvider>
+    <SearchPageContent />
+  </FiltersProvider>
+);

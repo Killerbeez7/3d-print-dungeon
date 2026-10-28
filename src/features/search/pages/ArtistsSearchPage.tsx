@@ -1,10 +1,8 @@
-import { FiltersProvider } from "@/features/search/providers/filtersProvider";
-import { ArtistsFilters } from "@/features/search/components/ArtistsFilters";
+import { UsersRound } from "lucide-react";
 
+import { StatePanel } from "@/features/shared/components/StatePanel";
+import { SearchHeader } from "../components/SearchHeader";
 import { SearchResults } from "../components/SearchResults";
-import { SearchInput } from "../components/SearchInput";
-import { SearchTabs } from "../components/SearchTabs";
-import { SearchEmptyState } from "../components/SearchEmptyState";
 import { useArtistsSearchPage } from "../hooks/useArtistsSearchPage";
 
 export const ArtistsSearchPage = () => {
@@ -19,33 +17,29 @@ export const ArtistsSearchPage = () => {
   } = useArtistsSearchPage();
 
   return (
-    <FiltersProvider>
-      <div className="min-h-screen text-txt-primary">
-        <div className="bg-section px-6 pb-0 py-12">
-          <SearchInput
-            value={localQuery}
-            onChange={handleInputChange}
-            onClear={handleClear}
-          />
+    <div className="min-h-screen bg-page pb-16">
+      <SearchHeader
+        value={localQuery}
+        onChange={handleInputChange}
+        onClear={handleClear}
+        activeTab={activeTab}
+        onTabSwitch={handleTabSwitch}
+      />
 
-          <div className="flex justify-center">
-            <SearchTabs activeTab={activeTab} onTabSwitch={handleTabSwitch} />
-          </div>
-        </div>
-
-        <div className="p-6">
-          <div className="mb-8">
-            <ArtistsFilters />
-          </div>
-
-          {noSearchNoFilters ? (
-            // <SearchEmptyState />
-            <SearchEmptyState description="Search by keyword or use the filters to discover artists." />
-          ) : (
-            <SearchResults search={debouncedQuery} activeTab={activeTab} />
-          )}
-        </div>
+      <div className="mx-auto max-w-[1600px] px-4 pt-6 sm:px-6 lg:px-8">
+        {noSearchNoFilters ? (
+          <StatePanel
+            icon={UsersRound}
+            headingLevel="h2"
+            className="min-h-[50vh]"
+            title="Find an artist"
+          >
+            Search by display name, username or bio.
+          </StatePanel>
+        ) : (
+          <SearchResults search={debouncedQuery} activeTab={activeTab} />
+        )}
       </div>
-    </FiltersProvider>
+    </div>
   );
 };
