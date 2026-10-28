@@ -1,10 +1,12 @@
 import { useState, useEffect, type ChangeEvent, type FormEvent } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
+import { Box, Check } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { useFetchModel } from "../hooks";
 import { updateModel } from "@/features/models/services";
-import { Spinner } from "@/features/shared/reusable/Spinner";
+import { Button, buttonClassName } from "@/components";
+import { StatePanel } from "@/features/shared/components/StatePanel";
 
 type FormData = {
   name: string;
@@ -13,7 +15,8 @@ type FormData = {
 };
 
 export function ModelEdit() {
-  const { id } = useParams<{ id: string }>();
+  // The route is /model/:modelId/edit
+  const { modelId: id } = useParams<{ modelId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -85,91 +88,104 @@ export function ModelEdit() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Spinner size={24} />
+      <div className="mx-auto max-w-2xl space-y-5 px-4 pb-16 pt-8 sm:px-6" role="status" aria-label="Loading">
+        <div className="skeleton-print h-9 w-56" />
+        <div className="skeleton-print h-12" />
+        <div className="skeleton-print h-32" />
+        <div className="skeleton-print h-11" />
       </div>
     );
   }
 
-  if (isError) {
+  if (isError || !model) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        Failed to load model.
-      </div>
+      <StatePanel
+        icon={Box}
+        title={isError ? "Couldn't load this model" : "Model not found"}
+        actions={
+          <Link to="/" className={buttonClassName()}>
+            Browse models
+          </Link>
+        }
+      >
+        {isError ? "Check your connection and refresh the page." : "It may have been removed, or the link is wrong."}
+      </StatePanel>
     );
   }
 
-  if (!model) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        Model not found.
-      </div>
-    );
-  }
+  const labelClass = "mb-1.5 block text-sm font-medium text-txt-secondary";
 
   return (
-    <div className="min-h-screen p-8">
-      <h1 className="mb-6 text-3xl font-bold text-txt-primary">Edit Model</h1>
+    <div className="mx-auto max-w-2xl px-4 pb-16 pt-8 sm:px-6">
+      <header className="mb-8">
+        <Link to={`/model/${id}`} className="label-mono text-accent hover:underline">
+          ← {model.name}
+        </Link>
+        <h1 className="mt-2 text-3xl font-bold sm:text-4xl">Edit model</h1>
+      </header>
 
-      {error && <p className="mb-4 text-red-600">{error}</p>}
+      <form onSubmit={handleSubmit} className="space-y-6 rounded-xl border border-br-subtle bg-surface-card p-5 sm:p-7">
+        {error && (
+          <p role="alert" className="rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-txt-primary">
+            {error}
+          </p>
+        )}
 
-      <form
-        onSubmit={handleSubmit}
-        className="mx-auto max-w-2xl rounded bg-surface-card p-6 shadow"
-      >
-        <div className="mb-4">
-          <label htmlFor="name" className="mb-1 block text-txt-secondary">
-            Model Name
+        <div>
+          <label htmlFor="name" className={labelClass}>
+            Model name
           </label>
-
           <input
             id="name"
             type="text"
             name="name"
             value={formData.name}
             onChange={handleChange}
-            className="w-full rounded border border-br-primary px-3 py-2"
+            className="field h-12 text-base"
             required
           />
         </div>
 
-        <div className="mb-4">
-          <label htmlFor="description" className="mb-1 block text-txt-secondary">
+        <div>
+          <label htmlFor="description" className={labelClass}>
             Description
           </label>
-
           <textarea
             id="description"
             name="description"
             value={formData.description}
             onChange={handleChange}
-            className="w-full rounded border border-br-primary px-3 py-2"
-            rows={4}
+            className="field resize-y py-3 leading-relaxed"
+            rows={6}
           />
         </div>
 
-        <div className="mb-4">
-          <label htmlFor="tags" className="mb-1 block text-txt-secondary">
-            Tags (comma-separated)
+        <div>
+          <label htmlFor="tags" className={labelClass}>
+            Tags
           </label>
-
           <input
             id="tags"
             type="text"
             name="tags"
             value={formData.tags}
             onChange={handleChange}
-            className="w-full rounded border border-br-primary px-3 py-2"
+            aria-describedby="tags-hint"
+            className="field h-11"
           />
+          <p id="tags-hint" className="mt-1.5 text-xs text-txt-muted">
+            Separate tags with commas.
+          </p>
         </div>
 
-        <button
-          type="submit"
-          disabled={isUpdating}
-          className="rounded bg-btn-primary px-4 py-2 text-white disabled:opacity-50"
-        >
-          {isUpdating ? "Updating..." : "Update Model"}
-        </button>
+        <div className="flex justify-end gap-2 border-t border-br-subtle pt-5">
+          <Link to={`/model/${id}`} className={buttonClassName({ variant: "ghost" })}>
+            Cancel
+          </Link>
+          <Button type="submit" isLoading={isUpdating} leftIcon={<Check className="size-4" aria-hidden="true" />}>
+            {isUpdating ? "Saving…" : "Save changes"}
+          </Button>
+        </div>
       </form>
     </div>
   );
