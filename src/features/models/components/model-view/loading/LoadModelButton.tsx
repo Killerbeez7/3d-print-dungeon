@@ -1,4 +1,6 @@
-import { FiBox } from "react-icons/fi";
+import { Box } from "lucide-react";
+
+import { buttonClassName } from "@/components";
 
 interface LoadModelButtonProps {
   handleLoadModel: () => void;
@@ -7,20 +9,17 @@ interface LoadModelButtonProps {
 export const LoadModelButton = ({ handleLoadModel }: LoadModelButtonProps) => {
   return (
     <>
-      <div className="absolute inset-0 bg-black/30" />
-      <div className="absolute inset-0 flex items-center justify-center z-10">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-3">
         <button
           type="button"
           onClick={handleLoadModel}
-          className="group inline-flex items-center justify-center gap-3 rounded-lg bg-linear-to-br from-accent-dark to-btn-primary px-8 py-4 font-semibold text-btn-primary-text shadow-lg transition-all duration-300 ease-out hover:scale-105 hover:from-btn-primary hover:to-btn-primary-hover hover:shadow-xl"
+          className={buttonClassName({ size: "lg", className: "group" })}
         >
-          <FiBox
-            className="size-6 transition-transform duration-300 group-hover:scale-110"
-            aria-hidden="true"
-          />
-
-          <span>Load 3D Model</span>
+          <Box className="size-5 transition-transform duration-300 group-hover:rotate-12" aria-hidden="true" />
+          Load 3D model
         </button>
+        <p className="label-mono text-white/70">Drag to orbit · scroll to zoom</p>
       </div>
     </>
   );

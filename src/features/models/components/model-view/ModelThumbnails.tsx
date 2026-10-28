@@ -1,5 +1,6 @@
+import { Box } from "lucide-react";
+
 import { LazyImage } from "@/features/shared/reusable/LazyImage";
-import { Model3DIcon } from "@/features/shared/Model3DIcon";
 import { getThumbnailUrl } from "@/utils/imageUtils";
 
 interface ModelThumbnailsProps {
@@ -8,47 +9,51 @@ interface ModelThumbnailsProps {
   setSelectedRenderIndex: (index: number) => void;
 }
 
+const thumbClass = (isActive: boolean) =>
+  `chamfer relative size-16 shrink-0 overflow-hidden bg-muted transition-[opacity,box-shadow] [--cut:8px] lg:size-20 ${
+    isActive
+      ? "opacity-100 ring-2 ring-inset ring-accent"
+      : "opacity-60 hover:opacity-100"
+  }`;
+
 export const ModelThumbnails = ({
   renderUrls,
   selectedRenderIndex,
   setSelectedRenderIndex,
 }: ModelThumbnailsProps) => {
   return (
-    <div className="">
-      <div className="flex space-x-4 overflow-x-auto pb-5 -mx-2 px-2">
-        <div
-          onClick={() => setSelectedRenderIndex(-1)}
-          className={`flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 border-2 rounded-lg cursor-pointer overflow-hidden bg-muted ${
-            selectedRenderIndex === -1
-              ? "border-accent shadow-lg ring-2 ring-accent/45"
-              : "border-br-secondary hover:border-accent hover:shadow-md"
-          }`}
-        >
-          <div className="w-full h-full flex items-center justify-center">
-            <Model3DIcon size={32} className="text-txt-secondary" />
-          </div>
-        </div>
+    <div className="flex gap-2 overflow-x-auto pb-1" role="group" aria-label="Model views">
+      <button
+        type="button"
+        onClick={() => setSelectedRenderIndex(-1)}
+        className={thumbClass(selectedRenderIndex === -1)}
+        aria-label="3D view"
+        aria-pressed={selectedRenderIndex === -1}
+      >
+        <span className="bg-buildplate flex size-full flex-col items-center justify-center gap-1 text-txt-secondary">
+          <Box className="size-6" aria-hidden="true" />
+          <span className="label-mono text-[0.6rem]">3D</span>
+        </span>
+      </button>
 
-        {renderUrls.map((url, idx) => (
-          <div
-            key={idx}
-            onClick={() => setSelectedRenderIndex(idx)}
-            className={`flex-shrink-0 w-16 h-16 lg:w-20 lg:h-20 border-2 rounded-lg cursor-pointer overflow-hidden bg-muted ${
-              selectedRenderIndex === idx
-                ? "border-accent shadow-lg ring-2 ring-accent/45"
-                : "border-br-secondary hover:border-accent hover:shadow-md"
-            }`}
-          >
-            <LazyImage
-              wrapperClassName="w-full h-full"
-              src={getThumbnailUrl(url, "SMALL") || url}
-              alt={`Render ${idx + 1}`}
-              loading="lazy"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        ))}
-      </div>
+      {renderUrls.map((url, idx) => (
+        <button
+          key={idx}
+          type="button"
+          onClick={() => setSelectedRenderIndex(idx)}
+          className={thumbClass(selectedRenderIndex === idx)}
+          aria-label={`Image ${idx + 1}`}
+          aria-pressed={selectedRenderIndex === idx}
+        >
+          <LazyImage
+            wrapperClassName="size-full"
+            src={getThumbnailUrl(url, "SMALL") || url}
+            alt=""
+            loading="lazy"
+            className="size-full object-cover"
+          />
+        </button>
+      ))}
     </div>
   );
 };

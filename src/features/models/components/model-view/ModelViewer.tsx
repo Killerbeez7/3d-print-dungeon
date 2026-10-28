@@ -360,10 +360,13 @@ export const ModelViewer = ({
                         {posterUrl && (
                             <img
                                 src={posterUrl}
-                                alt="Preview"
+                                alt=""
                                 className="absolute inset-0 w-full h-full object-contain"
                                 style={{
                                     filter: "blur(2px)",
+                                }}
+                                onError={(event) => {
+                                    event.currentTarget.style.display = "none";
                                 }}
                             />
                         )}
@@ -412,7 +415,7 @@ export const ModelViewer = ({
                     </>
                 )
             ) : (
-                <div className="flex items-center justify-center w-full h-[40vh] bg-gray-200 rounded-md">
+                <div className="flex h-full w-full items-center justify-center text-sm text-txt-muted">
                     No 3D preview available
                 </div>
             )
@@ -449,7 +452,7 @@ export const ModelViewer = ({
         <div
             className={`flex flex-col ${
                 isIOS && customFullscreen
-                    ? "fixed inset-0 z-[9999] bg-gray-900 w-screen h-screen"
+                    ? "fixed inset-0 z-[9999] bg-page w-screen h-screen"
                     : isFullscreen
                     ? "h-screen"
                     : ""

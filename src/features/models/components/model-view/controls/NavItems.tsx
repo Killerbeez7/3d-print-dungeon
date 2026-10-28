@@ -1,4 +1,4 @@
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface NavigationArrowProps {
   direction: "left" | "right";
@@ -10,21 +10,15 @@ export function NavigationArrow({ direction, onClick }: NavigationArrowProps) {
     <button
       type="button"
       onClick={onClick}
-      className={`group absolute top-1/2 z-40 hidden size-[35px] -translate-y-1/2 items-center justify-center rounded-full bg-black/50 transition-colors duration-200 hover:bg-black/70 md:flex ${
+      className={`chamfer group absolute top-1/2 z-40 hidden size-10 -translate-y-1/2 items-center justify-center bg-black/55 text-white backdrop-blur-sm transition-colors duration-200 [--cut:8px] hover:bg-btn-primary md:flex ${
         direction === "left" ? "left-4" : "right-4"
       }`}
       aria-label={direction === "left" ? "Previous view" : "Next view"}
     >
       {direction === "left" ? (
-        <FaArrowLeft
-          className="text-xl text-white transition-transform group-hover:scale-110"
-          aria-hidden="true"
-        />
+        <ChevronLeft className="size-5 transition-transform group-hover:-translate-x-0.5" aria-hidden="true" />
       ) : (
-        <FaArrowRight
-          className="text-xl text-white transition-transform group-hover:scale-110"
-          aria-hidden="true"
-        />
+        <ChevronRight className="size-5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
       )}
     </button>
   );
@@ -46,8 +40,8 @@ export function NavigationDots({
       <button
         type="button"
         onClick={() => onSelect(-1)}
-        className={`size-2.5 rounded-full transition-all ${
-          selectedIndex === -1 ? "scale-110 bg-white" : "bg-white/50 hover:bg-white/70"
+        className={`h-1 rounded-full transition-all duration-300 ${
+          selectedIndex === -1 ? "w-6 bg-white" : "w-3 bg-white/45 hover:bg-white/70"
         }`}
         aria-label="View 3D model"
       />
@@ -57,10 +51,8 @@ export function NavigationDots({
           key={index}
           type="button"
           onClick={() => onSelect(index)}
-          className={`size-2.5 rounded-full transition-all ${
-            selectedIndex === index
-              ? "scale-110 bg-white"
-              : "bg-white/50 hover:bg-white/70"
+          className={`h-1 rounded-full transition-all duration-300 ${
+            selectedIndex === index ? "w-6 bg-white" : "w-3 bg-white/45 hover:bg-white/70"
           }`}
           aria-label={`View image ${index + 1}`}
         />

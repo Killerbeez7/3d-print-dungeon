@@ -5,15 +5,9 @@ interface GetContainerClassesProps {
 }
 
 export const getContainerClasses = ({ isIOS, customFullscreen, isFullscreen }: GetContainerClassesProps) => {
-	const widthClasses = (isIOS && customFullscreen) || isFullscreen ? "w-full" : "w-[100%] ml-0 mr-auto";
-	const baseClasses = `relative ${widthClasses} bg-model-viewer-background overflow-hidden`;
-	const heightClasses =
-		(isIOS && customFullscreen) || isFullscreen
-			? "h-screen"
-			: "min-h-[320px] h-[45vh] lg:h-[calc(85vh-120px)]";
-	const borderClasses =
-		!customFullscreen && !isFullscreen
-			? "rounded-lg border border-gray-200 dark:border-gray-700"
-			: "";
+	const isFull = (isIOS && customFullscreen) || isFullscreen;
+	const baseClasses = "relative w-full overflow-hidden bg-model-viewer-background bg-buildplate";
+	const heightClasses = isFull ? "h-screen" : "min-h-[320px] h-[52vh] lg:h-[calc(100vh-15rem)]";
+	const borderClasses = isFull ? "" : "rounded-lg border border-br-subtle";
 	return `${baseClasses} ${heightClasses} ${borderClasses}`;
 };
