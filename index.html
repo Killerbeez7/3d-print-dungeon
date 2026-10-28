@@ -9,7 +9,7 @@
       content="3D Print Dungeon: Discover, share, and purchase 3D printable dungeon models, miniatures, and resources for tabletop gaming. Join our community of creators and enthusiasts!"
     />
 
-    <meta name="theme-color" content="#0f1115" />
+    <meta name="theme-color" content="#111218" />
 
     <title>3D Print Dungeon</title>
 
@@ -35,10 +35,11 @@
 
     <script>
       try {
-        document.documentElement.setAttribute(
-          "data-theme",
-          localStorage.getItem("theme") || "dark"
-        );
+        var theme = localStorage.getItem("theme") === "light" ? "light" : "dark";
+        document.documentElement.setAttribute("data-theme", theme);
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute("content", theme === "light" ? "#ffffff" : "#111218");
       } catch {
         document.documentElement.setAttribute("data-theme", "dark");
       }

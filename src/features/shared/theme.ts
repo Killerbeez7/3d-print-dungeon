@@ -10,6 +10,12 @@ type NonSystemTheme = Exclude<Theme, typeof SYSTEM>;
 
 const THEME_KEY = "theme";
 
+// Matches the navbar surface (--bg-section) so mobile browser bars blend in.
+const THEME_COLORS: Record<NonSystemTheme, string> = {
+    light: "#ffffff",
+    dark: "#111218",
+};
+
 function getSystemTheme(): NonSystemTheme {
     return DARK;
 }
@@ -32,6 +38,9 @@ export function useTheme(): [Theme, Dispatch<SetStateAction<Theme>>] {
         const applied: NonSystemTheme = theme === SYSTEM ? getSystemTheme() : theme;
         if (typeof document !== "undefined") {
             document.documentElement.setAttribute("data-theme", applied);
+            document
+                .querySelector('meta[name="theme-color"]')
+                ?.setAttribute("content", THEME_COLORS[applied]);
         }
         if (typeof localStorage !== "undefined") {
             localStorage.setItem(THEME_KEY, theme);
