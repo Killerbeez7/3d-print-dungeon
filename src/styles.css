@@ -437,6 +437,19 @@ body {
     --btn-fg: var(--txt-primary);
   }
 
+  /* Destructive actions: outlined in the error colour. */
+  .btn-danger {
+    --btn-bg: var(--surface-card);
+    --btn-edge: var(--error);
+    --btn-edge-w: 1px;
+    --btn-fg: var(--error);
+  }
+
+  .btn-danger:hover {
+    --btn-bg: color-mix(in srgb, var(--error) 14%, var(--surface-card));
+    transform: translateY(-1px);
+  }
+
   .btn-ember {
     --btn-bg: var(--ember-fill);
     --btn-edge: var(--ember-fill);

@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import clsx from "clsx";
 
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "ember";
+export type ButtonVariant = "primary" | "secondary" | "ghost" | "ember" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 type ButtonStyleOptions = {
