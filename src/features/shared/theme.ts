@@ -13,7 +13,7 @@ const THEME_KEY = "theme";
 // Matches the navbar surface (--bg-section) so mobile browser bars blend in.
 const THEME_COLORS: Record<NonSystemTheme, string> = {
     light: "#ffffff",
-    dark: "#111218",
+    dark: "#0f0f12",
 };
 
 function getSystemTheme(): NonSystemTheme {

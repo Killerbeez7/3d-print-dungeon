@@ -1,8 +1,20 @@
 @import "./styles/utilities.css";
 @import "tailwindcss";
 
+/* ==========================================================================
+   The Forge — 3D Print Dungeon design tokens (see DESIGN-SYSTEM.md)
+   Dark is the default theme. Token names are shared by both themes.
+   ========================================================================== */
+
 html {
   overflow-y: scroll;
+  color-scheme: dark;
+  scrollbar-color: var(--br-primary) transparent;
+  scrollbar-width: thin;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
 }
 
 html,
@@ -11,12 +23,14 @@ body {
   padding: 0;
   height: 100%;
   box-sizing: border-box;
-  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-sans);
   font-size: 16px;
   color: var(--txt-primary);
   background-color: var(--bg-page);
   background-image: var(--ambient-brand);
   background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 *,
@@ -25,52 +39,65 @@ body {
   box-sizing: inherit;
 }
 
+::selection {
+  background: rgba(var(--accent-rgb), 0.35);
+  color: var(--txt-highlight);
+}
+
+/* --- Light ------------------------------------------------------------- */
 :root {
-  --bg-page: #f7f8fa;
+  --bg-page: #f6f6f7;
   --bg-section: #ffffff;
-  --bg-muted: #eef0f3;
-  --bg-inverse: #0b0c0f;
+  --bg-muted: #ececef;
+  --bg-inverse: #0a0a0c;
 
   --surface-card: #ffffff;
-  --surface-elevated: #f3f4f6;
-  --surface-overlay: rgba(11, 12, 15, 0.64);
+  --surface-elevated: #f1f1f3;
+  --surface-overlay: rgba(10, 10, 12, 0.62);
   --ambient-brand: radial-gradient(
-    1100px circle at 18% 0%,
-    rgba(112, 93, 214, 0.035),
-    transparent 58%
+    1100px circle at 15% -10%,
+    rgba(85, 52, 232, 0.05),
+    transparent 60%
   );
 
-  --txt-primary: #15171c;
-  --txt-secondary: #4b5563;
-  --txt-highlight: #0b0c0f;
-  --txt-muted: #646a77;
+  --txt-primary: #0d0d10;
+  --txt-secondary: #474753;
+  --txt-highlight: #000000;
+  --txt-muted: #62626f;
   --txt-inverse: #ffffff;
 
-  --accent-dark: #5b48c8;
-  --accent: #705dd6;
-  --accent-hover: #624fc8;
-  --accent-soft: #f0edff;
-  --accent-muted: #ddd7ff;
-  --accent-text: #5140ad;
-  --accent-rgb: 112, 93, 214;
+  --accent-dark: #4524d6;
+  --accent: #5534e8;
+  --accent-hover: #4a2be0;
+  --accent-soft: #efebff;
+  --accent-muted: #ddd4ff;
+  --accent-text: #4524d6;
+  --accent-rgb: 85, 52, 232;
   --logo-accent-filter: brightness(0) saturate(100%) invert(43%) sepia(37%)
     saturate(1543%) hue-rotate(218deg) brightness(88%) contrast(91%);
 
-  --btn-primary: var(--accent);
-  --btn-primary-hover: var(--accent-hover);
+  /* Molten highlight: prices, trending, live states */
+  --ember: #b4380b;
+  --ember-fill: #ff6b35;
+  --ember-on: #120904;
+  --ember-rgb: 255, 107, 53;
+
+  --btn-primary: #5b3ef0;
+  --btn-primary-hover: #4a2be0;
   --btn-primary-text: #ffffff;
-  --btn-main: #e5e7eb;
-  --btn-secondary: #f3f4f6;
-  --btn-hover: #d9dde3;
-  --btn-secondary-hover: #e5e7eb;
-  --btn-disabled: #e5e7eb;
+  --btn-main: #e4e4e8;
+  --btn-secondary: #f1f1f3;
+  --btn-hover: #e4e4e8;
+  --btn-secondary-hover: #e4e4e8;
+  --btn-disabled: #e4e4e8;
 
-  --contrast: #b45309;
-  --contrast-hover: #92400e;
+  --contrast: var(--ember);
+  --contrast-hover: #9a2f08;
 
-  --br-primary: #9ca3af;
-  --br-secondary: #d1d5db;
-  --br-subtle: #e5e7eb;
+  --br-primary: #a1a1ac;
+  --br-secondary: #d4d4da;
+  --br-subtle: #e4e4e8;
+  --br-input: #82828e;
 
   --success: #15803d;
   --success-hover: #166534;
@@ -80,57 +107,64 @@ body {
   --info: #2563eb;
   --link: var(--accent-text);
   --link-hover: var(--accent-dark);
-  --focus: var(--accent);
+  --focus: #5534e8;
 
-  --model-viewer-background: #eef0f3;
+  --model-viewer-background: #ececef;
 }
 
+/* --- Dark (default) ---------------------------------------------------- */
 [data-theme="dark"] {
-  --bg-page: #0b0b0f;
-  --bg-section: #111218;
-  --bg-muted: #151821;
-  --bg-inverse: #f7f8fa;
+  --bg-page: #0a0a0c;
+  --bg-section: #0f0f12;
+  --bg-muted: #17171c;
+  --bg-inverse: #f6f6f7;
 
-  --surface-card: #1a1d26;
-  --surface-elevated: #212432;
-  --surface-overlay: rgba(11, 11, 15, 0.78);
+  --surface-card: #141418;
+  --surface-elevated: #1c1c22;
+  --surface-overlay: rgba(6, 6, 9, 0.78);
   --ambient-brand: radial-gradient(
-    1200px circle at 20% 0%,
-    rgba(139, 122, 246, 0.06),
-    transparent 58%
+    1200px circle at 12% -10%,
+    rgba(124, 92, 255, 0.07),
+    transparent 60%
   );
 
-  --txt-primary: #f4f4f5;
-  --txt-secondary: #c3c7cf;
+  --txt-primary: #f4f4f6;
+  --txt-secondary: #b4b4bf;
   --txt-highlight: #ffffff;
-  --txt-muted: #8f96a3;
-  --txt-inverse: #0b0c0f;
+  --txt-muted: #8b8b98;
+  --txt-inverse: #0a0a0c;
 
-  --accent-dark: #6f5be3;
-  --accent: #8b7af6;
-  --accent-hover: #a395ff;
-  --accent-soft: #1a172d;
-  --accent-muted: #282344;
-  --accent-text: #cbc3ff;
-  --accent-rgb: 139, 122, 246;
+  --accent-dark: #6d4dff;
+  --accent: #a48dff;
+  --accent-hover: #b8a6ff;
+  --accent-soft: #1b1630;
+  --accent-muted: #2a2148;
+  --accent-text: #c8bbff;
+  --accent-rgb: 164, 141, 255;
   --logo-accent-filter: brightness(0) saturate(100%) invert(61%) sepia(72%)
     saturate(1375%) hue-rotate(214deg) brightness(99%) contrast(94%);
 
-  --btn-primary: #7360e6;
-  --btn-primary-hover: #6550dc;
+  --ember: #ff7a45;
+  --ember-fill: #ff6b35;
+  --ember-on: #120904;
+  --ember-rgb: 255, 107, 53;
+
+  --btn-primary: #6d4dff;
+  --btn-primary-hover: #5f3ff0;
   --btn-primary-text: #ffffff;
-  --btn-main: #232633;
-  --btn-secondary: #262a36;
-  --btn-hover: #303544;
-  --btn-secondary-hover: #303544;
-  --btn-disabled: #242732;
+  --btn-main: #1c1c22;
+  --btn-secondary: #1c1c22;
+  --btn-hover: #26262e;
+  --btn-secondary-hover: #26262e;
+  --btn-disabled: #1c1c22;
 
-  --contrast: #f59e0b;
-  --contrast-hover: #fbbf24;
+  --contrast: var(--ember);
+  --contrast-hover: #ff9466;
 
-  --br-primary: #414757;
-  --br-secondary: #303541;
-  --br-subtle: #252934;
+  --br-primary: #3b3b46;
+  --br-secondary: #2a2a33;
+  --br-subtle: #1f1f26;
+  --br-input: #6b6b7a;
 
   --success: #34d399;
   --success-hover: #10b981;
@@ -140,15 +174,28 @@ body {
   --info: #60a5fa;
   --link: var(--accent-text);
   --link-hover: var(--accent-hover);
-  --focus: #a395ff;
+  --focus: #b3a3ff;
 
-  --model-viewer-background: #151821;
+  --model-viewer-background: #111115;
 }
 
 @theme inline {
-  /* Fonts */
-  --font-sans: "Inter", "Segoe UI", Arial, sans-serif;
-  --font-display: "Michroma", sans-serif;
+  /* Fonts (self-hosted, imported in main.tsx) */
+  --font-sans: "Geist Variable", "Segoe UI", system-ui, sans-serif;
+  --font-display: "Unbounded Variable", "Geist Variable", system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Sharper shape language */
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
+  --radius-2xl: 10px;
+  --radius-3xl: 14px;
+
+  /* Motion */
+  --ease-forge: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Colors */
   --color-page: var(--bg-page);
@@ -173,12 +220,17 @@ body {
   --color-accent-muted: var(--accent-muted);
   --color-accent-text: var(--accent-text);
 
+  --color-ember: var(--ember);
+  --color-ember-fill: var(--ember-fill);
+  --color-ember-on: var(--ember-on);
+
   --color-contrast: var(--contrast);
   --color-contrast-hover: var(--contrast-hover);
 
   --color-br-primary: var(--br-primary);
   --color-br-secondary: var(--br-secondary);
   --color-br-subtle: var(--br-subtle);
+  --color-br-input: var(--br-input);
 
   --color-primary: var(--btn-primary);
   --color-primary-hover: var(--btn-primary-hover);
@@ -200,6 +252,313 @@ body {
   --color-info: var(--info);
 
   --color-model-viewer-background: var(--model-viewer-background);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+@layer base {
+  h1,
+  h2 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+  }
+}
+
+/* ==========================================================================
+   Components
+   ========================================================================== */
+@layer components {
+  /* Chamfered (cut-corner) shape. --cut sets the corner size. */
+  .chamfer {
+    --cut: 8px;
+    clip-path: polygon(
+      var(--cut) 0,
+      100% 0,
+      100% calc(100% - var(--cut)),
+      calc(100% - var(--cut)) 100%,
+      0 100%,
+      0 var(--cut)
+    );
+  }
+
+  /* Buttons: the chamfered fill lives on pseudo-elements so the element
+     itself is not clipped and its focus outline stays visible. */
+  .btn {
+    --cut: 9px;
+    --btn-edge-w: 0px;
+    position: relative;
+    isolation: isolate;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--btn-fg);
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      color 0.2s ease,
+      transform 0.25s var(--ease-forge),
+      filter 0.25s ease;
+  }
+
+  .btn::before,
+  .btn::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    clip-path: polygon(
+      var(--cut) 0,
+      100% 0,
+      100% calc(100% - var(--cut)),
+      calc(100% - var(--cut)) 100%,
+      0 100%,
+      0 var(--cut)
+    );
+  }
+
+  .btn::before {
+    inset: 0;
+    background: var(--btn-edge);
+  }
+
+  .btn::after {
+    inset: var(--btn-edge-w);
+    background:
+      linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.16) 50%, transparent 65%)
+        no-repeat,
+      var(--btn-bg);
+    background-size:
+      250% 100%,
+      auto;
+    background-position:
+      160% 0,
+      0 0;
+  }
+
+  .btn:hover::after {
+    background-position:
+      -60% 0,
+      0 0;
+    transition: background-position 0.7s var(--ease-forge);
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  .btn-primary {
+    --btn-bg: var(--btn-primary);
+    --btn-edge: var(--btn-primary);
+    --btn-fg: var(--btn-primary-text);
+  }
+
+  .btn-primary:hover {
+    --btn-bg: var(--btn-primary-hover);
+    --btn-edge: var(--btn-primary-hover);
+    transform: translateY(-1px);
+    filter: drop-shadow(0 8px 18px rgba(var(--accent-rgb), 0.35));
+  }
+
+  .btn-secondary {
+    --btn-bg: var(--surface-card);
+    --btn-edge: var(--br-primary);
+    --btn-edge-w: 1px;
+    --btn-fg: var(--txt-primary);
+  }
+
+  .btn-secondary:hover {
+    --btn-bg: var(--surface-elevated);
+    --btn-edge: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    --btn-bg: transparent;
+    --btn-edge: transparent;
+    --btn-fg: var(--txt-secondary);
+  }
+
+  .btn-ghost:hover {
+    --btn-bg: var(--bg-muted);
+    --btn-fg: var(--txt-primary);
+  }
+
+  .btn-ember {
+    --btn-bg: var(--ember-fill);
+    --btn-edge: var(--ember-fill);
+    --btn-fg: var(--ember-on);
+  }
+
+  .btn-ember:hover {
+    transform: translateY(-1px);
+    filter: drop-shadow(0 8px 18px rgba(var(--ember-rgb), 0.4)) brightness(1.06);
+  }
+
+  .btn-sm {
+    --cut: 7px;
+    height: 2.25rem;
+    padding: 0 0.875rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-md {
+    height: 2.5rem;
+    padding: 0 1.125rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-lg {
+    --cut: 11px;
+    height: 3rem;
+    padding: 0 1.5rem;
+    font-size: 1rem;
+  }
+
+  /* Small mono label used for technical metadata ("STL · 42 MB"). */
+  .label-mono {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* Faint horizontal layer lines, like the surface of an FDM print. */
+  .bg-layer-lines {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(var(--accent-rgb), 0.05) 0 1px,
+      transparent 1px 5px
+    );
+  }
+
+  /* Build-plate grid. */
+  .bg-buildplate {
+    background-image:
+      linear-gradient(var(--br-subtle) 1px, transparent 1px),
+      linear-gradient(90deg, var(--br-subtle) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  /* Loading placeholder that "prints" bottom-up, layer by layer. */
+  .skeleton-print {
+    position: relative;
+    overflow: hidden;
+    background-color: var(--bg-muted);
+  }
+
+  .skeleton-print::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to top,
+      rgba(var(--accent-rgb), 0.14) 0 2px,
+      transparent 2px 6px
+    );
+    animation: print-fill 2.4s steps(14, end) infinite;
+  }
+
+  .skeleton-print::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(var(--accent-rgb), 0.9) 50%,
+      transparent
+    );
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.6);
+    animation: print-nozzle 2.4s steps(14, end) infinite;
+  }
+
+  /* Scroll reveal: content "prints" in from the bottom as it enters. */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal-print {
+        animation: print-in linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 55%;
+      }
+
+      .reveal-up {
+        animation: rise-in linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 45%;
+      }
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .skeleton-print::before,
+    .skeleton-print::after {
+      animation: none;
+    }
+
+    .skeleton-print::after {
+      display: none;
+    }
+  }
+}
+
+@keyframes print-fill {
+  0% {
+    clip-path: inset(100% 0 0 0);
+  }
+  85%,
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes print-nozzle {
+  0% {
+    bottom: 0;
+  }
+  85%,
+  100% {
+    bottom: 100%;
+  }
+}
+
+@keyframes print-in {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 /* Custom Divider */
