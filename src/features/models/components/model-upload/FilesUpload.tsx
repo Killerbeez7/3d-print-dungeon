@@ -1,6 +1,5 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCloudArrowUp, faFile, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useCallback } from "react";
+import { FileBox, Upload, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 
 import { ALLOWED_EXTENSIONS } from "../../constants/ALLOWED_EXTENSIONS";
@@ -43,28 +42,27 @@ export const FilesUpload: FC<FilesUploadProps> = ({ step, files, setFiles }) => 
       {step === 1 && (
         <div
           {...getRootProps()}
-          className={`group relative flex flex-col items-center justify-center gap-4 border-2 border-dashed rounded-xl p-10 mb-6 cursor-pointer transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-section
-                        ${
-                          isDragActive
-                            ? "border-accent bg-accent-soft shadow-lg shadow-accent/10"
-                            : "border-br-secondary/60 bg-surface-card hover:border-accent hover:bg-accent-soft/40 hover:shadow-md"
-                        }
-                    `}
+          className={`bg-buildplate group relative flex cursor-pointer flex-col items-center justify-center gap-3 overflow-hidden rounded-xl border-2 border-dashed px-6 py-14 text-center outline-none transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-focus ${
+            isDragActive
+              ? "border-accent bg-accent-soft"
+              : "border-br-input bg-page hover:border-accent"
+          }`}
         >
           <input {...getInputProps()} />
-          <FontAwesomeIcon
-            icon={faCloudArrowUp}
-            className="text-5xl text-accent transition-all duration-200 group-hover:scale-105 group-hover:text-accent-hover"
-          />
-          <h2 className="text-lg text-center text-txt-primary transition-colors group-hover:text-accent">
-            Drag & Drop your files
-          </h2>
-          <p className="text-center text-sm text-txt-secondary transition-colors group-hover:text-accent-text">
-            or click to browse
+          {/* Nozzle line sweeps while files hover over the plate */}
+          {isDragActive && <span className="skeleton-print absolute inset-0 opacity-60" aria-hidden="true" />}
+          <span className="chamfer relative flex size-14 items-center justify-center bg-btn-primary text-btn-primary-text [--cut:10px] transition-transform duration-300 group-hover:-translate-y-1">
+            <Upload className="size-6" aria-hidden="true" />
+          </span>
+          <p className="relative font-display text-lg font-semibold text-txt-primary">
+            {isDragActive ? "Drop to add your files" : "Drop your model files here"}
           </p>
-
-          <p className="max-w-lg text-center text-xs text-txt-muted">
-            Supported: {ALLOWED_EXTENSIONS.join(", ")}
+          <p className="relative text-sm text-txt-secondary">
+            or <span className="font-semibold text-accent underline-offset-2 group-hover:underline">browse</span>{" "}
+            from your device
+          </p>
+          <p className="relative mt-2 max-w-xl font-mono text-[0.7rem] leading-relaxed text-txt-muted">
+            {ALLOWED_EXTENSIONS.join("  ")}
           </p>
         </div>
       )}
@@ -85,33 +83,35 @@ interface UploadedFilesListProps {
   removeFile?: (fileName: string) => void;
 }
 
+const formatSize = (bytes: number) =>
+  bytes >= 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.max(1, Math.round(bytes / 1024))} KB`;
+
 const UploadedFilesList: FC<UploadedFilesListProps> = ({ files, removeFile }) => {
   return (
-    <div className="border-2 border-br-secondary rounded-md p-4 mt-4 bg-surface-card">
-      <ul className="flex flex-col gap-2">
-        {files.map((file) => (
-          <li
-            key={file.name}
-            className="flex items-center justify-between  hover:bg-muted p-3 rounded-lg transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <FontAwesomeIcon icon={faFile} className="text-accent" />
-              <span className="text-txt-primary truncate max-w-[200px]">{file.name}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-txt-primary">{(file.size / 1024).toFixed(2)} KB</span>
-              {removeFile && (
-                <button
-                  onClick={() => removeFile(file.name)}
-                  className="text-txt-secondary hover:text-error"
-                >
-                  <FontAwesomeIcon icon={faXmark} size="lg" />
-                </button>
-              )}
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <ul className="mt-4 divide-y divide-br-subtle rounded-lg border border-br-subtle bg-surface-card">
+      {files.map((file) => (
+        <li key={file.name} className="flex items-center gap-3 px-4 py-3">
+          <span className="chamfer flex size-9 shrink-0 items-center justify-center bg-accent-soft text-accent [--cut:7px]">
+            <FileBox className="size-4" aria-hidden="true" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-medium text-txt-primary">{file.name}</span>
+            <span className="font-mono text-xs text-txt-muted">
+              {file.name.split(".").pop()?.toUpperCase()} · {formatSize(file.size)}
+            </span>
+          </span>
+          {removeFile && (
+            <button
+              type="button"
+              onClick={() => removeFile(file.name)}
+              aria-label={`Remove ${file.name}`}
+              className="flex size-8 items-center justify-center rounded-md text-txt-muted transition-colors hover:bg-error/10 hover:text-error"
+            >
+              <X className="size-4" aria-hidden="true" />
+            </button>
+          )}
+        </li>
+      ))}
+    </ul>
   );
 };
