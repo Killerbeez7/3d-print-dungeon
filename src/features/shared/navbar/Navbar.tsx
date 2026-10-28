@@ -163,7 +163,7 @@ export const Navbar = () => {
     grid h-full min-w-0
     grid-cols-[auto_minmax(0,1fr)_auto]
     items-center gap-x-4
-    lg:grid-cols-[384px_minmax(220px,1fr)_168px]
+    lg:grid-cols-[384px_minmax(220px,1fr)_minmax(168px,auto)]
     lg:gap-x-6
   "
           >
