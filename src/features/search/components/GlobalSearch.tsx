@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, type FormEvent, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { Search, X } from "lucide-react";
 
 import { ROUTES } from "@/constants/routeConstants";
 import { searchArtists } from "@/features/search/services/searchService";
@@ -18,6 +17,22 @@ export function GlobalSearch() {
   const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
 
   const containerRef = useRef<HTMLFormElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // "/" focuses search from anywhere, unless the user is already typing.
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
+      const target = event.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+      if (!inputRef.current || inputRef.current.offsetParent === null) return;
+      event.preventDefault();
+      inputRef.current.focus();
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -157,32 +172,40 @@ export function GlobalSearch() {
       onSubmit={handleSubmit}
       className="relative w-full max-w-[1000px]"
     >
-      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted pointer-events-none">
-        <FontAwesomeIcon icon={faSearch} />
-      </span>
+      <Search
+        className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-txt-muted"
+        aria-hidden="true"
+      />
 
       <input
-        type="text"
-        placeholder="Search"
+        ref={inputRef}
+        type="search"
+        placeholder="Search models and artists"
+        aria-label="Search models and artists"
         value={searchTerm}
         onChange={handleInputChange}
         onFocus={handleFocus}
-        className="h-10 w-full rounded-full border border-br-secondary/80 bg-page/70 py-2 pl-10 pr-10 text-sm text-txt-primary placeholder:text-txt-muted transition-colors focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
+        className="h-10 w-full rounded-lg border border-br-secondary bg-surface-card py-2 pl-9 pr-10 text-sm text-txt-primary transition-[border-color,box-shadow] placeholder:text-txt-muted hover:border-br-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25 [&::-webkit-search-cancel-button]:hidden"
       />
 
-      {searchTerm && (
+      {searchTerm ? (
         <button
           type="button"
           onClick={handleClearSearch}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-muted hover:text-txt-secondary"
+          className="absolute right-2 top-1/2 flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-txt-muted hover:bg-muted hover:text-txt-primary"
+          aria-label="Clear search"
         >
-          <FontAwesomeIcon icon={faTimes} />
+          <X className="size-4" aria-hidden="true" />
         </button>
+      ) : (
+        <kbd className="pointer-events-none absolute right-2.5 top-1/2 hidden -translate-y-1/2 rounded border border-br-secondary px-1.5 font-mono text-[0.7rem] text-txt-muted md:block">
+          /
+        </kbd>
       )}
 
       {/* Search dropdown */}
       {!isMobile && showDropdown && (
-        <div className="absolute left-0 top-[110%] z-50 mt-1 w-full rounded-lg border border-br-secondary bg-surface-elevated text-txt-primary shadow-lg">
+        <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-xl border border-br-secondary bg-surface-elevated text-txt-primary shadow-2xl shadow-black/40">
           <ul className="py-2 max-h-80 overflow-auto text-sm">
             {searchTerm.trim() && artistResults.length > 0 && (
               <>
