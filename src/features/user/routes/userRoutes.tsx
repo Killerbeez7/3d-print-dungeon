@@ -34,7 +34,22 @@ const NotificationsPage = lazy(() =>
   }))
 );
 
+const PasswordResetPage = lazy(() =>
+  import("@/features/auth/components/PasswordResetPage").then((m) => ({
+    default: m.PasswordResetPage,
+  }))
+);
+
 export const userRoutes: RouteObject[] = [
+  // Target for Firebase's password reset email when its action URL points here.
+  {
+    path: ROUTES.PASSWORD_RESET,
+    element: (
+      <Suspense>
+        <PasswordResetPage />
+      </Suspense>
+    ),
+  },
   {
     path: ROUTES.USER_PROFILE_REDIRECT,
     element: withProtected(
