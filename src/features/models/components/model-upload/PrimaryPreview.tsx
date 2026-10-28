@@ -1,5 +1,5 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCrop, faImage, faUndo, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { Crop, ImagePlus, Undo2, X } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 interface PrimaryPreviewProps {
   previewUrl?: string;
@@ -8,6 +8,27 @@ interface PrimaryPreviewProps {
   onCrop: () => void;
   onRevert: () => void;
 }
+
+interface ToolButtonProps {
+  icon: LucideIcon;
+  label: string;
+  onClick: () => void;
+  danger?: boolean;
+}
+
+const ToolButton = ({ icon: Icon, label, onClick, danger }: ToolButtonProps) => (
+  <button
+    type="button"
+    onClick={onClick}
+    aria-label={label}
+    title={label}
+    className={`chamfer flex size-10 items-center justify-center bg-surface-elevated/90 text-txt-primary backdrop-blur [--cut:8px] transition-colors ${
+      danger ? "hover:bg-error/15 hover:text-error" : "hover:bg-btn-primary hover:text-btn-primary-text"
+    }`}
+  >
+    <Icon className="size-4" aria-hidden="true" />
+  </button>
+);
 
 export function PrimaryPreview({
   previewUrl,
@@ -21,49 +42,30 @@ export function PrimaryPreview({
       <button
         type="button"
         onClick={onSelect}
-        className="flex aspect-video w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-br-primary transition-colors hover:border-accent hover:bg-accent-soft/40 hover:text-accent"
+        className="bg-buildplate group flex aspect-video w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-br-input bg-page px-6 text-center transition-colors hover:border-accent"
       >
-        <FontAwesomeIcon icon={faImage} className="mb-3 text-4xl" />
-        <span className="font-medium">Add Primary Render</span>
+        <span className="chamfer flex size-14 items-center justify-center bg-btn-primary text-btn-primary-text [--cut:10px] transition-transform duration-300 group-hover:-translate-y-1">
+          <ImagePlus className="size-6" aria-hidden="true" />
+        </span>
+        <span className="font-display text-lg font-semibold text-txt-primary">Add a cover image</span>
+        <span className="font-mono text-[0.7rem] text-txt-muted">PNG  JPG  WEBP</span>
       </button>
     );
   }
 
   return (
-    <div className="group relative aspect-video w-full overflow-hidden rounded-lg bg-surface-card shadow-lg">
-      <img
-        src={previewUrl}
-        alt="Primary render"
-        className="h-full w-full object-contain"
-      />
+    <div className="group relative aspect-video w-full overflow-hidden rounded-xl border border-br-subtle bg-surface-card">
+      <img src={previewUrl} alt="Cover image" className="size-full object-contain" />
 
-      <div className="absolute inset-0 flex items-center justify-center gap-4 bg-inverse/40 opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100">
-        <button
-          type="button"
-          onClick={onCrop}
-          aria-label="Resize / Crop"
-          className="inline-flex h-10 w-11 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--btn-main)_0%,var(--btn-secondary)_100%)] text-sm font-semibold text-txt-primary shadow transition-all duration-150 hover:-translate-y-0.5 hover:scale-110 hover:bg-[linear-gradient(135deg,var(--btn-secondary)_0%,var(--btn-hover)_100%)] hover:text-inverse hover:shadow-xl"
-        >
-          <FontAwesomeIcon icon={faCrop} />
-        </button>
+      <span className="label-mono absolute left-3 top-3 bg-page/80 px-2 py-1 text-txt-secondary backdrop-blur">
+        Cover
+      </span>
 
-        <button
-          type="button"
-          onClick={onRevert}
-          aria-label="Revert to Original"
-          className="inline-flex h-10 w-11 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--btn-main)_0%,var(--btn-secondary)_100%)] text-sm font-semibold text-txt-primary shadow transition-all duration-150 hover:-translate-y-0.5 hover:scale-110 hover:bg-[linear-gradient(135deg,var(--btn-secondary)_0%,var(--btn-hover)_100%)] hover:text-inverse hover:shadow-xl"
-        >
-          <FontAwesomeIcon icon={faUndo} />
-        </button>
-
-        <button
-          type="button"
-          onClick={onRemove}
-          aria-label="Remove"
-          className="inline-flex h-10 w-11 items-center justify-center rounded-lg bg-[linear-gradient(135deg,var(--contrast)_0%,var(--contrast-hover)_100%)] text-sm font-semibold text-txt-inverse shadow transition-all duration-150 hover:-translate-y-0.5 hover:scale-110 hover:bg-[linear-gradient(135deg,var(--contrast-hover)_0%,var(--contrast)_100%)] hover:shadow-xl"
-        >
-          <FontAwesomeIcon icon={faXmark} />
-        </button>
+      {/* Tools stay visible on touch screens, appear on hover or focus elsewhere */}
+      <div className="absolute right-3 top-3 flex gap-1.5 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100">
+        <ToolButton icon={Crop} label="Crop image" onClick={onCrop} />
+        <ToolButton icon={Undo2} label="Revert to original" onClick={onRevert} />
+        <ToolButton icon={X} label="Remove image" onClick={onRemove} danger />
       </div>
     </div>
   );

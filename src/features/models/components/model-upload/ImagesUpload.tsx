@@ -1,8 +1,11 @@
 import { FC, useState, useRef, ChangeEvent, useEffect } from "react";
+import { ImagePlus } from "lucide-react";
 import type { ModelUploadData } from "@/features/models/types/model";
 import { PrimaryPreview } from "./PrimaryPreview";
 import { RenderList } from "./RenderList";
 import { ImageCropModal } from "./ImageCropModal";
+
+const MAX_RENDERS = 16;
 
 // Now storing original and cropped versions
 interface RenderItem {
@@ -168,7 +171,7 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
   }, []);
 
   return (
-    <div className="bg-section border border-br-secondary rounded-xl p-6 shadow-sm space-y-6">
+    <div className="space-y-4">
       <input
         type="file"
         ref={fileInputRef}
@@ -177,12 +180,19 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
         onChange={handleFileChange}
       />
 
-      <div>
-        <h3 className="text-xl font-bold text-txt-primary mb-1">Primary Render</h3>
-        <p className="text-sm text-txt-secondary">
-          This is the main image that will be displayed as the primary preview for your
-          model.
-        </p>
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <h3 className="text-base font-semibold text-txt-primary">Images</h3>
+          <p className="mt-0.5 text-sm text-txt-secondary">
+            The cover leads your listing and the home gallery.
+            {renders.length > 1 && " Click an image to make it the cover, drag to reorder."}
+          </p>
+        </div>
+        {renders.length > 0 && (
+          <span className="shrink-0 font-mono text-xs text-txt-muted">
+            {renders.length}/{MAX_RENDERS}
+          </span>
+        )}
       </div>
 
       <PrimaryPreview
@@ -194,30 +204,28 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
       />
 
       {renders.length > 0 && (
-        <div>
-          <h3 className="text-xl font-bold text-txt-primary mb-1">All Renders</h3>
-          <p className="text-sm text-txt-secondary">
-            Click on any image to set it as the primary render. Drag to reorder the
-            display sequence.
-          </p>
+        <div className="flex items-center gap-2">
+          <div className="min-w-0 flex-1">
+            <RenderList
+              renders={renders.map((r) => ({ id: r.id, preview: r.croppedPreview }))}
+              primaryId={primaryId}
+              onRemove={handleRemove}
+              onReorder={handleReorder}
+              onSetPrimary={setPrimaryId}
+            />
+          </div>
+          {renders.length < MAX_RENDERS && (
+            <button
+              type="button"
+              onClick={handleFileSelect}
+              aria-label="Add another image"
+              className="flex h-20 w-20 shrink-0 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-br-input text-txt-secondary transition-colors hover:border-accent hover:text-accent"
+            >
+              <ImagePlus className="size-5" aria-hidden="true" />
+              <span className="text-xs font-medium">Add</span>
+            </button>
+          )}
         </div>
-      )}
-
-      <RenderList
-        renders={renders.map((r) => ({ id: r.id, preview: r.croppedPreview }))}
-        primaryId={primaryId}
-        onRemove={handleRemove}
-        onReorder={handleReorder}
-        onSetPrimary={setPrimaryId}
-      />
-
-      {renders.length > 0 && renders.length < 16 && (
-        <button
-          onClick={handleFileSelect}
-          className="w-full py-3 px-4 border-2 border-dashed border-br-secondary rounded-lg text-txt-secondary hover:border-accent hover:bg-accent-soft/40 hover:text-accent transition-colors font-medium"
-        >
-          + Add More Renders
-        </button>
       )}
 
       {isCropModalOpen && croppingItem && (

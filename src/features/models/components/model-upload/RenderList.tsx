@@ -1,7 +1,6 @@
 import { FC } from "react";
 import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { X } from "lucide-react";
 
 interface RenderItem {
   id: string;
@@ -37,49 +36,50 @@ export const RenderList: FC<RenderListProps> = ({
           <div
             ref={provided.innerRef}
             {...provided.droppableProps}
-            className="flex gap-3 overflow-x-auto py-2 -mx-6 px-6" // Negative margin to extend scroll area
+            className="-mx-1 flex gap-2 overflow-x-auto px-1 py-2"
           >
-            {renders.map((render, index) => (
-              <Draggable key={render.id} draggableId={render.id} index={index}>
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    onClick={() => onSetPrimary(render.id)}
-                    className={`group relative flex-shrink-0 w-28 h-20 rounded-lg overflow-hidden bg-surface-card cursor-pointer transition-all duration-200
-                                            ${
-                                              snapshot.isDragging
-                                                ? "ring-2 ring-accent scale-105 shadow-lg"
-                                                : ""
-                                            }
-                                            ${
-                                              render.id === primaryId
-                                                ? "ring-2 ring-accent"
-                                                : "hover:ring-2 hover:ring-accent"
-                                            }`}
-                  >
-                    <img
-                      src={render.preview}
-                      alt={`Render ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-inverse opacity-0 group-hover:opacity-20 transition-opacity" />
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRemove(render.id);
+            {renders.map((render, index) => {
+              const isPrimary = render.id === primaryId;
+              return (
+                <Draggable key={render.id} draggableId={render.id} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      onClick={() => onSetPrimary(render.id)}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter") onSetPrimary(render.id);
                       }}
-                      className="absolute top-1 right-1 flex size-6 items-center justify-center rounded-full bg-inverse text-txt-inverse opacity-0 transition-all duration-150 hover:scale-105 group-hover:opacity-100"
-                      aria-label="Remove Render"
+                      aria-label={`Image ${index + 1}${isPrimary ? ", cover" : ""}. Enter sets it as cover, space picks it up to reorder.`}
+                      className={`group relative h-20 w-28 shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 bg-surface-card transition-[border-color,transform] duration-200 ${
+                        snapshot.isDragging
+                          ? "scale-105 border-accent shadow-lg"
+                          : isPrimary
+                            ? "border-accent"
+                            : "border-transparent hover:border-br-primary"
+                      }`}
                     >
-                      <FontAwesomeIcon icon={faXmark} size="sm" />
-                    </button>
-                  </div>
-                )}
-              </Draggable>
-            ))}
+                      <img src={render.preview} alt="" className="size-full object-cover" />
+                      <span className="absolute bottom-1 left-1 bg-page/80 px-1.5 font-mono text-[0.65rem] text-txt-secondary backdrop-blur">
+                        {isPrimary ? "COVER" : String(index + 1).padStart(2, "0")}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          onRemove(render.id);
+                        }}
+                        className="chamfer absolute right-1 top-1 flex size-6 items-center justify-center bg-page/85 text-txt-primary backdrop-blur [--cut:5px] transition-[opacity,color] hover:text-error focus-visible:opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
+                        aria-label={`Remove image ${index + 1}`}
+                      >
+                        <X className="size-3.5" aria-hidden="true" />
+                      </button>
+                    </div>
+                  )}
+                </Draggable>
+              );
+            })}
             {provided.placeholder}
           </div>
         )}

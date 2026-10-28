@@ -3,8 +3,7 @@ import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 import FocusLock from "react-focus-lock";
 import { createPortal } from "react-dom";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faXmark, faUndo } from "@fortawesome/free-solid-svg-icons";
+import { Check, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components";
 import { getCroppedImg } from "./cropUtils";
 
@@ -72,24 +71,41 @@ export const ImageCropModal: FC<ImageCropModalProps> = ({
   if (!isOpen) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[11000] flex items-center justify-center animate-fade-in">
-      <div className="absolute inset-0 bg-black/60" onClick={onClose} />
-      <FocusLock returnFocus>
-        <div className="relative bg-section rounded-2xl shadow-xl border border-br-secondary w-[90vw] max-w-5xl h-[90vh] max-h-[90vh] mx-4 flex flex-col">
+    <div className="fixed inset-0 z-[11000] flex items-end justify-center md:items-center md:p-6">
+      <div
+        className="absolute inset-0 animate-[fade_0.2s_ease] bg-surface-overlay backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <FocusLock returnFocus className="contents">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="crop-title"
+          onKeyDown={(event) => {
+            if (event.key === "Escape") onClose();
+          }}
+          className="auth-panel relative flex h-[92dvh] w-full max-w-5xl flex-col overflow-hidden rounded-t-2xl border border-br-secondary bg-surface-card shadow-2xl md:h-[88dvh] md:rounded-xl"
+        >
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-br-secondary">
-            <h2 className="text-xl font-bold text-txt-primary">Adjust Image</h2>
+          <div className="flex items-center justify-between gap-4 border-b border-br-subtle px-5 py-3">
+            <div>
+              <p className="label-mono text-txt-muted">Cover image</p>
+              <h2 id="crop-title" className="text-lg font-bold text-txt-primary">
+                Crop and frame
+              </h2>
+            </div>
             <button
-              className="p-2 rounded-full hover:bg-surface-card transition-colors text-txt-secondary"
+              type="button"
+              className="flex size-9 items-center justify-center rounded-md text-txt-secondary transition-colors hover:bg-muted hover:text-txt-primary"
               onClick={onClose}
               aria-label="Close"
             >
-              <FontAwesomeIcon icon={faXmark} />
+              <X className="size-5" aria-hidden="true" />
             </button>
           </div>
 
           {/* Cropper */}
-          <div className="relative flex-grow min-h-0 flex items-center justify-center bg-page overflow-hidden p-6">
+          <div className="bg-buildplate relative min-h-0 flex-grow bg-page">
             <Cropper
               image={imageUrl}
               crop={crop}
@@ -107,38 +123,55 @@ export const ImageCropModal: FC<ImageCropModalProps> = ({
           </div>
 
           {/* Controls */}
-          <div className="p-4 space-y-4 border-t border-br-secondary">
-            {/* Aspect Ratio */}
-            <div className="flex justify-center items-center gap-2">
+          <div className="flex flex-col gap-4 border-t border-br-subtle px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div role="group" aria-label="Aspect ratio" className="flex flex-wrap items-center gap-1.5">
+              <span className="label-mono mr-1 text-txt-muted">Ratio</span>
               {aspectRatios.map(({ label, value }) => (
                 <Button
                   key={label}
                   type="button"
                   size="sm"
-                  variant={aspect === value ? "primary" : "secondary"}
+                  variant={aspect === value ? "primary" : "ghost"}
                   onClick={() => setAspect(value)}
                   aria-pressed={aspect === value}
-                  className="transition-transform duration-150 hover:scale-105"
+                  className="font-mono [--cut:6px]"
                 >
                   {label}
                 </Button>
               ))}
             </div>
+
+            <label className="flex items-center gap-3 sm:w-56">
+              <span className="label-mono text-txt-muted">Zoom</span>
+              <input
+                type="range"
+                min={1}
+                max={3}
+                step={0.05}
+                value={zoom}
+                onChange={(event) => setZoom(Number(event.target.value))}
+                className="h-1 flex-1 cursor-pointer accent-btn-primary"
+              />
+            </label>
           </div>
 
           {/* Footer */}
-          <div className="flex justify-between items-center gap-3 p-4 bg-surface-card border-t border-br-secondary rounded-b-2xl">
-            <Button onClick={handleReset}>
-              <FontAwesomeIcon icon={faUndo} /> Reset
+          <div className="flex items-center justify-between gap-3 border-t border-br-subtle bg-section px-5 py-3">
+            <Button
+              variant="ghost"
+              onClick={handleReset}
+              leftIcon={<RotateCcw className="size-4" aria-hidden="true" />}
+            >
+              Reset
             </Button>
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               <Button variant="secondary" onClick={onClose}>
                 Cancel
               </Button>
               <Button
                 onClick={handleApply}
                 disabled={!croppedAreaPixels}
-                leftIcon={<FontAwesomeIcon icon={faCheck} />}
+                leftIcon={<Check className="size-4" aria-hidden="true" />}
               >
                 Apply
               </Button>
