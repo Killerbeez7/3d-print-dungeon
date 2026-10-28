@@ -6,6 +6,9 @@ import { ErrorBoundary } from "@/features/shared/ErrorBoundary";
 import { ScrollToTop } from "./utils/ScrollToTop";
 // Styles
 import "nprogress/nprogress.css";
+import "@fontsource-variable/geist";
+import "@fontsource-variable/geist-mono";
+import "@fontsource-variable/unbounded";
 import "@/styles.css";
 import "@/styles/nprogress.css";
 import "@/styles/animations.css";
