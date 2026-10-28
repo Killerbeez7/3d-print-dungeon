@@ -1,15 +1,23 @@
 import { Link, useLocation } from "react-router-dom";
-import { LuPanelLeftClose, LuPanelLeftOpen } from "react-icons/lu";
-import { MdDashboard, MdHome } from "react-icons/md";
-import { FaInfoCircle, FaQuestionCircle, FaUser } from "react-icons/fa";
+import {
+  BookOpenText,
+  CircleHelp,
+  House,
+  LayoutDashboard,
+  MessagesSquare,
+  PanelLeftClose,
+  PanelLeftOpen,
+  UserRound,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+
 import { FORUM_CATEGORIES } from "@/config/forumCategories";
 import { FORUM_PATHS } from "../constants/forumPaths";
 
 import type { ForumCategory } from "../types/forum";
-import type { IconType } from "react-icons";
 
 export const FORUM_RAIL_WIDTH = 72;
-export const FORUM_EXPANDED_WIDTH = 320;
+export const FORUM_EXPANDED_WIDTH = 280;
 
 interface ForumSidebarProps {
   isSidebarOpen: boolean;
@@ -18,85 +26,64 @@ interface ForumSidebarProps {
   className?: string;
 }
 
-interface SidebarLinkProps {
-  icon: IconType;
-  label: string;
-  to: string;
-  isActive?: boolean;
-  showLabel: boolean;
-}
-
 interface SidebarLinkData {
-  icon: IconType;
+  icon: LucideIcon;
   label: string;
   to: string;
 }
 
 const MAIN_LINKS: SidebarLinkData[] = [
-  {
-    icon: MdHome,
-    label: "Home",
-    to: FORUM_PATHS.HOME,
-  },
-  {
-    icon: MdDashboard,
-    label: "Dashboard",
-    to: FORUM_PATHS.DASHBOARD,
-  },
-  {
-    icon: FaUser,
-    label: "My Threads",
-    to: FORUM_PATHS.MY_THREADS,
-  },
+  { icon: House, label: "Home", to: FORUM_PATHS.HOME },
+  { icon: LayoutDashboard, label: "Dashboard", to: FORUM_PATHS.DASHBOARD },
+  { icon: UserRound, label: "My threads", to: FORUM_PATHS.MY_THREADS },
 ];
 
 const INFO_LINKS: SidebarLinkData[] = [
-  {
-    icon: FaInfoCircle,
-    label: "Forum Rules",
-    to: FORUM_PATHS.RULES,
-  },
-  {
-    icon: FaQuestionCircle,
-    label: "Help",
-    to: FORUM_PATHS.HELP,
-  },
+  { icon: BookOpenText, label: "Forum rules", to: FORUM_PATHS.RULES },
+  { icon: CircleHelp, label: "Help", to: FORUM_PATHS.HELP },
 ];
 
 const SidebarLink = ({
   icon: Icon,
   label,
   to,
-  isActive = false,
+  isActive,
   showLabel,
-}: SidebarLinkProps) => {
-  return (
-    <Link
-      to={to}
-      title={showLabel ? undefined : label}
-      aria-label={label}
-      className={[
-        "grid h-10 grid-cols-[40px_1fr] items-center rounded-lg text-sm transition-colors duration-200",
-        isActive
-          ? "bg-surface-card font-semibold text-txt-primary shadow-sm"
-          : "text-txt-secondary hover:bg-surface-card hover:text-txt-primary overflow-hidden",
-      ].join(" ")}
+}: SidebarLinkData & { isActive: boolean; showLabel: boolean }) => (
+  <Link
+    to={to}
+    title={showLabel ? undefined : label}
+    aria-label={showLabel ? undefined : label}
+    aria-current={isActive ? "page" : undefined}
+    className={`relative grid h-10 grid-cols-[40px_1fr] items-center overflow-hidden rounded-md text-sm transition-colors before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:bg-accent before:transition-transform before:duration-300 before:ease-forge ${
+      isActive
+        ? "bg-muted font-semibold text-txt-primary before:scale-y-100"
+        : "text-txt-secondary before:scale-y-0 hover:bg-muted/60 hover:text-txt-primary"
+    }`}
+  >
+    <span className="flex size-10 items-center justify-center">
+      <Icon className={`size-[18px] ${isActive ? "text-accent" : ""}`} aria-hidden="true" />
+    </span>
+    <span
+      className={`min-w-0 truncate pr-3 transition-opacity duration-150 ${
+        showLabel ? "opacity-100 delay-100" : "pointer-events-none opacity-0"
+      }`}
     >
-      <span className="flex h-10 w-10 items-center justify-center">
-        <Icon size={19} className="shrink-0" />
-      </span>
+      {label}
+    </span>
+  </Link>
+);
 
-      <span
-        className={[
-          "min-w-0 overflow-hidden whitespace-nowrap pl-2 pr-3 transition-opacity duration-150",
-          showLabel ? "opacity-100 delay-100" : "pointer-events-none opacity-0",
-        ].join(" ")}
-      >
-        {label}
-      </span>
-    </Link>
-  );
-};
+const SectionLabel = ({ children, show }: { children: string; show: boolean }) => (
+  <p
+    className={`label-mono mb-1 mt-5 h-4 px-3 text-txt-muted transition-opacity duration-150 ${
+      show ? "opacity-100 delay-100" : "opacity-0"
+    }`}
+    aria-hidden={!show}
+  >
+    {show ? children : ""}
+  </p>
+);
 
 export const ForumSidebar = ({
   isSidebarOpen,
@@ -104,104 +91,68 @@ export const ForumSidebar = ({
   categories,
   className,
 }: ForumSidebarProps) => {
-  const location = useLocation();
+  const { pathname } = useLocation();
 
-  const showLabels = isSidebarOpen;
-
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
-
-  const isCategoryActive = (categoryId: string) => {
-    return location.pathname === FORUM_PATHS.CATEGORY(categoryId);
-  };
-
-  const renderSection = (links: SidebarLinkData[]) => {
-    return (
-      <div className="space-y-1">
-        {links.map((link) => {
-          return (
-            <SidebarLink
-              key={link.to}
-              icon={link.icon}
-              label={link.label}
-              to={link.to}
-              isActive={isActive(link.to)}
-              showLabel={showLabels}
-            />
-          );
-        })}
-      </div>
-    );
-  };
+  const renderLinks = (links: SidebarLinkData[]) => (
+    <div className="space-y-0.5">
+      {links.map((link) => (
+        <SidebarLink
+          key={link.to}
+          {...link}
+          isActive={pathname === link.to}
+          showLabel={isSidebarOpen}
+        />
+      ))}
+    </div>
+  );
 
   return (
     <aside
-      className={[
-        className ?? "",
-        "sticky top-20 hidden self-start shrink-0 overflow-hidden border-r border-br-secondary",
-        "bg-page text-txt-primary shadow-sm transition-[width] duration-300 ease-in-out md:flex md:flex-col",
-      ].join(" ")}
-      style={{
-        width: isSidebarOpen ? FORUM_EXPANDED_WIDTH : FORUM_RAIL_WIDTH,
-
-        height: "calc(100vh - 5rem)",
-      }}
+      className={`${className ?? ""} sticky top-16 hidden h-[calc(100dvh-4rem)] shrink-0 self-start overflow-hidden border-r border-br-subtle bg-page transition-[width] duration-300 ease-forge md:flex md:flex-col`}
+      style={{ width: isSidebarOpen ? FORUM_EXPANDED_WIDTH : FORUM_RAIL_WIDTH }}
+      aria-label="Forum"
     >
-      <div className="grid h-14 grid-cols-[40px_1fr] items-center px-4">
+      <div className="grid h-14 shrink-0 grid-cols-[40px_1fr] items-center border-b border-br-subtle px-4">
         <button
           type="button"
           onClick={toggleSidebar}
           aria-expanded={isSidebarOpen}
-          aria-label={
-            isSidebarOpen ? "Collapse forum navigation" : "Expand forum navigation"
-          }
-          className="flex h-10 w-10 items-center justify-center rounded-lg text-txt-secondary transition hover:bg-surface-card hover:text-txt-primary"
+          aria-label={isSidebarOpen ? "Collapse forum navigation" : "Expand forum navigation"}
+          className="flex size-10 items-center justify-center rounded-md text-txt-secondary transition-colors hover:bg-muted hover:text-txt-primary"
         >
-          {isSidebarOpen ? <LuPanelLeftClose size={20} /> : <LuPanelLeftOpen size={20} />}
+          {isSidebarOpen ? (
+            <PanelLeftClose className="size-5" aria-hidden="true" />
+          ) : (
+            <PanelLeftOpen className="size-5" aria-hidden="true" />
+          )}
         </button>
-
         <span
-          className={[
-            "min-w-0 overflow-hidden whitespace-nowrap pl-3 text-sm font-semibold transition-opacity duration-150",
-            showLabels ? "opacity-100 delay-100" : "pointer-events-none opacity-0",
-          ].join(" ")}
+          className={`flex items-center gap-2 pl-3 font-display text-sm font-semibold transition-opacity duration-150 ${
+            isSidebarOpen ? "opacity-100 delay-100" : "pointer-events-none opacity-0"
+          }`}
         >
+          <MessagesSquare className="size-4 text-accent" aria-hidden="true" />
           Forum
         </span>
       </div>
 
-      <nav className="flex min-h-0 flex-1 flex-col border-t border-br-secondary px-4 py-3">
-        {renderSection(MAIN_LINKS)}
+      <nav className="flex min-h-0 flex-1 flex-col overflow-y-auto overflow-x-hidden px-4 pb-4">
+        <SectionLabel show={isSidebarOpen}>Browse</SectionLabel>
+        {renderLinks(MAIN_LINKS)}
 
-        <div className="my-4 border-t border-br-secondary" />
+        <SectionLabel show={isSidebarOpen}>Categories</SectionLabel>
+        {renderLinks(
+          categories.map((category) => ({
+            icon: FORUM_CATEGORIES.find((item) => item.id === category.id)?.icon ?? MessagesSquare,
+            label: category.name,
+            to: FORUM_PATHS.CATEGORY(category.id),
+          }))
+        )}
 
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="space-y-1">
-            {categories.map((category) => {
-              const configCategory = FORUM_CATEGORIES.find((item) => {
-                return item.id === category.id;
-              });
-
-              const CategoryIcon = configCategory?.icon ?? FaQuestionCircle;
-
-              return (
-                <SidebarLink
-                  key={category.id}
-                  icon={CategoryIcon}
-                  label={category.name}
-                  to={FORUM_PATHS.CATEGORY(category.id)}
-                  isActive={isCategoryActive(category.id)}
-                  showLabel={showLabels}
-                />
-              );
-            })}
-          </div>
+        <div className="mt-auto">
+          <SectionLabel show={isSidebarOpen}>Info</SectionLabel>
+          {renderLinks(INFO_LINKS)}
         </div>
-
-        <div className="my-4 border-t border-br-secondary" />
-
-        {renderSection(INFO_LINKS)}
       </nav>
     </aside>
   );
