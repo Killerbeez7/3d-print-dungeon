@@ -1,8 +1,12 @@
 import { useEffect, useState, ChangeEvent } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Check, Link2, Pencil, Trash2 } from "lucide-react";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { Button } from "@/components";
+import { MODEL_CATEGORIES } from "@/features/models/constants/modelCategories";
+import { formatPrice, getFileFormat, toDate } from "@/features/models/utils/modelMeta";
+import { toUrlSafeUsername } from "@/utils/stringUtils";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useSystemAlert } from "@/features/system-alerts/hooks/useSystemAlert";
 //components
@@ -28,7 +32,49 @@ interface ModelSidebarProps {
   viewCountLoading?: boolean;
   currentUser: CurrentUser | null;
   openAuthModal: () => void;
+  /** On phones the purchase button lives in a sticky bottom bar instead. */
+  showPurchase?: boolean;
 }
+
+const inputClass =
+  "w-full rounded-lg border border-br-input bg-page px-3 py-2.5 text-sm text-txt-primary placeholder:text-txt-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25";
+
+/** Copies the page link (or opens the share sheet on phones). */
+const ShareButton = ({ title }: { title: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleShare = async () => {
+    const url = window.location.href;
+    try {
+      if (navigator.share && window.matchMedia("(pointer: coarse)").matches) {
+        await navigator.share({ title, url });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Share sheet dismissed or clipboard blocked: nothing to do.
+    }
+  };
+
+  return (
+    <Button
+      variant="secondary"
+      onClick={() => void handleShare()}
+      aria-label={copied ? "Link copied" : "Share link"}
+      leftIcon={
+        copied ? (
+          <Check className="size-4 text-success" aria-hidden="true" />
+        ) : (
+          <Link2 className="size-4" aria-hidden="true" />
+        )
+      }
+    >
+      <span className="sr-only sm:not-sr-only">{copied ? "Copied" : "Share"}</span>
+    </Button>
+  );
+};
 
 export function ModelSidebar({
   model,
@@ -37,6 +83,7 @@ export function ModelSidebar({
   viewCountLoading,
   currentUser,
   openAuthModal,
+  showPurchase = true,
 }: ModelSidebarProps) {
   const navigate = useNavigate();
   const { isAdmin } = useAuth();
@@ -126,101 +173,176 @@ export function ModelSidebar({
     }
   };
 
+  const category = MODEL_CATEGORIES.find((item) => model.categoryIds?.includes(item.id));
+  const createdAt = toDate(model.createdAt);
+  const fileFormat = getFileFormat(model.originalFileUrl);
+  const tags = formData.tags
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+  const isPaid = Boolean(model.isPaid && model.price && model.price > 0);
+  const profilePath = uploader?.username ? `/${toUrlSafeUsername(uploader.username)}` : null;
+  const creatorName = uploader?.displayName || "Anonymous";
+  const imageCount =
+    (model.renderPrimaryUrl ? 1 : 0) + (Array.isArray(model.renderExtraUrls) ? model.renderExtraUrls.length : 0);
+
+  const specs = [
+    { label: "Format", value: fileFormat },
+    { label: "Category", value: category?.name },
+    { label: "Images", value: imageCount ? String(imageCount) : null },
+    {
+      label: "Uploaded",
+      value: createdAt?.toLocaleDateString("en", { year: "numeric", month: "short", day: "numeric" }),
+    },
+    { label: "Made with AI", value: model.isAI ? "Yes" : null },
+  ].filter((spec): spec is { label: string; value: string } => Boolean(spec.value));
+
+  const stats = [
+    { label: "Views", value: viewCountLoading ? "…" : viewCount.toLocaleString("en") },
+    { label: "Likes", value: (model.likes ?? 0).toLocaleString("en") },
+    {
+      label: "Added",
+      value: createdAt ? createdAt.toLocaleDateString("en", { month: "short", year: "numeric" }) : "—",
+    },
+  ];
+
   return (
-    <aside className="w-full lg:w-[400px] flex flex-col h-full overflow-y-auto rounded-lg">
-      {/* Model Info Section */}
-      <section className="px-4 pb-5 pt-0 lg:px-6 lg:pb-6">
+    <aside className="flex w-full flex-col gap-6 lg:sticky lg:top-24 lg:w-[400px] lg:shrink-0 lg:self-start">
+      {/* Title */}
+      <section>
         {isEditing ? (
-          <>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="mb-3 w-full rounded-lg border border-br-secondary bg-surface-card px-3 py-2 text-lg font-bold text-txt-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 lg:text-2xl"
-              required
-            />
-            <textarea
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              className="mb-4 w-full rounded-lg border border-br-secondary bg-surface-card px-3 py-2 text-sm text-txt-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 lg:text-base"
-              rows={3}
-            />
-            <input
-              type="text"
-              name="tags"
-              value={formData.tags}
-              onChange={handleChange}
-              className="mb-4 w-full rounded-lg border border-br-secondary bg-surface-card px-3 py-2 text-sm text-txt-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30 lg:text-base"
-              placeholder="Tags (comma-separated)"
-            />
-            {error && <p className="text-red-600 mb-2 text-sm">{error}</p>}
-            <div className="flex gap-2 mb-4">
-              <button
-                onClick={handleSave}
-                disabled={isUpdating}
-                className="flex-1 rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-text transition-colors hover:bg-btn-primary-hover focus:outline-none focus:ring-2 focus:ring-focus disabled:opacity-60 lg:text-base"
-              >
-                {isUpdating ? "Saving..." : "Save"}
-              </button>
-              <button
-                onClick={handleCancel}
-                disabled={isUpdating}
-                className="flex-1 rounded-lg border border-br-secondary bg-surface-card px-4 py-2 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-focus disabled:opacity-60 lg:text-base"
-              >
+          <div className="space-y-3">
+            <label className="block">
+              <span className="label-mono mb-1.5 block text-txt-muted">Name</span>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                className={`${inputClass} text-lg font-semibold`}
+                required
+              />
+            </label>
+            <label className="block">
+              <span className="label-mono mb-1.5 block text-txt-muted">Description</span>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                className={inputClass}
+                rows={4}
+              />
+            </label>
+            <label className="block">
+              <span className="label-mono mb-1.5 block text-txt-muted">Tags</span>
+              <input
+                type="text"
+                name="tags"
+                value={formData.tags}
+                onChange={handleChange}
+                className={inputClass}
+                placeholder="dragon, presupported, 32mm"
+              />
+            </label>
+            {error && <p className="text-sm text-error">{error}</p>}
+            <div className="flex gap-2">
+              <Button onClick={handleSave} isLoading={isUpdating} className="flex-1">
+                {isUpdating ? "Saving…" : "Save changes"}
+              </Button>
+              <Button variant="secondary" onClick={handleCancel} disabled={isUpdating} className="flex-1">
                 Cancel
-              </button>
+              </Button>
             </div>
-          </>
+          </div>
         ) : (
           <>
-            <h4 className="mb-3 text-base font-bold text-txt-primary lg:text-lg">
-              {formData.name}
-            </h4>
-            <p className="text-sm leading-relaxed text-txt-secondary lg:text-base">
-              {formData.description}
-            </p>
-            {formData.tags && (
-              <div className="mt-5 flex flex-wrap gap-2">
-                {formData.tags.split(",").map((tag, i) => (
-                  <span
-                    key={i}
-                    className="rounded-full border border-br-subtle bg-surface-card px-2.5 py-1 text-xs text-txt-secondary"
-                  >
-                    {tag.trim()}
-                  </span>
-                ))}
-              </div>
+            {category && (
+              <Link
+                to={`/?category=${category.id}`}
+                className="label-mono text-accent transition-colors hover:text-accent-hover"
+              >
+                {category.name}
+              </Link>
             )}
+            <h1 className="mt-2 break-words text-2xl font-bold leading-tight lg:text-3xl">
+              {formData.name}
+            </h1>
           </>
         )}
       </section>
 
-      {/* Action Buttons Section */}
-      <section className="border-t border-br-subtle px-4 py-5 lg:px-6">
-        {model.isPaid && model.price && model.price > 0 && (
-          <div className="mb-3">
-            <p className="text-xs font-medium uppercase text-txt-muted">Price</p>
-            <p className="mt-1 text-2xl font-semibold leading-tight text-txt-primary">
-              ${model.price}
-            </p>
+      {/* Creator */}
+      <section className="flex items-center gap-3">
+        <span className="chamfer size-12 shrink-0 overflow-hidden bg-muted [--cut:9px]">
+          <img
+            src={uploader?.photoURL || "/assets/images/user.png"}
+            alt=""
+            className="size-full object-cover"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "/assets/images/user.png";
+            }}
+          />
+        </span>
+        <div className="min-w-0 flex-1">
+          {profilePath ? (
+            <Link
+              to={profilePath}
+              className="block truncate text-sm font-semibold text-txt-primary transition-colors hover:text-accent"
+            >
+              {creatorName}
+            </Link>
+          ) : (
+            <p className="truncate text-sm font-semibold text-txt-primary">{creatorName}</p>
+          )}
+          {uploader?.username && (
+            <p className="truncate font-mono text-xs text-txt-muted">@{uploader.username}</p>
+          )}
+        </div>
+        {model.uploaderId && (
+          <FollowButton
+            targetUserId={model.uploaderId}
+            targetUserName={uploader?.displayName || undefined}
+            size="sm"
+            variant="primary"
+            openAuthModal={openAuthModal}
+          />
+        )}
+      </section>
+
+      {/* Stats */}
+      <dl className="grid grid-cols-3 divide-x divide-br-subtle border-y border-br-subtle py-3 text-center">
+        {stats.map((stat) => (
+          <div key={stat.label}>
+            <dt className="label-mono text-txt-muted">{stat.label}</dt>
+            <dd className="mt-1 font-mono text-base font-semibold text-txt-primary">{stat.value}</dd>
+          </div>
+        ))}
+      </dl>
+
+      {/* Actions */}
+      <section className="space-y-3">
+        {isPaid && showPurchase && (
+          <div className="flex items-baseline justify-between">
+            <span className="label-mono text-txt-muted">Price</span>
+            <span className="font-mono text-3xl font-semibold text-ember">
+              {formatPrice(model.price as number, model.currency)}
+            </span>
           </div>
         )}
 
-        {/* Purchase/Download Button */}
-        <div className="mb-4">
+        {showPurchase && (
           <PurchaseButton
             model={{
               ...model,
               price: model.price ?? 0,
               uploaderId: model.uploaderId ?? "",
             }}
-            className="h-12 w-full text-sm font-semibold lg:text-base"
+            className="w-full"
           />
-        </div>
+        )}
 
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <LikeButton
             modelId={model.id}
             initialLikes={model.likes}
@@ -232,105 +354,99 @@ export function ModelSidebar({
             currentUser={currentUser}
             openAuthModal={openAuthModal}
           />
+          <ShareButton title={model.name} />
         </div>
+      </section>
 
-        {/* Edit and Delete Buttons for Owner or Admin */}
-        {currentUser &&
-          (currentUser.uid === model.uploaderId || isAdmin) &&
-          !isEditing && (
-            <div className="mt-5 border-t border-br-subtle pt-4">
-              <p className="mb-3 text-xs font-medium uppercase text-txt-muted">
-                Owner actions
-              </p>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                <button
-                  onClick={handleEdit}
-                  className="h-11 w-full rounded-lg border border-br-secondary bg-surface-card px-4 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-focus"
+      {/* Description */}
+      {!isEditing && formData.description && (
+        <section>
+          <h2 className="label-mono mb-2 text-txt-muted">About this model</h2>
+          <p className="whitespace-pre-line text-sm leading-relaxed text-txt-secondary">
+            {formData.description}
+          </p>
+        </section>
+      )}
+
+      {/* Specs */}
+      {specs.length > 0 && (
+        <section>
+          <h2 className="label-mono mb-2 text-txt-muted">Specs</h2>
+          <dl className="divide-y divide-br-subtle rounded-lg border border-br-subtle bg-surface-card">
+            {specs.map((spec) => (
+              <div key={spec.label} className="flex items-center justify-between gap-4 px-4 py-2.5 text-sm">
+                <dt className="text-txt-muted">{spec.label}</dt>
+                <dd className="font-mono text-txt-primary">{spec.value}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
+
+      {/* Tags */}
+      {!isEditing && tags.length > 0 && (
+        <ul className="flex flex-wrap gap-1.5" aria-label="Tags">
+          {tags.map((tag) => (
+            <li key={tag}>
+              <Link
+                to={`/search?sort_by=relevance&query=${encodeURIComponent(tag)}`}
+                className="inline-block border border-br-secondary px-2 py-1 font-mono text-xs text-txt-secondary transition-colors hover:border-accent hover:text-accent"
+              >
+                #{tag}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Owner actions */}
+      {currentUser && (currentUser.uid === model.uploaderId || isAdmin) && !isEditing && (
+        <section className="rounded-lg border border-dashed border-br-secondary p-4">
+          <h2 className="label-mono mb-3 text-txt-muted">Owner actions</h2>
+          {showDeleteConfirm ? (
+            <div className="space-y-3">
+              <p className="text-sm text-error">Delete this model? This can&apos;t be undone.</p>
+              {error && <p className="text-sm text-error">{error}</p>}
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleDelete}
+                  isLoading={isDeleting}
+                  className="flex-1 [--btn-bg:var(--error)] [--btn-edge:var(--error)]"
                 >
-                  <span className="inline-flex items-center justify-center gap-2">
-                    <Pencil className="h-4 w-4 lg:h-5 lg:w-5" aria-hidden="true" />
-                    <span>Edit Model</span>
-                  </span>
-                </button>
-
-                {showDeleteConfirm ? (
-                  <div className="space-y-3 rounded-lg border border-error/40 bg-error/5 p-3 sm:col-span-2 lg:col-span-1">
-                    <p className="text-sm text-error">
-                      Delete this model? This action cannot be undone.
-                    </p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={handleDelete}
-                        disabled={isDeleting}
-                        className="h-10 flex-1 rounded-lg bg-error px-4 text-sm font-medium text-txt-inverse transition-colors hover:bg-error-hover focus:outline-none focus:ring-2 focus:ring-error disabled:bg-btn-disabled disabled:opacity-70"
-                      >
-                        {isDeleting ? "Deleting..." : "Delete"}
-                      </button>
-                      <button
-                        onClick={() => setShowDeleteConfirm(false)}
-                        disabled={isDeleting}
-                        className="h-10 flex-1 rounded-lg border border-br-secondary bg-surface-card px-4 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-focus disabled:opacity-70"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => setShowDeleteConfirm(true)}
-                    className="h-11 w-full rounded-lg border border-error/50 bg-transparent px-4 text-sm font-medium text-error transition-colors hover:bg-error/10 focus:outline-none focus:ring-2 focus:ring-error/60"
-                  >
-                    <span className="inline-flex items-center justify-center gap-2">
-                      <Trash2 className="h-4 w-4 lg:h-5 lg:w-5" aria-hidden="true" />
-                      <span>Delete Model</span>
-                    </span>
-                  </button>
-                )}
+                  {isDeleting ? "Deleting…" : "Delete"}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
               </div>
             </div>
-          )}
-      </section>
-
-      {/* Creator Info Section */}
-      <section className="border-t border-br-subtle px-4 py-5 lg:px-6">
-        <p className="mb-3 text-xs font-medium uppercase text-txt-muted">Creator</p>
-        <div className="flex items-center gap-3 rounded-lg bg-surface-card/60 p-3 lg:gap-4">
-          <img
-            src={uploader?.photoURL || "/assets/images/user.png"}
-            alt={uploader?.displayName || "Unknown User"}
-            className="h-14 w-14 rounded-lg border border-br-secondary object-cover lg:h-16 lg:w-16"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = "/assets/images/user.png";
-            }}
-          />
-          <div className="flex-1 min-w-0">
-            <h5 className="text-base font-semibold text-txt-primary">
-              <span
-                className="block truncate"
-                title={uploader?.displayName || "Anonymous"}
+          ) : (
+            <div className="flex gap-2">
+              <Button
+                variant="secondary"
+                onClick={handleEdit}
+                className="flex-1"
+                leftIcon={<Pencil className="size-4" aria-hidden="true" />}
               >
-                {uploader?.displayName || "Anonymous"}
-              </span>
-            </h5>
-            <p className="mt-1 text-xs text-txt-secondary">Senior 3D Artist</p>
-            <div className="mt-3 flex items-center gap-2 lg:gap-3">
-              {model.uploaderId && (
-                <FollowButton
-                  targetUserId={model.uploaderId}
-                  targetUserName={uploader?.displayName || undefined}
-                  size="sm"
-                  variant="primary"
-                  openAuthModal={openAuthModal}
-                />
-              )}
-              <span className="text-xs lg:text-sm text-txt-secondary">
-                {viewCountLoading ? "Loading..." : `${viewCount} views`}
-              </span>
+                Edit
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => setShowDeleteConfirm(true)}
+                className="flex-1 text-error"
+                leftIcon={<Trash2 className="size-4" aria-hidden="true" />}
+              >
+                Delete
+              </Button>
             </div>
-          </div>
-        </div>
-      </section>
+          )}
+        </section>
+      )}
     </aside>
   );
 }
