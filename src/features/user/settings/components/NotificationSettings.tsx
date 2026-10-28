@@ -124,7 +124,7 @@ export const NotificationSettings = () => {
         onClick={() => onChange(!enabled)}
         disabled={loading}
         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 ${
-          enabled ? "bg-accent" : "bg-br-secondary"
+          enabled ? "bg-btn-primary" : "bg-br-secondary"
         } ${loading ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
       >
         <span

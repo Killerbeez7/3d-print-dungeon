@@ -101,7 +101,7 @@ export const ContentModeration = () => {
             onClick={() => setSelectedStatus(status)}
             className={`px-4 py-2 rounded-lg text-sm font-medium ${
               selectedStatus === status
-                ? "bg-accent text-white"
+                ? "bg-btn-primary text-white"
                 : "bg-section text-txt-secondary hover:text-txt-primary"
             }`}
           >

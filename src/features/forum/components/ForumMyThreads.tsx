@@ -437,7 +437,7 @@ export function ForumMyThreads() {
               onClick={() => {
                 window.location.reload();
               }}
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover"
+              className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
             >
               Retry
             </button>
@@ -584,7 +584,7 @@ export function ForumMyThreads() {
 
               <Link
                 to={FORUM_PATHS.NEW_THREAD}
-                className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover"
+                className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
               >
                 Create Thread
               </Link>

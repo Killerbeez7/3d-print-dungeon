@@ -92,7 +92,7 @@ export function ForumDashboard() {
 
         <Link
           to={FORUM_PATHS.NEW_THREAD}
-          className="inline-flex items-center justify-center gap-2 self-start rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-btn-primary-text shadow-sm transition-all hover:bg-accent-hover hover:shadow-md sm:self-auto"
+          className="inline-flex items-center justify-center gap-2 self-start rounded-lg bg-btn-primary px-4 py-2.5 text-sm font-semibold text-btn-primary-text shadow-sm transition-all hover:bg-btn-primary-hover hover:shadow-md sm:self-auto"
         >
           <FaPlus size={11} aria-hidden="true" />
           New Thread

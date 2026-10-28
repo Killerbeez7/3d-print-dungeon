@@ -170,15 +170,15 @@ export function CookiePolicyPage() {
                     <h4 className="font-medium text-txt-primary mb-3">Examples:</h4>
                     <div className="space-y-2 text-sm text-txt-secondary">
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
+                        <div className="w-1.5 h-1.5 bg-btn-primary rounded-full"></div>
                         <span>Analytics and performance tools</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
+                        <div className="w-1.5 h-1.5 bg-btn-primary rounded-full"></div>
                         <span>Page view tracking</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
+                        <div className="w-1.5 h-1.5 bg-btn-primary rounded-full"></div>
                         <span>Usage analysis</span>
                       </div>
                     </div>
@@ -204,15 +204,15 @@ export function CookiePolicyPage() {
                     <h4 className="font-medium text-txt-primary mb-3">Examples:</h4>
                     <div className="space-y-2 text-sm text-txt-secondary">
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
+                        <div className="w-1.5 h-1.5 bg-btn-primary rounded-full"></div>
                         <span>Personalized recommendations</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
+                        <div className="w-1.5 h-1.5 bg-btn-primary rounded-full"></div>
                         <span>Advertising integrations</span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-accent rounded-full"></div>
+                        <div className="w-1.5 h-1.5 bg-btn-primary rounded-full"></div>
                         <span>Social media features</span>
                       </div>
                     </div>

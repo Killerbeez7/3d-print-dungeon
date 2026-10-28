@@ -142,7 +142,7 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
                 modelData.tags.map((tag: string) => (
                   <div
                     key={tag}
-                    className="bg-accent text-white flex items-center px-3 py-1 rounded-full"
+                    className="bg-btn-primary text-white flex items-center px-3 py-1 rounded-full"
                   >
                     <span className="text-sm">{tag}</span>
                     <button

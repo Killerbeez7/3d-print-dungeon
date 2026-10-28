@@ -205,7 +205,7 @@ export function ForumHome() {
             <button
               type="button"
               onClick={handleCreateThread}
-              className="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover"
+              className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
             >
               {actionLabel}
             </button>
@@ -375,7 +375,7 @@ export function ForumHome() {
         <button
           type="button"
           onClick={handleCreateThread}
-          className="inline-flex items-center justify-center gap-2 self-start rounded-lg bg-accent px-4 py-2.5 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover lg:self-auto"
+          className="inline-flex items-center justify-center gap-2 self-start rounded-lg bg-btn-primary px-4 py-2.5 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover lg:self-auto"
         >
           <FaPlus size={13} aria-hidden="true" />
           New Thread

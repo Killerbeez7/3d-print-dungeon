@@ -52,7 +52,7 @@ export const AdminPage = () => {
                 classNames(
                   "w-full rounded-lg py-2.5 text-sm font-medium leading-5",
                   selected
-                    ? "bg-accent text-white shadow"
+                    ? "bg-btn-primary text-white shadow"
                     : "text-txt-secondary hover:bg-section hover:text-txt-primary"
                 )
               }

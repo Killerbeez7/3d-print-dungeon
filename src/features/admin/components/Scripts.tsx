@@ -123,7 +123,7 @@ export const Scripts = () => {
         <div className="flex gap-4 items-center">
           <button
             onClick={checkClaims}
-            className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover"
+            className="px-4 py-2 bg-btn-primary text-white rounded-lg hover:bg-btn-primary-hover"
             disabled={loading}
           >
             {loading ? "Checking..." : "Check Current Claims"}

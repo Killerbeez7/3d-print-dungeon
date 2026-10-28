@@ -126,7 +126,7 @@ export const PaymentModal = ({
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={() => setPaymentStatus("idle")}
-                  className="px-4 py-2 bg-accent text-white rounded-md hover:bg-accent-hover transition-colors"
+                  className="px-4 py-2 bg-btn-primary text-white rounded-md hover:bg-btn-primary-hover transition-colors"
                 >
                   Try Again
                 </button>

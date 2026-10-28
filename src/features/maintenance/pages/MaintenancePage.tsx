@@ -91,7 +91,7 @@ export const MaintenancePage = () => {
             <button
               type="button"
               onClick={() => navigate("/login")}
-              className="mt-6 rounded-lg bg-accent px-6 py-3 text-white transition-colors hover:bg-accent-hover"
+              className="mt-6 rounded-lg bg-btn-primary px-6 py-3 text-white transition-colors hover:bg-btn-primary-hover"
             >
               Sign in
             </button>
@@ -102,7 +102,7 @@ export const MaintenancePage = () => {
                 enableAdminBypass();
                 navigate("/", { replace: true });
               }}
-              className="mt-6 rounded-lg bg-accent px-6 py-3 text-white transition-colors hover:bg-accent-hover"
+              className="mt-6 rounded-lg bg-btn-primary px-6 py-3 text-white transition-colors hover:bg-btn-primary-hover"
             >
               Access Site
             </button>

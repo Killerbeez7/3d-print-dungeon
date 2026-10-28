@@ -86,7 +86,7 @@ export const BlogGrid = ({
                 onClick={() => handleTagToggle(tag)}
                 className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
                   selectedTags.includes(tag)
-                    ? "bg-accent text-white"
+                    ? "bg-btn-primary text-white"
                     : "bg-muted text-txt-secondary hover:bg-surface-card"
                 }`}
               >

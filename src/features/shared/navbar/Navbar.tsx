@@ -226,7 +226,7 @@ export const Navbar = () => {
                   >
                     <button
                       type="button"
-                      className={`relative inline-flex h-10 items-center whitespace-nowrap px-1 text-sm font-medium transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-accent after:transition-opacity after:duration-200 hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
+                      className={`relative inline-flex h-10 items-center whitespace-nowrap px-1 text-sm font-medium transition-colors duration-200 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:rounded-full after:bg-btn-primary after:transition-opacity after:duration-200 hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
                         activeDropdown === section.label
                           ? "text-txt-primary after:opacity-100"
                           : "text-txt-secondary after:opacity-0 group-hover:after:opacity-100"

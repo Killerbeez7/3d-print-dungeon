@@ -332,7 +332,7 @@ export function ForumRules() {
 
           <Link
             to={FORUM_PATHS.HOME}
-            className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover"
+            className="rounded-lg bg-btn-primary px-5 py-2.5 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
           >
             Back to Forum
           </Link>

@@ -49,7 +49,7 @@ export function ForumCategory() {
 
         <Link
           to={FORUM_PATHS.HOME}
-          className="inline-flex items-center justify-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover"
+          className="inline-flex items-center justify-center rounded-lg bg-btn-primary px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
         >
           Return to Forum
         </Link>
@@ -61,7 +61,7 @@ export function ForumCategory() {
     <div className="space-y-5">
       {/* Category header */}
       <header className="relative overflow-hidden rounded-xl border border-br-subtle bg-surface-card p-6 shadow-sm">
-        <div className="absolute inset-y-0 left-0 w-1 bg-accent" />
+        <div className="absolute inset-y-0 left-0 w-1 bg-btn-primary" />
 
         <div className="pl-2">
           <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
@@ -164,7 +164,7 @@ export function ForumCategory() {
 
         <Link
           to={FORUM_PATHS.NEW_THREAD_FOR_CATEGORY(categoryId)}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-btn-primary-text shadow-sm transition-all hover:bg-accent-hover hover:shadow-md"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-btn-primary px-4 py-2 text-sm font-semibold text-btn-primary-text shadow-sm transition-all hover:bg-btn-primary-hover hover:shadow-md"
         >
           <FaPlus size={11} aria-hidden="true" />
           New Thread

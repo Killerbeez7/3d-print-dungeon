@@ -116,7 +116,7 @@ export const SettingsPage = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full text-left px-4 py-3 rounded-md font-medium transition-colors ${
                     activeTab === tab.id
-                      ? "bg-accent text-white shadow-sm"
+                      ? "bg-btn-primary text-white shadow-sm"
                       : "text-txt-secondary hover:bg-section hover:text-txt-primary"
                   }`}
                 >

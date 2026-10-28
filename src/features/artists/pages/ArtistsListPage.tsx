@@ -89,7 +89,7 @@ export const ArtistsListPage = () => {
           {/* Stats */}
           {artists.length > 0 && (
             <div className="mt-6 inline-flex items-center gap-2 bg-section rounded-full px-4 py-2 shadow-sm">
-              <div className="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+              <div className="w-2 h-2 bg-btn-primary rounded-full animate-pulse"></div>
               <span className="text-sm text-txt-secondary">
                 {artists.length} {artists.length === 1 ? "artist" : "artists"} discovered
               </span>

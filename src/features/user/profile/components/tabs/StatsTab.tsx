@@ -176,7 +176,7 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
               onClick={() => setSelectedPeriod(period)}
               className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
                 selectedPeriod === period
-                  ? "bg-accent text-white"
+                  ? "bg-btn-primary text-white"
                   : "bg-section text-txt-secondary hover:text-txt-primary"
               }`}
             >
@@ -255,7 +255,7 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
                       </div>
                       <div className="w-full bg-page rounded-full h-2">
                         <div
-                          className="bg-accent h-2 rounded-full transition-all duration-300"
+                          className="bg-btn-primary h-2 rounded-full transition-all duration-300"
                           style={{ width: `${achievement.progress}%` }}
                         ></div>
                       </div>
@@ -282,7 +282,7 @@ export const StatsTab = ({ userData }: StatsTabProps) => {
               key={index}
               className="flex items-center gap-3 p-3 bg-surface-card rounded-lg"
             >
-              <div className="w-2 h-2 bg-accent rounded-full"></div>
+              <div className="w-2 h-2 bg-btn-primary rounded-full"></div>
               <div className="flex-1">
                 <span className="text-txt-primary">{activity.action}</span>
                 <span className="text-txt-secondary"> {activity.item}</span>

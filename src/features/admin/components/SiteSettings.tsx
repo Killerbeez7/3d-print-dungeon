@@ -132,7 +132,7 @@ export const SiteSettings = () => {
                   }
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-surface-card rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-accent"></div>
+                <div className="w-11 h-6 bg-surface-card rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-btn-primary"></div>
               </label>
             </div>
           </div>
@@ -202,7 +202,7 @@ export const SiteSettings = () => {
               />
               <button
                 onClick={handleAddCategory}
-                className="px-4 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover"
+                className="px-4 py-2 bg-btn-primary text-white rounded-lg hover:bg-btn-primary-hover"
               >
                 Add
               </button>
@@ -233,7 +233,7 @@ export const SiteSettings = () => {
         <button
           onClick={handleSaveSettings}
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-2 bg-accent text-white rounded-lg hover:bg-accent-hover disabled:opacity-50"
+          className="flex items-center gap-2 px-6 py-2 bg-btn-primary text-white rounded-lg hover:bg-btn-primary-hover disabled:opacity-50"
         >
           <MdSave size={20} />
           {saving ? "Saving..." : "Save Settings"}

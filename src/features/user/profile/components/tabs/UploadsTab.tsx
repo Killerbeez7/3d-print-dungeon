@@ -147,7 +147,7 @@ export const UploadsTab = ({ userId }: UploadsTabProps) => {
             onClick={() => setViewMode("grid")}
             className={`p-2 rounded-lg transition-colors ${
               viewMode === "grid"
-                ? "bg-accent text-white"
+                ? "bg-btn-primary text-white"
                 : "bg-section text-txt-secondary hover:text-txt-primary"
             }`}
             title="Grid View"
@@ -158,7 +158,7 @@ export const UploadsTab = ({ userId }: UploadsTabProps) => {
             onClick={() => setViewMode("list")}
             className={`p-2 rounded-lg transition-colors ${
               viewMode === "list"
-                ? "bg-accent text-white"
+                ? "bg-btn-primary text-white"
                 : "bg-section text-txt-secondary hover:text-txt-primary"
             }`}
             title="List View"
@@ -311,7 +311,7 @@ export const UploadsTab = ({ userId }: UploadsTabProps) => {
                     {model.tags.slice(0, 3).map((tag, index) => (
                       <span
                         key={index}
-                        className="px-2 py-1 bg-accent bg-opacity-20 text-accent text-xs rounded-full"
+                        className="px-2 py-1 bg-btn-primary bg-opacity-20 text-accent text-xs rounded-full"
                       >
                         {tag}
                       </span>

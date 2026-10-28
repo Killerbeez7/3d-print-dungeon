@@ -43,7 +43,7 @@ body {
   --txt-primary: #15171c;
   --txt-secondary: #4b5563;
   --txt-highlight: #0b0c0f;
-  --txt-muted: #737987;
+  --txt-muted: #646a77;
   --txt-inverse: #ffffff;
 
   --accent-dark: #5b48c8;
@@ -116,8 +116,8 @@ body {
   --logo-accent-filter: brightness(0) saturate(100%) invert(61%) sepia(72%)
     saturate(1375%) hue-rotate(214deg) brightness(99%) contrast(94%);
 
-  --btn-primary: var(--accent);
-  --btn-primary-hover: var(--accent-dark);
+  --btn-primary: #7360e6;
+  --btn-primary-hover: #6550dc;
   --btn-primary-text: #ffffff;
   --btn-main: #232633;
   --btn-secondary: #262a36;

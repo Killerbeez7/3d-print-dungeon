@@ -160,7 +160,7 @@ export function ModelSidebar({
               <button
                 onClick={handleSave}
                 disabled={isUpdating}
-                className="flex-1 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-btn-primary-text transition-colors hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-focus disabled:opacity-60 lg:text-base"
+                className="flex-1 rounded-lg bg-btn-primary px-4 py-2 text-sm font-medium text-btn-primary-text transition-colors hover:bg-btn-primary-hover focus:outline-none focus:ring-2 focus:ring-focus disabled:opacity-60 lg:text-base"
               >
                 {isUpdating ? "Saving..." : "Save"}
               </button>

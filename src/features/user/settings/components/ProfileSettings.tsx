@@ -352,7 +352,7 @@ export const ProfileSettings = () => {
                     accept="image/*"
                     onChange={handleProfilePictureChange}
                     disabled={loading}
-                    className="block w-full text-sm spellcheck-disabled text-txt-secondary file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white hover:file:bg-accent/90 disabled:opacity-50"
+                    className="block w-full text-sm spellcheck-disabled text-txt-secondary file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-btn-primary file:text-white hover:file:bg-accent/90 disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -383,7 +383,7 @@ export const ProfileSettings = () => {
                     type="file"
                     accept="image/*"
                     disabled
-                    className="block w-full text-sm spellcheck-disabled text-txt-secondary opacity-50 cursor-not-allowed file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-accent file:text-white"
+                    className="block w-full text-sm spellcheck-disabled text-txt-secondary opacity-50 cursor-not-allowed file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-btn-primary file:text-white"
                   />
                 </div>
               </div>

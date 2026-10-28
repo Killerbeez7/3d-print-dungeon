@@ -142,7 +142,7 @@ export const SellerVerification = ({
               <button
                 onClick={handleStartVerification}
                 disabled={isLoading}
-                className="px-3 py-2 bg-accent text-white rounded text-sm hover:bg-accent-hover disabled:opacity-50"
+                className="px-3 py-2 bg-btn-primary text-white rounded text-sm hover:bg-btn-primary-hover disabled:opacity-50"
               >
                 {isLoading ? "Setting up..." : "Start verification"}
               </button>

@@ -74,7 +74,7 @@ export const BlogCard = ({ post, isExpanded = false, onToggle }: BlogCardProps) 
               }`}
             />
             {post.featured && (
-              <div className="absolute top-3 left-3 bg-accent text-white px-2 py-1 rounded-full text-xs font-semibold">
+              <div className="absolute top-3 left-3 bg-btn-primary text-white px-2 py-1 rounded-full text-xs font-semibold">
                 Featured
               </div>
             )}

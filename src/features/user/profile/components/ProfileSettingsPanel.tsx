@@ -212,7 +212,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
 
               <Link
                 to="/upload"
-                className="text-sm bg-accent hover:bg-accent-hover text-white px-3 py-1 rounded-md transition-colors"
+                className="text-sm bg-btn-primary hover:bg-btn-primary-hover text-white px-3 py-1 rounded-md transition-colors"
               >
                 Upload New
               </Link>
@@ -377,7 +377,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="bg-section rounded-lg p-4 border border-br-secondary">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-btn-primary rounded-full flex items-center justify-center">
                     <FontAwesomeIcon icon={faTrophy} className="text-white" />
                   </div>
 
@@ -393,7 +393,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
 
               <div className="bg-section rounded-lg p-4 border border-br-secondary">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-btn-primary rounded-full flex items-center justify-center">
                     <FontAwesomeIcon icon={faHeart} className="text-white" />
                   </div>
 
@@ -407,7 +407,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
 
               <div className="bg-section rounded-lg p-4 border border-br-secondary">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-btn-primary rounded-full flex items-center justify-center">
                     <FontAwesomeIcon icon={faUser} className="text-white" />
                   </div>
 
@@ -436,7 +436,7 @@ export const ProfileSettingsPanel = ({ user }: ProfileSettingsPanelProps) => {
 
         <Link
           to={ROUTES.USER_SETTINGS}
-          className="flex items-center space-x-2 px-4 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg transition-all duration-200"
+          className="flex items-center space-x-2 px-4 py-2 bg-btn-primary hover:bg-btn-primary-hover text-white rounded-lg transition-all duration-200"
         >
           <FontAwesomeIcon icon={faCog} className="w-4 h-4" />
 

@@ -63,7 +63,7 @@ export const EventEntryForm = ({
             </div>
             <button
                 type="submit"
-                className="mt-4 px-6 py-2 bg-accent text-white rounded font-semibold hover:bg-accent-hover transition"
+                className="mt-4 px-6 py-2 bg-btn-primary text-white rounded font-semibold hover:bg-btn-primary-hover transition"
             >
                 Submit Entry
             </button>

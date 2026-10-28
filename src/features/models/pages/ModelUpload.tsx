@@ -671,7 +671,7 @@ function StepIndicator({ stepNumber, label, currentStep }: StepIndicatorProps) {
       <div
         className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
           isActive
-            ? "bg-accent text-btn-primary-text shadow-lg shadow-accent/30 ring-2 ring-accent/20"
+            ? "bg-btn-primary text-btn-primary-text shadow-lg shadow-accent/30 ring-2 ring-accent/20"
             : isCompleted
             ? "bg-success text-txt-inverse"
             : "bg-surface-card border border-br-secondary text-txt-secondary"

@@ -182,7 +182,7 @@ export function ForumThread() {
 
         <Link
           to={FORUM_PATHS.HOME}
-          className="inline-flex items-center justify-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover"
+          className="inline-flex items-center justify-center rounded-lg bg-btn-primary px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
         >
           Return to Forum
         </Link>
@@ -285,7 +285,7 @@ export function ForumThread() {
 
                 setIsReplying(true);
               }}
-              className="inline-flex items-center gap-2 rounded-lg bg-accent px-3.5 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover"
+              className="inline-flex items-center gap-2 rounded-lg bg-btn-primary px-3.5 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
             >
               <FaReply size={11} aria-hidden="true" />
               {currentUser ? "Reply" : "Sign in to Reply"}

@@ -48,7 +48,7 @@ export const ExpandedBlogCard = ({ post, onClose }: ExpandedBlogCardProps) => {
                 className="w-full h-full object-cover"
               />
               {post.featured && (
-                <div className="absolute top-4 left-4 bg-accent text-white px-3 py-1 rounded-full text-sm font-semibold">
+                <div className="absolute top-4 left-4 bg-btn-primary text-white px-3 py-1 rounded-full text-sm font-semibold">
                   Featured
                 </div>
               )}
@@ -125,7 +125,7 @@ export const ExpandedBlogCard = ({ post, onClose }: ExpandedBlogCardProps) => {
 
             {/* Action Buttons */}
             <div className="flex justify-center space-x-4 pt-4 border-t border-br-secondary">
-              <button className="px-6 py-2 bg-accent hover:bg-accent-hover text-white rounded-lg font-semibold transition-colors duration-200">
+              <button className="px-6 py-2 bg-btn-primary hover:bg-btn-primary-hover text-white rounded-lg font-semibold transition-colors duration-200">
                 Read Full Article
               </button>
               <button className="px-6 py-2 bg-muted hover:bg-surface-card text-txt-primary rounded-lg font-semibold transition-colors duration-200">

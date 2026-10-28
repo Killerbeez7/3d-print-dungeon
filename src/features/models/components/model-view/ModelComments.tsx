@@ -144,7 +144,7 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
           <button
             type="submit"
             disabled={!newComment.trim()}
-            className="h-10 rounded-lg bg-accent px-5 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-focus disabled:cursor-not-allowed disabled:opacity-60"
+            className="h-10 rounded-lg bg-btn-primary px-5 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover focus:outline-none focus:ring-2 focus:ring-focus disabled:cursor-not-allowed disabled:opacity-60"
           >
             Submit
           </button>
@@ -188,7 +188,7 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
                     <button
                       type="button"
                       onClick={() => saveEditing(comment.id)}
-                      className="h-9 rounded-lg bg-accent px-3 text-sm font-medium text-btn-primary-text transition-colors hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-focus"
+                      className="h-9 rounded-lg bg-btn-primary px-3 text-sm font-medium text-btn-primary-text transition-colors hover:bg-btn-primary-hover focus:outline-none focus:ring-2 focus:ring-focus"
                     >
                       Save
                     </button>

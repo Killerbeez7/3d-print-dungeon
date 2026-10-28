@@ -21,7 +21,7 @@ const sizeClasses = {
 } as const;
 
 const variantClasses = {
-  primary: "bg-accent hover:bg-accent-hover text-white",
+  primary: "bg-btn-primary hover:bg-btn-primary-hover text-white",
   secondary: "bg-section hover:bg-muted text-txt-primary",
   outline: "border border-br-primary hover:bg-section text-txt-primary",
 } as const;

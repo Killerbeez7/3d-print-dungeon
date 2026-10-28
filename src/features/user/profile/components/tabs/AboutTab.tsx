@@ -72,7 +72,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
       {/* Bio Section */}
       <div className="bg-section rounded-lg p-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-btn-primary rounded-full flex items-center justify-center">
             <i className="fas fa-user text-white text-sm"></i>
           </div>
           <h3 className="text-xl font-semibold text-txt-primary">About Me</h3>
@@ -154,7 +154,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
       {hasAnySocialLinks && (
         <div className="bg-section rounded-lg p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 bg-accent rounded-full flex items-center justify-center">
+            <div className="w-8 h-8 bg-btn-primary rounded-full flex items-center justify-center">
               <i className="fas fa-share-alt text-white text-sm"></i>
             </div>
             <h3 className="text-xl font-semibold text-txt-primary">Connect & Follow</h3>
@@ -225,7 +225,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
           ].map((skill, index) => (
             <span
               key={index}
-              className="px-3 py-1 bg-accent bg-opacity-20 text-accent rounded-full text-sm font-medium"
+              className="px-3 py-1 bg-btn-primary bg-opacity-20 text-accent rounded-full text-sm font-medium"
             >
               {skill}
             </span>

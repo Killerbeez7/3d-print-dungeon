@@ -203,7 +203,7 @@ export const Analytics = () => {
               onClick={() => setTimeRange(range)}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
                 timeRange === range
-                  ? "bg-accent text-white"
+                  ? "bg-btn-primary text-white"
                   : "bg-section text-txt-secondary hover:text-txt-primary"
               }`}
             >
