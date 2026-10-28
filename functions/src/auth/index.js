@@ -15,7 +15,7 @@ import {
 export const setUserRole = onCall(async (request) => {
     try {
         const { data } = request;
-        console.log("setUserRole called, auth:", request.auth);
+        console.log("setUserRole called by:", request.auth?.uid ?? "anonymous");
 
         // Require admin authentication
         requireAdmin(request);
@@ -212,7 +212,7 @@ export const checkEmailAvailability = onCall(async (request) => {
         // Check if email exists in Firebase Auth
         try {
             await admin.auth().getUserByEmail(email);
-            console.log(`Email "${email}" availability: TAKEN (Firebase Auth)`);
+            console.log("Email availability: TAKEN (Firebase Auth)");
             return {
                 available: false,
                 email: email,
@@ -221,7 +221,7 @@ export const checkEmailAvailability = onCall(async (request) => {
         } catch (error) {
             // If user not found, email is available
             if (error.code === "auth/user-not-found") {
-                console.log(`Email "${email}" availability: AVAILABLE`);
+                console.log("Email availability: AVAILABLE");
                 return {
                     available: true,
                     email: email,
@@ -243,8 +243,8 @@ export const checkEmailAvailability = onCall(async (request) => {
 export const createValidatedUser = onCall(async (request) => {
     try {
         const { data } = request;
+        // Never log `data`: it contains the plaintext password.
         console.log("createValidatedUser called");
-        console.log("data:", data);
 
         // Validate input
         validateRequiredFields(data, ["email", "password"]);
@@ -389,11 +389,14 @@ export const createValidatedUser = onCall(async (request) => {
 
         return result;
     } catch (err) {
-        console.error("createValidatedUser INTERNAL ERROR:", err);
         if (err instanceof HttpsError) {
             throw err;
         }
-        throw new HttpsError("internal", err.message || "Unknown error");
+        if (err?.code === "auth/email-already-exists") {
+            throw new HttpsError("already-exists", "An account with this email already exists");
+        }
+        console.error("createValidatedUser INTERNAL ERROR:", err?.code ?? err?.message ?? "unknown");
+        throw new HttpsError("internal", "Could not create the account");
     }
 });
 
