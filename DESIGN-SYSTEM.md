@@ -79,6 +79,15 @@ Awesome and react-icons uses are migrated over time (TODO.md).
   `outline-none` without a replacement.
 - **States**: every data view has loading (skeleton), empty (message + action) and error
   (message + retry) states.
+- **ModelCard** (`src/features/home/components/ModelCard.tsx`): square image (lazy, fades
+  in, icon on error), name and "by creator" always visible below, price badge for paid
+  models. Use it for every model grid (`HomeModelsGrid`).
+- **Chips** (`CategoryChips`): `h-9` pills, selected = `bg-btn-primary`; one row that
+  scrolls sideways on phones, wraps from `lg`. Use `aria-pressed`.
+- **Header**: `h-16`, max width 1600px, direct links for top sections, at most one menu
+  (Community). Mobile menu is a left panel (focus trapped, Escape closes, 48px rows).
+- **Forced-dark bands**: put `data-theme="dark"` on a section to keep it dark in both
+  themes (used by the Home hero, whose artwork has a black background).
 
 ## Mobile browser chrome
 

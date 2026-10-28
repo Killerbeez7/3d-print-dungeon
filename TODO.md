@@ -20,6 +20,10 @@ https://claude.ai/artifact/LuGUKVXqRe6iGmgMEUY5cZ
 
 ## Design system follow-ups
 
+- [ ] Footer still links to the hidden Marketplace and Business pages; align it with the
+      new navigation
+- [ ] Replace AI-generated hero/carousel artwork with real photos of printed models
+
 - [ ] Add a `--br-input` token (about `#868c98` light, `#6b7282` dark, 3:1+) and use it on
       all 106 inputs, selects and textareas
 - [ ] Migrate Font Awesome and react-icons to `lucide-react`
