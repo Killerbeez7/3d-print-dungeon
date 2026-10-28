@@ -104,7 +104,7 @@ export const ProfileMenu = ({
 
       <div
         role="menu"
-        className={`absolute right-0 top-full z-50 mt-3 w-80 max-w-[calc(100vw-1.5rem)] origin-top-right overflow-hidden rounded-xl border border-br-secondary bg-surface-elevated shadow-2xl shadow-black/40 transition-[opacity,transform,visibility] duration-200 ease-forge ${
+        className={`absolute right-0 top-full z-50 mt-3 w-80 max-w-[calc(100vw-1.5rem)] origin-top-right overflow-hidden rounded-xl border border-br-secondary bg-surface-elevated shadow-popover transition-[opacity,transform,visibility] duration-200 ease-forge ${
           isOpen ? "visible scale-100 opacity-100" : "invisible scale-95 opacity-0"
         }`}
       >

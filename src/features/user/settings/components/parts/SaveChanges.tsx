@@ -22,7 +22,7 @@ export const SaveChanges = ({
   }
 
   return (
-    <div className="sticky bottom-4 z-10 flex justify-end gap-2 rounded-xl border border-br-secondary bg-surface-elevated/95 p-3 shadow-2xl shadow-black/30 backdrop-blur">
+    <div className="sticky bottom-4 z-10 flex justify-end gap-2 rounded-xl border border-br-secondary bg-surface-elevated/95 p-3 shadow-popover backdrop-blur">
       <Button variant="ghost" onClick={onReset} disabled={loading}>
         {resetText}
       </Button>

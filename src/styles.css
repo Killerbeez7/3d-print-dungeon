@@ -54,6 +54,7 @@ body {
   --surface-card: #ffffff;
   --surface-elevated: #f1f1f3;
   --surface-overlay: rgba(10, 10, 12, 0.62);
+  --popover-shadow: 0 24px 48px -12px rgba(20, 20, 30, 0.22);
   --ambient-brand: radial-gradient(
     1100px circle at 15% -10%,
     rgba(85, 52, 232, 0.05),
@@ -122,6 +123,7 @@ body {
   --surface-card: #141418;
   --surface-elevated: #1c1c22;
   --surface-overlay: rgba(6, 6, 9, 0.78);
+  --popover-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
   --ambient-brand: radial-gradient(
     1200px circle at 12% -10%,
     rgba(124, 92, 255, 0.07),
@@ -180,6 +182,7 @@ body {
 }
 
 @theme inline {
+  --shadow-popover: var(--popover-shadow);
   /* Fonts (self-hosted, imported in main.tsx) */
   --font-sans: "Geist Variable", "Segoe UI", system-ui, sans-serif;
   --font-display: "Unbounded Variable", "Geist Variable", system-ui, sans-serif;

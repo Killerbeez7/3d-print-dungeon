@@ -205,7 +205,7 @@ export function GlobalSearch() {
 
       {/* Search dropdown */}
       {!isMobile && showDropdown && (
-        <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-xl border border-br-secondary bg-surface-elevated text-txt-primary shadow-2xl shadow-black/40">
+        <div className="absolute left-0 top-full z-50 mt-2 w-full overflow-hidden rounded-xl border border-br-secondary bg-surface-elevated text-txt-primary shadow-popover">
           <ul className="py-2 max-h-80 overflow-auto text-sm">
             {searchTerm.trim() && artistResults.length > 0 && (
               <>

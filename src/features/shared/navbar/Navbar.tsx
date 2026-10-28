@@ -170,7 +170,7 @@ export const Navbar = () => {
                         : "invisible -translate-y-1 opacity-0"
                     }`}
                   >
-                    <div className="w-60 rounded-xl border border-br-secondary bg-surface-elevated p-1.5 shadow-2xl shadow-black/40">
+                    <div className="w-60 rounded-xl border border-br-secondary bg-surface-elevated p-1.5 shadow-popover">
                       {section.items.map((item) => (
                         <Link
                           key={item.to}

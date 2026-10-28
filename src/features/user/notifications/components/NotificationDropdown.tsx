@@ -256,7 +256,7 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
           id="notification-dropdown"
           role="region"
           aria-label="Notifications"
-          className="absolute right-0 top-full z-50 mt-3 w-80 overflow-hidden rounded-xl border border-br-secondary bg-surface-elevated shadow-2xl shadow-black/40"
+          className="absolute right-0 top-full z-50 mt-3 w-80 overflow-hidden rounded-xl border border-br-secondary bg-surface-elevated shadow-popover"
         >
           <div className="border-b border-br-secondary/30 p-3">
             <button
