@@ -2,6 +2,8 @@
 
 import { useRef, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { ArrowLeft, ArrowRight, BadgeDollarSign, Check, Upload } from "lucide-react";
+import { Button } from "@/components";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useSystemAlert } from "@/features/system-alerts";
 import { createAdvancedModel } from "@/features/models/services/modelsService";
@@ -483,90 +485,73 @@ export function ModelUpload() {
     setShowSellerVerification(false);
   };
 
+  const steps = [
+    { number: 1, label: "Files", hint: "Your model file" },
+    { number: 2, label: "Details", hint: "Images, name, tags" },
+    { number: 3, label: "Pricing", hint: "Free or paid" },
+  ];
+
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="mb-4 text-3xl text-txt-primary">Upload Your 3D Model</h1>
-        <div className="flex items-center space-x-4 sm:space-x-6 md:space-x-8 mb-8">
-          <StepIndicator stepNumber={1} label="Files" currentStep={step} />
-          <StepIndicator stepNumber={2} label="Details" currentStep={step} />
-          <StepIndicator stepNumber={3} label="Pricing" currentStep={step} />
-        </div>
-      </div>
+    <div className="mx-auto max-w-4xl px-4 pb-16 pt-8 sm:px-6">
+      <header className="mb-8">
+        <p className="label-mono text-accent">New upload</p>
+        <h1 className="mt-2 text-3xl font-bold sm:text-4xl">Share a model</h1>
+        <p className="mt-2 text-sm text-txt-secondary">
+          Three short steps: your file, the details, then pricing.
+        </p>
+      </header>
+
+      {/* Stepper: a print-progress bar split in three layers */}
+      <ol className="mb-8 grid grid-cols-3 gap-2" aria-label="Upload steps">
+        {steps.map((item) => (
+          <StepIndicator key={item.number} {...item} currentStep={step} />
+        ))}
+      </ol>
 
       {error && (
-        <div className="mb-6 p-4 bg-error/10 border border-error/20 rounded-md">
-          <p className="text-error">{error}</p>
+        <div
+          role="alert"
+          className="mb-6 rounded-lg border border-error/40 bg-error/10 p-4 text-sm text-txt-primary"
+        >
+          {error}
         </div>
       )}
 
       {needsSellerVerification && (
-        <div className="mb-6 p-4 bg-surface-card border border-br-secondary rounded-lg shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-accent-soft border border-accent/25 rounded-full flex items-center justify-center">
-                <svg
-                  className="w-4 h-4 text-accent-text"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
-                  />
-                </svg>
-              </div>
-              <div>
-                <p className="text-sm font-medium text-txt-primary">
-                  {hasPendingVerification
-                    ? "Pending verification"
-                    : "Want to sell your models?"}
-                </p>
-                <p className="text-xs text-txt-secondary">
-                  {hasPendingVerification
-                    ? "Your account is being verified. Complete the process to enable paid model uploads."
-                    : "Complete seller verification to enable paid model uploads"}
-                </p>
-              </div>
-            </div>
-            <div className="flex space-x-2">
-              {!hasPendingVerification ? (
-                <button
-                  onClick={handleStartVerification}
-                  className="px-4 py-2 text-sm font-medium rounded-md transition-colors bg-btn-primary text-btn-primary-text hover:bg-btn-primary-hover shadow-sm shadow-accent/20"
-                >
-                  Verify Now
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={handleStartVerification}
-                    className="px-4 py-2 text-sm font-medium rounded-md transition-colors bg-btn-primary text-btn-primary-text hover:bg-btn-primary-hover shadow-sm shadow-accent/20"
-                  >
-                    Continue verification
-                  </button>
-                </>
-              )}
+        <div className="mb-6 flex flex-col gap-4 rounded-xl border border-br-subtle bg-surface-card p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3">
+            <span className="chamfer flex size-10 shrink-0 items-center justify-center bg-ember-fill/15 text-ember [--cut:8px]">
+              <BadgeDollarSign className="size-5" aria-hidden="true" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-txt-primary">
+                {hasPendingVerification ? "Verification in progress" : "Want to sell your models?"}
+              </p>
+              <p className="text-xs text-txt-secondary">
+                {hasPendingVerification
+                  ? "Finish verification with Stripe to enable paid uploads."
+                  : "Complete a one-time seller verification to enable paid uploads."}
+              </p>
             </div>
           </div>
+          <Button variant="secondary" size="sm" onClick={handleStartVerification}>
+            {hasPendingVerification ? "Continue verification" : "Verify now"}
+          </Button>
         </div>
       )}
 
-      <div className="bg-section border border-br-subtle rounded-lg p-4 sm:p-6 shadow-md">
+      <div className="rounded-xl border border-br-subtle bg-surface-card p-4 sm:p-6">
         {step === 1 && (
           <div>
             <FilesUpload step={step} files={files} setFiles={setFiles} />
-            <div className="flex justify-end mt-6">
-              <button
+            <div className="mt-6 flex justify-end border-t border-br-subtle pt-5">
+              <Button
                 onClick={nextStep}
                 disabled={!canProceedToStep2}
-                className="px-6 py-2 bg-btn-primary text-btn-primary-text rounded-md hover:bg-btn-primary-hover disabled:opacity-50 transition-colors font-medium shadow-sm shadow-accent/20"
+                rightIcon={<ArrowRight className="size-4" aria-hidden="true" />}
               >
-                Next: Add Details
-              </button>
+                Next: details
+              </Button>
             </div>
           </div>
         )}
@@ -574,20 +559,21 @@ export function ModelUpload() {
         {step === 2 && (
           <div>
             <InfoForm modelData={modelData} setModelData={setModelData} />
-            <div className="flex justify-between mt-6">
-              <button
+            <div className="mt-8 flex justify-between border-t border-br-subtle pt-5">
+              <Button
+                variant="ghost"
                 onClick={prevStep}
-                className="px-6 py-2 border border-br-secondary rounded-md text-txt-secondary hover:bg-muted transition-colors font-medium"
+                leftIcon={<ArrowLeft className="size-4" aria-hidden="true" />}
               >
                 Back
-              </button>
-              <button
+              </Button>
+              <Button
                 onClick={nextStep}
                 disabled={!canProceedToStep3}
-                className="px-6 py-2 bg-btn-primary text-btn-primary-text rounded-md hover:bg-btn-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-sm shadow-accent/20"
+                rightIcon={<ArrowRight className="size-4" aria-hidden="true" />}
               >
-                Next: Set Pricing
-              </button>
+                Next: pricing
+              </Button>
             </div>
           </div>
         )}
@@ -595,28 +581,38 @@ export function ModelUpload() {
         {step === 3 && (
           <form onSubmit={handleSubmit}>
             <PricingForm modelData={modelData} setModelData={setModelData} />
-            <div className="flex justify-between mt-6">
-              <button
-                type="button"
+
+            {isUploading && (
+              <div className="mt-6" role="status" aria-live="polite">
+                <div className="label-mono mb-2 flex justify-between text-txt-muted">
+                  <span>Uploading</span>
+                  <span className="text-txt-primary">{Math.round(uploadProgress)}%</span>
+                </div>
+                <div className="h-2 overflow-hidden bg-muted">
+                  <div
+                    className="bg-layer-lines h-full bg-gradient-to-r from-accent to-ember-fill transition-[width] duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="mt-8 flex justify-between border-t border-br-subtle pt-5">
+              <Button
+                variant="ghost"
                 onClick={prevStep}
-                className="px-6 py-2 border border-br-secondary rounded-md text-txt-secondary hover:bg-muted transition-colors font-medium"
+                disabled={isUploading}
+                leftIcon={<ArrowLeft className="size-4" aria-hidden="true" />}
               >
                 Back
-              </button>
-              <button
+              </Button>
+              <Button
                 type="submit"
-                disabled={isUploading}
-                className="px-6 py-2 bg-btn-primary text-btn-primary-text rounded-md hover:bg-btn-primary-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium shadow-sm shadow-accent/20"
+                isLoading={isUploading}
+                leftIcon={<Upload className="size-4" aria-hidden="true" />}
               >
-                {isUploading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-btn-primary-text mr-2"></div>
-                    Uploading... {Math.round(uploadProgress)}%
-                  </div>
-                ) : (
-                  "Upload Model"
-                )}
-              </button>
+                {isUploading ? "Uploading…" : "Upload model"}
+              </Button>
             </div>
           </form>
         )}
@@ -653,44 +649,46 @@ export function ModelUpload() {
 }
 
 interface StepIndicatorProps {
-  stepNumber: number;
+  number: number;
   label: string;
+  hint: string;
   currentStep: number;
 }
 
-function StepIndicator({ stepNumber, label, currentStep }: StepIndicatorProps) {
-  const isActive = currentStep === stepNumber;
-  const isCompleted = currentStep > stepNumber;
+function StepIndicator({ number, label, hint, currentStep }: StepIndicatorProps) {
+  const isActive = currentStep === number;
+  const isCompleted = currentStep > number;
 
   return (
-    <div
-      className={`flex items-center space-x-3 ${
-        isActive ? "text-accent" : isCompleted ? "text-success" : "text-txt-secondary"
-      }`}
-    >
-      <div
-        className={`w-8 h-8 flex items-center justify-center rounded-full transition-all ${
-          isActive
-            ? "bg-btn-primary text-btn-primary-text shadow-lg shadow-accent/30 ring-2 ring-accent/20"
-            : isCompleted
-            ? "bg-success text-txt-inverse"
-            : "bg-surface-card border border-br-secondary text-txt-secondary"
-        } font-bold`}
-      >
-        {isCompleted ? (
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
-          </svg>
-        ) : (
-          stepNumber
-        )}
+    <li aria-current={isActive ? "step" : undefined}>
+      <div className="h-1.5 overflow-hidden bg-muted">
+        <div
+          className={`h-full origin-left bg-gradient-to-r from-accent to-ember-fill transition-transform duration-500 ease-forge ${
+            isCompleted || isActive ? "scale-x-100" : "scale-x-0"
+          } ${isActive ? "opacity-60" : ""}`}
+        />
       </div>
-      <span className="font-semibold">{label}</span>
-    </div>
+      <div className="mt-3 flex items-center gap-2">
+        <span
+          className={`chamfer flex size-6 shrink-0 items-center justify-center font-mono text-xs font-semibold [--cut:5px] ${
+            isCompleted
+              ? "bg-success text-txt-inverse"
+              : isActive
+                ? "bg-btn-primary text-btn-primary-text"
+                : "bg-muted text-txt-muted"
+          }`}
+        >
+          {isCompleted ? <Check className="size-3.5" aria-hidden="true" /> : `0${number}`}
+        </span>
+        <span className="min-w-0">
+          <span
+            className={`block text-sm font-semibold ${isActive || isCompleted ? "text-txt-primary" : "text-txt-muted"}`}
+          >
+            {label}
+          </span>
+          <span className="hidden truncate text-xs text-txt-muted sm:block">{hint}</span>
+        </span>
+      </div>
+    </li>
   );
 }
