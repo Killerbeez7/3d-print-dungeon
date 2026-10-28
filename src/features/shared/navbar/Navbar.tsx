@@ -8,7 +8,6 @@ import { useClickOutside } from "@/hooks/useClickOutside";
 import { useModal } from "@/features/shared/modal/hooks/useModal";
 // configs
 import { NAV_SECTIONS } from "@/config/navConfig";
-import { STATIC_ASSETS } from "@/config/assetsConfig";
 import { ROUTES } from "@/constants/routeConstants";
 // components
 import { AuthButtons } from "./AuthButtons";
@@ -17,20 +16,24 @@ import { ProfileMenu } from "./ProfileMenu";
 import { GlobalSearch } from "@/features/search/components/GlobalSearch";
 import { NotificationDropdown } from "@/features/user/notifications";
 import { buttonClassName } from "@/components";
+import { BrandMark } from "@/features/shared/components/BrandMark";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
 
 const iconButtonClass =
   "flex size-10 items-center justify-center rounded-lg text-txt-secondary transition-colors hover:bg-muted hover:text-txt-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
 
+// Underline grows from the left on hover and stays on the active link.
 const navLinkClass = (isActive: boolean) =>
-  `relative inline-flex h-10 items-center gap-1 whitespace-nowrap rounded-lg px-3 text-sm font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus ${
-    isActive ? "text-txt-primary bg-muted" : "text-txt-secondary hover:bg-muted/60 hover:text-txt-primary"
+  `relative inline-flex h-10 items-center gap-1 whitespace-nowrap px-3 text-sm font-medium transition-colors after:absolute after:inset-x-3 after:bottom-1 after:h-0.5 after:origin-left after:bg-accent after:transition-transform after:duration-300 after:ease-forge ${
+    isActive
+      ? "text-txt-primary after:scale-x-100"
+      : "text-txt-secondary after:scale-x-0 hover:text-txt-primary hover:after:scale-x-100"
   }`;
 
 const NavbarAuthSkeleton = () => (
   <div className="flex h-10 items-center justify-end gap-2" aria-hidden="true">
-    <div className="h-9 w-20 animate-pulse rounded-md bg-surface-card" />
-    <div className="size-9 animate-pulse rounded-full bg-surface-card" />
+    <div className="skeleton-print chamfer h-9 w-20 [--cut:7px]" />
+    <div className="skeleton-print chamfer size-10 [--cut:7px]" />
   </div>
 );
 
@@ -94,7 +97,9 @@ export const Navbar = () => {
 
   return (
     <div className="sticky top-0 left-0 right-0 z-50">
-      <header className="relative z-50 border-b border-br-subtle bg-section/95 backdrop-blur-md">
+      <header className="relative z-50 border-b border-br-subtle bg-section/85 backdrop-blur-xl">
+        {/* Print progress: fills as the page scrolls (CSS scroll timeline). */}
+        <div className="scroll-progress" aria-hidden="true" />
         <div className="relative mx-auto flex h-16 max-w-[1600px] items-center gap-2 px-3 sm:px-6 md:gap-4 lg:px-8">
           {/* Mobile menu button */}
           <button
@@ -116,16 +121,7 @@ export const Navbar = () => {
             className="flex shrink-0 items-center gap-2 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus max-md:absolute max-md:left-1/2 max-md:-translate-x-1/2"
             aria-label="3D Print Dungeon home"
           >
-            <img
-              src={STATIC_ASSETS.LOGO}
-              alt=""
-              width={36}
-              height={36}
-              className="size-9 object-contain logo-accent"
-            />
-            <span className="hidden text-sm font-semibold tracking-tight text-txt-primary xl:inline">
-              3D Print Dungeon
-            </span>
+            <BrandMark wordmarkClassName="max-xl:hidden" />
           </Link>
 
           {/* Desktop nav */}
@@ -168,20 +164,31 @@ export const Navbar = () => {
                   </button>
                   <div
                     role="menu"
-                    className={`absolute left-0 top-full z-40 w-48 pt-2 transition-opacity duration-150 ${
-                      activeDropdown === section.label ? "visible opacity-100" : "invisible opacity-0"
+                    className={`absolute left-0 top-full z-40 pt-2 transition-[opacity,transform] duration-200 ease-forge ${
+                      activeDropdown === section.label
+                        ? "visible translate-y-0 opacity-100"
+                        : "invisible -translate-y-1 opacity-0"
                     }`}
                   >
-                    <div className="rounded-xl border border-br-subtle bg-surface-elevated p-1.5 shadow-xl">
+                    <div className="w-60 rounded-xl border border-br-secondary bg-surface-elevated p-1.5 shadow-2xl shadow-black/40">
                       {section.items.map((item) => (
                         <Link
                           key={item.to}
                           to={item.to}
                           role="menuitem"
-                          className="flex rounded-lg px-3 py-2.5 text-sm font-medium text-txt-secondary hover:bg-muted hover:text-txt-primary focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-focus"
+                          className="group/item flex flex-col rounded-lg px-3 py-2.5 transition-colors hover:bg-muted"
                           onClick={() => setActiveDropdown(null)}
                         >
-                          {item.label}
+                          <span className="text-sm font-medium text-txt-primary">
+                            {item.label}
+                            <span
+                              className="ml-1 inline-block text-accent opacity-0 transition-[opacity,transform] duration-200 group-hover/item:translate-x-0.5 group-hover/item:opacity-100"
+                              aria-hidden="true"
+                            >
+                              →
+                            </span>
+                          </span>
+                          {item.hint && <span className="text-xs text-txt-muted">{item.hint}</span>}
                         </Link>
                       ))}
                     </div>
@@ -236,6 +243,7 @@ export const Navbar = () => {
                   onLogout={() => void handleLogout()}
                   isAdmin={isAdmin}
                   displayName={profileDisplayName}
+                  username={publicProfile?.username ?? null}
                   email={profileEmail}
                   avatarSrc={profileAvatarSrc}
                   profilePath={`/${urlSafeUsername}`}

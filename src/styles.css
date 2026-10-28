@@ -509,6 +509,28 @@ body {
     }
   }
 
+  /* Header line that fills with page scroll, violet to molten. */
+  .scroll-progress {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 2px;
+    transform: scaleX(0);
+    transform-origin: left;
+    background: linear-gradient(90deg, var(--accent), var(--ember-fill));
+    pointer-events: none;
+  }
+
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .scroll-progress {
+        animation: grow-x linear both;
+        animation-timeline: scroll(root block);
+      }
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .skeleton-print::before,
     .skeleton-print::after {
@@ -538,6 +560,15 @@ body {
   85%,
   100% {
     bottom: 100%;
+  }
+}
+
+@keyframes grow-x {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
   }
 }
 

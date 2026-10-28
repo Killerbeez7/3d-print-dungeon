@@ -4,6 +4,7 @@ import { FORUM_PATHS } from "@/features/forum/constants/forumPaths";
 export interface NavItem {
   label: string;
   to: string;
+  hint?: string;
 }
 
 /** A top-level entry: a direct link (`to`) or a menu of `items`. */
@@ -23,9 +24,9 @@ export const NAV_SECTIONS: NavSection[] = [
     label: "Community",
     to: null,
     items: [
-      { label: "Forum", to: FORUM_PATHS.HOME },
-      { label: "Events", to: ROUTES.EVENTS },
-      { label: "Blog", to: ROUTES.BLOG },
+      { label: "Forum", to: FORUM_PATHS.HOME, hint: "Ask, share, discuss" },
+      { label: "Events", to: ROUTES.EVENTS, hint: "Contests and meetups" },
+      { label: "Blog", to: ROUTES.BLOG, hint: "News and guides" },
     ],
   },
 ];
