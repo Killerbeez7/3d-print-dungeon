@@ -1,7 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { Button } from "@/components";
+import { AuthModal } from "@/features/auth/components/AuthModal";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { BrandMark } from "@/features/shared/components/BrandMark";
+import { useModal } from "@/features/shared/modal/hooks/useModal";
 import { useMaintenance } from "../hooks/useMaintenance";
 
 type TimeLeft = {
@@ -14,6 +18,7 @@ export const MaintenancePage = () => {
   const navigate = useNavigate();
 
   const { currentUser, isAdmin } = useAuth();
+  const { open } = useModal("auth");
   const { status, loading, enableAdminBypass } = useMaintenance();
 
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
@@ -63,58 +68,65 @@ export const MaintenancePage = () => {
     return null;
   }
 
+  const pad = (value: number) => String(value).padStart(2, "0");
+
   return (
-    <div className="flex min-h-[60vh] flex-col items-center justify-center py-12">
-      <div className="mx-4 w-full max-w-lg rounded-xl border border-br-secondary bg-surface-card p-8 text-center shadow-2xl">
-        <div className="mb-8">
-          <img
-            src="/logo.png"
-            alt="3D Print Dungeon"
-            className="mx-auto mb-6 h-16 w-auto"
-          />
+    <div className="relative isolate flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-page px-4 py-16 text-center">
+      <div className="bg-buildplate fade-radial absolute inset-0 -z-10" aria-hidden="true" />
+      <div className="bg-layer-lines absolute inset-0 -z-10 opacity-60" aria-hidden="true" />
 
-          <h1 className="mb-4 text-4xl font-bold text-txt-primary">Under Maintenance</h1>
+      <BrandMark size="lg" />
 
-          <div className="mb-6 text-xl text-txt-secondary">
-            {status.message ??
-              "We're currently performing some updates to improve your experience."}
+      <p className="label-mono mt-12 text-accent">Maintenance · re-printing the dungeon</p>
+      <h1 className="mt-3 max-w-2xl text-4xl font-bold leading-tight sm:text-6xl">
+        We&apos;ll be right back
+      </h1>
+      <p className="mt-4 max-w-lg text-base leading-relaxed text-txt-secondary sm:text-lg">
+        {status.message ?? "We're currently performing some updates to improve your experience."}
+      </p>
+
+      {/* Print-progress bar: purely decorative */}
+      <div className="skeleton-print mt-10 h-2 w-64 max-w-full" aria-hidden="true" />
+
+      {timeLeft && (
+        <div className="mt-10" role="timer" aria-live="off">
+          <p className="label-mono text-txt-muted">Expected back in</p>
+          <div className="mt-3 flex items-center justify-center gap-2 font-mono">
+            {[
+              { value: timeLeft.hours, label: "h" },
+              { value: timeLeft.minutes, label: "m" },
+              { value: timeLeft.seconds, label: "s" },
+            ].map((unit) => (
+              <span
+                key={unit.label}
+                className="chamfer flex min-w-16 items-baseline justify-center gap-0.5 bg-surface-card px-3 py-2 [--cut:8px]"
+              >
+                <span className="text-3xl font-semibold text-txt-primary">{pad(unit.value)}</span>
+                <span className="text-sm text-txt-muted">{unit.label}</span>
+              </span>
+            ))}
           </div>
-
-          {timeLeft && (
-            <div className="mb-6 text-lg font-medium text-accent">
-              Expected completion in: {timeLeft.hours}h {timeLeft.minutes}m{" "}
-              {timeLeft.seconds}s
-            </div>
-          )}
-
-          {!currentUser ? (
-            <button
-              type="button"
-              onClick={() => navigate("/login")}
-              className="mt-6 rounded-lg bg-btn-primary px-6 py-3 text-white transition-colors hover:bg-btn-primary-hover"
-            >
-              Sign in
-            </button>
-          ) : isAdmin ? (
-            <button
-              type="button"
-              onClick={() => {
-                enableAdminBypass();
-                navigate("/", { replace: true });
-              }}
-              className="mt-6 rounded-lg bg-btn-primary px-6 py-3 text-white transition-colors hover:bg-btn-primary-hover"
-            >
-              Access Site
-            </button>
-          ) : null}
         </div>
+      )}
 
-        <div className="border-t border-br-secondary pt-6">
-          <p className="text-sm text-txt-secondary">
-            If you&apos;re an administrator, please sign in to access the site.
-          </p>
-        </div>
+      <div className="mt-10">
+        {!currentUser ? (
+          <Button onClick={() => open({ mode: "signin" })}>Administrator sign in</Button>
+        ) : isAdmin ? (
+          <Button
+            onClick={() => {
+              enableAdminBypass();
+              navigate("/", { replace: true });
+            }}
+          >
+            Enter the site
+          </Button>
+        ) : (
+          <p className="text-sm text-txt-muted">You&apos;re signed in. We&apos;ll be back shortly.</p>
+        )}
       </div>
+
+      <AuthModal />
     </div>
   );
 };
