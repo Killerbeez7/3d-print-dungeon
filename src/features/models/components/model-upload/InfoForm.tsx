@@ -1,5 +1,5 @@
 import { useState, ChangeEvent, KeyboardEvent, FC } from "react";
-import { TiDelete } from "react-icons/ti";
+import { Sparkles, X } from "lucide-react";
 
 import { ImagesUpload } from "./ImagesUpload";
 import { MODEL_CATEGORIES } from "@/features/models/constants/modelCategories";
@@ -49,115 +49,144 @@ export const InfoForm: FC<InfoFormProps> = ({ modelData, setModelData }) => {
     setModelData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const toggleCategory = (categoryId: string): void => {
+    setModelData((prev) => {
+      const current = prev.categoryIds ?? [];
+      return {
+        ...prev,
+        categoryIds: current.includes(categoryId)
+          ? current.filter((id) => id !== categoryId)
+          : [...current, categoryId],
+      };
+    });
+  };
+
+  const fieldClass =
+    "w-full rounded-lg border border-br-input bg-page px-3 text-sm text-txt-primary placeholder:text-txt-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25";
+  const labelClass = "mb-1.5 block text-sm font-medium text-txt-secondary";
+  const selectedCategories = modelData.categoryIds ?? [];
+
   return (
-    <section className="flex flex-col gap-2">
-      <section className="rounded-md py-4 px-8">
+    <section className="space-y-8">
+      <ImagesUpload modelData={modelData} setModelData={setModelData} />
+
+      <div className="space-y-6">
         <div>
-          {/* Image Upload Section */}
-          <ImagesUpload modelData={modelData} setModelData={setModelData} />
+          <label htmlFor="model-name" className={labelClass}>
+            Model name <span className="text-error">*</span>
+          </label>
+          <input
+            id="model-name"
+            type="text"
+            name="name"
+            value={typeof modelData.name === "string" ? modelData.name : ""}
+            onChange={handleModelDataChange}
+            className={`${fieldClass} h-12 text-base`}
+            placeholder="e.g. Golden Dragon"
+            required
+          />
         </div>
 
-        <form className="space-y-4">
-          <div>
-            <div className="mb-1 block text-sm font-medium text-txt-secondary">
-              Model Name <span className="text-error">*</span>
-            </div>
-            <input
-              type="text"
-              name="name"
-              value={typeof modelData.name === "string" ? modelData.name : ""}
-              onChange={handleModelDataChange}
-              className="w-full p-3 border border-br-secondary rounded-md bg-surface-card text-txt-primary placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
-              placeholder="Enter model name"
-              required
-            />
-          </div>
-
-          {/* Category multi-select */}
-          <div>
-            <div className="mb-1 block text-sm font-medium text-txt-secondary">
-              Categories <span className="text-error">*</span>
-            </div>
-            <select
-              multiple
-              value={modelData.categoryIds ?? []}
-              onChange={(e) => {
-                const vals = Array.from(e.target.selectedOptions).map((o) => o.value);
-                setModelData((prev) => ({ ...prev, categoryIds: vals }));
-              }}
-              className="w-full p-3 border border-br-secondary rounded-md bg-surface-card h-40 text-txt-primary focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
-            >
-              {MODEL_CATEGORIES.map((category) => (
-                <option key={category.id} value={category.id}>
+        <fieldset>
+          <legend className={labelClass}>
+            Categories <span className="text-error">*</span>
+            <span className="ml-2 font-mono text-xs text-txt-muted">
+              {selectedCategories.length} selected
+            </span>
+          </legend>
+          <div className="flex flex-wrap gap-1.5">
+            {MODEL_CATEGORIES.map((category) => {
+              const isSelected = selectedCategories.includes(category.id);
+              return (
+                <button
+                  key={category.id}
+                  type="button"
+                  aria-pressed={isSelected}
+                  onClick={() => toggleCategory(category.id)}
+                  title={category.description}
+                  className={`h-9 border px-3 text-sm font-medium transition-colors ${
+                    isSelected
+                      ? "border-accent bg-accent-soft text-txt-primary"
+                      : "border-br-secondary text-txt-secondary hover:border-br-primary hover:text-txt-primary"
+                  }`}
+                >
                   {category.name}
-                </option>
-              ))}
-            </select>
+                </button>
+              );
+            })}
           </div>
+        </fieldset>
 
-          <div>
-            <div className="mb-1 block text-sm font-medium text-txt-secondary">
-              Description <span className="text-error">*</span>
-            </div>
-            <textarea
-              name="description"
-              value={
-                typeof modelData.description === "string" ? modelData.description : ""
-              }
-              onChange={handleModelDataChange}
-              className="w-full p-3 border border-br-secondary rounded-md bg-surface-card text-txt-primary placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
-              placeholder="Enter model description"
-              required
-            />
-          </div>
+        <div>
+          <label htmlFor="model-description" className={labelClass}>
+            Description <span className="text-error">*</span>
+          </label>
+          <textarea
+            id="model-description"
+            name="description"
+            rows={5}
+            value={typeof modelData.description === "string" ? modelData.description : ""}
+            onChange={handleModelDataChange}
+            className={`${fieldClass} py-3 leading-relaxed`}
+            placeholder="Scale, supports, print settings, anything a printer should know"
+            required
+          />
+        </div>
 
-          {/* AI Checkbox */}
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              checked={Boolean(modelData.isAI)}
-              onChange={(e) =>
-                setModelData((prev) => ({ ...prev, isAI: e.target.checked }))
-              }
-              className="accent-accent h-4 w-4"
-            />
-            <div className="mb-1 block text-sm font-medium text-txt-secondary">
-              Model is AI-generated
-            </div>
-          </div>
-
-          {/* Tags Section */}
-          <div className="border border-br-secondary rounded-lg p-4 bg-section">
-            <h3 className="mb-3">Add Tags</h3>
-            <input
-              type="text"
-              value={newTag}
-              onChange={handleTagInputChange}
-              onKeyDown={handleTagAdd}
-              placeholder="Press enter to add tags"
-              className="w-full px-4 py-2 text-sm border border-br-secondary rounded-md mb-3 bg-surface-card text-txt-primary placeholder:text-txt-muted focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent"
-            />
-            <div className="flex flex-wrap gap-2">
-              {Array.isArray(modelData.tags) &&
-                modelData.tags.map((tag: string) => (
-                  <div
-                    key={tag}
-                    className="bg-btn-primary text-white flex items-center px-3 py-1 rounded-full"
+        <div>
+          <label htmlFor="model-tags" className={labelClass}>
+            Tags
+          </label>
+          <input
+            id="model-tags"
+            type="text"
+            value={newTag}
+            onChange={handleTagInputChange}
+            onKeyDown={handleTagAdd}
+            placeholder="Type a tag and press Enter"
+            className={`${fieldClass} h-11`}
+          />
+          {Array.isArray(modelData.tags) && modelData.tags.length > 0 && (
+            <ul className="mt-3 flex flex-wrap gap-1.5">
+              {modelData.tags.map((tag: string) => (
+                <li
+                  key={tag}
+                  className="flex items-center gap-1 border border-br-secondary py-1 pl-2.5 pr-1 font-mono text-xs text-txt-secondary"
+                >
+                  #{tag}
+                  <button
+                    type="button"
+                    onClick={() => handleTagRemove(tag)}
+                    aria-label={`Remove tag ${tag}`}
+                    className="flex size-5 items-center justify-center text-txt-muted transition-colors hover:text-error"
                   >
-                    <span className="text-sm">{tag}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleTagRemove(tag)}
-                      className="ml-2 text-white hover:text-red-200 transition-colors"
-                    >
-                      <TiDelete size={18} />
-                    </button>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </form>
-      </section>
+                    <X className="size-3.5" aria-hidden="true" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-br-subtle bg-page p-4 transition-colors hover:border-br-primary">
+          <input
+            type="checkbox"
+            checked={Boolean(modelData.isAI)}
+            onChange={(e) => setModelData((prev) => ({ ...prev, isAI: e.target.checked }))}
+            className="mt-0.5 size-4 accent-accent"
+          />
+          <span>
+            <span className="flex items-center gap-1.5 text-sm font-medium text-txt-primary">
+              <Sparkles className="size-4 text-accent" aria-hidden="true" />
+              Made with AI
+            </span>
+            <span className="mt-0.5 block text-xs text-txt-muted">
+              Tick this if AI tools generated the model or its renders. It&apos;s shown on the model
+              page.
+            </span>
+          </span>
+        </label>
+      </div>
     </section>
   );
 };
