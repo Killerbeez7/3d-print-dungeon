@@ -20,6 +20,14 @@
             "collectionGroup": "models",
             "queryScope": "COLLECTION",
             "fields": [
+                { "fieldPath": "uploaderId", "order": "ASCENDING" },
+                { "fieldPath": "createdAt", "order": "DESCENDING" }
+            ]
+        },
+        {
+            "collectionGroup": "models",
+            "queryScope": "COLLECTION",
+            "fields": [
                 { "fieldPath": "createdAt", "order": "ASCENDING" },
                 { "fieldPath": "views", "order": "DESCENDING" }
             ]
