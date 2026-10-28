@@ -6,6 +6,7 @@ export interface NavItem {
   to: string;
 }
 
+/** A top-level entry: a direct link (`to`) or a menu of `items`. */
 export interface NavSection {
   label: string;
   to: string | null;
@@ -13,21 +14,15 @@ export interface NavSection {
 }
 
 export const NAV_SECTIONS: NavSection[] = [
-  {
-    label: "Explore",
-    to: null,
-    items: [
-      { label: "Models", to: ROUTES.HOME },
-      { label: "Artists", to: ROUTES.ARTISTS_LIST },
-      { label: "Collections", to: ROUTES.COLLECTIONS },
-    ],
-  },
+  { label: "Models", to: ROUTES.HOME, items: [] },
+  { label: "Artists", to: ROUTES.ARTISTS_LIST, items: [] },
+  { label: "Collections", to: ROUTES.COLLECTIONS, items: [] },
   {
     label: "Community",
     to: null,
     items: [
-      { label: "Events", to: ROUTES.EVENTS },
       { label: "Forum", to: FORUM_PATHS.HOME },
+      { label: "Events", to: ROUTES.EVENTS },
       { label: "Blog", to: ROUTES.BLOG },
     ],
   },
