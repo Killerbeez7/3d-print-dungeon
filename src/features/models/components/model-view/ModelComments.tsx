@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { formatDistanceToNow } from "date-fns";
 
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { buttonClassName } from "@/components";
 import { useModelComments } from "../../comments/hooks/useModelComments";
 import type { ModelComment } from "../../comments/types/comment";
 
@@ -106,12 +107,12 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
   return (
     <section
       id="model-discussion"
-      className="mx-auto max-w-5xl scroll-mt-24 border-t border-br-subtle pt-7"
+      className="mx-auto max-w-4xl scroll-mt-24"
     >
       <div className="mb-5 flex items-baseline justify-between gap-3">
-        <h3 className="text-xl font-bold text-txt-primary">Comments</h3>
+        <h2 className="text-xl font-bold text-txt-primary">Comments</h2>
 
-        <span className="text-sm text-txt-muted">
+        <span className="font-mono text-sm text-txt-muted">
           {comments.length} {comments.length === 1 ? "comment" : "comments"}
         </span>
       </div>
@@ -130,7 +131,7 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
           value={newComment}
           onChange={(event) => setNewComment(event.target.value)}
           placeholder="Share your thoughts..."
-          className="min-h-20 w-full resize-y rounded-md border border-transparent bg-page p-3 text-sm leading-relaxed text-txt-primary placeholder:text-txt-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+          className="min-h-20 w-full resize-y rounded-md border border-br-input bg-page p-3 text-sm leading-relaxed text-txt-primary placeholder:text-txt-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
           rows={3}
         />
 
@@ -144,7 +145,7 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
           <button
             type="submit"
             disabled={!newComment.trim()}
-            className="h-10 rounded-lg bg-btn-primary px-5 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover focus:outline-none focus:ring-2 focus:ring-focus disabled:cursor-not-allowed disabled:opacity-60"
+            className={buttonClassName()}
           >
             Submit
           </button>
@@ -168,7 +169,7 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
               return (
                 <li key={comment.id} className="py-5">
                   <div className="mb-3 flex items-center gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent-soft text-sm font-semibold text-accent-text">
+                    <div className="chamfer flex size-9 shrink-0 items-center justify-center bg-accent-soft font-mono text-sm font-semibold text-accent-text [--cut:7px]">
                       {comment.userName?.charAt(0)?.toUpperCase() || "A"}
                     </div>
 
@@ -180,7 +181,7 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
                   <textarea
                     value={editingText}
                     onChange={(event) => setEditingText(event.target.value)}
-                    className="mb-3 w-full rounded-lg border border-br-secondary bg-surface-card p-3 text-sm text-txt-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/30"
+                    className="mb-3 w-full rounded-lg border border-br-input bg-page p-3 text-sm text-txt-primary focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
                     rows={2}
                   />
 
@@ -188,7 +189,7 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
                     <button
                       type="button"
                       onClick={() => saveEditing(comment.id)}
-                      className="h-9 rounded-lg bg-btn-primary px-3 text-sm font-medium text-btn-primary-text transition-colors hover:bg-btn-primary-hover focus:outline-none focus:ring-2 focus:ring-focus"
+                      className={buttonClassName({ size: "sm" })}
                     >
                       Save
                     </button>
@@ -196,7 +197,7 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
                     <button
                       type="button"
                       onClick={cancelEditing}
-                      className="h-9 rounded-lg border border-br-secondary bg-surface-card px-3 text-sm font-medium text-txt-primary transition-colors hover:border-br-primary hover:bg-muted focus:outline-none focus:ring-2 focus:ring-focus"
+                      className={buttonClassName({ variant: "secondary", size: "sm" })}
                     >
                       Cancel
                     </button>
@@ -209,7 +210,7 @@ export const ModelComments = ({ modelId, openAuthModal }: ModelCommentsProps) =>
               <li key={comment.id} className="py-5">
                 <div className="mb-3 flex items-start justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-txt-secondary">
+                    <div className="chamfer flex size-9 shrink-0 items-center justify-center bg-muted font-mono text-sm font-semibold text-txt-secondary [--cut:7px]">
                       {comment.userName?.charAt(0)?.toUpperCase() || "A"}
                     </div>
 
