@@ -1,5 +1,4 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { Check, X } from "lucide-react";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 
 interface ValidityIndicatorProps {
@@ -20,28 +19,25 @@ export function ValidityIndicator({
     if (!state) return null;
 
     const sizeClasses = {
-        sm: "text-sm",
-        md: "text-base",
-        lg: "text-lg",
+        sm: "size-4",
+        md: "size-5",
+        lg: "size-6",
     };
 
-    const baseClasses = `absolute ${position} top-1/2 -translate-y-1/2`;
+    const baseClasses = `absolute ${position} top-1/2 flex -translate-y-1/2 items-center`;
 
     switch (state) {
         case "loading":
             return (
                 <div className={baseClasses}>
-                    <Spinner size={16} />
+                    <Spinner size={16} delay={0} />
                 </div>
             );
 
         case "valid":
             return (
                 <div className={baseClasses}>
-                    <FontAwesomeIcon
-                        icon={faCheck}
-                        className={`${sizeClasses[size]} text-txt-muted`}
-                    />
+                    <Check className={`${sizeClasses[size]} text-success`} aria-label="Valid" />
                 </div>
             );
 
@@ -54,9 +50,10 @@ export function ValidityIndicator({
                     <button
                         type="button"
                         onClick={onClear}
-                        className={`${baseClasses} text-error hover:text-error-hover transition-colors`}
+                        aria-label="Clear field"
+                        className={`${baseClasses} text-error transition-colors hover:text-error-hover`}
                     >
-                        <FontAwesomeIcon icon={faTimes} className={sizeClasses[size]} />
+                        <X className={sizeClasses[size]} aria-hidden="true" />
                     </button>
                 );
             }

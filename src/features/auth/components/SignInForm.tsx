@@ -6,17 +6,9 @@ import {
   formatErrorForDisplay,
   isAuthPopupCancellation,
 } from "@/features/auth/utils/errorHandling";
-import { ValidityIndicator } from "./ValidityIndicator";
-import { Spinner } from "@/features/shared/reusable/Spinner";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGoogle, faTwitter, faFacebook } from "@fortawesome/free-brands-svg-icons";
-import {
-  faEye,
-  faEyeSlash,
-  faEnvelope,
-  faLock,
-  faExclamationTriangle,
-} from "@fortawesome/free-solid-svg-icons";
+import { Lock, Mail } from "lucide-react";
+import { AuthField } from "./AuthField";
+import { AuthAlert, AuthDivider, GoogleButton } from "./AuthExtras";
 import { PasswordResetModal } from "./PasswordResetModal";
 import { Button } from "@/components";
 
@@ -75,21 +67,11 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
     }
   };
 
-  const handleOAuthSignIn = async (
-    provider: "google" | "facebook" | "twitter"
-  ): Promise<void> => {
+  const handleGoogle = async (): Promise<void> => {
     setError(null);
 
     try {
-      switch (provider) {
-        case "google":
-          await handleGoogleSignIn();
-          break;
-        case "facebook":
-          break;
-        case "twitter":
-          break;
-      }
+      await handleGoogleSignIn();
     } catch (err) {
       if (isAuthPopupCancellation(err)) return;
 
@@ -99,195 +81,77 @@ export const SignInForm = ({ onSwitchToSignUp }: SignInFormProps) => {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Form */}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Email field */}
-        <div className="relative">
-          {/* <label className="block text-sm font-medium mb-2 text-txt-primary">
-                        Email Address
-                    </label> */}
-          <div className="relative">
-            <FontAwesomeIcon
-              icon={faEnvelope}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted"
-            />
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={fields.email.value}
-              onChange={handleInputChange}
-              onBlur={handleInputBlur}
-              required
-              spellCheck="false"
-              autoComplete="email"
-              className="w-full pl-10 pr-4 py-3 border border-br-secondary rounded-xl bg-surface-card text-txt-primary placeholder-txt-muted shadow-inner
-                            focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition-all duration-200"
-              placeholder="Enter your email"
-            />
-            <ValidityIndicator
-              state={
-                fields.email.isChecking
-                  ? "loading"
-                  : fields.email.isValid
-                  ? "valid"
-                  : fields.email.hasError
-                  ? "error"
-                  : null
-              }
-              onClear={() => handleClearField("email")}
-              showClearButton={fields.email.hasError}
-            />
-          </div>
-          {getFieldError("email") && (
-            <p className="mt-1 text-sm text-error">{getFieldError("email")}</p>
-          )}
-        </div>
+    <div className="space-y-5">
+      <GoogleButton onClick={() => void handleGoogle()} disabled={loading} />
 
-        {/* Password field */}
-        <div className="relative">
-          <div className="relative">
-            <FontAwesomeIcon
-              icon={faLock}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted"
-            />
-            <input
-              id="password"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              value={fields.password.value}
-              onChange={handleInputChange}
-              onBlur={handleInputBlur}
-              required
-              spellCheck="false"
-              autoComplete="current-password"
-              className="w-full pl-10 pr-12 py-3 border border-br-secondary rounded-xl bg-surface-card text-txt-primary placeholder-txt-muted shadow-inner focus:outline-none focus:ring-2 focus:ring-focus focus:border-focus transition-all duration-200"
-              placeholder="Enter your password"
-            />
+      <AuthDivider label="or with email" />
+
+      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+        <AuthField
+          name="email"
+          label="Email"
+          type="email"
+          icon={Mail}
+          field={fields.email}
+          error={getFieldError("email")}
+          autoComplete="email"
+          placeholder="you@example.com"
+          onChange={handleInputChange}
+          onBlur={handleInputBlur}
+          onClear={() => handleClearField("email")}
+        />
+
+        <div>
+          <AuthField
+            name="password"
+            label="Password"
+            type="password"
+            icon={Lock}
+            field={fields.password}
+            error={getFieldError("password")}
+            autoComplete="current-password"
+            placeholder="Your password"
+            onChange={handleInputChange}
+            onBlur={handleInputBlur}
+            onClear={() => handleClearField("password")}
+            isVisible={showPassword}
+            onToggleVisibility={() => setShowPassword(!showPassword)}
+          />
+          <div className="mt-2 flex justify-end">
             <button
               type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-txt-muted hover:text-txt-primary transition-colors duration-200"
+              className="text-sm font-medium text-link transition-colors hover:text-link-hover hover:underline"
+              onClick={() => setShowPasswordReset(true)}
             >
-              <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
+              Forgot password?
             </button>
-            <ValidityIndicator
-              state={
-                fields.password.isChecking
-                  ? "loading"
-                  : fields.password.isValid
-                  ? "valid"
-                  : fields.password.hasError
-                  ? "error"
-                  : null
-              }
-              position="right-12"
-              onClear={() => handleClearField("password")}
-              showClearButton={fields.password.hasError}
-            />
           </div>
-          {getFieldError("password") && (
-            <p className="mt-1 text-sm text-txt-secondary">{getFieldError("password")}</p>
-          )}
         </div>
 
-        {/* Forgot Password Link */}
-        <div className="flex justify-end">
-          <button
-            type="button"
-            className="text-sm text-link hover:text-link-hover font-medium transition-colors duration-200 hover:underline focus:outline-none focus:ring-2 focus:ring-focus focus:ring-offset-1 rounded"
-            onClick={() => setShowPasswordReset(true)}
-          >
-            Forgot Password?
-          </button>
-        </div>
+        {error && <AuthAlert message={error} />}
 
-        {/* Error message */}
-        {error && (
-          <div className="flex items-center p-3 bg-muted border border-error rounded-xl">
-            <FontAwesomeIcon icon={faExclamationTriangle} className="text-error mr-2" />
-            <p className="text-txt-secondary text-sm font-medium">{error}</p>
-          </div>
-        )}
-
-        {/* Submit button */}
-        <Button type="submit" size="lg" fullWidth disabled={!isFormValid() || loading}>
-          {loading ? (
-            <div className="flex items-center justify-center">
-              <Spinner size={18} />
-              <span className="ml-2">Processing...</span>
-            </div>
-          ) : (
-            "Sign In"
-          )}
+        <Button
+          type="submit"
+          size="lg"
+          fullWidth
+          isLoading={loading}
+          disabled={!isFormValid() || loading}
+        >
+          {loading ? "Signing in…" : "Sign in"}
         </Button>
       </form>
 
-      {/* Social login */}
-      <div className="mt-6">
-        <div className="flex items-center mb-4">
-          <hr className="flex-grow border-br-secondary" />
-          <span className="mx-4 text-sm font-medium">Or continue with</span>
-          <hr className="flex-grow border-br-secondary" />
-        </div>
+      <p className="text-center text-sm text-txt-secondary">
+        New here?{" "}
+        <button
+          type="button"
+          onClick={onSwitchToSignUp}
+          className="font-semibold text-link transition-colors hover:text-link-hover hover:underline"
+        >
+          Create an account
+        </button>
+      </p>
 
-        <div className="grid grid-cols-3 gap-4 xl:grid-cols-1 lg:gap-3">
-          <button
-            onClick={() => handleOAuthSignIn("google")}
-            disabled={loading}
-            className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4
-                        border border-br-secondary rounded-lg lg:rounded-xl text-txt-primary bg-surface-card
-                        hover:shadow-md hover:scale-[1.02] transition-all duration-200
-                        disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            title="Continue with Google"
-          >
-            <FontAwesomeIcon icon={faGoogle} size="lg" style={{ color: "#EA4335" }} />
-            <span className="font-medium hidden xl:inline">Continue with Google</span>
-          </button>
-
-          <button
-            onClick={() => handleOAuthSignIn("facebook")}
-            disabled={loading}
-            className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4
-                        border border-br-secondary rounded-lg lg:rounded-xl text-txt-primary bg-surface-card
-                        hover:shadow-md hover:scale-[1.02] transition-all duration-200
-                        disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            title="Continue with Facebook"
-          >
-            <FontAwesomeIcon icon={faFacebook} size="lg" style={{ color: "#1877F2" }} />
-            <span className="font-medium hidden xl:inline">Continue with Facebook</span>
-          </button>
-
-          <button
-            onClick={() => handleOAuthSignIn("twitter")}
-            disabled={loading}
-            className="flex items-center justify-center gap-2 lg:gap-3 py-2 lg:py-3 px-3 lg:px-4 border border-br-secondary
-                        rounded-lg lg:rounded-xl text-txt-primary bg-surface-card hover:shadow-md hover:scale-[1.02]
-                        transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            title="Continue with Twitter"
-          >
-            <FontAwesomeIcon icon={faTwitter} size="xl" style={{ color: "#1DA1F2" }} />
-            <span className="font-medium hidden xl:inline">Continue with Twitter</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Switch to Sign Up */}
-      <div className="mt-6 text-center">
-        <p className="text-sm text-txt-secondary">
-          Don&apos;t have an account?{" "}
-          <button
-            type="button"
-            onClick={onSwitchToSignUp}
-            className="text-link hover:text-link-hover font-semibold transition-all duration-200 hover:scale-105 hover:underline"
-          >
-            Sign Up
-          </button>
-        </p>
-      </div>
-
-      {/* Password Reset Modal */}
       <PasswordResetModal
         isOpen={showPasswordReset}
         onClose={() => setShowPasswordReset(false)}

@@ -563,6 +563,38 @@ body {
   }
 }
 
+@keyframes fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+}
+
+/* Dialog entrance: bottom sheet on phones, pop on larger screens. */
+@media (prefers-reduced-motion: no-preference) {
+  .auth-panel {
+    animation: sheet-up 0.35s var(--ease-forge);
+  }
+
+  @media (min-width: 768px) {
+    .auth-panel {
+      animation: pop-in 0.3s var(--ease-forge);
+    }
+  }
+}
+
 @keyframes grow-x {
   from {
     transform: scaleX(0);
