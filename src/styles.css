@@ -457,6 +457,11 @@ body {
     background-size: 32px 32px;
   }
 
+  /* Fades a background out towards its edges (pairs with .bg-buildplate). */
+  .fade-radial {
+    mask-image: radial-gradient(closest-side, #000, transparent);
+  }
+
   /* Loading placeholder that "prints" bottom-up, layer by layer. */
   .skeleton-print {
     position: relative;

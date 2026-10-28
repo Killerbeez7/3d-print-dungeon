@@ -3,6 +3,7 @@ import { UserRoundX } from "lucide-react";
 
 import { buttonClassName } from "@/components";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { StatePanel } from "@/features/shared/components/StatePanel";
 import { usePublicProfileByUsername } from "../hooks/usePublicProfile";
 
 import { ProfileAbout } from "../components/ProfileAbout";
@@ -42,22 +43,19 @@ export const PublicProfilePage = () => {
 
   if (!username || isError || !profile) {
     return (
-      <div className="mx-auto flex min-h-[70vh] max-w-md flex-col items-center justify-center px-4 text-center">
-        <span className="chamfer bg-buildplate flex size-20 items-center justify-center bg-muted text-txt-muted [--cut:14px]">
-          <UserRoundX className="size-9" aria-hidden="true" />
-        </span>
-        <h1 className="mt-6 text-2xl font-bold">
-          {isError ? "Couldn't load this profile" : "User not found"}
-        </h1>
-        <p className="mt-2 text-sm text-txt-secondary">
-          {isError
-            ? "Check your connection and refresh the page."
-            : "The user you're looking for doesn't exist, or changed their username."}
-        </p>
-        <Link to="/artists" className={buttonClassName({ className: "mt-6" })}>
-          Browse artists
-        </Link>
-      </div>
+      <StatePanel
+        icon={UserRoundX}
+        title={isError ? "Couldn't load this profile" : "User not found"}
+        actions={
+          <Link to="/artists" className={buttonClassName()}>
+            Browse artists
+          </Link>
+        }
+      >
+        {isError
+          ? "Check your connection and refresh the page."
+          : "The user you're looking for doesn't exist, or changed their username."}
+      </StatePanel>
     );
   }
 

@@ -21,6 +21,7 @@ import { ModelComments } from "../components/model-view/ModelComments";
 import { ModelPageSkeleton } from "../components/model-view/ModelPageSkeleton";
 import { PurchaseButton } from "@/features/payment/components/PurchaseButton";
 import { buttonClassName } from "@/components";
+import { StatePanel } from "@/features/shared/components/StatePanel";
 import { MODEL_CATEGORIES } from "@/features/models/constants/modelCategories";
 import { formatPrice } from "@/features/models/utils/modelMeta";
 import { useScreenSize } from "@/hooks/useScreenSize";
@@ -75,18 +76,17 @@ export function ModelPage() {
 
   if (!model) {
     return (
-      <div className="mx-auto flex min-h-[70vh] max-w-md flex-col items-center justify-center px-4 text-center">
-        <span className="chamfer bg-buildplate flex size-20 items-center justify-center bg-muted text-txt-muted [--cut:14px]">
-          <Box className="size-9" aria-hidden="true" />
-        </span>
-        <h1 className="mt-6 text-2xl font-bold">Model not found</h1>
-        <p className="mt-2 text-sm text-txt-secondary">
-          It may have been removed, or the link is wrong.
-        </p>
-        <Link to="/" className={buttonClassName({ className: "mt-6" })}>
-          Browse models
-        </Link>
-      </div>
+      <StatePanel
+        icon={Box}
+        title="Model not found"
+        actions={
+          <Link to="/" className={buttonClassName()}>
+            Browse models
+          </Link>
+        }
+      >
+        It may have been removed, or the link is wrong.
+      </StatePanel>
     );
   }
 
