@@ -7,7 +7,7 @@ import { useFetchModels } from "@/features/models/hooks/index";
 import { HomeModelsGrid } from "../components/HomeModelsGrid";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 
-import { useState, useCallback, useEffect } from "react";
+import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useLayout } from "@/features/shared/context/layoutContext";
 
@@ -33,9 +33,6 @@ export const HomePage = (): React.ReactNode => {
 
     return () => hideFooter(false);
   }, [hasNextPage, hideFooter]);
-
-  const [loadIndex, setLoadIndex] = useState<number>(0);
-  const bumpIndex = useCallback(() => setLoadIndex((i) => i + 1), []);
 
   const models = data?.pages.flatMap((page) => page.models) ?? [];
 
@@ -74,7 +71,7 @@ export const HomePage = (): React.ReactNode => {
           {isLoading && !models.length ? (
             showSpinner()
           ) : (
-            <HomeModelsGrid models={models} loadIndex={loadIndex} bumpIndex={bumpIndex} />
+            <HomeModelsGrid models={models} />
           )}
         </InfiniteScrollList>
       </section>

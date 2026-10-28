@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 
 import { HomeModelsGrid } from "@/features/home/components/HomeModelsGrid";
 import { Spinner } from "@/features/shared/reusable/Spinner";
@@ -16,8 +16,6 @@ export const ArtworksTab = ({ search, onResultsCount }: ArtworksTabProps) => {
   const { filters } = useFilters();
   const { data, isLoading, error } = useArtworks(filters, search);
 
-  const [loadIndex, setLoadIndex] = useState<number>(0);
-
   const models = data?.pages.flatMap((page) => page.models) ?? [];
 
   useEffect(() => {
@@ -31,10 +29,6 @@ export const ArtworksTab = ({ search, onResultsCount }: ArtworksTabProps) => {
 
     onResultsCount(models.length);
   }, [models.length, isLoading, onResultsCount]);
-
-  const handleBumpIndex = () => {
-    setLoadIndex((current) => current + 1);
-  };
 
   if (isLoading) {
     return (
@@ -60,7 +54,5 @@ export const ArtworksTab = ({ search, onResultsCount }: ArtworksTabProps) => {
     return <SearchNotFound msg={message} />;
   }
 
-  return (
-    <HomeModelsGrid models={models} loadIndex={loadIndex} bumpIndex={handleBumpIndex} />
-  );
+  return <HomeModelsGrid models={models} />;
 };
