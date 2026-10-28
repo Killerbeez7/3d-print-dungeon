@@ -91,7 +91,7 @@ export function ForumCategory() {
                   return !current;
                 });
               }}
-              className="flex min-w-36 items-center justify-between gap-4 rounded-lg border border-br-secondary bg-page px-3 py-2 text-sm text-txt-primary outline-none transition hover:border-br-primary"
+              className="flex min-w-36 items-center justify-between gap-4 rounded-lg border border-br-secondary bg-page px-3 py-2 text-sm text-txt-primary outline-none transition hover:border-br-primary focus-visible:ring-2 focus-visible:ring-focus"
               aria-haspopup="listbox"
               aria-expanded={isSortOpen}
             >
