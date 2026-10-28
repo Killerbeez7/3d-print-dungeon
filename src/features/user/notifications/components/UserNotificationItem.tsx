@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { FaRegTrashAlt } from "react-icons/fa";
+import { Bell, Download, Heart, Mail, MessageSquare, ShoppingBag, Trash2, UserPlus } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-import { useScreenSize } from "@/hooks/useScreenSize";
+import { STATIC_ASSETS } from "@/config/assetsConfig";
 import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
 
 import { useUserNotification } from "../hooks/useUserNotification";
@@ -129,6 +130,16 @@ function getNotificationText(notification: UserNotification) {
   }
 }
 
+const typeIcons: Partial<Record<UserNotification["type"], { icon: LucideIcon; tone: string }>> = {
+  like: { icon: Heart, tone: "bg-ember-fill text-ember-on" },
+  follow: { icon: UserPlus, tone: "bg-btn-primary text-btn-primary-text" },
+  comment: { icon: MessageSquare, tone: "bg-btn-primary text-btn-primary-text" },
+  message: { icon: Mail, tone: "bg-btn-primary text-btn-primary-text" },
+  purchase: { icon: ShoppingBag, tone: "bg-success text-page" },
+  sale: { icon: ShoppingBag, tone: "bg-success text-page" },
+  download: { icon: Download, tone: "bg-btn-primary text-btn-primary-text" },
+};
+
 function getNotificationAvatar(notification: UserNotification) {
   return (
     notification.metadata?.userAvatar ??
@@ -159,21 +170,14 @@ function getNotificationUserName(notification: UserNotification) {
 
 interface UserNotificationItemProps {
   notification: UserNotification;
-  compact?: boolean;
 }
 
-export function UserNotificationItem({
-  notification,
-  compact = false,
-}: UserNotificationItemProps) {
+export function UserNotificationItem({ notification }: UserNotificationItemProps) {
   const { deleteNotification } = useUserNotification();
-  const { isMobile } = useScreenSize();
-
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
     setIsDeleting(true);
-
     try {
       await deleteNotification(notification.id);
     } finally {
@@ -182,71 +186,64 @@ export function UserNotificationItem({
   };
 
   const isUnread = notification.status === "unread";
-
-  const containerClasses =
-    notification.status === "archived"
-      ? "bg-section/80 opacity-75"
-      : "bg-section hover:bg-surface-card";
-
-  const spacingClasses = compact
-    ? "gap-3 rounded-lg p-3"
-    : `gap-4 rounded-xl ${isMobile ? "p-3" : "p-4"}`;
-
-  const avatarSize = compact ? "h-10 w-10" : isMobile ? "h-12 w-12" : "h-14 w-14";
+  const { icon: TypeIcon, tone } = typeIcons[notification.type] ?? {
+    icon: Bell,
+    tone: "bg-muted text-txt-secondary",
+  };
 
   return (
-    <div
-      className={`relative flex items-center transition-all duration-200 hover:shadow-sm ${spacingClasses} ${containerClasses}`}
+    <li
+      className={`group relative flex items-center gap-4 px-4 py-4 transition-colors hover:bg-muted/40 sm:px-5 ${
+        notification.status === "archived" ? "opacity-70" : ""
+      }`}
     >
-      {isUnread && (
-        <span
-          aria-label="Unread"
-          className={`absolute h-3 w-3 animate-pulse rounded-full bg-page ${
-            compact || isMobile ? "right-2 top-2" : "right-3 top-3"
-          }`}
+      {/* Unread: accent bar on the left edge */}
+      {isUnread && <span className="absolute inset-y-3 left-0 w-0.5 bg-accent" aria-hidden="true" />}
+
+      <span className="relative shrink-0">
+        <img
+          src={getAvatarUrlWithCacheBust(getNotificationAvatar(notification))}
+          alt=""
+          loading="lazy"
+          referrerPolicy="no-referrer"
+          className="chamfer size-11 bg-muted object-cover [--cut:9px]"
+          onError={(event) => {
+            const image = event.currentTarget;
+            if (!image.src.endsWith(STATIC_ASSETS.DEFAULT_AVATAR)) image.src = STATIC_ASSETS.DEFAULT_AVATAR;
+          }}
         />
-      )}
-
-      <img
-        src={getAvatarUrlWithCacheBust(getNotificationAvatar(notification))}
-        alt={`${getNotificationUserName(notification)}'s profile`}
-        className={`${avatarSize} flex-shrink-0 rounded-full border border-br-secondary/30 object-cover`}
-      />
-
-      <div className="min-w-0 flex flex-1 flex-col justify-center space-y-0.5">
-        <div
-          className={`leading-relaxed ${compact ? "text-xs" : "text-sm"} ${
-            isUnread ? "text-txt-primary" : "text-txt-secondary"
-          }`}
+        <span
+          className={`absolute -bottom-1 -right-1 flex size-5 items-center justify-center rounded-full ring-2 ring-surface-card ${tone}`}
+          aria-hidden="true"
         >
-          {getNotificationText(notification)}
-        </div>
-
-        <span className="text-xs font-medium text-txt-secondary">
-          {formatTimeAbbreviated(notification.createdAt)}
+          <TypeIcon className="size-3" />
         </span>
+      </span>
+
+      <div className="min-w-0 flex-1">
+        <p className={`text-sm leading-relaxed ${isUnread ? "" : "opacity-80"}`}>
+          <span className="sr-only">{getNotificationUserName(notification)}: </span>
+          {getNotificationText(notification)}
+        </p>
+        <p className="mt-0.5 flex items-center gap-2 font-mono text-xs text-txt-muted">
+          {formatTimeAbbreviated(notification.createdAt)}
+          {isUnread && <span className="text-accent">· new</span>}
+        </p>
       </div>
 
-      {!compact && (
-        <button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            void handleDelete();
-          }}
-          disabled={isDeleting}
-          aria-label="Delete notification"
-          title="Delete notification"
-          className={`rounded-lg border border-red-500/20 bg-red-500/10 transition-colors duration-200 hover:bg-red-500/20 disabled:cursor-not-allowed disabled:opacity-50 ${
-            isMobile ? "p-1.5" : "p-2"
-          }`}
-        >
-          <FaRegTrashAlt
-            aria-hidden="true"
-            className={`text-red-500 ${isMobile ? "h-3.5 w-3.5" : "h-4 w-4"}`}
-          />
-        </button>
-      )}
-    </div>
+      <button
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          void handleDelete();
+        }}
+        disabled={isDeleting}
+        aria-label="Delete notification"
+        title="Delete notification"
+        className="flex size-9 shrink-0 items-center justify-center rounded-md text-txt-muted transition-[color,background-color,opacity] hover:bg-error/10 hover:text-error focus-visible:opacity-100 disabled:opacity-50 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100"
+      >
+        <Trash2 className="size-4" aria-hidden="true" />
+      </button>
+    </li>
   );
 }

@@ -1,4 +1,3 @@
-export { NotificationBadge } from "./components/NotificationBadge";
 export { UserNotificationItem } from "./components/UserNotificationItem";
 export { NotificationDropdown } from "./components/NotificationDropdown";
 
