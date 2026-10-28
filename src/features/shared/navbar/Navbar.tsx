@@ -16,6 +16,7 @@ import { MobileMenu } from "./MobileMenu";
 import { ProfileMenu } from "./ProfileMenu";
 import { GlobalSearch } from "@/features/search/components/GlobalSearch";
 import { NotificationDropdown } from "@/features/user/notifications";
+import { buttonClassName } from "@/components";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
 
 const iconButtonClass =
@@ -216,7 +217,11 @@ export const Navbar = () => {
               <>
                 <Link
                   to="/model/upload"
-                  className="hidden h-9 items-center gap-2 rounded-md border border-br-secondary bg-surface-card px-3 text-sm font-semibold text-txt-primary transition-colors hover:border-br-primary hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus md:inline-flex"
+                  className={buttonClassName({
+                    variant: "secondary",
+                    size: "sm",
+                    className: "max-md:hidden",
+                  })}
                 >
                   <Upload className="size-4" aria-hidden="true" />
                   Upload

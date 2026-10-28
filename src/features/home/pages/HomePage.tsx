@@ -3,7 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 
-import { Button } from "@/components";
+import { Button, buttonClassName } from "@/components";
 import { useFetchModels } from "@/features/models/hooks/index";
 import { MODEL_CATEGORIES } from "@/features/models/constants/modelCategories";
 import { InfiniteScrollList } from "@/features/shared/InfiniteScrollList";
@@ -98,7 +98,7 @@ export const HomePage = (): React.ReactNode => {
             )}
             <Link
               to="/model/upload"
-              className="inline-flex h-10 items-center rounded-md px-4 text-sm font-semibold text-accent-text hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+              className={buttonClassName({ variant: "ghost" })}
             >
               Upload a model
             </Link>

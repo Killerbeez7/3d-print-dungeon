@@ -68,7 +68,6 @@ export const EventsHome = () => {
               type="button"
               onClick={() => setShowCreate(true)}
               fullWidth
-              className="bg-success hover:bg-success/80 text-txt-inverse"
             >
               + Create Event
             </Button>

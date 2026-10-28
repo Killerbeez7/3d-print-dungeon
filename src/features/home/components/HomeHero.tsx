@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { ArrowDown, Upload } from "lucide-react";
 
-import { Button } from "@/components";
+import { Button, buttonClassName } from "@/components";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useModal } from "@/features/shared/modal/hooks/useModal";
 
@@ -53,10 +53,7 @@ export const HomeHero = ({ onBrowse }: HomeHeroProps) => {
           </Button>
 
           {currentUser ? (
-            <Link
-              to="/model/upload"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-br-secondary bg-surface-card px-5 text-base font-semibold text-txt-primary transition-colors hover:border-br-primary hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
-            >
+            <Link to="/model/upload" className={buttonClassName({ variant: "secondary", size: "lg" })}>
               <Upload className="size-4" aria-hidden="true" />
               Upload a model
             </Link>

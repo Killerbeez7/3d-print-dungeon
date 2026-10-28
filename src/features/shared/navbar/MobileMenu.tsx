@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
-import { Button } from "@/components";
+import { Button, buttonClassName } from "@/components";
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 import type { NavSection } from "@/config/navConfig";
 import { GlobalSearch } from "@/features/search/components/GlobalSearch";
@@ -166,7 +166,7 @@ export const MobileMenu = ({
               <Link
                 to="/model/upload"
                 onClick={onClose}
-                className="flex h-11 w-full items-center justify-center gap-2 rounded-md bg-btn-primary px-5 text-base font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus"
+                className={buttonClassName({ size: "lg", fullWidth: true })}
               >
                 <Upload className="size-5" aria-hidden="true" />
                 Upload a model
