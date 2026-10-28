@@ -1,24 +1,15 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  FaCalendar,
-  FaChartLine,
-  FaComment,
-  FaEdit,
-  FaEye,
-  FaFilter,
-  FaLock,
-  FaStar,
-  FaThumbtack,
-  FaTrash,
-} from "react-icons/fa";
+import { MessagesSquare, Pencil, Plus, Search, Trash2, UserRound } from "lucide-react";
 
-import Skeleton from "@/features/shared/Skeleton";
+import { Button, buttonClassName } from "@/components";
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { StatePanel } from "@/features/shared/components/StatePanel";
+import { useModal } from "@/features/shared/modal/hooks/useModal";
 
 import { FORUM_PATHS } from "../constants/forumPaths";
-import { formatRelativeTime } from "../utils/threadUtils";
 import { useDeleteThread, useFetchCategories, useFetchThreads } from "../hooks";
+import { ForumAlert, ForumHeader, ThreadListFrame, ThreadListSkeleton, ThreadRow } from "./ForumUI";
 
 import type { FetchThreadsOptions, ForumThread } from "../types/forum";
 
@@ -28,6 +19,7 @@ type FilterOption = "all" | "recent" | "popular" | "unanswered" | "pinned";
 
 export function ForumMyThreads() {
   const { currentUser } = useAuth();
+  const { open } = useModal("auth");
 
   const {
     mutateAsync: deleteThread,
@@ -181,417 +173,196 @@ export function ForumMyThreads() {
 
   if (!currentUser) {
     return (
-      <div className="mx-auto max-w-4xl rounded-xl border border-br-subtle bg-surface-card p-8 text-center shadow-sm">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
-          My Threads
-        </p>
-
-        <h1 className="text-2xl font-bold text-txt-primary">
-          Sign in to manage your discussions
-        </h1>
-
-        <p className="mx-auto mt-2 max-w-xl text-txt-secondary">
-          Your threads, engagement statistics, and management tools will appear here.
-        </p>
-
-        <Link
-          to={FORUM_PATHS.HOME}
-          className="mt-6 inline-flex items-center justify-center rounded-lg border border-br-secondary bg-surface-card px-4 py-2 text-sm font-semibold text-txt-primary transition-colors hover:bg-muted"
-        >
-          Back to Forum
-        </Link>
-      </div>
+      <StatePanel
+        icon={UserRound}
+        title="Sign in to see your threads"
+        actions={<Button onClick={() => open({ mode: "signin" })}>Sign in</Button>}
+      >
+        Your discussions and how people respond to them show up here.
+      </StatePanel>
     );
   }
 
+  const thisMonth = allThreads.filter(
+    (thread) => Date.now() - getThreadDate(thread.createdAt).getTime() <= 30 * 24 * 60 * 60 * 1000
+  ).length;
+
+  const statItems = [
+    { label: "Threads", value: stats.totalThreads },
+    { label: "Views", value: stats.totalViews },
+    { label: "Replies received", value: stats.totalRepliesReceived },
+    { label: "Avg views", value: stats.avgViewsPerThread },
+    { label: "This month", value: thisMonth },
+    { label: "Pinned", value: stats.pinnedThreads },
+  ];
+
+  const isFiltered = Boolean(searchQuery) || filterBy !== "all";
+
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-8">
-      {/* Header */}
-      <header>
-        {/* <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
-          Your Activity
-        </p> */}
+    <div>
+      <ForumHeader
+        eyebrow="Your activity"
+        title="My threads"
+        description="Manage your discussions and see how the community responds."
+        action={
+          <Link to={FORUM_PATHS.NEW_THREAD} className={buttonClassName()}>
+            <Plus className="size-4" aria-hidden="true" />
+            New thread
+          </Link>
+        }
+      />
 
-        <h1 className="text-3xl font-bold text-txt-primary">My Threads</h1>
-
-        <p className="mt-2 max-w-2xl text-txt-secondary">
-          Manage your discussions and see how the community is engaging with them.
-        </p>
-      </header>
-
-      {/* Main stats */}
-      <section className="grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
-          <div className="text-2xl font-bold text-txt-primary">{stats.totalThreads}</div>
-
-          <div className="mt-1 text-sm text-txt-muted">Total Threads</div>
-        </div>
-
-        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
-          <div className="text-2xl font-bold text-txt-primary">{stats.totalViews}</div>
-
-          <div className="mt-1 text-sm text-txt-muted">Total Views</div>
-        </div>
-
-        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
-          <div className="text-2xl font-bold text-txt-primary">
-            {stats.totalRepliesReceived}
+      <dl className="mb-8 grid grid-cols-3 border-y border-br-subtle lg:grid-cols-6">
+        {statItems.map((stat, index) => (
+          <div
+            key={stat.label}
+            className={`px-3 py-3 ${index % 3 !== 0 ? "border-l border-br-subtle" : ""} ${
+              index >= 3 ? "border-t border-br-subtle lg:border-t-0" : ""
+            } lg:border-l lg:first:border-l-0`}
+          >
+            <dt className="label-mono truncate text-txt-muted">{stat.label}</dt>
+            <dd className="mt-1 font-mono text-xl font-semibold text-txt-primary">{stat.value}</dd>
           </div>
-
-          <div className="mt-1 text-sm text-txt-muted">Replies Received</div>
-        </div>
-
-        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
-          <div className="text-2xl font-bold text-txt-primary">
-            {stats.avgViewsPerThread}
-          </div>
-
-          <div className="mt-1 text-sm text-txt-muted">Avg Views / Thread</div>
-        </div>
-      </section>
-
-      {/* Secondary insights */}
-      <section className="grid gap-4 md:grid-cols-3">
-        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
-          <div className="mb-4 flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
-              <FaChartLine size={14} aria-hidden="true" />
-            </div>
-
-            <h2 className="font-semibold text-txt-primary">Engagement</h2>
-          </div>
-
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between gap-4">
-              <span className="text-txt-secondary">Avg Views</span>
-
-              <span className="font-semibold text-txt-primary">
-                {stats.avgViewsPerThread}
-              </span>
-            </div>
-
-            <div className="flex justify-between gap-4">
-              <span className="text-txt-secondary">Avg Replies</span>
-
-              <span className="font-semibold text-txt-primary">
-                {stats.avgRepliesPerThread}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
-          <div className="mb-4 flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
-              <FaThumbtack size={13} aria-hidden="true" />
-            </div>
-
-            <h2 className="font-semibold text-txt-primary">Thread Status</h2>
-          </div>
-
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between gap-4">
-              <span className="text-txt-secondary">Pinned</span>
-
-              <span className="font-semibold text-warning">{stats.pinnedThreads}</span>
-            </div>
-
-            <div className="flex justify-between gap-4">
-              <span className="text-txt-secondary">Locked</span>
-
-              <span className="font-semibold text-error">{stats.lockedThreads}</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
-          <div className="mb-4 flex items-center gap-3">
-            <div className="flex size-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
-              <FaStar size={13} aria-hidden="true" />
-            </div>
-
-            <h2 className="font-semibold text-txt-primary">Recent Activity</h2>
-          </div>
-
-          <div className="space-y-3 text-sm">
-            <div className="flex justify-between gap-4">
-              <span className="text-txt-secondary">This Week</span>
-
-              <span className="font-semibold text-txt-primary">
-                {
-                  allThreads.filter((thread) => {
-                    const daysSinceCreated =
-                      (Date.now() - getThreadDate(thread.createdAt).getTime()) /
-                      (1000 * 60 * 60 * 24);
-
-                    return daysSinceCreated <= 7;
-                  }).length
-                }
-              </span>
-            </div>
-
-            <div className="flex justify-between gap-4">
-              <span className="text-txt-secondary">This Month</span>
-
-              <span className="font-semibold text-txt-primary">
-                {
-                  allThreads.filter((thread) => {
-                    const daysSinceCreated =
-                      (Date.now() - getThreadDate(thread.createdAt).getTime()) /
-                      (1000 * 60 * 60 * 24);
-
-                    return daysSinceCreated <= 30;
-                  }).length
-                }
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
+        ))}
+      </dl>
 
       {/* Controls */}
-      <section className="flex flex-col gap-4 rounded-xl border border-br-subtle bg-surface-card p-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
-        <div className="flex flex-1 flex-col gap-3 sm:flex-row">
-          <div className="relative flex-1 sm:max-w-xs">
-            <FaFilter
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-txt-muted"
-              size={12}
-              aria-hidden="true"
-            />
-
-            <input
-              type="search"
-              placeholder="Search your threads..."
-              value={searchQuery}
-              onChange={(event) => {
-                setSearchQuery(event.target.value);
-              }}
-              className="w-full rounded-lg border border-br-secondary bg-page py-2.5 pr-3 pl-9 text-sm text-txt-primary outline-none transition placeholder:text-txt-muted focus:border-focus focus:ring-2 focus:ring-focus/15"
-            />
-          </div>
-
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <div className="relative sm:max-w-xs sm:flex-1">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-txt-muted"
+            aria-hidden="true"
+          />
+          <input
+            type="search"
+            aria-label="Search your threads"
+            placeholder="Search your threads"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            className="field h-10 pl-9"
+          />
+        </div>
+        <div className="flex gap-2">
           <select
+            aria-label="Filter threads"
             value={filterBy}
-            onChange={(event) => {
-              setFilterBy(event.target.value as FilterOption);
-            }}
-            className="rounded-lg border border-br-secondary bg-page px-3 py-2.5 text-sm text-txt-primary outline-none transition focus:border-focus focus:ring-2 focus:ring-focus/15"
+            onChange={(event) => setFilterBy(event.target.value as FilterOption)}
+            className="field h-10 w-auto"
           >
-            <option value="all">All Threads</option>
-            <option value="recent">Recent</option>
+            <option value="all">All threads</option>
+            <option value="recent">This week</option>
             <option value="popular">Popular</option>
             <option value="unanswered">Unanswered</option>
             <option value="pinned">Pinned</option>
           </select>
-
           <select
+            aria-label="Sort threads"
             value={sortBy}
-            onChange={(event) => {
-              setSortBy(event.target.value as SortOption);
-            }}
-            className="rounded-lg border border-br-secondary bg-page px-3 py-2.5 text-sm text-txt-primary outline-none transition focus:border-focus focus:ring-2 focus:ring-focus/15"
+            onChange={(event) => setSortBy(event.target.value as SortOption)}
+            className="field h-10 w-auto"
           >
-            <option value="newest">Newest First</option>
-            <option value="oldest">Oldest First</option>
-            <option value="mostViews">Most Views</option>
-            <option value="mostReplies">Most Replies</option>
-            <option value="lastActivity">Last Activity</option>
+            <option value="newest">Newest</option>
+            <option value="oldest">Oldest</option>
+            <option value="mostViews">Most views</option>
+            <option value="mostReplies">Most replies</option>
+            <option value="lastActivity">Last activity</option>
           </select>
         </div>
-
-        <span className="shrink-0 text-sm text-txt-muted">
-          {filteredThreads.length} of {allThreads.length} threads
+        <span className="font-mono text-xs text-txt-muted sm:ml-auto">
+          {filteredThreads.length} of {allThreads.length}
         </span>
-      </section>
+      </div>
 
       {deleteThreadError && (
-        <div className="rounded-xl border border-error/30 bg-error/10 p-4 text-sm text-error">
-          {deleteThreadError.message}
+        <div className="mb-4">
+          <ForumAlert>Couldn&apos;t delete that thread: {deleteThreadError.message}</ForumAlert>
         </div>
       )}
 
-      {/* Threads */}
-      <section className="space-y-3">
-        {threadsLoading ? (
-          [0, 1, 2].map((item) => (
-            <div
-              key={item}
-              className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm"
-            >
-              <Skeleton className="mb-3 h-6 w-3/4" />
-              <Skeleton className="mb-4 h-4 w-full" />
-
-              <div className="flex gap-4">
-                <Skeleton className="h-4 w-20" />
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-16" />
-              </div>
-            </div>
-          ))
-        ) : threadsError ? (
-          <div className="rounded-xl border border-error/30 bg-error/10 p-8 text-center">
-            <p className="mb-4 font-medium text-error">Error loading threads</p>
-
-            <button
-              type="button"
-              onClick={() => {
-                window.location.reload();
-              }}
-              className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
-            >
-              Retry
-            </button>
-          </div>
-        ) : filteredThreads.length > 0 ? (
-          <>
+      {threadsLoading ? (
+        <ThreadListSkeleton rows={3} />
+      ) : threadsError ? (
+        <StatePanel
+          icon={MessagesSquare}
+          title="Couldn't load your threads"
+          headingLevel="h2"
+          className="min-h-[30vh]"
+          actions={<Button onClick={() => window.location.reload()}>Try again</Button>}
+        />
+      ) : filteredThreads.length > 0 ? (
+        <div className="space-y-4">
+          <ThreadListFrame>
             {filteredThreads.map((thread) => {
-              const isDeletingThisThread =
-                isDeletingThread && deletingThreadId === thread.id;
-
-              const categoryName =
-                categories.find((category) => {
-                  return category.id === thread.categoryId;
-                })?.name ?? "Category";
-
+              const isDeletingThisThread = isDeletingThread && deletingThreadId === thread.id;
               return (
-                <article
+                <ThreadRow
                   key={thread.id}
-                  className="group rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm transition-all duration-200 hover:border-accent/30 hover:shadow-md"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-2 flex flex-wrap items-center gap-2">
-                        <span className="text-xs font-semibold uppercase tracking-wide text-accent">
-                          {categoryName}
-                        </span>
-
-                        {thread.isPinned && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-warning/10 px-2 py-1 text-xs font-medium text-warning">
-                            <FaThumbtack size={9} aria-hidden="true" />
-                            Pinned
-                          </span>
-                        )}
-
-                        {thread.isLocked && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-error/10 px-2 py-1 text-xs font-medium text-error">
-                            <FaLock size={9} aria-hidden="true" />
-                            Locked
-                          </span>
-                        )}
-                      </div>
-
-                      <Link
-                        to={FORUM_PATHS.THREAD(thread.id)}
-                        className="text-lg font-semibold text-txt-primary transition-colors group-hover:text-accent"
-                      >
-                        {thread.title}
-                      </Link>
-
-                      <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-txt-secondary">
-                        {thread.content}
-                      </p>
-
-                      <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-br-subtle pt-4 text-sm text-txt-muted">
-                        <span className="inline-flex items-center gap-1.5">
-                          <FaCalendar size={11} aria-hidden="true" />
-                          {formatRelativeTime(thread.createdAt)}
-                        </span>
-
-                        <span className="inline-flex items-center gap-1.5">
-                          <FaEye size={11} aria-hidden="true" />
-                          {thread.views} views
-                        </span>
-
-                        <span className="inline-flex items-center gap-1.5">
-                          <FaComment size={11} aria-hidden="true" />
-                          {thread.replyCount} replies
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex shrink-0 items-center gap-1">
+                  thread={thread}
+                  categories={categories}
+                  actions={
+                    <>
                       <Link
                         to={FORUM_PATHS.THREAD_EDIT(thread.id)}
-                        className="flex size-9 items-center justify-center rounded-lg text-txt-secondary transition-colors hover:bg-muted hover:text-accent"
-                        title="Edit Thread"
                         aria-label={`Edit ${thread.title}`}
+                        className={buttonClassName({ variant: "ghost", size: "sm" })}
                       >
-                        <FaEdit size={13} aria-hidden="true" />
+                        <Pencil className="size-3.5" aria-hidden="true" />
+                        Edit
                       </Link>
-
-                      <button
-                        type="button"
-                        onClick={() => {
-                          void handleDeleteThread(thread);
-                        }}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => void handleDeleteThread(thread)}
                         disabled={isDeletingThisThread}
-                        className="flex size-9 items-center justify-center rounded-lg text-txt-secondary transition-colors hover:bg-error/10 hover:text-error disabled:cursor-not-allowed disabled:opacity-60"
-                        title="Delete Thread"
                         aria-label={`Delete ${thread.title}`}
+                        className="text-error"
+                        leftIcon={<Trash2 className="size-3.5" aria-hidden="true" />}
                       >
-                        {isDeletingThisThread ? (
-                          <span className="text-xs">...</span>
-                        ) : (
-                          <FaTrash size={13} aria-hidden="true" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </article>
+                        {isDeletingThisThread ? "Deleting…" : "Delete"}
+                      </Button>
+                    </>
+                  }
+                />
               );
             })}
+          </ThreadListFrame>
 
-            {hasNextPage && (
-              <div className="flex justify-center pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    void fetchNextPage();
-                  }}
-                  disabled={isFetchingNextPage}
-                  className="rounded-lg border border-br-secondary bg-surface-card px-5 py-2.5 text-sm font-semibold text-txt-primary shadow-sm transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {isFetchingNextPage ? "Loading..." : "Load More"}
-                </button>
-              </div>
-            )}
-          </>
-        ) : (
-          <div className="rounded-xl border border-br-subtle bg-surface-card p-8 text-center shadow-sm">
-            <h2 className="text-xl font-semibold text-txt-primary">
-              {searchQuery || filterBy !== "all" ? "No threads found" : "No threads yet"}
-            </h2>
-
-            <p className="mx-auto mt-2 max-w-xl text-sm text-txt-secondary">
-              {searchQuery || filterBy !== "all"
-                ? "Try adjusting your search or filter criteria."
-                : "Start your first discussion to see it here."}
-            </p>
-
-            <div className="mt-6 flex flex-wrap justify-center gap-3">
-              {(searchQuery || filterBy !== "all") && (
-                <button
-                  type="button"
+          {hasNextPage && (
+            <div className="flex justify-center">
+              <Button variant="secondary" onClick={() => void fetchNextPage()} isLoading={isFetchingNextPage}>
+                Load more
+              </Button>
+            </div>
+          )}
+        </div>
+      ) : (
+        <StatePanel
+          icon={MessagesSquare}
+          title={isFiltered ? "No threads match" : "No threads yet"}
+          headingLevel="h2"
+          className="min-h-[30vh] rounded-xl border border-dashed border-br-secondary"
+          actions={
+            <>
+              {isFiltered && (
+                <Button
+                  variant="secondary"
                   onClick={() => {
                     setSearchQuery("");
                     setFilterBy("all");
                   }}
-                  className="rounded-lg border border-br-secondary bg-surface-card px-4 py-2 text-sm font-semibold text-txt-primary transition-colors hover:bg-muted"
                 >
-                  Clear Filters
-                </button>
+                  Clear filters
+                </Button>
               )}
-
-              <Link
-                to={FORUM_PATHS.NEW_THREAD}
-                className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
-              >
-                Create Thread
+              <Link to={FORUM_PATHS.NEW_THREAD} className={buttonClassName()}>
+                New thread
               </Link>
-            </div>
-          </div>
-        )}
-      </section>
+            </>
+          }
+        >
+          {isFiltered ? "Try another search or filter." : "Start your first discussion to see it here."}
+        </StatePanel>
+      )}
     </div>
   );
 }

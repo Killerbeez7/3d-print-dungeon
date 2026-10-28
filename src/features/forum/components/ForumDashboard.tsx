@@ -1,13 +1,53 @@
 import { Link } from "react-router-dom";
-import { FaComment, FaPlus, FaRegFileAlt } from "react-icons/fa";
+import { ArrowRight, LayoutDashboard, MessageSquare, Plus } from "lucide-react";
+import type { ReactNode } from "react";
 
+import { Button, buttonClassName } from "@/components";
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { Spinner } from "@/features/shared/reusable/Spinner";
+import { StatePanel } from "@/features/shared/components/StatePanel";
+import { useModal } from "@/features/shared/modal/hooks/useModal";
 import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
 
 import { useFetchUserReplies, useFetchUserThreads } from "../hooks";
 
 import { FORUM_PATHS } from "../constants/forumPaths";
+import { formatRelativeTime } from "../utils/threadUtils";
+import { ForumAvatar, ForumHeader } from "./ForumUI";
+
+const Panel = ({
+  title,
+  link,
+  isLoading,
+  empty,
+  children,
+}: {
+  title: string;
+  link?: { to: string; label: string };
+  isLoading: boolean;
+  empty: ReactNode | null;
+  children: ReactNode;
+}) => (
+  <section className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card">
+    <div className="flex items-center justify-between border-b border-br-subtle px-5 py-3.5">
+      <h2 className="font-sans text-sm font-semibold">{title}</h2>
+      {link && (
+        <Link to={link.to} className="group inline-flex items-center gap-1 text-sm font-semibold text-accent">
+          {link.label}
+          <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+        </Link>
+      )}
+    </div>
+    {isLoading ? (
+      <div className="space-y-3 p-5" role="status" aria-label="Loading">
+        <div className="skeleton-print h-4 w-3/4" />
+        <div className="skeleton-print h-4 w-1/2" />
+        <div className="skeleton-print h-4 w-2/3" />
+      </div>
+    ) : (
+      empty ?? <div className="divide-y divide-br-subtle">{children}</div>
+    )}
+  </section>
+);
 
 export function ForumDashboard() {
   const { currentUser } = useAuth();
@@ -24,31 +64,18 @@ export function ForumDashboard() {
     error: repliesError,
   } = useFetchUserReplies(currentUser?.uid);
 
+  const { open } = useModal("auth");
   const avatarUrl = getAvatarUrlWithCacheBust(currentUser?.photoURL);
 
   if (!currentUser) {
     return (
-      <div className="rounded-xl border border-br-subtle bg-surface-card p-8 shadow-sm">
-        {/* <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
-          Forum Dashboard
-        </p> */}
-
-        <h1 className="text-2xl font-bold text-txt-primary">
-          Sign in to view your activity
-        </h1>
-
-        <p className="mt-2 max-w-xl text-txt-secondary">
-          Your threads, replies, and activity shortcuts will appear here once you&apos;re
-          signed in.
-        </p>
-
-        <Link
-          to={FORUM_PATHS.HOME}
-          className="mt-6 inline-flex items-center justify-center rounded-lg border border-br-secondary bg-surface-card px-4 py-2 text-sm font-semibold text-txt-primary transition-colors hover:bg-muted"
-        >
-          Back to Forum
-        </Link>
-      </div>
+      <StatePanel
+        icon={LayoutDashboard}
+        title="Sign in to see your activity"
+        actions={<Button onClick={() => open({ mode: "signin" })}>Sign in</Button>}
+      >
+        Your threads and replies show up here once you&apos;re signed in.
+      </StatePanel>
     );
   }
 
@@ -56,165 +83,112 @@ export function ForumDashboard() {
 
   if (queryError) {
     return (
-      <div className="rounded-xl border border-error/30 bg-error/10 p-6 text-error">
-        <h2 className="text-lg font-semibold">Unable to Load Forum Activity</h2>
-
-        <p className="mt-2 text-sm">{queryError.message}</p>
-      </div>
+      <StatePanel icon={LayoutDashboard} title="Couldn't load your activity">
+        Check your connection and refresh the page.
+      </StatePanel>
     );
   }
 
+  const stats = [
+    { label: "Threads", value: userThreads.length },
+    { label: "Replies", value: userReplies.length },
+    {
+      label: "Replies received",
+      value: userThreads.reduce((total, thread) => total + (thread.replyCount ?? 0), 0),
+    },
+    { label: "Thread views", value: userThreads.reduce((total, thread) => total + (thread.views ?? 0), 0) },
+  ];
+
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          <img
-            src={avatarUrl}
-            alt={currentUser.displayName || "User avatar"}
-            className="size-16 rounded-full border border-br-subtle object-cover shadow-sm"
-          />
-
-          <div>
-            {/* <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
-              Forum Dashboard
-            </p> */}
-
-            <h1 className="text-2xl font-bold text-txt-primary">
-              Welcome back, {currentUser.displayName || "User"}
-            </h1>
-
-            <p className="mt-1 text-txt-secondary">
-              Your recent community activity at a glance.
-            </p>
-          </div>
-        </div>
-
-        <Link
-          to={FORUM_PATHS.NEW_THREAD}
-          className="inline-flex items-center justify-center gap-2 self-start rounded-lg bg-btn-primary px-4 py-2.5 text-sm font-semibold text-btn-primary-text shadow-sm transition-all hover:bg-btn-primary-hover hover:shadow-md sm:self-auto"
-        >
-          <FaPlus size={11} aria-hidden="true" />
-          New Thread
-        </Link>
-      </header>
-
-      {/* Stats */}
-      <section className="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
-          <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
-            <FaRegFileAlt size={14} aria-hidden="true" />
-          </div>
-
-          <div className="text-2xl font-bold text-txt-primary">{userThreads.length}</div>
-
-          <div className="mt-1 text-sm text-txt-muted">Threads</div>
-        </div>
-
-        <div className="rounded-xl border border-br-subtle bg-surface-card p-5 shadow-sm">
-          <div className="mb-3 flex size-9 items-center justify-center rounded-lg bg-accent-soft text-accent">
-            <FaComment size={14} aria-hidden="true" />
-          </div>
-
-          <div className="text-2xl font-bold text-txt-primary">{userReplies.length}</div>
-
-          <div className="mt-1 text-sm text-txt-muted">Replies</div>
-        </div>
-      </section>
-
-      {/* Recent Threads */}
-      <section className="rounded-xl border border-br-subtle bg-surface-card shadow-sm">
-        <div className="flex items-center justify-between border-b border-br-subtle px-5 py-4">
-          <div>
-            <h2 className="font-semibold text-txt-primary">Recent Threads</h2>
-
-            <p className="mt-0.5 text-sm text-txt-muted">
-              Discussions you&apos;ve started recently.
-            </p>
-          </div>
-
-          <Link
-            to={FORUM_PATHS.MY_THREADS}
-            className="text-sm font-medium text-accent transition-colors hover:text-accent-hover"
-          >
-            View all
+    <div>
+      <ForumHeader
+        eyebrow="Dashboard"
+        title={`Welcome back, ${currentUser.displayName || "maker"}`}
+        description="Your forum activity at a glance."
+        action={
+          <Link to={FORUM_PATHS.NEW_THREAD} className={buttonClassName()}>
+            <Plus className="size-4" aria-hidden="true" />
+            New thread
           </Link>
-        </div>
+        }
+      />
 
-        <div className="divide-y divide-br-subtle">
-          {areThreadsLoading ? (
-            <div className="flex justify-center p-8">
-              <Spinner size={24} />
+      <div className="mb-8 flex items-center gap-4">
+        <ForumAvatar src={avatarUrl} />
+        <dl className="grid flex-1 grid-cols-2 border-y border-br-subtle sm:grid-cols-4">
+          {stats.map((stat, index) => (
+            <div
+              key={stat.label}
+              className={`px-3 py-3 ${index % 2 === 1 ? "border-l border-br-subtle" : ""} ${
+                index >= 2 ? "border-t border-br-subtle sm:border-t-0" : ""
+              } sm:border-l sm:first:border-l-0`}
+            >
+              <dt className="label-mono text-txt-muted">{stat.label}</dt>
+              <dd className="mt-1 font-mono text-xl font-semibold text-txt-primary">{stat.value}</dd>
             </div>
-          ) : userThreads.length === 0 ? (
-            <div className="p-6">
-              <p className="text-sm text-txt-secondary">
-                You haven&apos;t started any threads yet.
-              </p>
+          ))}
+        </dl>
+      </div>
 
-              <Link
-                to={FORUM_PATHS.NEW_THREAD}
-                className="mt-3 inline-flex text-sm font-semibold text-accent hover:text-accent-hover"
-              >
-                Create your first thread
-              </Link>
-            </div>
-          ) : (
-            userThreads.slice(0, 5).map((thread) => (
-              <Link
-                key={thread.id}
-                to={FORUM_PATHS.THREAD(thread.id)}
-                className="group flex items-center justify-between gap-4 px-5 py-4 transition-colors hover:bg-muted/60"
-              >
-                <div className="min-w-0">
-                  <p className="truncate font-medium text-txt-primary transition-colors group-hover:text-accent">
-                    {thread.title}
-                  </p>
-                </div>
-
-                <span className="shrink-0 text-xs text-txt-muted">
-                  {thread.replyCount || 0} replies
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Panel
+          title="Your threads"
+          link={{ to: FORUM_PATHS.MY_THREADS, label: "All" }}
+          isLoading={areThreadsLoading}
+          empty={
+            userThreads.length === 0 ? (
+              <div className="p-5 text-sm text-txt-secondary">
+                You haven&apos;t started a thread yet.{" "}
+                <Link to={FORUM_PATHS.NEW_THREAD} className="font-semibold text-accent hover:underline">
+                  Start one
+                </Link>
+              </div>
+            ) : null
+          }
+        >
+          {userThreads.slice(0, 5).map((thread) => (
+            <Link
+              key={thread.id}
+              to={FORUM_PATHS.THREAD(thread.id)}
+              className="group flex items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-muted/50"
+            >
+              <span className="min-w-0">
+                <span className="block truncate text-sm font-medium text-txt-primary group-hover:text-accent">
+                  {thread.title}
                 </span>
-              </Link>
-            ))
-          )}
-        </div>
-      </section>
+                <span className="font-mono text-xs text-txt-muted">{formatRelativeTime(thread.createdAt)}</span>
+              </span>
+              <span className="flex shrink-0 items-center gap-1.5 font-mono text-xs text-txt-muted">
+                <MessageSquare className="size-3.5" aria-hidden="true" />
+                {thread.replyCount || 0}
+              </span>
+            </Link>
+          ))}
+        </Panel>
 
-      {/* Recent Replies */}
-      <section className="rounded-xl border border-br-subtle bg-surface-card shadow-sm">
-        <div className="border-b border-br-subtle px-5 py-4">
-          <h2 className="font-semibold text-txt-primary">Recent Replies</h2>
-
-          <p className="mt-0.5 text-sm text-txt-muted">
-            Your latest contributions to discussions.
-          </p>
-        </div>
-
-        <div className="divide-y divide-br-subtle">
-          {areRepliesLoading ? (
-            <div className="flex justify-center p-8">
-              <Spinner size={24} />
-            </div>
-          ) : userReplies.length === 0 ? (
-            <div className="p-6 text-sm text-txt-secondary">
-              You haven&apos;t replied to any threads yet.
-            </div>
-          ) : (
-            userReplies.slice(0, 5).map((reply) => (
-              <Link
-                key={reply.id}
-                to={FORUM_PATHS.THREAD(reply.threadId)}
-                className="group block px-5 py-4 transition-colors hover:bg-muted/60"
-              >
-                <p className="line-clamp-2 text-sm leading-relaxed text-txt-secondary transition-colors group-hover:text-txt-primary">
-                  {reply.content}
-                </p>
-              </Link>
-            ))
-          )}
-        </div>
-      </section>
+        <Panel
+          title="Your replies"
+          isLoading={areRepliesLoading}
+          empty={
+            userReplies.length === 0 ? (
+              <p className="p-5 text-sm text-txt-secondary">You haven&apos;t replied to a thread yet.</p>
+            ) : null
+          }
+        >
+          {userReplies.slice(0, 5).map((reply) => (
+            <Link
+              key={reply.id}
+              to={FORUM_PATHS.THREAD(reply.threadId)}
+              className="group block px-5 py-3.5 transition-colors hover:bg-muted/50"
+            >
+              <span className="line-clamp-2 text-sm leading-relaxed text-txt-secondary group-hover:text-txt-primary">
+                {reply.content}
+              </span>
+              <span className="font-mono text-xs text-txt-muted">{formatRelativeTime(reply.createdAt)}</span>
+            </Link>
+          ))}
+        </Panel>
+      </div>
     </div>
   );
 }
