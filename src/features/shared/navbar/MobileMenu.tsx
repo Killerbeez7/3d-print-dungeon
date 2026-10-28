@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Link, NavLink } from "react-router-dom";
 import FocusLock from "react-focus-lock";
 import {
@@ -82,9 +83,11 @@ export const MobileMenu = ({
   const directLinks = sections.filter((section) => section.to);
   const groups = sections.filter((section) => !section.to && section.items.length);
 
-  return (
+  // Portalled so it sits above the sticky header's stacking context and the
+  // cookie banner (z-50), but below the auth modal.
+  return createPortal(
     <div
-      className={`fixed inset-0 z-[60] md:hidden ${isOpen ? "" : "pointer-events-none"}`}
+      className={`fixed inset-0 z-[70] md:hidden ${isOpen ? "" : "pointer-events-none"}`}
       inert={!isOpen}
     >
       <div
@@ -181,6 +184,7 @@ export const MobileMenu = ({
           </div>
         </div>
       </FocusLock>
-    </div>
+    </div>,
+    document.body
   );
 };
