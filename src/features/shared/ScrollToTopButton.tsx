@@ -26,7 +26,7 @@ export const ScrollToTopButton = () => {
     return (
         <button
             onClick={scrollToTop}
-            className={`btn btn-primary fixed bottom-5 right-5 z-[101] size-12 p-0 transition-[opacity,transform,visibility] duration-300 ease-forge ${
+            className={`btn btn-primary fixed bottom-5 right-5 max-md:hidden z-[101] size-12 p-0 transition-[opacity,transform,visibility] duration-300 ease-forge ${
                 isVisible ? "visible translate-y-0 opacity-100" : "invisible translate-y-3 opacity-0"
             }`}
             aria-label="Scroll to top"
