@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FaArrowUp } from "react-icons/fa";
+import { ArrowUp } from "lucide-react";
 
 export const ScrollToTopButton = () => {
     const [isVisible, setIsVisible] = useState(false);
@@ -26,12 +26,12 @@ export const ScrollToTopButton = () => {
     return (
         <button
             onClick={scrollToTop}
-            className={`fixed bottom-5 right-5 w-[50px] h-[50px] rounded-full text-2xl cursor-pointer transition-all duration-300 ease-in-out flex items-center justify-center ${
-                isVisible ? "opacity-100 visible" : "opacity-0 invisible"
-            } hover:scale-110 z-[101] bg-gradient-to-br from-accent-dark to-accent hover:from-accent hover:to-accent-hover text-btn-primary-text shadow-lg hover:shadow-xl`}
+            className={`btn btn-primary fixed bottom-5 right-5 z-[101] size-12 p-0 transition-[opacity,transform,visibility] duration-300 ease-forge ${
+                isVisible ? "visible translate-y-0 opacity-100" : "invisible translate-y-3 opacity-0"
+            }`}
             aria-label="Scroll to top"
         >
-            <FaArrowUp className="text-lg" />
+            <ArrowUp className="size-5" aria-hidden="true" />
         </button>
     );
 };

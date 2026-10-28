@@ -2,7 +2,7 @@ import { useState, useRef, type MouseEvent, type RefObject } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { Settings } from "lucide-react";
-import { MdNotifications } from "react-icons/md";
+import { Bell } from "lucide-react";
 
 import { useScreenSize } from "@/hooks/useScreenSize";
 import { useClickOutside } from "@/hooks/useClickOutside";
@@ -237,14 +237,14 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
         }
         aria-expanded={isMobile ? undefined : isOpen}
         aria-controls={isMobile ? undefined : "notification-dropdown"}
-        className="relative inline-flex h-9 w-9 items-center justify-center rounded-lg p-1 text-txt-secondary transition-colors duration-200 hover:bg-surface-card hover:text-txt-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-br-primary"
+        className="relative inline-flex size-10 items-center justify-center rounded-lg text-txt-secondary transition-colors duration-200 hover:bg-muted hover:text-txt-primary"
       >
-        <MdNotifications aria-hidden="true" className="h-7 w-7" />
+        <Bell aria-hidden="true" className="size-5" />
 
         {unreadCount > 0 && (
           <span
             aria-hidden="true"
-            className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-medium text-white"
+            className="absolute right-0.5 top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-ember-fill px-1 font-mono text-[0.625rem] font-semibold text-ember-on"
           >
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
@@ -256,7 +256,7 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
           id="notification-dropdown"
           role="region"
           aria-label="Notifications"
-          className="absolute right-0 top-12 z-50 w-80 rounded-xl border border-br-secondary bg-section shadow-xl"
+          className="absolute right-0 top-full z-50 mt-3 w-80 overflow-hidden rounded-xl border border-br-secondary bg-surface-elevated shadow-2xl shadow-black/40"
         >
           <div className="border-b border-br-secondary/30 p-3">
             <button
@@ -276,10 +276,7 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
           >
             {notifications.length === 0 ? (
               <div className="p-4 text-center">
-                <MdNotifications
-                  aria-hidden="true"
-                  className="mx-auto mb-2 h-8 w-8 text-txt-tertiary"
-                />
+                <Bell aria-hidden="true" className="mx-auto mb-2 size-8 text-txt-muted" />
 
                 <p className="text-sm text-txt-secondary">No notifications yet</p>
               </div>
@@ -303,7 +300,7 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
                         {getNotificationText(notification)}
                       </div>
 
-                      <p className="mt-1 text-xs leading-tight text-txt-tertiary">
+                      <p className="mt-1 text-xs leading-tight text-txt-muted">
                         {formatTimeAbbreviated(notification.createdAt)}
                       </p>
                     </div>

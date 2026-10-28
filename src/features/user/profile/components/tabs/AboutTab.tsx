@@ -194,7 +194,7 @@ export const AboutTab = ({ userData }: { userData: UserData }) => {
                   <span className="text-sm font-medium text-txt-secondary group-hover:text-txt-primary transition-colors text-center">
                     {platform.name}
                   </span>
-                  <ExternalLink className="w-3 h-3 text-txt-tertiary opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2" />
+                  <ExternalLink className="w-3 h-3 text-txt-muted opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2" />
                 </a>
               );
             })}

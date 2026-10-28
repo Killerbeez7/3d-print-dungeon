@@ -136,7 +136,7 @@ export const NotificationsPage = () => {
             <div className={`text-center ${isMobile ? "p-8" : "p-16"}`}>
               <FaBell
                 aria-hidden="true"
-                className="mx-auto mb-6 h-20 w-20 text-txt-tertiary opacity-40"
+                className="mx-auto mb-6 h-20 w-20 text-txt-muted opacity-40"
               />
 
               <h2
