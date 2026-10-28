@@ -1,90 +1,32 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FaPlus, FaSearch } from "react-icons/fa";
+import { MessagesSquare, Plus, Search, SearchX, X } from "lucide-react";
+
+import { Button } from "@/components";
+import { StatePanel } from "@/features/shared/components/StatePanel";
 
 import { FORUM_CATEGORIES } from "@/config/forumCategories";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useModal } from "@/features/shared/modal/hooks/useModal";
 import { InfiniteScrollList } from "@/features/shared/InfiniteScrollList";
-import Skeleton from "@/features/shared/Skeleton";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 
 import { useFetchCategories, useFetchThreads } from "@/features/forum/hooks";
-import { formatRelativeTime, isThreadNew } from "@/features/forum/utils/threadUtils";
+import {
+  ForumHeader,
+  ForumTabs,
+  ThreadListFrame,
+  ThreadListSkeleton,
+  ThreadRow,
+} from "@/features/forum/components/ForumUI";
 
-import type { ForumCategory, ForumThread } from "@/features/forum/types/forum";
+type ForumTab = "recent" | "popular" | "unanswered";
 
-interface ThreadCardProps {
-  thread: ForumThread;
-  categories: ForumCategory[];
-}
-
-function ThreadCard({ thread, categories }: ThreadCardProps) {
-  const categoryName =
-    categories.find((category) => {
-      return category.id === thread.categoryId;
-    })?.name ?? "Unknown Category";
-
-  return (
-    <article className="px-5 py-5 transition-colors duration-150 hover:bg-muted/30 sm:px-6">
-      <div className="min-w-0">
-        <div className="mb-2 flex flex-wrap items-center gap-2">
-          <Link
-            to={`/forum/category/${thread.categoryId}`}
-            className="text-xs font-semibold uppercase tracking-[0.14em] text-txt-muted"
-          >
-            {categoryName}
-          </Link>
-
-          {isThreadNew(thread) && (
-            <span className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-txt-secondary">
-              New
-            </span>
-          )}
-        </div>
-
-        <Link
-          to={`/forum/thread/${thread.id}`}
-          className="text-lg font-semibold leading-snug text-txt-primary"
-        >
-          {thread.title}
-        </Link>
-
-        <p className="mt-2 line-clamp-2 max-w-4xl text-sm leading-relaxed text-txt-secondary">
-          {thread.content}
-        </p>
-
-        <div className="mt-4 flex flex-col gap-2 text-xs text-txt-muted sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <span>{thread.authorName}</span>
-
-            <span aria-hidden="true">·</span>
-
-            <span>{formatRelativeTime(thread.createdAt)}</span>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            {thread.replyCount !== undefined && (
-              <span>
-                {thread.replyCount} {thread.replyCount === 1 ? "reply" : "replies"}
-              </span>
-            )}
-
-            {thread.replyCount !== undefined && thread.views !== undefined && (
-              <span aria-hidden="true">·</span>
-            )}
-
-            {thread.views !== undefined && (
-              <span>
-                {thread.views} {thread.views === 1 ? "view" : "views"}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
+const TABS: { value: ForumTab; label: string }[] = [
+  { value: "recent", label: "Recent" },
+  { value: "popular", label: "Popular" },
+  { value: "unanswered", label: "Unanswered" },
+];
 
 export function ForumHome() {
   const navigate = useNavigate();
@@ -92,7 +34,7 @@ export function ForumHome() {
   const { currentUser } = useAuth();
   const { open } = useModal("auth");
 
-  const [activeTab, setActiveTab] = useState<string>("recent");
+  const [activeTab, setActiveTab] = useState<ForumTab>("recent");
 
   const [searchQuery, setSearchQuery] = useState<string>("");
 
@@ -177,43 +119,28 @@ export function ForumHome() {
     navigate("/forum/new-thread");
   };
 
-  const renderEmptyState = (
-    title: string,
-    description: string,
-    actionLabel = "Create Thread"
-  ) => {
-    return (
-      <div className="rounded-xl border border-br-subtle bg-surface-card px-6 py-10 shadow-sm">
-        <div className="max-w-xl">
-          <h3 className="text-xl font-semibold text-txt-primary">{title}</h3>
-
-          <p className="mt-2 text-sm leading-relaxed text-txt-secondary">{description}</p>
-
-          <div className="mt-5 flex flex-wrap gap-3">
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery("");
-                }}
-                className="rounded-lg border border-br-secondary bg-surface-card px-4 py-2 text-sm font-semibold text-txt-primary transition-colors hover:bg-muted"
-              >
-                Clear Search
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={handleCreateThread}
-              className="rounded-lg bg-btn-primary px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
-            >
-              {actionLabel}
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  const renderEmptyState = (title: string, description: string) => (
+    <StatePanel
+      icon={searchQuery ? SearchX : MessagesSquare}
+      title={title}
+      headingLevel="h2"
+      className="min-h-[40vh] rounded-xl border border-dashed border-br-secondary"
+      actions={
+        <>
+          {searchQuery && (
+            <Button variant="secondary" onClick={() => setSearchQuery("")}>
+              Clear search
+            </Button>
+          )}
+          <Button onClick={handleCreateThread} leftIcon={<Plus className="size-4" aria-hidden="true" />}>
+            New thread
+          </Button>
+        </>
+      }
+    >
+      {description}
+    </StatePanel>
+  );
 
   const renderThreadListForTab = () => {
     if (searchQuery && searchData) {
@@ -230,21 +157,10 @@ export function ForumHome() {
 
       return (
         <div className="flex flex-1 flex-col">
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold text-txt-primary">
-              Search results for &quot;
-              {searchQuery.trim()}&quot;
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="label-mono text-txt-muted">
+              {searchThreads.length} results for “{searchQuery.trim()}”
             </h2>
-
-            <button
-              type="button"
-              onClick={() => {
-                setSearchQuery("");
-              }}
-              className="text-sm font-medium text-txt-secondary transition-colors hover:text-txt-primary"
-            >
-              Clear search
-            </button>
           </div>
 
           <InfiniteScrollList
@@ -252,13 +168,13 @@ export function ForumHome() {
             hasMore={hasNextSearch}
             loadMore={fetchNextSearch}
             isLoading={isFetchingNextSearch}
-            loader={<Spinner size={24} />}
+            loader={<div className="flex justify-center py-8"><Spinner size={24} /></div>}
           >
-            <div className="divide-y divide-br-subtle overflow-hidden rounded-xl border border-br-subtle bg-surface-card shadow-sm">
+            <ThreadListFrame>
               {searchThreads.map((thread) => (
-                <ThreadCard key={thread.id} thread={thread} categories={categories} />
+                <ThreadRow key={thread.id} thread={thread} categories={categories} />
               ))}
-            </div>
+            </ThreadListFrame>
           </InfiniteScrollList>
         </div>
       );
@@ -270,18 +186,14 @@ export function ForumHome() {
       }) ?? [];
 
     if (threadsLoading && threads.length === 0) {
-      return (
-        <div className="flex flex-1 items-center justify-center py-16">
-          <Spinner size={24} />
-        </div>
-      );
+      return <ThreadListSkeleton />;
     }
 
     if (threads.length === 0) {
       return renderEmptyState(
         activeTab === "unanswered"
-          ? "No unanswered threads"
-          : `No ${activeTab} discussions yet`,
+          ? "Every thread has a reply"
+          : "No discussions yet",
         activeTab === "unanswered"
           ? "Every visible thread has at least one reply. Check another tab or ask a new question."
           : "Start a focused discussion so other members have something concrete to respond to."
@@ -290,167 +202,99 @@ export function ForumHome() {
 
     return (
       <div className="flex flex-1 flex-col">
-        <h2 className="mb-4 text-lg font-semibold text-txt-primary">
-          {activeTab === "recent" && "Recent Discussions"}
-
-          {activeTab === "popular" && "Popular Discussions"}
-
-          {activeTab === "unanswered" && "Unanswered Discussions"}
-        </h2>
-
         <InfiniteScrollList
           items={threads}
           hasMore={hasNextPage}
           loadMore={fetchNextPage}
           isLoading={isFetchingNextPage}
-          loader={<Spinner size={24} />}
+          loader={<div className="flex justify-center py-8"><Spinner size={24} /></div>}
         >
-          <div className="divide-y divide-br-subtle overflow-hidden rounded-xl border border-br-subtle bg-surface-card shadow-sm">
+          <ThreadListFrame>
             {threads.map((thread) => (
-              <ThreadCard key={thread.id} thread={thread} categories={categories} />
+              <ThreadRow key={thread.id} thread={thread} categories={categories} />
             ))}
-          </div>
+          </ThreadListFrame>
         </InfiniteScrollList>
       </div>
     );
   };
 
   if (categoriesLoading && categories.length === 0) {
-    return (
-      <div className="space-y-6">
-        <div className="space-y-3">
-          <Skeleton className="h-9 w-64" />
-
-          <Skeleton className="h-5 w-96 max-w-full" />
-        </div>
-
-        <Skeleton className="h-11 w-full max-w-2xl" />
-
-        <div className="flex gap-6 border-b border-br-secondary">
-          {[0, 1, 2].map((item) => (
-            <Skeleton key={item} className="h-10 w-24" />
-          ))}
-        </div>
-
-        <div className="divide-y divide-br-subtle overflow-hidden rounded-xl border border-br-subtle bg-surface-card shadow-sm">
-          {[0, 1, 2].map((item) => (
-            <div key={item} className="px-5 py-5 sm:px-6">
-              <Skeleton className="mb-3 h-4 w-24" />
-
-              <Skeleton className="mb-4 h-6 w-3/4" />
-
-              <Skeleton className="h-4 w-1/2" />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+    return <ThreadListSkeleton />;
   }
 
   if (threadsError) {
     return (
-      <div className="rounded-xl border border-error/30 bg-error/10 p-6 text-error">
-        <h2 className="mb-2 text-lg font-semibold">Error Loading Forum</h2>
-
-        <p>Failed to load forum threads. Please try again.</p>
-      </div>
+      <StatePanel icon={MessagesSquare} title="Couldn't load the forum" headingLevel="h1">
+        Check your connection and refresh the page.
+      </StatePanel>
     );
   }
 
   return (
     <div className="flex min-h-full flex-col">
-      {/* Header */}
-      <header className="mb-7 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-        <div className="max-w-3xl">
-          <h1 className="text-3xl font-bold leading-tight text-txt-primary">
-            Community Forum
-          </h1>
-
-          <p className="mt-3 max-w-2xl text-base leading-relaxed text-txt-secondary">
-            Discuss 3D printing, models, techniques, workflows, and ideas with the
-            community.
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={handleCreateThread}
-          className="inline-flex items-center justify-center gap-2 self-start rounded-lg bg-btn-primary px-4 py-2.5 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover lg:self-auto"
-        >
-          <FaPlus size={13} aria-hidden="true" />
-          New Thread
-        </button>
-      </header>
+      <ForumHeader
+        eyebrow="Community"
+        title="Forum"
+        description="Ask questions, share prints and swap tips with other makers."
+        action={
+          <Button onClick={handleCreateThread} leftIcon={<Plus className="size-4" aria-hidden="true" />}>
+            New thread
+          </Button>
+        }
+      />
 
       {/* Search */}
-      <form onSubmit={handleSearch} className="mb-5 w-full">
-        <div className="relative w-full max-w-2xl">
-          <FaSearch
-            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-txt-muted"
+      <form onSubmit={handleSearch} role="search" className="mb-5">
+        <div className="relative max-w-2xl">
+          <Search
+            className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-txt-muted"
             aria-hidden="true"
           />
-
           <input
             type="search"
+            aria-label="Search discussions"
             value={searchQuery}
-            onChange={(event) => {
-              setSearchQuery(event.target.value);
-            }}
+            onChange={(event) => setSearchQuery(event.target.value)}
             disabled={searchLoading}
-            placeholder="Search discussions..."
-            className="block w-full rounded-lg border border-br-secondary bg-surface-card py-3 pr-4 pl-10 text-sm text-txt-primary outline-none transition-colors placeholder:text-txt-muted focus:border-focus focus:ring-2 focus:ring-focus/15"
+            placeholder="Search discussions"
+            className="h-11 w-full rounded-lg border border-br-input bg-page pl-10 pr-10 text-sm text-txt-primary transition-colors placeholder:text-txt-muted focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25 [&::-webkit-search-cancel-button]:appearance-none"
           />
+          {searchQuery && (
+            <button
+              type="button"
+              onClick={() => setSearchQuery("")}
+              aria-label="Clear search"
+              className="absolute right-1.5 top-1/2 flex size-8 -translate-y-1/2 items-center justify-center rounded-md text-txt-muted hover:bg-muted hover:text-txt-primary"
+            >
+              <X className="size-4" aria-hidden="true" />
+            </button>
+          )}
         </div>
       </form>
 
-      {/* Mobile categories */}
-      <div className="mb-6 flex flex-wrap gap-2 md:hidden">
+      {/* Phones: categories as a scrolling chip row (the sidebar is hidden) */}
+      <nav aria-label="Forum categories" className="-mx-4 mb-5 flex gap-1.5 overflow-x-auto px-4 pb-1 md:hidden">
         {categories.map((category) => {
-          const configCategory = FORUM_CATEGORIES.find((item) => {
-            return item.id === category.id;
-          });
-
-          const CategoryIcon = configCategory?.icon;
-
+          const CategoryIcon = FORUM_CATEGORIES.find((item) => item.id === category.id)?.icon;
           return (
             <Link
               key={category.id}
               to={`/forum/category/${category.id}`}
-              className="inline-flex items-center gap-2 rounded-full border border-br-subtle px-3 py-1.5 text-sm text-txt-secondary transition-colors hover:bg-muted hover:text-txt-primary"
+              className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-br-secondary px-3 text-sm text-txt-secondary transition-colors hover:border-br-primary hover:text-txt-primary"
             >
-              {CategoryIcon && <CategoryIcon size={15} aria-hidden="true" />}
-
+              {CategoryIcon && <CategoryIcon className="size-4" aria-hidden="true" />}
               {category.name}
             </Link>
           );
         })}
-      </div>
+      </nav>
 
-      {/* Tabs */}
-      <div className="mb-4 border-b border-br-secondary">
-        <nav className="flex gap-8 overflow-x-auto" aria-label="Forum discussion filters">
-          {[
-            ["recent", "Recent"],
-            ["popular", "Popular"],
-            ["unanswered", "Unanswered"],
-          ].map(([value, label]) => (
-            <button
-              key={value}
-              type="button"
-              onClick={() => {
-                setActiveTab(value);
-              }}
-              className={`border-b-2 px-1 py-3 text-sm font-medium transition-colors ${
-                activeTab === value
-                  ? "border-accent text-txt-primary"
-                  : "border-transparent text-txt-muted hover:text-txt-primary"
-              }`}
-            >
-              {label}
-            </button>
-          ))}
-        </nav>
-      </div>
+      {!searchQuery && (
+        <div className="mb-4">
+          <ForumTabs tabs={TABS} active={activeTab} onChange={setActiveTab} label="Sort discussions" />
+        </div>
+      )}
 
       <div className="flex flex-1 flex-col">{renderThreadListForTab()}</div>
     </div>

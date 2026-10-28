@@ -1,177 +1,75 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { FaPlus } from "react-icons/fa";
+import { FolderX, Plus } from "lucide-react";
 
+import { buttonClassName } from "@/components";
 import { FORUM_CATEGORIES } from "@/config/forumCategories";
+import { StatePanel } from "@/features/shared/components/StatePanel";
 
 import { useFetchCategories } from "../hooks";
 import { FORUM_PATHS } from "../constants/forumPaths";
 
+import { ForumHeader, ForumTabs } from "./ForumUI";
 import { ThreadList } from "./ThreadList";
 
 import type { ForumThreadSortField } from "../types/forum";
 
+const SORT_OPTIONS: { value: ForumThreadSortField; label: string }[] = [
+  { value: "lastActivity", label: "Active" },
+  { value: "createdAt", label: "Newest" },
+  { value: "views", label: "Most viewed" },
+  { value: "replyCount", label: "Most replies" },
+];
+
 export function ForumCategory() {
   const { categoryId } = useParams();
-
   const [sortBy, setSortBy] = useState<ForumThreadSortField>("lastActivity");
-  const [isSortOpen, setIsSortOpen] = useState(false);
 
   const { data: fetchedCategories = [] } = useFetchCategories();
-
   const categories = fetchedCategories.length > 0 ? fetchedCategories : FORUM_CATEGORIES;
-
-  const currentCategory = categories.find((category) => {
-    return category.id === categoryId;
-  });
-
-  const sortOptions = [
-    { value: "lastActivity", label: "Last Activity" },
-    { value: "createdAt", label: "Newest" },
-    { value: "views", label: "Most Viewed" },
-    { value: "replyCount", label: "Most Replies" },
-  ] as const;
+  const currentCategory = categories.find((category) => category.id === categoryId);
 
   if (!categoryId || !currentCategory) {
     return (
-      <div className="rounded-xl border border-br-subtle bg-surface-card p-8 text-center shadow-sm">
-        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-error">
-          Forum
-        </p>
-
-        <h2 className="mb-3 text-xl font-semibold text-txt-primary">
-          Category Not Found
-        </h2>
-
-        <p className="mb-6 text-txt-secondary">
-          The category you&apos;re looking for does not exist.
-        </p>
-
-        <Link
-          to={FORUM_PATHS.HOME}
-          className="inline-flex items-center justify-center rounded-lg bg-btn-primary px-4 py-2 text-sm font-semibold text-btn-primary-text transition-colors hover:bg-btn-primary-hover"
-        >
-          Return to Forum
-        </Link>
-      </div>
+      <StatePanel
+        icon={FolderX}
+        title="Category not found"
+        actions={
+          <Link to={FORUM_PATHS.HOME} className={buttonClassName()}>
+            Back to the forum
+          </Link>
+        }
+      >
+        This category doesn&apos;t exist, or it was renamed.
+      </StatePanel>
     );
   }
 
+  const Icon = FORUM_CATEGORIES.find((item) => item.id === categoryId)?.icon;
+
   return (
-    <div className="space-y-5">
-      {/* Category header */}
-      <header className="relative overflow-hidden rounded-xl border border-br-subtle bg-surface-card p-6 shadow-sm">
-        <div className="absolute inset-y-0 left-0 w-1 bg-btn-primary" />
-
-        <div className="pl-2">
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-accent">
-            Forum Category
-          </p>
-
-          <h1 className="text-2xl font-bold text-txt-primary">{currentCategory.name}</h1>
-
-          <p className="mt-2 max-w-3xl leading-relaxed text-txt-secondary">
+    <div>
+      <ForumHeader
+        eyebrow="Forum category"
+        title={currentCategory.name}
+        description={
+          <span className="flex items-start gap-2">
+            {Icon && <Icon className="mt-0.5 size-4 shrink-0 text-accent" aria-hidden="true" />}
             {currentCategory.description}
-          </p>
-        </div>
-      </header>
+          </span>
+        }
+        action={
+          <Link to={FORUM_PATHS.NEW_THREAD_FOR_CATEGORY(categoryId)} className={buttonClassName()}>
+            <Plus className="size-4" aria-hidden="true" />
+            New thread
+          </Link>
+        }
+      />
 
-      {/* Controls */}
-      <div className="flex flex-col gap-3 rounded-xl p-4 sm:flex-row sm:items-center sm:justify-between">
-        {/* <div className="flex flex-col gap-3 rounded-xl border border-br-subtle bg-surface-card p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between"> */}
-
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-txt-secondary">Sort by</span>
-
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => {
-                setIsSortOpen((current) => {
-                  return !current;
-                });
-              }}
-              className="flex min-w-36 items-center justify-between gap-4 rounded-lg border border-br-secondary bg-page px-3 py-2 text-sm text-txt-primary outline-none transition hover:border-br-primary focus-visible:ring-2 focus-visible:ring-focus"
-              aria-haspopup="listbox"
-              aria-expanded={isSortOpen}
-            >
-              <span>
-                {
-                  sortOptions.find((option) => {
-                    return option.value === sortBy;
-                  })?.label
-                }
-              </span>
-
-              <span
-                className={`text-xs text-txt-muted transition-transform ${
-                  isSortOpen ? "rotate-180" : ""
-                }`}
-              >
-                ▼
-              </span>
-            </button>
-
-            {isSortOpen && (
-              <div
-                role="listbox"
-                className="absolute right-0 top-full z-20 mt-2 min-w-full overflow-hidden rounded-xl border border-br-subtle bg-surface-card p-1 shadow-lg"
-              >
-                {sortOptions.map((option) => {
-                  const isSelected = option.value === sortBy;
-
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      role="option"
-                      aria-selected={isSelected}
-                      onClick={() => {
-                        setSortBy(option.value);
-                        setIsSortOpen(false);
-                      }}
-                      className={`block w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                        isSelected
-                          ? "bg-accent-soft font-medium text-accent"
-                          : "text-txt-primary hover:bg-muted"
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-        {/* <div className="flex items-center gap-3">
-          <label htmlFor="sortBy" className="text-sm font-medium text-txt-secondary">
-            Sort by
-          </label>
-
-          <select
-            id="sortBy"
-            value={sortBy}
-            onChange={handleSortChange}
-            className="rounded-lg border border-br-secondary bg-page px-3 py-2 text-sm text-txt-primary outline-none transition focus:border-focus focus:ring-2 focus:ring-focus/15"
-          >
-            <option value="lastActivity">Last Activity</option>
-            <option value="createdAt">Newest</option>
-            <option value="views">Most Viewed</option>
-            <option value="replyCount">Most Replies</option>
-          </select>
-        </div> */}
-
-        <Link
-          to={FORUM_PATHS.NEW_THREAD_FOR_CATEGORY(categoryId)}
-          className="inline-flex items-center justify-center gap-2 rounded-lg bg-btn-primary px-4 py-2 text-sm font-semibold text-btn-primary-text shadow-sm transition-all hover:bg-btn-primary-hover hover:shadow-md"
-        >
-          <FaPlus size={11} aria-hidden="true" />
-          New Thread
-        </Link>
+      <div className="mb-4">
+        <ForumTabs tabs={SORT_OPTIONS} active={sortBy} onChange={setSortBy} label="Sort threads" />
       </div>
 
-      {/* Discussions */}
       <ThreadList categoryId={categoryId} sortBy={sortBy} />
     </div>
   );

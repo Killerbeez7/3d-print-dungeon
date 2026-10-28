@@ -1,13 +1,10 @@
-import { Link } from "react-router-dom";
-import { FaLock, FaTag, FaThumbtack } from "react-icons/fa";
+import { MessagesSquare } from "lucide-react";
 
-// import Skeleton from "@/features/shared/Skeleton";
-import { Spinner } from "@/features/shared/reusable/Spinner";
+import { Button } from "@/components";
+import { StatePanel } from "@/features/shared/components/StatePanel";
 
 import { useFetchCategories, useFetchThreads } from "../hooks";
-
-import { FORUM_PATHS } from "../constants/forumPaths";
-import { formatRelativeTime } from "../utils/threadUtils";
+import { ThreadListFrame, ThreadListSkeleton, ThreadRow } from "./ForumUI";
 
 import type { ForumThreadSortField } from "../types/forum";
 
@@ -27,183 +24,57 @@ export function ThreadList({
   const { data: categories = [] } = useFetchCategories();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, error } =
-    useFetchThreads({
-      categoryId,
-      sortBy,
-      sortOrder: "desc",
-    });
+    useFetchThreads({ categoryId, sortBy, sortOrder: "desc" });
 
-  const threads =
-    data?.pages.flatMap((page) => {
-      return page.threads;
-    }) ?? [];
+  const threads = data?.pages.flatMap((page) => page.threads) ?? [];
 
   if (isLoading) {
-    return (
-      <Spinner size={24} />
-      // <div className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card shadow-sm divide-y divide-br-subtle">
-      //   {[0, 1, 2, 3].map((item) => (
-      //     <div key={item} className="px-5 py-5 sm:px-6">
-      //       <Skeleton className="mb-3 h-4 w-24" />
-      //       <Skeleton className="mb-3 h-6 w-3/4" />
-      //       <Skeleton className="mb-4 h-4 w-full max-w-3xl" />
-
-      //       <div className="flex gap-4">
-      //         <Skeleton className="h-4 w-24" />
-      //         <Skeleton className="h-4 w-20" />
-      //         <Skeleton className="h-4 w-28" />
-      //       </div>
-      //     </div>
-      // ))}
-      // </div>
-    );
+    return <ThreadListSkeleton />;
   }
 
   if (error) {
     return (
-      <div className="rounded-xl border border-error/30 bg-error/10 p-5 text-error">
-        <p className="font-medium">Unable to load discussions</p>
-
-        <p className="mt-1 text-sm">{error.message}</p>
-      </div>
+      <StatePanel icon={MessagesSquare} title="Couldn't load discussions" headingLevel="h2" className="min-h-[30vh]">
+        Check your connection and refresh the page.
+      </StatePanel>
     );
   }
 
   if (threads.length === 0) {
     return (
-      <div className="p-6">
-        <h3 className="mb-2 text-xl font-semibold text-txt-primary text-center">
-          No threads yet
-        </h3>
-
-        <p className="mb-5 text-sm leading-relaxed text-txt-secondary text-center">
-          {categoryId
-            ? "This category is ready for discussion. Start the first thread or browse another category."
-            : "There are no discussions to show yet. Start a new thread to get the conversation going."}
-        </p>
-      </div>
+      <StatePanel
+        icon={MessagesSquare}
+        title="No threads yet"
+        headingLevel="h2"
+        className="min-h-[30vh] rounded-xl border border-dashed border-br-secondary"
+      >
+        {categoryId
+          ? "This category is ready for its first discussion."
+          : "Start a new thread to get the conversation going."}
+      </StatePanel>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-xl shadow-sm divide-y divide-br-subtle">
-      {threads.map((thread) => {
-        const categoryName =
-          categories.find((category) => {
-            return category.id === thread.categoryId;
-          })?.name ?? "Category";
-
-        return (
-          <article
+    <div className="space-y-4">
+      <ThreadListFrame>
+        {threads.map((thread) => (
+          <ThreadRow
             key={thread.id}
-            className={[
-              "group px-5 text-txt-primary transition-colors duration-200 hover:bg-muted/35 sm:px-6",
-              isCompact ? "py-4" : "py-5",
-            ].join(" ")}
-          >
-            <div className="min-w-0">
-              {/* Category */}
-              {showCategory && (
-                <Link
-                  to={FORUM_PATHS.CATEGORY(thread.categoryId)}
-                  className="mb-2 inline-block text-xs font-semibold uppercase tracking-[0.16em] text-accent transition-colors hover:text-accent-hover"
-                >
-                  {categoryName}
-                </Link>
-              )}
-
-              {/* Title + status */}
-              <div className="flex flex-wrap items-center gap-2">
-                <Link
-                  to={FORUM_PATHS.THREAD(thread.id)}
-                  className="text-lg font-semibold leading-snug text-txt-primary transition-colors hover:text-txt-highlight"
-                >
-                  {thread.title}
-                </Link>
-
-                {thread.isPinned && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-warning/10 px-2 py-1 text-xs font-medium text-warning">
-                    <FaThumbtack size={9} aria-hidden="true" />
-                    Pinned
-                  </span>
-                )}
-
-                {thread.isLocked && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-error/10 px-2 py-1 text-xs font-medium text-error">
-                    <FaLock size={9} aria-hidden="true" />
-                    Locked
-                  </span>
-                )}
-              </div>
-
-              {/* Preview */}
-              {!isCompact && (
-                <p className="mt-2 line-clamp-2 max-w-4xl text-sm leading-relaxed text-txt-secondary">
-                  {thread.content}
-                </p>
-              )}
-
-              {/* Tags */}
-              {!isCompact && thread.tags && thread.tags.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {thread.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-flex items-center rounded-full bg-muted px-2 py-1 text-xs text-txt-secondary"
-                    >
-                      <FaTag
-                        className="mr-1 text-txt-muted"
-                        size={9}
-                        aria-hidden="true"
-                      />
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Metadata */}
-            <div
-              className={[
-                "flex flex-col gap-2 text-xs text-txt-muted sm:flex-row sm:items-center sm:justify-between",
-                isCompact ? "mt-3" : "mt-4",
-              ].join(" ")}
-            >
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <span>{thread.authorName}</span>
-                <span aria-hidden="true">·</span>
-                <span>{formatRelativeTime(thread.lastActivity)}</span>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <span>
-                  {thread.replyCount} {thread.replyCount === 1 ? "reply" : "replies"}
-                </span>
-
-                <span aria-hidden="true">·</span>
-
-                <span>
-                  {thread.views} {thread.views === 1 ? "view" : "views"}
-                </span>
-              </div>
-            </div>
-          </article>
-        );
-      })}
+            thread={thread}
+            categories={categories}
+            showCategory={showCategory}
+            showPreview={!isCompact}
+            timeField="lastActivity"
+          />
+        ))}
+      </ThreadListFrame>
 
       {hasNextPage && (
-        <div className="flex justify-center px-5 py-5">
-          <button
-            type="button"
-            onClick={() => {
-              void fetchNextPage();
-            }}
-            disabled={isFetchingNextPage}
-            className="min-w-32 rounded-lg border border-br-secondary bg-surface-card px-5 py-2.5 text-sm font-semibold text-txt-primary transition-colors hover:border-br-primary hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isFetchingNextPage ? <Spinner size={12} /> : "Load More"}
-          </button>
+        <div className="flex justify-center">
+          <Button variant="secondary" onClick={() => void fetchNextPage()} isLoading={isFetchingNextPage}>
+            Load more
+          </Button>
         </div>
       )}
     </div>
