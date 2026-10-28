@@ -5,12 +5,11 @@ import {
   Cookie,
   Settings,
   CheckCircle,
+  Undo2,
   XCircle,
 } from "lucide-react";
 import { CookieSettingsModal } from "@/features/cookies/components/CookieSettingsModal";
 import { useCookieManagement } from "../scripts/manageCookies";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCookieBite, faUndo } from "@fortawesome/free-solid-svg-icons";
 
 export const CookieManagement = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,9 +29,9 @@ export const CookieManagement = () => {
         className="flex items-center justify-between w-full p-3 bg-section rounded-lg border border-br-secondary hover:bg-page transition-colors"
       >
         <div className="flex items-center">
-          <Cookie className="w-5 h-5 mr-2 text-primary" />
+          <Cookie className="w-5 h-5 mr-2 text-accent" />
           <span className="font-semibold text-txt-primary">Cookie Management</span>
-          <span className="ml-2 px-2 py-1 text-xs bg-page text-white rounded-full">
+          <span className="ml-2 px-2 py-1 text-xs bg-muted text-txt-primary rounded-full">
             {getConsentStatus()}
           </span>
         </div>
@@ -46,36 +45,36 @@ export const CookieManagement = () => {
             <div className="flex items-center justify-between p-2 bg-page rounded-lg">
               <span className="text-xs text-txt-secondary">Essential</span>
               {consent.essential ? (
-                <CheckCircle className="w-4 h-4 text-green-500" />
+                <CheckCircle className="w-4 h-4 text-success" />
               ) : (
-                <XCircle className="w-4 h-4 text-red-500" />
+                <XCircle className="w-4 h-4 text-error" />
               )}
             </div>
 
             <div className="flex items-center justify-between p-2 bg-page rounded-lg">
               <span className="text-xs text-txt-secondary">Analytics</span>
               {consent.analytics ? (
-                <CheckCircle className="w-4 h-4 text-green-500" />
+                <CheckCircle className="w-4 h-4 text-success" />
               ) : (
-                <XCircle className="w-4 h-4 text-red-500" />
+                <XCircle className="w-4 h-4 text-error" />
               )}
             </div>
 
             <div className="flex items-center justify-between p-2 bg-page rounded-lg">
               <span className="text-xs text-txt-secondary">Marketing</span>
               {consent.marketing ? (
-                <CheckCircle className="w-4 h-4 text-green-500" />
+                <CheckCircle className="w-4 h-4 text-success" />
               ) : (
-                <XCircle className="w-4 h-4 text-red-500" />
+                <XCircle className="w-4 h-4 text-error" />
               )}
             </div>
 
             <div className="flex items-center justify-between p-2 bg-page rounded-lg">
               <span className="text-xs text-txt-secondary">Payment</span>
               {consent.payment ? (
-                <CheckCircle className="w-4 h-4 text-green-500" />
+                <CheckCircle className="w-4 h-4 text-success" />
               ) : (
-                <XCircle className="w-4 h-4 text-red-500" />
+                <XCircle className="w-4 h-4 text-error" />
               )}
             </div>
           </div>
@@ -84,7 +83,7 @@ export const CookieManagement = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             <button
               onClick={() => setShowSettingsModal(true)}
-              className="flex items-center justify-center px-3 py-2 bg-page text-white rounded-lg hover:bg-page/90 transition-colors text-sm"
+              className="flex items-center justify-center px-3 py-2 bg-muted text-txt-primary rounded-lg hover:bg-surface-elevated transition-colors text-sm"
             >
               <Settings className="w-4 h-4 mr-1" />
               Preferences
@@ -92,18 +91,18 @@ export const CookieManagement = () => {
 
             <button
               onClick={() => acceptAll()}
-              className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm"
+              className="px-3 py-2 bg-success text-page rounded-lg hover:opacity-90 transition-colors text-sm"
             >
-              <FontAwesomeIcon icon={faCookieBite} className="mr-2" />
+              <Cookie className="size-4 mr-2" aria-hidden="true" />
               Accept All
             </button>
 
             <button
               onClick={handleResetCookies}
-              className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm"
+              className="px-3 py-2 bg-error text-page rounded-lg hover:bg-error-hover transition-colors text-sm"
               title="Reset to default: only essential cookies enabled"
             >
-              <FontAwesomeIcon icon={faUndo} className="mr-2" />
+              <Undo2 className="size-4 mr-2" aria-hidden="true" />
               Reset to Default
             </button>
           </div>

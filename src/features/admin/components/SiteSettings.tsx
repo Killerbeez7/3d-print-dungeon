@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../../config/firebaseConfig";
-import { MdSave } from "react-icons/md";
+import { Save } from "lucide-react";
 import type { SiteSettingsType } from "@/features/admin/types/admin";
 
 export const SiteSettings = () => {
@@ -113,7 +113,7 @@ export const SiteSettings = () => {
       <div className="grid grid-cols-1 gap-6">
         {/* Site Status */}
         <div className="bg-section rounded-lg p-6">
-          <h3 className="text-lg font-bold mb-4 text-white">Site Status</h3>
+          <h3 className="text-lg font-bold mb-4 text-txt-primary">Site Status</h3>
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -132,7 +132,7 @@ export const SiteSettings = () => {
                   }
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-surface-card rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-btn-primary"></div>
+                <div className="w-11 h-6 bg-surface-card rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-page after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-page after:border-br-secondary after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-btn-primary"></div>
               </label>
             </div>
           </div>
@@ -140,7 +140,7 @@ export const SiteSettings = () => {
 
         {/* Upload Settings */}
         <div className="bg-section rounded-lg p-6">
-          <h3 className="text-lg font-bold mb-4 text-white">Upload Settings</h3>
+          <h3 className="text-lg font-bold mb-4 text-txt-primary">Upload Settings</h3>
           <div className="space-y-4">
             <div>
               <label className="block font-medium text-txt-primary mb-1">
@@ -155,7 +155,7 @@ export const SiteSettings = () => {
                     maxUploadSizeMB: Number(e.target.value),
                   }))
                 }
-                className="w-full px-4 py-2 rounded-lg bg-surface-card text-txt-primary"
+                className="field h-10"
               />
             </div>
 
@@ -172,7 +172,7 @@ export const SiteSettings = () => {
                     defaultUserQuotaMB: Number(e.target.value),
                   }))
                 }
-                className="w-full px-4 py-2 rounded-lg bg-surface-card text-txt-primary"
+                className="field h-10"
               />
             </div>
           </div>
@@ -180,7 +180,7 @@ export const SiteSettings = () => {
 
         {/* Featured Categories */}
         <div className="bg-section rounded-lg p-6">
-          <h3 className="text-lg font-bold mb-4 text-white">Featured Categories</h3>
+          <h3 className="text-lg font-bold mb-4 text-txt-primary">Featured Categories</h3>
           <div className="space-y-4">
             <div className="flex gap-2">
               <input
@@ -198,11 +198,11 @@ export const SiteSettings = () => {
                   }
                 }}
                 placeholder="Enter category name"
-                className="flex-1 px-4 py-2 rounded-lg bg-surface-card text-txt-primary"
+                className="field h-10 flex-1"
               />
               <button
                 onClick={handleAddCategory}
-                className="px-4 py-2 bg-btn-primary text-white rounded-lg hover:bg-btn-primary-hover"
+                className="px-4 py-2 bg-btn-primary text-btn-primary-text rounded-lg hover:bg-btn-primary-hover"
               >
                 Add
               </button>
@@ -217,7 +217,7 @@ export const SiteSettings = () => {
                   <span className="text-txt-primary">{category}</span>
                   <button
                     onClick={() => handleRemoveCategory(category)}
-                    className="text-txt-secondary hover:text-red-500"
+                    className="text-txt-secondary hover:text-error"
                   >
                     ×
                   </button>
@@ -233,16 +233,16 @@ export const SiteSettings = () => {
         <button
           onClick={handleSaveSettings}
           disabled={saving}
-          className="flex items-center gap-2 px-6 py-2 bg-btn-primary text-white rounded-lg hover:bg-btn-primary-hover disabled:opacity-50"
+          className="flex items-center gap-2 px-6 py-2 bg-btn-primary text-btn-primary-text rounded-lg hover:bg-btn-primary-hover disabled:opacity-50"
         >
-          <MdSave size={20} />
+          <Save size={20} />
           {saving ? "Saving..." : "Save Settings"}
         </button>
 
         {saveStatus && (
           <p
             className={`text-sm ${
-              saveStatus.type === "success" ? "text-green-500" : "text-red-500"
+              saveStatus.type === "success" ? "text-success" : "text-error"
             }`}
           >
             {saveStatus.message}

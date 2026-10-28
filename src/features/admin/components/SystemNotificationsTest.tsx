@@ -109,7 +109,7 @@ export function SystemNotificationsTest() {
             <button
               type="button"
               onClick={() => handleTest("error")}
-              className="rounded-lg bg-error px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-error-hover"
+              className="rounded-lg bg-error px-3 py-2 text-sm font-semibold text-page transition-colors hover:bg-error-hover"
             >
               Error
             </button>

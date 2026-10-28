@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { doc, getDoc, serverTimestamp, setDoc, Timestamp } from "firebase/firestore";
-import { MdExpandLess, MdExpandMore, MdSave } from "react-icons/md";
+import { ChevronDown, ChevronUp, Save } from "lucide-react";
 
 import { db } from "@/config/firebaseConfig";
 import type { MaintenanceSettingsType } from "@/features/admin/types/admin";
@@ -156,14 +156,14 @@ export const MaintenanceSettings = () => {
             className="flex cursor-pointer items-center justify-between"
             onClick={() => setShowCurrentSettings((current) => !current)}
           >
-            <h3 className="flex items-center gap-2 text-lg font-bold text-white/90">
+            <h3 className="flex items-center gap-2 text-lg font-bold text-txt-primary">
               Current Maintenance
             </h3>
 
             {showCurrentSettings ? (
-              <MdExpandLess size={24} className="text-white" />
+              <ChevronUp size={24} className="text-txt-primary" />
             ) : (
-              <MdExpandMore size={24} className="text-white" />
+              <ChevronDown size={24} className="text-txt-primary" />
             )}
           </div>
 
@@ -192,7 +192,7 @@ export const MaintenanceSettings = () => {
                     className="peer sr-only"
                   />
 
-                  <div className="peer h-6 w-11 rounded-full bg-surface-card after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:content-[''] after:transition-all peer-checked:bg-btn-primary peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/25" />
+                  <div className="peer h-6 w-11 rounded-full bg-surface-card after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-br-secondary after:bg-page after:content-[''] after:transition-all peer-checked:bg-btn-primary peer-checked:after:translate-x-full peer-checked:after:border-page peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/25" />
                 </label>
               </div>
 
@@ -211,7 +211,7 @@ export const MaintenanceSettings = () => {
                           maintenanceMessage: event.target.value,
                         }))
                       }
-                      className="min-h-[100px] w-full rounded-lg bg-surface-card px-4 py-2 text-txt-primary"
+                      className="field min-h-[100px] py-2"
                       placeholder="Enter maintenance message..."
                     />
                   </div>
@@ -230,7 +230,7 @@ export const MaintenanceSettings = () => {
                           maintenanceEndTime: event.target.value,
                         }))
                       }
-                      className="w-full rounded-lg bg-surface-card px-4 py-2 text-txt-primary"
+                      className="field h-10"
                     />
                   </div>
                 </>
@@ -245,14 +245,14 @@ export const MaintenanceSettings = () => {
             className="flex cursor-pointer items-center justify-between"
             onClick={() => setShowScheduledSettings((current) => !current)}
           >
-            <h3 className="flex items-center gap-2 text-lg font-bold text-white/90">
+            <h3 className="flex items-center gap-2 text-lg font-bold text-txt-primary">
               Scheduled Maintenance
             </h3>
 
             {showScheduledSettings ? (
-              <MdExpandLess size={24} className="text-white" />
+              <ChevronUp size={24} className="text-txt-primary" />
             ) : (
-              <MdExpandMore size={24} className="text-white" />
+              <ChevronDown size={24} className="text-txt-primary" />
             )}
           </div>
 
@@ -286,7 +286,7 @@ export const MaintenanceSettings = () => {
                     className="peer sr-only"
                   />
 
-                  <div className="peer h-6 w-11 rounded-full bg-surface-card after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:content-[''] after:transition-all peer-checked:bg-btn-primary peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/25" />
+                  <div className="peer h-6 w-11 rounded-full bg-surface-card after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-br-secondary after:bg-page after:content-[''] after:transition-all peer-checked:bg-btn-primary peer-checked:after:translate-x-full peer-checked:after:border-page peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/25" />
                 </label>
               </div>
 
@@ -309,7 +309,7 @@ export const MaintenanceSettings = () => {
                           },
                         }))
                       }
-                      className="w-full rounded-lg bg-surface-card px-4 py-2 text-txt-primary"
+                      className="field h-10"
                     />
                   </div>
 
@@ -330,7 +330,7 @@ export const MaintenanceSettings = () => {
                           },
                         }))
                       }
-                      className="w-full rounded-lg bg-surface-card px-4 py-2 text-txt-primary"
+                      className="field h-10"
                     />
                   </div>
 
@@ -350,7 +350,7 @@ export const MaintenanceSettings = () => {
                           },
                         }))
                       }
-                      className="min-h-[100px] w-full rounded-lg bg-surface-card px-4 py-2 text-txt-primary"
+                      className="field min-h-[100px] py-2"
                       placeholder="Enter scheduled maintenance message..."
                     />
                   </div>
@@ -367,16 +367,16 @@ export const MaintenanceSettings = () => {
           type="button"
           onClick={handleSaveSettings}
           disabled={saving}
-          className="flex items-center gap-2 rounded-lg bg-btn-primary px-6 py-2 text-white hover:bg-btn-primary-hover disabled:opacity-50"
+          className="flex items-center gap-2 rounded-lg bg-btn-primary px-6 py-2 text-btn-primary-text hover:bg-btn-primary-hover disabled:opacity-50"
         >
-          <MdSave size={20} />
+          <Save size={20} />
           {saving ? "Saving..." : "Save Settings"}
         </button>
 
         {saveStatus && (
           <p
             className={`text-sm ${
-              saveStatus.type === "success" ? "text-green-500" : "text-red-500"
+              saveStatus.type === "success" ? "text-success" : "text-error"
             }`}
           >
             {saveStatus.message}

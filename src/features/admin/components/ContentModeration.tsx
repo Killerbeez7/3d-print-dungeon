@@ -8,7 +8,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { db } from "../../../config/firebaseConfig";
-import { MdDelete, MdCheck, MdClose } from "react-icons/md";
+import { Check, Trash2, X } from "lucide-react";
 import type { AdminReport } from "@/features/admin/types/admin";
 
 export const ContentModeration = () => {
@@ -101,7 +101,7 @@ export const ContentModeration = () => {
             onClick={() => setSelectedStatus(status)}
             className={`px-4 py-2 rounded-lg text-sm font-medium ${
               selectedStatus === status
-                ? "bg-btn-primary text-white"
+                ? "bg-btn-primary text-btn-primary-text"
                 : "bg-section text-txt-secondary hover:text-txt-primary"
             }`}
           >
@@ -168,17 +168,17 @@ export const ContentModeration = () => {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => handleUpdateStatus(report.id, "resolved")}
-                      className="text-green-500 hover:text-green-600"
+                      className="text-success hover:text-success"
                       title="Mark as resolved"
                     >
-                      <MdCheck size={20} />
+                      <Check size={20} />
                     </button>
                     <button
                       onClick={() => handleUpdateStatus(report.id, "reviewing")}
-                      className="text-yellow-500 hover:text-yellow-600"
+                      className="text-warning hover:text-warning"
                       title="Mark as reviewing"
                     >
-                      <MdClose size={20} />
+                      <X size={20} />
                     </button>
                     <button
                       onClick={() =>
@@ -188,10 +188,10 @@ export const ContentModeration = () => {
                           report.contentType
                         )
                       }
-                      className="text-red-500 hover:text-red-600"
+                      className="text-error hover:text-error"
                       title="Delete content"
                     >
-                      <MdDelete size={20} />
+                      <Trash2 size={20} />
                     </button>
                   </div>
                 </td>

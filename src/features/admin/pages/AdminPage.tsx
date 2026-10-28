@@ -24,7 +24,11 @@ export const AdminPage = () => {
   const [selectedTab, setSelectedTab] = useState<number>(0);
 
   if (loading) {
-    return <Spinner size={24} />;
+    return (
+      <div className="flex justify-center py-20">
+        <Spinner size={24} />
+      </div>
+    );
   }
 
   if (!currentUser || !isAdmin) {
@@ -41,19 +45,22 @@ export const AdminPage = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-      <h1 className="text-2xl font-bold mb-8 text-white">Admin Panel</h1>
+    <div className="mx-auto max-w-[1600px] px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+      <header className="mb-6">
+        <p className="label-mono text-accent">Owner tools</p>
+        <h1 className="mt-2 text-3xl font-bold sm:text-4xl">Admin</h1>
+      </header>
       <Tab.Group selectedIndex={selectedTab} onChange={setSelectedTab}>
-        <Tab.List className="flex space-x-2 rounded-xl bg-surface-card p-1">
+        <Tab.List className="flex gap-1 overflow-x-auto border-b border-br-subtle">
           {tabs.map((tab) => (
             <Tab
               key={tab.name}
               className={({ selected }: { selected: boolean }) =>
                 classNames(
-                  "w-full rounded-lg py-2.5 text-sm font-medium leading-5",
+                  "relative flex h-11 shrink-0 items-center px-3 text-sm font-semibold transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:origin-left after:bg-accent after:transition-transform after:duration-300 after:ease-forge",
                   selected
-                    ? "bg-btn-primary text-white shadow"
-                    : "text-txt-secondary hover:bg-section hover:text-txt-primary"
+                    ? "text-txt-primary after:scale-x-100"
+                    : "text-txt-muted after:scale-x-0 hover:text-txt-primary"
                 )
               }
             >
@@ -61,9 +68,9 @@ export const AdminPage = () => {
             </Tab>
           ))}
         </Tab.List>
-        <Tab.Panels className="mt-4">
+        <Tab.Panels className="mt-6">
           {tabs.map((tab, idx) => (
-            <Tab.Panel key={idx} className={"rounded-xl bg-surface-card p-6"}>
+            <Tab.Panel key={idx} className="rounded-xl border border-br-subtle bg-surface-card p-5 sm:p-6">
               <tab.component />
             </Tab.Panel>
           ))}

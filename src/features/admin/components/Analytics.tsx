@@ -1,13 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { collection, query, getDocs, where, orderBy, limit } from "firebase/firestore";
 import { db } from "../../../config/firebaseConfig";
-import {
-  MdPeople,
-  MdFileUpload,
-  MdRemoveRedEye,
-  MdThumbUp,
-  MdDelete,
-} from "react-icons/md";
+import { Eye, ThumbsUp, Trash2, Upload, UsersRound } from "lucide-react";
 import { getThumbnailUrl } from "@/utils/imageUtils";
 import type { AdminModel, AdminUser } from "@/features/admin/types/admin";
 
@@ -203,7 +197,7 @@ export const Analytics = () => {
               onClick={() => setTimeRange(range)}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
                 timeRange === range
-                  ? "bg-btn-primary text-white"
+                  ? "bg-btn-primary text-btn-primary-text"
                   : "bg-section text-txt-secondary hover:text-txt-primary"
               }`}
             >
@@ -214,9 +208,9 @@ export const Analytics = () => {
         <button
           onClick={handleCleanupViews}
           disabled={isCleaningViews}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-red-500 text-white hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-error text-error hover:bg-error/10 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <MdDelete className="w-5 h-5" />
+          <Trash2 className="w-5 h-5" />
           {isCleaningViews ? "Cleaning..." : "Reset All Views"}
         </button>
       </div>
@@ -229,7 +223,7 @@ export const Analytics = () => {
               <p className="text-txt-secondary">Total Users</p>
               <p className="text-2xl font-bold text-txt-primary">{stats.totalUsers}</p>
             </div>
-            <MdPeople className="text-accent" size={24} />
+            <UsersRound className="text-accent" size={24} />
           </div>
         </div>
 
@@ -239,7 +233,7 @@ export const Analytics = () => {
               <p className="text-txt-secondary">Total Models</p>
               <p className="text-2xl font-bold text-txt-primary">{stats.totalModels}</p>
             </div>
-            <MdFileUpload className="text-accent" size={24} />
+            <Upload className="text-accent" size={24} />
           </div>
         </div>
 
@@ -249,7 +243,7 @@ export const Analytics = () => {
               <p className="text-txt-secondary">Total Views</p>
               <p className="text-2xl font-bold text-txt-primary">{stats.totalViews}</p>
             </div>
-            <MdRemoveRedEye className="text-accent" size={24} />
+            <Eye className="text-accent" size={24} />
           </div>
         </div>
 
@@ -259,7 +253,7 @@ export const Analytics = () => {
               <p className="text-txt-secondary">Total Likes</p>
               <p className="text-2xl font-bold text-txt-primary">{stats.totalLikes}</p>
             </div>
-            <MdThumbUp className="text-accent" size={24} />
+            <ThumbsUp className="text-accent" size={24} />
           </div>
         </div>
       </div>
@@ -268,7 +262,7 @@ export const Analytics = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Uploads */}
         <div className="bg-section rounded-lg p-6">
-          <h3 className="text-lg font-bold mb-4 text-white/90">Recent Uploads</h3>
+          <h3 className="text-lg font-bold mb-4 text-txt-primary">Recent Uploads</h3>
           <div className="space-y-4">
             {stats.recentUploads.map((model) => (
               <div key={model.id} className="flex items-center space-x-3">
@@ -295,7 +289,7 @@ export const Analytics = () => {
 
         {/* Popular Models */}
         <div className="bg-section rounded-lg p-6">
-          <h3 className="text-lg font-bold mb-4 text-white/90">Popular Models</h3>
+          <h3 className="text-lg font-bold mb-4 text-txt-primary">Popular Models</h3>
           <div className="space-y-4">
             {stats.popularModels.map((model) => (
               <div key={model.id} className="flex items-center justify-between">
@@ -311,7 +305,7 @@ export const Analytics = () => {
                       By {(model.uploaderDisplayName as string) || "Anonymous"}
                     </p>
                     <div className="flex items-center space-x-2 text-txt-secondary text-sm">
-                      <MdRemoveRedEye className="w-4 h-4" />
+                      <Eye className="w-4 h-4" />
                       <span>{(model.views as number) || 0}</span>
                     </div>
                   </div>
@@ -323,7 +317,7 @@ export const Analytics = () => {
 
         {/* Active Users */}
         <div className="bg-section rounded-lg p-6">
-          <h3 className="text-lg font-bold mb-4 text-white/90">Most Active Users</h3>
+          <h3 className="text-lg font-bold mb-4 text-txt-primary">Most Active Users</h3>
           <div className="space-y-4">
             {stats.activeUsers.map((user) => (
               <div key={user.id} className="flex items-center justify-between">

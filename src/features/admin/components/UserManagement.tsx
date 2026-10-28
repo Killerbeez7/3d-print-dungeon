@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MdCheck, MdEdit, MdClose } from "react-icons/md";
+import { Check, Pencil, X } from "lucide-react";
 
 import { grantRole, revokeRole } from "@/features/admin/services/adminService";
 
@@ -28,11 +28,11 @@ const ALL_ROLES = [
 ] as const satisfies readonly Role[];
 
 const ROLE_CLASSES: Record<Role, string> = {
-  user: "bg-slate-500/15 text-slate-300",
+  user: "bg-muted text-txt-secondary",
   artist: "bg-violet-500/15 text-violet-300",
-  moderator: "bg-blue-500/15 text-blue-300",
-  admin: "bg-red-500/15 text-red-300",
-  superadmin: "bg-amber-500/15 text-amber-300",
+  moderator: "bg-accent-soft text-accent",
+  admin: "bg-error/15 text-error",
+  superadmin: "bg-warning/15 text-warning",
 };
 
 const isRole = (value: string): value is Role => ALL_ROLES.some((role) => role === value);
@@ -178,7 +178,7 @@ export const UserManagement = () => {
       <input
         type="text"
         placeholder="Search users..."
-        className="w-full rounded-lg bg-section px-4 py-2 text-txt-primary"
+        className="field h-10"
         value={searchQuery}
         onChange={(event) => setSearchQuery(event.target.value)}
       />
@@ -273,16 +273,16 @@ export const UserManagement = () => {
                             className="text-accent hover:text-accent-hover"
                             aria-label="Save roles"
                           >
-                            <MdCheck className="w-6 h-6" />
+                            <Check className="w-6 h-6" />
                           </button>
 
                           <button
                             type="button"
                             onClick={() => setEditingUser(null)}
-                            className="text-red-500 hover:text-red-600"
+                            className="text-error hover:text-error"
                             aria-label="Cancel editing"
                           >
-                            <MdClose className="w-6 h-6" />
+                            <X className="w-6 h-6" />
                           </button>
                         </>
                       )
@@ -295,7 +295,7 @@ export const UserManagement = () => {
                           user.displayName || user.username || "user"
                         }`}
                       >
-                        <MdEdit className="w-6 h-6" />
+                        <Pencil className="w-6 h-6" />
                       </button>
                     )}
                   </div>
