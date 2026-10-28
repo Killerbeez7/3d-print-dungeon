@@ -19,4 +19,6 @@ export interface ArtistCardProps {
   username?: string | null;
   photoURL?: string | null;
   bio?: string;
+  isVerified?: boolean;
+  stats?: Partial<PublicProfileView["stats"]>;
 }

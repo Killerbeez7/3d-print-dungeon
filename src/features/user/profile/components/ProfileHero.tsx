@@ -23,6 +23,7 @@ import { useModal } from "@/features/shared/modal/hooks/useModal";
 import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
 
 import type { PublicProfileView } from "../types/profile";
+import { profileCoverBackground } from "../utils/profileCover";
 
 const socialIcons: Record<string, { icon: LucideIcon; label: string }> = {
   twitter: { icon: Twitter, label: "X / Twitter" },
@@ -30,13 +31,6 @@ const socialIcons: Record<string, { icon: LucideIcon; label: string }> = {
   facebook: { icon: Facebook, label: "Facebook" },
   linkedin: { icon: Linkedin, label: "LinkedIn" },
   youtube: { icon: Youtube, label: "YouTube" },
-};
-
-/** Stable 0-100 numbers from the username, so each cover looks different. */
-const seededPositions = (seed: string): number[] => {
-  let hash = 0;
-  for (const char of seed) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return [hash % 100, (hash >> 7) % 100, (hash >> 14) % 100, (hash >> 21) % 100];
 };
 
 const hostname = (url: string) => {
@@ -58,7 +52,6 @@ export const ProfileHero = ({ user, isOwner }: ProfileHeroProps) => {
 
   // Cache-busted URLs change every call; compute once per photo.
   const avatarUrl = useMemo(() => getAvatarUrlWithCacheBust(user.photoURL), [user.photoURL]);
-  const [ax, ay, ex, ey] = seededPositions(user.username);
 
   const socialLinks = Object.entries(user.socialLinks ?? {}).filter(
     (entry): entry is [string, string] => Boolean(entry[1]) && entry[0] in socialIcons
@@ -80,9 +73,7 @@ export const ProfileHero = ({ user, isOwner }: ProfileHeroProps) => {
       <div className="relative h-40 overflow-hidden border-b border-br-subtle bg-section sm:h-56">
         <div
           className="absolute inset-0"
-          style={{
-            background: `radial-gradient(640px circle at ${ax}% ${ay}%, rgba(var(--accent-rgb), 0.35), transparent 60%), radial-gradient(520px circle at ${ex}% ${ey}%, rgba(var(--ember-rgb), 0.22), transparent 60%)`,
-          }}
+          style={{ background: profileCoverBackground(user.username) }}
           aria-hidden="true"
         />
         <div className="bg-buildplate absolute inset-0 opacity-40" aria-hidden="true" />

@@ -1,5 +1,5 @@
 import { ArtistListGrid } from "@/features/artists/components/ArtistListGrid";
-import { Spinner } from "@/features/shared/reusable/Spinner";
+import { ArtistListSkeleton } from "@/features/artists/components/ArtistListSkeleton";
 
 import { useArtists } from "@/features/search/hooks/useArtists";
 import { SearchNotFound } from "@/features/search/components/SearchNotFound";
@@ -16,11 +16,7 @@ export const ArtistsTab = ({ search }: ArtistsProps) => {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-10">
-        <Spinner size={24} />
-      </div>
-    );
+    return <ArtistListSkeleton count={5} />;
   }
 
   if (artists.length === 0) {

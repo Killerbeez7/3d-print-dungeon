@@ -1,21 +1,16 @@
-/**
- * @file ArtistListSkeleton.tsx
- * @description Displays the skeleton for an artist list
- * @usedIn ArtistsListPage
- */
+import { artistGridClass } from "./ArtistListGrid";
 
-export function ArtistListSkeleton() {
+export function ArtistListSkeleton({ count = 10 }: { count?: number }) {
   return (
-    <div
-      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-2 animate-pulse"
-      aria-label="Loading artists..."
-    >
-      {Array.from({ length: 14 }).map((_, i) => (
-        <div key={i} className="rounded-lg overflow-hidden bg-surface-card">
-          <div className="w-full aspect-square bg-section"></div>
-          <div className="p-3">
-            <div className="h-5 w-3/4 mb-2 bg-section rounded"></div>
-            <div className="h-4 w-1/2 bg-section rounded"></div>
+    <div className={artistGridClass} role="status" aria-label="Loading artists">
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card">
+          <div className="skeleton-print h-24" />
+          <div className="px-4 pb-4">
+            <div className="skeleton-print chamfer -mt-9 size-[4.5rem] [--cut:13px]" />
+            <div className="skeleton-print mt-3 h-4 w-2/3" />
+            <div className="skeleton-print mt-2 h-3 w-1/3" />
+            <div className="skeleton-print mt-5 h-3 w-1/2" />
           </div>
         </div>
       ))}
