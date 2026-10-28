@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
+import FocusLock from "react-focus-lock";
+import { ChevronDown, Lock, X } from "lucide-react";
 
 import "@/styles/customScrollbar.css";
+
+import { Button } from "@/components";
 
 import { useCookies } from "../hooks/useCookies";
 import type { CookieCategory, OptionalCookieCategory } from "../types/cookies";
@@ -182,178 +186,135 @@ export function CookieSettingsModal({ isOpen, onClose }: CookieSettingsModalProp
   ][];
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/55 p-4 backdrop-blur-sm">
+    <div className="fixed inset-0 z-[9999] flex items-end justify-center md:items-center md:p-6">
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="cookie-settings-title"
-        className="flex max-h-[82vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-br-secondary bg-section shadow-2xl"
-      >
-        {/* Header */}
-        <div className="flex-shrink-0 border-b border-br-secondary px-5 py-4">
-          <div className="flex items-start justify-between gap-4">
+        className="absolute inset-0 animate-[fade_0.2s_ease] bg-surface-overlay backdrop-blur-sm"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+      <FocusLock returnFocus className="contents">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cookie-settings-title"
+          className="auth-panel relative flex max-h-[88dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl border border-br-secondary bg-surface-card shadow-popover md:rounded-xl"
+        >
+          <div className="flex items-start justify-between gap-4 border-b border-br-subtle px-5 py-4">
             <div>
-              <h2
-                id="cookie-settings-title"
-                className="text-lg font-semibold tracking-tight text-txt-primary"
-              >
-                Cookie Settings
+              <p className="label-mono text-accent">Privacy</p>
+              <h2 id="cookie-settings-title" className="mt-1 text-lg font-bold">
+                Cookie settings
               </h2>
-
-              <p className="mt-1 max-w-md text-xs leading-relaxed text-txt-secondary">
-                Choose which optional cookies you allow. Essential cookies are always
-                enabled.
+              <p className="mt-1 text-sm leading-relaxed text-txt-secondary">
+                Choose which optional cookies you allow. Essential cookies are always enabled.
               </p>
             </div>
-
             <button
               type="button"
               onClick={onClose}
               aria-label="Close cookie settings"
-              className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-br-secondary bg-surface-card text-sm text-txt-secondary transition-all hover:border-br-primary hover:text-txt-primary"
+              className="flex size-9 shrink-0 items-center justify-center rounded-md text-txt-secondary transition-colors hover:bg-muted hover:text-txt-primary"
             >
-              ✕
+              <X className="size-5" aria-hidden="true" />
             </button>
           </div>
-        </div>
 
-        {/* Cookie Categories */}
-        <div className="custom-scrollbar-md flex-1 overflow-y-auto bg-page/60 p-3">
-          <div className="space-y-2">
+          <ul className="custom-scrollbar-md flex-1 divide-y divide-br-subtle overflow-y-auto">
             {categoryEntries.map(([category, info]) => {
               const isExpanded = expandedSections.has(category);
               const isEssential = category === "essential";
+              const detailsId = `cookie-${category}-details`;
 
               return (
-                <div
-                  key={category}
-                  className="overflow-hidden rounded-xl border border-br-secondary bg-section transition-colors hover:border-br-primary"
-                >
-                  {/* Category Header */}
-                  <div className="px-3 py-2.5">
-                    <div className="flex items-center gap-3">
+                <li key={category} className="px-5 py-4">
+                  <div className="flex items-start gap-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="flex items-center gap-2 text-sm font-semibold text-txt-primary">
+                        {info.title}
+                        {isEssential && (
+                          <span className="label-mono inline-flex items-center gap-1 text-txt-muted">
+                            <Lock className="size-3" aria-hidden="true" /> Always on
+                          </span>
+                        )}
+                      </p>
+                      <p className="mt-0.5 text-sm leading-relaxed text-txt-secondary">{info.description}</p>
                       <button
                         type="button"
                         onClick={() => toggleSection(category)}
-                        aria-label={`${isExpanded ? "Collapse" : "Expand"} ${info.title}`}
                         aria-expanded={isExpanded}
-                        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-br-secondary bg-surface-card text-lg font-medium leading-none text-primary transition-all hover:border-primary/40 hover:bg-page/10"
+                        aria-controls={detailsId}
+                        className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-accent"
                       >
-                        {isExpanded ? "−" : "+"}
+                        {isExpanded ? "Hide details" : "Details"}
+                        <ChevronDown
+                          className={`size-3.5 transition-transform duration-300 ease-forge ${isExpanded ? "rotate-180" : ""}`}
+                          aria-hidden="true"
+                        />
                       </button>
-
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-3">
-                          <div>
-                            <p className="text-sm font-medium text-txt-primary">
-                              {info.title}
-                            </p>
-
-                            <p className="mt-0.5 text-xs leading-relaxed text-txt-secondary">
-                              {info.description}
-                            </p>
-                          </div>
-
-                          <input
-                            type="checkbox"
-                            checked={localConsent[category]}
-                            disabled={isEssential}
-                            onChange={(event) => {
-                              if (category === "essential") {
-                                return;
-                              }
-
-                              handleToggle(category, event.target.checked);
-                            }}
-                            aria-label={info.title}
-                            className="h-4 w-4 flex-shrink-0 rounded border-br-secondary text-primary focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
-                          />
-                        </div>
-                      </div>
                     </div>
+
+                    <label className="relative mt-0.5 inline-flex shrink-0 cursor-pointer has-[:disabled]:cursor-not-allowed">
+                      <input
+                        type="checkbox"
+                        role="switch"
+                        checked={localConsent[category]}
+                        disabled={isEssential}
+                        onChange={(event) => {
+                          if (category === "essential") return;
+                          handleToggle(category, event.target.checked);
+                        }}
+                        aria-label={info.title}
+                        className="peer sr-only"
+                      />
+                      <span
+                        aria-hidden="true"
+                        className="relative h-6 w-11 rounded-full bg-br-input transition-colors after:absolute after:left-0.5 after:top-0.5 after:size-5 after:rounded-full after:bg-page after:transition-transform after:duration-300 after:ease-forge peer-checked:bg-btn-primary peer-checked:after:translate-x-5 peer-disabled:opacity-60 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-focus"
+                      />
+                    </label>
                   </div>
 
-                  {/* Expanded Details */}
                   {isExpanded && (
-                    <div className="space-y-3 border-t border-br-secondary bg-surface-card/40 px-4 py-3">
+                    <div id={detailsId} className="mt-3 grid gap-4 rounded-lg bg-section p-4 text-sm sm:grid-cols-2">
                       <div>
-                        <h4 className="mb-1.5 text-xs font-medium text-txt-primary">
-                          What these cookies do
-                        </h4>
-
-                        <ul className="space-y-1.5 text-xs text-txt-secondary">
+                        <p className="label-mono mb-1.5 text-txt-muted">What they do</p>
+                        <ul className="space-y-1 text-txt-secondary">
                           {info.details.map((detail) => (
-                            <li key={detail} className="flex items-start gap-2">
-                              <span className="mt-[1px] text-primary">•</span>
-
-                              <span className="leading-relaxed">{detail}</span>
-                            </li>
+                            <li key={detail}>{detail}</li>
                           ))}
                         </ul>
                       </div>
-
                       <div>
-                        <h4 className="mb-1.5 text-xs font-medium text-txt-primary">
-                          Examples
-                        </h4>
-
-                        <ul className="space-y-1.5 text-xs text-txt-secondary">
+                        <p className="label-mono mb-1.5 text-txt-muted">Examples</p>
+                        <ul className="space-y-1 text-txt-secondary">
                           {info.examples.map((example) => (
-                            <li key={example} className="flex items-start gap-2">
-                              <span className="mt-[1px] text-primary">•</span>
-
-                              <span className="leading-relaxed">{example}</span>
-                            </li>
+                            <li key={example}>{example}</li>
                           ))}
                         </ul>
                       </div>
-
-                      <div className="rounded-lg border border-br-secondary bg-page/50 p-2.5">
-                        <h4 className="mb-1 text-xs font-medium text-txt-primary">
-                          Impact of disabling
-                        </h4>
-
-                        <p className="text-xs leading-relaxed text-txt-secondary">
-                          {info.impact}
-                        </p>
-                      </div>
+                      <p className="text-txt-secondary sm:col-span-2">
+                        <span className="font-semibold text-txt-primary">If disabled: </span>
+                        {info.impact}
+                      </p>
                     </div>
                   )}
-                </div>
+                </li>
               );
             })}
+          </ul>
+
+          <div className="grid grid-cols-2 gap-2 border-t border-br-subtle bg-section px-5 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:flex sm:justify-end">
+            <Button variant="secondary" size="sm" onClick={handleDeclineNonEssentials}>
+              Reject optional
+            </Button>
+            <Button variant="secondary" size="sm" onClick={handleAcceptAll}>
+              Accept all
+            </Button>
+            <Button size="sm" onClick={handleSaveSettings} className="col-span-2">
+              Save choices
+            </Button>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="flex-shrink-0 border-t border-br-secondary bg-section px-4 py-3">
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            <button
-              type="button"
-              onClick={handleDeclineNonEssentials}
-              className="min-w-[135px] rounded-lg border border-br-secondary px-4 py-2 text-xs font-medium text-txt-secondary transition-colors hover:border-br-primary hover:bg-surface-card hover:text-txt-primary"
-            >
-              Decline
-            </button>
-
-            <button
-              type="button"
-              onClick={handleSaveSettings}
-              className="min-w-[135px] rounded-lg border border-primary/40 bg-page/10 px-4 py-2 text-xs font-medium text-primary transition-colors hover:bg-page/15"
-            >
-              Save Preferences
-            </button>
-
-            <button
-              type="button"
-              onClick={handleAcceptAll}
-              className="min-w-[135px] rounded-lg bg-page px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-page/90"
-            >
-              Accept All
-            </button>
-          </div>
-        </div>
-      </div>
+      </FocusLock>
     </div>
   );
 }
