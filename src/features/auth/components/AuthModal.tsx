@@ -14,7 +14,7 @@ type AuthMode = "signin" | "signup";
 const perks = [
   "Download models shared by the community",
   "Upload and showcase your own prints",
-  "Join the forum and events",
+  "Ask and answer questions in the forum",
 ];
 
 export const AuthModal = () => {
