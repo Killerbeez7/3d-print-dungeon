@@ -36,6 +36,29 @@ export const isAuthPopupCancellation = (error: unknown): boolean => {
 
 export const mapFirebaseError = (error: unknown): AuthError => {
   const code = (error as { code?: string })?.code ?? "unknown";
+  const serverMessage = (error as { message?: string })?.message ?? "";
+
+  // Errors from the sign-up Cloud Function (createValidatedUser)
+  if (code.startsWith("functions/")) {
+    if (code === "functions/already-exists" || /already in use|already exists/i.test(serverMessage)) {
+      return {
+        type: AuthErrorType.EMAIL_ALREADY_IN_USE,
+        message: "An account with this email already exists",
+        code,
+        field: "email",
+      };
+    }
+
+    if (code === "functions/invalid-argument" && serverMessage) {
+      return { type: AuthErrorType.VALIDATION_ERROR, message: serverMessage, code };
+    }
+
+    return {
+      type: AuthErrorType.SERVER_ERROR,
+      message: `Our sign-up service didn't respond. Please try again in a minute (${code})`,
+      code,
+    };
+  }
 
   switch (code) {
     case "auth/popup-closed-by-user":
@@ -110,6 +133,38 @@ export const mapFirebaseError = (error: unknown): AuthError => {
         code,
       };
 
+    case "auth/popup-blocked":
+      return {
+        type: AuthErrorType.SERVER_ERROR,
+        message:
+          "Your browser blocked the Google sign-in window. Allow pop-ups for this site, or sign in with email",
+        code,
+      };
+
+    case "auth/unauthorized-domain":
+      return {
+        type: AuthErrorType.SERVER_ERROR,
+        message: "Google sign-in isn't enabled for this web address yet. Please sign in with email",
+        code,
+      };
+
+    case "auth/operation-not-supported-in-this-environment":
+    case "auth/web-storage-unsupported":
+    case "auth/internal-error":
+      return {
+        type: AuthErrorType.SERVER_ERROR,
+        message:
+          "Google sign-in couldn't start in this browser. If you opened the link inside another app, open it in Safari or Chrome, or sign in with email",
+        code,
+      };
+
+    case "auth/account-exists-with-different-credential":
+      return {
+        type: AuthErrorType.INVALID_CREDENTIALS,
+        message: "This email already has an account with a different sign-in method. Try signing in with email",
+        code,
+      };
+
     case "auth/requires-recent-login":
       return {
         type: AuthErrorType.SERVER_ERROR,
@@ -118,9 +173,10 @@ export const mapFirebaseError = (error: unknown): AuthError => {
       };
 
     default:
+      // Keep the code visible so problems can be reported and diagnosed.
       return {
         type: AuthErrorType.SERVER_ERROR,
-        message: "An unexpected error occurred. Please try again",
+        message: `Something went wrong. Please try again (${code})`,
         code,
       };
   }
