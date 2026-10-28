@@ -170,7 +170,7 @@ export function ModelPage() {
 
       {/* Phones: the main action stays in reach at the bottom of the screen. */}
       {!isDesktop && (
-        <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t border-br-subtle bg-section/95 px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3 backdrop-blur-xl">
+        <div className="fixed inset-x-0 bottom-0 z-40 flex items-center gap-3 border-t border-br-subtle bg-page/95 px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3 backdrop-blur-xl">
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold">{model.name}</p>
             <p className={`font-mono text-sm ${isPaid ? "text-ember" : "text-txt-muted"}`}>
