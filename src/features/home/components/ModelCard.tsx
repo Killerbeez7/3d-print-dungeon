@@ -3,11 +3,8 @@ import { Link } from "react-router-dom";
 import { Box } from "lucide-react";
 
 import type { ModelData } from "@/features/models/types/model";
-import {
-  getThumbUrl,
-  reportThumbResult,
-  thumbsLikelyMissing,
-} from "@/features/models/utils/imageVariants";
+import { reportThumbResult, thumbsLikelyMissing } from "@/features/models/utils/imageVariants";
+import { getThumbnailUrl } from "@/utils/imageUtils";
 
 type Stage = "thumb" | "original" | "error";
 
@@ -36,9 +33,11 @@ export const ModelCard = ({ model, priority = false }: ModelCardProps) => {
   const original = model.renderPrimaryUrl ?? null;
   const thumbs = useMemo(() => {
     if (thumbsLikelyMissing()) return null;
-    const small = getThumbUrl(original, 400);
-    const large = getThumbUrl(original, 800);
-    return small && large ? { src: small, srcSet: `${small} 400w, ${large} 800w` } : null;
+    const small = getThumbnailUrl(original, "MEDIUM");
+    const large = getThumbnailUrl(original, "LARGE");
+    return small && large && small !== original
+      ? { src: small, srcSet: `${small} 400w, ${large} 800w` }
+      : null;
   }, [original]);
 
   const [stage, setStage] = useState<Stage>(thumbs ? "thumb" : original ? "original" : "error");
