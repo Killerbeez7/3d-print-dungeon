@@ -145,7 +145,7 @@ body {
   --model-viewer-background: #151821;
 }
 
-@theme {
+@theme inline {
   /* Fonts */
   --font-sans: "Inter", "Segoe UI", Arial, sans-serif;
   --font-display: "Michroma", sans-serif;
