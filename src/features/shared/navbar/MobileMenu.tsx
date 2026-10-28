@@ -2,31 +2,13 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Link, NavLink } from "react-router-dom";
 import FocusLock from "react-focus-lock";
-import {
-  BookOpen,
-  CalendarDays,
-  Images,
-  LayoutGrid,
-  MessagesSquare,
-  Upload,
-  Users,
-  X,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { ArrowUpRight, Upload, X } from "lucide-react";
 
 import { Button, buttonClassName } from "@/components";
-import { STATIC_ASSETS } from "@/config/assetsConfig";
-import type { NavSection } from "@/config/navConfig";
+import type { NavItem, NavSection } from "@/config/navConfig";
+import { BrandMark } from "@/features/shared/components/BrandMark";
+import { ThemeToggle } from "@/features/shared/components/ThemeToggle";
 import { GlobalSearch } from "@/features/search/components/GlobalSearch";
-
-const navIcons: Record<string, LucideIcon> = {
-  Models: LayoutGrid,
-  Artists: Users,
-  Collections: Images,
-  Forum: MessagesSquare,
-  Events: CalendarDays,
-  Blog: BookOpen,
-};
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -37,23 +19,9 @@ interface MobileMenuProps {
   onSignUp: () => void;
 }
 
-const linkClass = ({ isActive }: { isActive: boolean }) =>
-  `flex min-h-12 items-center gap-3 rounded-lg px-3 text-base font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-focus ${
-    isActive
-      ? "bg-accent-soft text-accent-text"
-      : "text-txt-secondary hover:bg-muted hover:text-txt-primary"
-  }`;
-
-const MenuLink = ({ to, label, onClose }: { to: string; label: string; onClose: () => void }) => {
-  const Icon = navIcons[label];
-
-  return (
-    <NavLink to={to} end={to === "/"} className={linkClass} onClick={onClose}>
-      {Icon && <Icon className="size-5 shrink-0" aria-hidden="true" />}
-      <span>{label}</span>
-    </NavLink>
-  );
-};
+interface NumberedLink extends NavItem {
+  index: number;
+}
 
 export const MobileMenu = ({
   isOpen,
@@ -80,8 +48,22 @@ export const MobileMenu = ({
     };
   }, [isOpen, onClose]);
 
-  const directLinks = sections.filter((section) => section.to);
-  const groups = sections.filter((section) => !section.to && section.items.length);
+  // Number every link in reading order: 01 Models, 02 Artists, ...
+  let counter = 0;
+  const groups: { label: string; links: NumberedLink[] }[] = [
+    {
+      label: "Explore",
+      links: sections
+        .filter((section) => section.to)
+        .map((section) => ({ label: section.label, to: section.to as string, index: ++counter })),
+    },
+    ...sections
+      .filter((section) => !section.to && section.items.length)
+      .map((section) => ({
+        label: section.label,
+        links: section.items.map((item) => ({ ...item, index: ++counter })),
+      })),
+  ];
 
   // Portalled so it sits above the sticky header's stacking context and the
   // cookie banner (z-50), but below the auth modal.
@@ -91,7 +73,7 @@ export const MobileMenu = ({
       inert={!isOpen}
     >
       <div
-        className={`absolute inset-0 bg-surface-overlay transition-opacity duration-200 ${
+        className={`absolute inset-0 bg-surface-overlay backdrop-blur-sm transition-opacity duration-300 ${
           isOpen ? "opacity-100" : "opacity-0"
         }`}
         onClick={onClose}
@@ -103,65 +85,77 @@ export const MobileMenu = ({
           role="dialog"
           aria-modal="true"
           aria-label="Menu"
-          className={`absolute inset-y-0 left-0 flex w-[86%] max-w-sm flex-col bg-section shadow-xl transition-transform duration-200 ease-out ${
+          className={`bg-layer-lines absolute inset-y-0 left-0 flex w-[88%] max-w-sm flex-col border-r border-br-secondary bg-section shadow-2xl transition-transform duration-300 ease-forge ${
             isOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
           <div className="flex h-16 shrink-0 items-center justify-between border-b border-br-subtle px-4">
-            <Link to="/" onClick={onClose} className="flex items-center gap-2 rounded-lg">
-              <img
-                src={STATIC_ASSETS.LOGO}
-                alt=""
-                width={32}
-                height={32}
-                className="size-8 object-contain logo-accent"
-              />
-              <span className="text-sm font-semibold text-txt-primary">3D Print Dungeon</span>
+            <Link to="/" onClick={onClose} aria-label="3D Print Dungeon home">
+              <BrandMark />
             </Link>
             <button
               type="button"
               onClick={onClose}
-              className="flex size-10 items-center justify-center rounded-lg text-txt-secondary hover:bg-muted hover:text-txt-primary focus-visible:outline-2 focus-visible:outline-focus"
+              className="flex size-10 items-center justify-center rounded-lg text-txt-secondary hover:bg-muted hover:text-txt-primary"
               aria-label="Close menu"
             >
               <X className="size-6" aria-hidden="true" />
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-3 py-4">
-            <div className="px-1 pb-4">
-              <GlobalSearch />
-            </div>
+          <div className="flex-1 overflow-y-auto px-4 py-5">
+            <GlobalSearch />
 
-            <nav aria-label="Mobile navigation" className="space-y-6">
-              <div className="space-y-1">
-                <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-txt-muted">
-                  Explore
-                </p>
-                {directLinks.map((section) => (
-                  <MenuLink
-                    key={section.label}
-                    to={section.to as string}
-                    label={section.label}
-                    onClose={onClose}
-                  />
-                ))}
-              </div>
-
+            <nav aria-label="Mobile navigation" className="mt-6 space-y-7">
               {groups.map((group) => (
-                <div key={group.label} className="space-y-1">
-                  <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wide text-txt-muted">
-                    {group.label}
-                  </p>
-                  {group.items.map((item) => (
-                    <MenuLink key={item.to} to={item.to} label={item.label} onClose={onClose} />
-                  ))}
+                <div key={group.label}>
+                  <p className="label-mono mb-1 text-txt-muted">{group.label}</p>
+                  <ul>
+                    {group.links.map((link) => (
+                      <li
+                        key={link.to}
+                        className="transition-[opacity,transform] duration-500 ease-forge"
+                        style={{
+                          transitionDelay: isOpen ? `${80 + link.index * 35}ms` : "0ms",
+                          opacity: isOpen ? 1 : 0,
+                          transform: isOpen ? "none" : "translateX(-12px)",
+                        }}
+                      >
+                        <NavLink
+                          to={link.to}
+                          end={link.to === "/"}
+                          onClick={onClose}
+                          className={({ isActive }) =>
+                            `group flex min-h-13 items-center gap-4 border-b border-br-subtle py-2 ${
+                              isActive ? "text-accent" : "text-txt-primary"
+                            }`
+                          }
+                        >
+                          <span className="font-mono text-xs text-txt-muted">
+                            {String(link.index).padStart(2, "0")}
+                          </span>
+                          <span className="flex-1 font-display text-lg font-semibold tracking-tight">
+                            {link.label}
+                          </span>
+                          <ArrowUpRight
+                            className="size-4 text-txt-muted transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent"
+                            aria-hidden="true"
+                          />
+                        </NavLink>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               ))}
             </nav>
+
+            <div className="mt-7 flex items-center justify-between">
+              <span className="label-mono text-txt-muted">Theme</span>
+              <ThemeToggle />
+            </div>
           </div>
 
-          <div className="shrink-0 space-y-2 border-t border-br-subtle p-4">
+          <div className="shrink-0 space-y-2 border-t border-br-subtle bg-section p-4">
             {isSignedIn ? (
               <Link
                 to="/model/upload"
