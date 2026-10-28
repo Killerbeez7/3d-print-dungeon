@@ -1,0 +1,77 @@
+name: Preview deploy
+
+# Builds every claude/* branch and, when the Firebase secrets are set,
+# deploys it to its own Firebase Hosting preview channel. The live site
+# (printdungeon.com) is never touched by this workflow.
+#
+# Repository secrets (Settings > Secrets and variables > Actions):
+#   FIREBASE_SERVICE_ACCOUNT     service account JSON with the Firebase Hosting Admin role
+#   FIREBASE_WEB_CONFIG          contents of src/keys/firebase_key.json
+#   VITE_STRIPE_PUBLISHABLE_KEY  optional, Stripe publishable key (pk_...)
+
+on:
+  push:
+    branches: ["claude/**"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  checks: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    env:
+      HAS_DEPLOY_SECRETS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' && secrets.FIREBASE_WEB_CONFIG != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Write Firebase web config
+        env:
+          FIREBASE_WEB_CONFIG: ${{ secrets.FIREBASE_WEB_CONFIG }}
+        run: |
+          if [ -n "$FIREBASE_WEB_CONFIG" ]; then
+            printf '%s' "$FIREBASE_WEB_CONFIG" > src/keys/firebase_key.json
+          else
+            cp src/keys/firebase_key.example.json src/keys/firebase_key.json
+          fi
+
+      - run: npm run type-check
+
+      - run: npm run build
+        env:
+          VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+
+      - name: Channel name from branch
+        id: channel
+        run: |
+          name=$(echo "${GITHUB_REF_NAME}" | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9-' '-' | sed 's/-*$//' | cut -c1-36)
+          echo "id=$name" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy to preview channel
+        id: deploy
+        if: env.HAS_DEPLOY_SECRETS == 'true'
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: print-dungeon-3d
+          channelId: ${{ steps.channel.outputs.id }}
+          expires: 30d
+
+      - name: Preview link
+        if: steps.deploy.outcome == 'success'
+        run: |
+          echo "Preview: ${{ steps.deploy.outputs.details_url }}" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Deploy skipped
+        if: env.HAS_DEPLOY_SECRETS != 'true'
+        run: |
+          echo "Build passed. Preview not deployed - add FIREBASE_SERVICE_ACCOUNT and FIREBASE_WEB_CONFIG secrets." >> "$GITHUB_STEP_SUMMARY"
