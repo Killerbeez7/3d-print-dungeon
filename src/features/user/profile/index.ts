@@ -1,8 +1,3 @@
-// Components
-export { UserHeader } from "./components/UserHeader";
-export { UserStats } from "./components/UserStats";
-export { UserPortfolio } from "./components/UserPortfolio";
-
 // Pages
 export { PublicProfilePage } from "./pages/PublicProfilePage";
 
