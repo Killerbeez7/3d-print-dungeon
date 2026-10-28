@@ -1,307 +1,140 @@
-import { useState, FormEvent, ChangeEvent } from "react";
-import {
-  FaFacebook,
-  FaTwitter,
-  FaInstagram,
-  FaLinkedin,
-  FaDiscord,
-  FaPinterest,
-} from "react-icons/fa";
-import { AlertModal } from "../AlertModal";
-import { CookieSettingsModal } from "@/features/cookies/components/CookieSettingsModal";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { ArrowUp, Upload } from "lucide-react";
+
+import { buttonClassName } from "@/components";
 import { ROUTES } from "@/constants/routeConstants";
+import { CookieSettingsModal } from "@/features/cookies/components/CookieSettingsModal";
 import { FORUM_PATHS } from "@/features/forum/constants/forumPaths";
-import { Button } from "@/components";
+import { BrandMark } from "@/features/shared/components/BrandMark";
+
+interface FooterLink {
+  label: string;
+  to: string;
+}
+
+const columns: { title: string; links: FooterLink[] }[] = [
+  {
+    title: "Explore",
+    links: [
+      { label: "Models", to: ROUTES.HOME },
+      { label: "Artists", to: ROUTES.ARTISTS_LIST },
+      { label: "Collections", to: ROUTES.COLLECTIONS },
+      { label: "Search", to: `${ROUTES.SEARCH}?sort_by=relevance` },
+    ],
+  },
+  {
+    title: "Community",
+    links: [
+      { label: "Forum", to: FORUM_PATHS.HOME },
+      { label: "Events", to: ROUTES.EVENTS },
+      { label: "Blog", to: ROUTES.BLOG },
+      { label: "Forum rules", to: "/forum/rules" },
+    ],
+  },
+  {
+    title: "Account",
+    links: [
+      { label: "Upload a model", to: ROUTES.MODEL_UPLOAD },
+      { label: "Settings", to: ROUTES.USER_SETTINGS },
+      { label: "Notifications", to: ROUTES.USER_NOTIFICATIONS },
+      { label: "Help center", to: "/forum/help" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { label: "Terms of use", to: ROUTES.TERMS_OF_USE },
+      { label: "Privacy policy", to: ROUTES.PRIVACY_POLICY },
+      { label: "Cookie policy", to: ROUTES.COOKIE_POLICY },
+      { label: "Refund policy", to: ROUTES.REFUND_POLICY },
+    ],
+  },
+];
+
+const linkClass =
+  "group inline-flex min-h-9 items-center text-sm text-txt-secondary transition-colors hover:text-txt-primary";
 
 export const Footer = () => {
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [email, setEmail] = useState<string>("");
   const [showCookieSettings, setShowCookieSettings] = useState<boolean>(false);
-
-  const handleSubscribe = (e: FormEvent<HTMLFormElement>): void => {
-    e.preventDefault();
-    setIsModalOpen(true);
-    setEmail("");
-  };
-
-  const handleEmailChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setEmail(e.target.value);
-  };
 
   return (
     <>
-      <footer className="text-txt-secondary bg-section z-10 min-h-[16rem]">
-        {/* Footer Top Section */}
-        <div className="pt-8 pb-6 sm:pt-15 sm:pb-10" role="footer-top">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Footer Top Section */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-8 text-center sm:text-left">
-              {/* EXPLORE Section */}
-              <div className="mb-4">
-                <h6 className="text-xs sm:text-sm font-bold text-txt-primary mb-2 sm:mb-3">
-                  EXPLORE
-                </h6>
-                <div className="flex flex-col gap-1">
-                  <Link
-                    to={ROUTES.HOME}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    3D Models
-                  </Link>
-                  <Link
-                    to={ROUTES.ARTISTS_LIST}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Artists
-                  </Link>
-                  <Link
-                    to={ROUTES.COLLECTIONS}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Collections
-                  </Link>
-                  <Link
-                    to={ROUTES.SEARCH}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Search Models
-                  </Link>
-                </div>
-              </div>
-
-              {/* COMMUNITY Section */}
-              <div className="mb-4">
-                <h6 className="text-xs sm:text-sm font-bold text-txt-primary mb-2 sm:mb-3">
-                  COMMUNITY
-                </h6>
-                <div className="flex flex-col gap-1">
-                  <Link
-                    to={ROUTES.EVENTS}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Events
-                  </Link>
-                  <Link
-                    to={FORUM_PATHS.HOME}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Forum
-                  </Link>
-                  <Link
-                    to={ROUTES.BLOG}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Blog
-                  </Link>
-                  <Link
-                    to="/forum/rules"
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Forum Rules
-                  </Link>
-                </div>
-              </div>
-
-              {/* MARKETPLACE Section */}
-              <div className="mb-4">
-                <h6 className="text-xs sm:text-sm font-bold text-txt-primary mb-2 sm:mb-3">
-                  MARKETPLACE
-                </h6>
-                <div className="flex flex-col gap-1">
-                  <Link
-                    to="/marketplace"
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    All Models
-                  </Link>
-                  <Link
-                    to={ROUTES.MARKETPLACE_FEATURED}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Featured
-                  </Link>
-                  <Link
-                    to={ROUTES.MARKETPLACE_NEW_ARRIVALS}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    New Arrivals
-                  </Link>
-                  <Link
-                    to={ROUTES.MARKETPLACE_BEST_SELLERS}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Best Sellers
-                  </Link>
-                </div>
-              </div>
-
-              {/* BUSINESS Section */}
-              <div className="mb-4">
-                <h6 className="text-xs sm:text-sm font-bold text-txt-primary mb-2 sm:mb-3">
-                  BUSINESS
-                </h6>
-                <div className="flex flex-col gap-1">
-                  <Link
-                    to={ROUTES.BUSINESS_BULK_ORDERS}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Bulk Orders
-                  </Link>
-                  <Link
-                    to={ROUTES.BUSINESS_CUSTOM_SOLUTIONS}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Custom Solutions
-                  </Link>
-                  <Link
-                    to={ROUTES.BUSINESS_ENTERPRISE_SUITE}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Enterprise Suite
-                  </Link>
-                  <Link
-                    to={ROUTES.MODEL_UPLOAD}
-                    className="text-sm sm:text-base py-2 px-1 hover:text-accent-hover transition-colors duration-300 min-h-[44px] flex items-center"
-                  >
-                    Upload Models
-                  </Link>
-                </div>
-              </div>
-
-              {/* NEWSLETTER Section */}
-              <div className="col-span-2 sm:col-span-1 mb-4">
-                <h6 className="text-xs sm:text-sm font-bold text-txt-primary mb-2 sm:mb-3">
-                  NEWSLETTER
-                </h6>
-                <p className="text-xs text-txt-secondary mb-3 text-center sm:text-left">
-                  Subscribe to get the latest model drops, updates, tips and special
-                  offers.
-                </p>
-                <form onSubmit={handleSubscribe} className="flex flex-col gap-2">
-                  <input
-                    type="email"
-                    placeholder="Email"
-                    required
-                    value={email}
-                    onChange={handleEmailChange}
-                    className="px-3 py-2 rounded border border-br-primary focus:outline-none focus:ring-1 focus:ring-accent focus:border-transparent text-xs bg-page"
-                  />
-                  <Button type="submit">SUBSCRIBE</Button>
-                </form>
-              </div>
+      <footer className="relative z-10 overflow-hidden border-t border-br-subtle bg-section">
+        <div className="mx-auto max-w-[1600px] px-4 pt-14 sm:px-6 lg:px-8">
+          <div className="grid gap-10 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
+            <div className="max-w-xs">
+              <BrandMark size="lg" />
+              <p className="mt-4 text-sm leading-relaxed text-txt-secondary">
+                A community workshop for 3D printable tabletop models: find them, print them,
+                share your own.
+              </p>
+              <Link
+                to={ROUTES.MODEL_UPLOAD}
+                className={buttonClassName({ variant: "secondary", size: "sm", className: "mt-5" })}
+              >
+                <Upload className="size-4" aria-hidden="true" />
+                Share your model
+              </Link>
             </div>
+
+            <div className="grid grid-cols-2 gap-8 sm:grid-cols-4 lg:col-span-4">
+              {columns.map((column) => (
+                <nav key={column.title} aria-label={column.title}>
+                  <p className="label-mono mb-3 text-txt-muted">{column.title}</p>
+                  <ul>
+                    {column.links.map((link) => (
+                      <li key={link.to}>
+                        <Link to={link.to} className={linkClass}>
+                          <span className="h-px w-0 bg-accent transition-[width,margin] duration-300 ease-forge group-hover:mr-2 group-hover:w-3" />
+                          {link.label}
+                        </Link>
+                      </li>
+                    ))}
+                    {column.title === "Legal" && (
+                      <li>
+                        <button
+                          type="button"
+                          onClick={() => setShowCookieSettings(true)}
+                          className={linkClass}
+                        >
+                          <span className="h-px w-0 bg-accent transition-[width,margin] duration-300 ease-forge group-hover:mr-2 group-hover:w-3" />
+                          Cookie settings
+                        </button>
+                      </li>
+                    )}
+                  </ul>
+                </nav>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-12 flex flex-col gap-3 border-t border-br-subtle py-5 text-xs text-txt-muted sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              © {new Date().getFullYear()} 3D Print Dungeon
+              <span className="label-mono ml-3 hidden text-[0.65rem] sm:inline">
+                Printed layer by layer
+              </span>
+            </p>
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="inline-flex items-center gap-1.5 self-start text-txt-secondary transition-colors hover:text-txt-primary sm:self-auto"
+            >
+              Back to top
+              <ArrowUp className="size-3.5" aria-hidden="true" />
+            </button>
           </div>
         </div>
 
-        {/* Footer Bottom Section */}
-        <div className="bg-page border-t border-br-secondary py-3">
-          <div className="container mx-auto px-4 sm:px-6">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-              {/* Copyright */}
-              <div className="flex items-center gap-2">
-                <div className="w-5 h-5 sm:w-6 sm:h-6 bg-page rounded-full flex items-center justify-center">
-                  <img
-                    src="/assets/images/logo.png"
-                    alt="Site Logo"
-                    className="w-full h-full object-cover logo-accent"
-                  />
-                </div>
-                <span className="text-xs text-txt-secondary text-center sm:text-left">
-                  © 2025 Print Dungeon. All rights reserved.
-                </span>
-              </div>
-
-              {/* Policy Links */}
-              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 sm:gap-4">
-                <Link
-                  to={ROUTES.TERMS_OF_USE}
-                  className="text-sm sm:text-base text-txt-secondary hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center"
-                >
-                  Terms of use
-                </Link>
-                <Link
-                  to={ROUTES.REFUND_POLICY}
-                  className="text-sm sm:text-base text-txt-secondary hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center"
-                >
-                  Refund policy
-                </Link>
-                <Link
-                  to={ROUTES.PRIVACY_POLICY}
-                  className="text-sm sm:text-base text-txt-secondary hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center"
-                >
-                  Privacy policy
-                </Link>
-                <Link
-                  to={ROUTES.COOKIE_POLICY}
-                  className="text-sm sm:text-base text-txt-secondary hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center"
-                >
-                  Cookie policy
-                </Link>
-                <Link
-                  to="/sitemap"
-                  className="text-sm sm:text-base text-txt-secondary hover:text-primary transition-colors py-2 px-1 min-h-[44px] flex items-center"
-                >
-                  Sitemap
-                </Link>
-              </div>
-
-              {/* Social Media Icons */}
-              <div className="flex items-center gap-2 sm:gap-3 text-txt-secondary">
-                <Link
-                  to="/"
-                  className="hover:text-primary transition-colors"
-                  aria-label="Twitter"
-                >
-                  <FaTwitter size={14} className="sm:w-4 sm:h-4" />
-                </Link>
-                <Link
-                  to="/"
-                  className="hover:text-primary transition-colors"
-                  aria-label="Instagram"
-                >
-                  <FaInstagram size={14} className="sm:w-4 sm:h-4" />
-                </Link>
-                <Link
-                  to="/"
-                  className="hover:text-primary transition-colors"
-                  aria-label="Facebook"
-                >
-                  <FaFacebook size={14} className="sm:w-4 sm:h-4" />
-                </Link>
-                <Link
-                  to="/"
-                  className="hover:text-primary transition-colors"
-                  aria-label="Discord"
-                >
-                  <FaDiscord size={14} className="sm:w-4 sm:h-4" />
-                </Link>
-                <Link
-                  to="/"
-                  className="hover:text-primary transition-colors"
-                  aria-label="Pinterest"
-                >
-                  <FaPinterest size={14} className="sm:w-4 sm:h-4" />
-                </Link>
-                <Link
-                  to="/"
-                  className="hover:text-primary transition-colors"
-                  aria-label="LinkedIn"
-                >
-                  <FaLinkedin size={14} className="sm:w-4 sm:h-4" />
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Oversized outline wordmark, cut off by the page edge. */}
+        <p
+          aria-hidden="true"
+          className="pointer-events-none -mb-[0.32em] select-none text-center font-display text-[13.5vw] font-bold uppercase leading-none tracking-tighter text-transparent [-webkit-text-stroke:1px_var(--br-primary)]"
+        >
+          Dungeon
+        </p>
       </footer>
-
-      <AlertModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Subscription Complete!"
-        message="Thanks for joining the 3D Print Dungeon! You'll now get the latest model releases, special offers, and updates delivered straight to your inbox."
-      />
 
       <CookieSettingsModal
         isOpen={showCookieSettings}
