@@ -1,12 +1,12 @@
-import { useState, useEffect, Dispatch, SetStateAction } from "react";
+import { useCallback, useSyncExternalStore, Dispatch, SetStateAction } from "react";
 
 const LIGHT = "light" as const;
 const DARK = "dark" as const;
-const SYSTEM = "system" as const;
 
-export type Theme = typeof LIGHT | typeof DARK | typeof SYSTEM;
+// "system" is a legacy stored value; it is treated as the dark default.
+export type Theme = typeof LIGHT | typeof DARK | "system";
 
-type NonSystemTheme = Exclude<Theme, typeof SYSTEM>;
+type NonSystemTheme = typeof LIGHT | typeof DARK;
 
 const THEME_KEY = "theme";
 
@@ -16,42 +16,66 @@ const THEME_COLORS: Record<NonSystemTheme, string> = {
     dark: "#0f0f12",
 };
 
-function getSystemTheme(): NonSystemTheme {
-    return DARK;
+function getStoredTheme(): NonSystemTheme {
+    try {
+        return localStorage.getItem(THEME_KEY) === LIGHT ? LIGHT : DARK;
+    } catch {
+        return DARK;
+    }
 }
 
-function getStoredTheme(): NonSystemTheme | null {
-    if (typeof localStorage === "undefined") return null;
-    const stored = localStorage.getItem(THEME_KEY) as Theme | null;
-    if (stored === LIGHT || stored === DARK) return stored;
-    return null;
+function applyTheme(theme: Theme): void {
+    // Legacy "system" values are pinned to the app default.
+    const applied: NonSystemTheme = theme === LIGHT ? LIGHT : DARK;
+    document.documentElement.setAttribute("data-theme", applied);
+    document
+        .querySelector('meta[name="theme-color"]')
+        ?.setAttribute("content", THEME_COLORS[applied]);
 }
 
+// One shared theme value, so every component using the hook stays in sync.
+let currentTheme: Theme = typeof window === "undefined" ? DARK : getStoredTheme();
+const listeners = new Set<() => void>();
+
+function setSharedTheme(next: Theme): void {
+    currentTheme = next;
+    try {
+        localStorage.setItem(THEME_KEY, next);
+    } catch {
+        // Storage can be unavailable (private mode); the theme still applies.
+    }
+    applyTheme(next);
+    listeners.forEach((listener) => listener());
+}
+
+function subscribe(listener: () => void): () => void {
+    listeners.add(listener);
+
+    // Follow changes made in other tabs.
+    const handleStorage = (event: StorageEvent) => {
+        if (event.key !== THEME_KEY) return;
+        currentTheme = getStoredTheme();
+        applyTheme(currentTheme);
+        listener();
+    };
+    window.addEventListener("storage", handleStorage);
+
+    return () => {
+        listeners.delete(listener);
+        window.removeEventListener("storage", handleStorage);
+    };
+}
 
 export function useTheme(): [Theme, Dispatch<SetStateAction<Theme>>] {
-    const [theme, setTheme] = useState<Theme>(() => {
-        return getStoredTheme() ?? DARK;
-    });
+    const theme = useSyncExternalStore(
+        subscribe,
+        () => currentTheme,
+        () => DARK
+    );
 
-    // Apply theme whenever it changes
-    useEffect(() => {
-        const applied: NonSystemTheme = theme === SYSTEM ? getSystemTheme() : theme;
-        if (typeof document !== "undefined") {
-            document.documentElement.setAttribute("data-theme", applied);
-            document
-                .querySelector('meta[name="theme-color"]')
-                ?.setAttribute("content", THEME_COLORS[applied]);
-        }
-        if (typeof localStorage !== "undefined") {
-            localStorage.setItem(THEME_KEY, theme);
-        }
-    }, [theme]);
-
-    // Keep legacy "system" values pinned to the app default.
-    useEffect(() => {
-        if (theme !== SYSTEM || typeof document === "undefined") return;
-        document.documentElement.setAttribute("data-theme", DARK);
-    }, [theme]);
+    const setTheme = useCallback<Dispatch<SetStateAction<Theme>>>((value) => {
+        setSharedTheme(typeof value === "function" ? value(currentTheme) : value);
+    }, []);
 
     return [theme, setTheme];
 }
