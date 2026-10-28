@@ -14,7 +14,7 @@ export interface NavSection {
   items: NavItem[];
 }
 
-// Shop (Marketplace, Printed Figures) and Business pages still show demo
+// Shop (Marketplace, Printed Figures), Business, Events and Blog only had demo
 // content, so they are left out of the navigation until they are real.
 export const NAV_SECTIONS: NavSection[] = [
   { label: "Models", to: ROUTES.HOME, items: [] },
@@ -25,8 +25,8 @@ export const NAV_SECTIONS: NavSection[] = [
     to: null,
     items: [
       { label: "Forum", to: FORUM_PATHS.HOME, hint: "Ask, share, discuss" },
-      { label: "Events", to: ROUTES.EVENTS, hint: "Contests and meetups" },
-      { label: "Blog", to: ROUTES.BLOG, hint: "News and guides" },
+      { label: "Forum rules", to: FORUM_PATHS.RULES, hint: "How we keep it friendly" },
+      { label: "Help", to: FORUM_PATHS.HELP, hint: "Answers to common questions" },
     ],
   },
 ];

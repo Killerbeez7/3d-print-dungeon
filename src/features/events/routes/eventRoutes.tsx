@@ -5,9 +5,6 @@ import type { RouteObject } from "react-router-dom";
 const EventsHome = lazy(() =>
   import("../pages/EventsHome").then((m) => ({ default: m.EventsHome }))
 );
-const EventDetailsPage = lazy(() =>
-  import("../pages/EventDetailsPage").then((m) => ({ default: m.EventDetailsPage }))
-);
 
 export const eventsRoutes: RouteObject[] = [
   {
@@ -22,7 +19,7 @@ export const eventsRoutes: RouteObject[] = [
     path: ROUTES.EVENTS_DETAILS,
     element: (
       <Suspense>
-        <EventDetailsPage />
+        <EventsHome />
       </Suspense>
     ),
   },

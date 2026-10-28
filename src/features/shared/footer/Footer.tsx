@@ -27,8 +27,6 @@ const columns: { title: string; links: FooterLink[] }[] = [
     title: "Community",
     links: [
       { label: "Forum", to: FORUM_PATHS.HOME },
-      { label: "Events", to: ROUTES.EVENTS },
-      { label: "Blog", to: ROUTES.BLOG },
       { label: "Forum rules", to: "/forum/rules" },
     ],
   },
