@@ -1,4 +1,9 @@
 import { useState, useEffect } from "react";
+import FocusLock from "react-focus-lock";
+import { ShieldCheck, X } from "lucide-react";
+
+import { Button } from "@/components";
+import { Spinner } from "@/features/shared/reusable/Spinner";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { paymentService } from "@/features/payment/services/paymentService";
 import type { SellerVerificationProps } from "@/features/payment/types/payment";
@@ -76,92 +81,91 @@ export const SellerVerification = ({
 
   if (!isOpen) return null;
 
+  const steps = [
+    { id: "info", label: "Create your seller account" },
+    { id: "linking", label: "Verify your details with Stripe" },
+    { id: "success", label: "Come back and publish paid models" },
+  ];
+
   return (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-md flex items-center justify-center z-50 p-4 transition-all duration-300">
-      <div className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl border border-gray-200/50 transform transition-all duration-300 scale-100 backdrop-blur-sm">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-              <svg
-                className="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+    <div className="fixed inset-0 z-[11000] flex items-end justify-center md:items-center md:p-6">
+      <div
+        className="absolute inset-0 animate-[fade_0.2s_ease] bg-surface-overlay backdrop-blur-sm"
+        onClick={handleClose}
+        aria-hidden="true"
+      />
+      <FocusLock returnFocus className="contents">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="seller-verification-title"
+          className="auth-panel relative w-full max-w-lg rounded-t-2xl border border-br-secondary bg-surface-card p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-popover md:rounded-xl md:p-8"
+        >
+          <div className="flex items-start justify-between gap-4">
+            <span className="chamfer flex size-12 items-center justify-center bg-accent-soft text-accent [--cut:9px]">
+              <ShieldCheck className="size-6" aria-hidden="true" />
+            </span>
+            {!isLoading && (
+              <button
+                type="button"
+                onClick={handleClose}
+                aria-label="Close"
+                className="flex size-9 items-center justify-center rounded-md text-txt-secondary transition-colors hover:bg-muted hover:text-txt-primary"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-700">Seller Verification</h2>
-              <p className="text-sm text-gray-600">Complete setup to start selling</p>
-            </div>
+                <X className="size-5" aria-hidden="true" />
+              </button>
+            )}
           </div>
-          {!isLoading && (
-            <button
-              onClick={handleClose}
-              className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center text-txt-secondary hover:text-txt-primary hover:bg-gray-200 transition-all duration-200"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
+
+          <p className="label-mono mt-5 text-accent">Seller verification</p>
+          <h2 id="seller-verification-title" className="mt-1 text-2xl font-bold">
+            Complete setup to start selling
+          </h2>
+
+          {step === "info" && (
+            <>
+              <p className="mt-2 text-sm leading-relaxed text-txt-secondary">
+                To sell paid models, you need to complete a quick Stripe verification.
+              </p>
+
+              <ol className="mt-6 space-y-3">
+                {steps.map((item, index) => (
+                  <li key={item.id} className="flex items-center gap-3 text-sm text-txt-primary">
+                    <span className="chamfer flex size-7 items-center justify-center bg-muted font-mono text-xs text-txt-secondary [--cut:5px]">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    {item.label}
+                  </li>
+                ))}
+              </ol>
+
+              {error && (
+                <p role="alert" className="mt-5 rounded-lg border border-error/40 bg-error/10 px-4 py-3 text-sm text-txt-primary">
+                  {error}
+                </p>
+              )}
+
+              <div className="mt-8 grid grid-cols-2 gap-2">
+                <Button variant="secondary" onClick={handleClose}>
+                  Not now
+                </Button>
+                <Button onClick={handleStartVerification} isLoading={isLoading}>
+                  {isLoading ? "Setting up…" : "Start verification"}
+                </Button>
+              </div>
+            </>
+          )}
+
+          {(step === "creating" || step === "linking") && (
+            <div className="flex flex-col items-center gap-4 py-10 text-center" role="status">
+              <Spinner size={28} />
+              <p className="text-sm text-txt-secondary">
+                {step === "creating" ? "Creating your seller account…" : "Redirecting to Stripe…"}
+              </p>
+            </div>
           )}
         </div>
-        {step === "info" && (
-          <div className="space-y-4">
-            <p className="text-sm text-gray-600">
-              To sell paid models, you need to complete a quick Stripe verification.
-            </p>
-            {error && (
-              <div className="p-2 border border-error/30 rounded text-sm text-error bg-error/5">
-                {error}
-              </div>
-            )}
-            <div className="flex gap-2 justify-end">
-              <button
-                onClick={handleClose}
-                className="px-3 py-2 border border-br-secondary rounded text-sm text-gray-600 hover:bg-muted"
-              >
-                Close
-              </button>
-              <button
-                onClick={handleStartVerification}
-                disabled={isLoading}
-                className="px-3 py-2 bg-btn-primary text-white rounded text-sm hover:bg-btn-primary-hover disabled:opacity-50"
-              >
-                {isLoading ? "Setting up..." : "Start verification"}
-              </button>
-            </div>
-          </div>
-        )}
-        {step === "creating" && (
-          <div className="text-center py-6 space-y-2">
-            <div className="animate-spin rounded-full h-6 w-6 border-2 border-accent border-t-transparent mx-auto"></div>
-            <p className="text-sm text-txt-secondary">Creating your seller account…</p>
-          </div>
-        )}
-        {step === "linking" && (
-          <div className="text-center py-6 space-y-2">
-            <div className="animate-spin rounded-full h-6 w-6 border-2 border-accent border-t-transparent mx-auto"></div>
-            <p className="text-sm text-txt-secondary">Redirecting to Stripe…</p>
-          </div>
-        )}
-      </div>
+      </FocusLock>
     </div>
   );
 };

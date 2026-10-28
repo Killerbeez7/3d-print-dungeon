@@ -72,58 +72,38 @@ export const CheckoutForm = ({
   };
 
   return (
-    <div className="max-w-md mx-auto bg-surface-card rounded-lg p-6 shadow-lg">
-      <div className="mb-6">
-        <h3 className="text-xl font-semibold text-txt-primary mb-2">
-          Complete Your Purchase
-        </h3>
-        <div className="text-sm text-txt-secondary">
-          <p className="font-medium">{modelName}</p>
-          <p className="text-lg font-bold text-accent mt-1">
-            {paymentService.formatPrice(amount)}
-          </p>
-        </div>
+    <form id="payment-form" onSubmit={handleSubmit}>
+      <PaymentElement id="payment-element" options={paymentElementOptions} onChange={handleElementChange} />
+
+      {message && (
+        <p
+          role="status"
+          className={`mt-4 rounded-lg border px-4 py-3 text-sm text-txt-primary ${
+            message.includes("succeeded") ? "border-success/40 bg-success/10" : "border-error/40 bg-error/10"
+          }`}
+        >
+          {message}
+        </p>
+      )}
+
+      <div className="mt-6 grid grid-cols-[auto_1fr] gap-2">
+        <Button type="button" variant="ghost" onClick={onCancel} disabled={isLoading}>
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          variant="ember"
+          fullWidth
+          isLoading={isLoading}
+          disabled={!stripe || !elements || !isDetailsComplete}
+        >
+          Pay {paymentService.formatPrice(amount)}
+        </Button>
       </div>
 
-      <form id="payment-form" onSubmit={handleSubmit}>
-        <PaymentElement
-          id="payment-element"
-          options={paymentElementOptions}
-          onChange={handleElementChange}
-        />
-
-        <div className="mt-6 flex gap-3">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onCancel}
-            disabled={isLoading}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            type="submit"
-            fullWidth
-            isLoading={isLoading}
-            disabled={!stripe || !elements || !isDetailsComplete}
-          >
-            Pay {paymentService.formatPrice(amount)}
-          </Button>
-        </div>
-
-        {message && (
-          <div
-            className={`mt-4 p-3 rounded-md text-sm ${
-              message.includes("succeeded")
-                ? "bg-green-50 text-green-800 border border-green-200"
-                : "bg-red-50 text-red-800 border border-red-200"
-            }`}
-          >
-            {message}
-          </div>
-        )}
-      </form>
-    </div>
+      <p className="mt-3 text-center text-xs text-txt-muted">
+        {modelName} · Payments are processed by Stripe.
+      </p>
+    </form>
   );
 };
