@@ -635,6 +635,28 @@ body {
   }
 }
 
+/* Home hero: the artwork prints in on load; the category ticker scrolls. */
+.marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-print {
+    animation: print-in 0.9s steps(18, end) 0.1s both;
+  }
+
+  .marquee-track {
+    animation: marquee 70s linear infinite;
+  }
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
 /* Dialog entrance: bottom sheet on phones, pop on larger screens. */
 @media (prefers-reduced-motion: no-preference) {
   .auth-panel {
