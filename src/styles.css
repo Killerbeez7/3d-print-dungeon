@@ -278,6 +278,40 @@ body {
    Components
    ========================================================================== */
 @layer components {
+  /* Text inputs, selects and textareas. Size them with h-* or py-*. */
+  .field {
+    display: block;
+    width: 100%;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--br-input);
+    background-color: var(--bg-page);
+    padding-inline: 0.75rem;
+    font-size: 0.875rem;
+    color: var(--txt-primary);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .field::placeholder {
+    color: var(--txt-muted);
+  }
+
+  .field:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.25);
+  }
+
+  .field[aria-invalid="true"] {
+    border-color: var(--error);
+  }
+
+  .field:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
   /* Chamfered (cut-corner) shape. --cut sets the corner size. */
   .chamfer {
     --cut: 8px;

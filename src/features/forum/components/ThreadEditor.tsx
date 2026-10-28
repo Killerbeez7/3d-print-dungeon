@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { FaSave, FaTimes } from "react-icons/fa";
+import { Check } from "lucide-react";
 
 import { Button } from "@/components";
 
@@ -105,14 +105,21 @@ export function ThreadEditor({
     void onSubmit(data);
   };
 
+  const labelClass = "mb-1.5 block text-sm font-medium text-txt-secondary";
+  const errorText = (field: string) =>
+    errors[field] && (
+      <p id={`${field}-error`} className="mt-1.5 text-sm text-error">
+        {errors[field]}
+      </p>
+    );
+  const describedBy = (field: string) => (errors[field] ? `${field}-error` : undefined);
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Title */}
       <div>
-        <label htmlFor="title" className="block text-sm font-medium text-txt-primary">
-          Thread Title
+        <label htmlFor="title" className={labelClass}>
+          Title
         </label>
-
         <input
           id="title"
           name="title"
@@ -120,76 +127,64 @@ export function ThreadEditor({
           value={formData.title}
           onChange={handleChange}
           disabled={isLoading}
-          placeholder="Enter a descriptive title"
+          placeholder="Ask a question or name the topic"
           aria-invalid={Boolean(errors.title)}
-          className={`mt-2 block w-full rounded-lg border bg-surface-card px-3 py-2.5 text-sm text-txt-primary shadow-sm outline-none transition placeholder:text-txt-muted focus:border-focus focus:ring-2 focus:ring-focus/15 disabled:cursor-not-allowed disabled:opacity-60 ${
-            errors.title ? "border-error" : "border-br-secondary"
-          }`}
+          aria-describedby={describedBy("title")}
+          className="field h-12 text-base"
         />
-
-        {errors.title && <p className="mt-2 text-sm text-error">{errors.title}</p>}
+        {errorText("title")}
       </div>
 
-      {/* Category */}
-      <div>
-        <label
-          htmlFor="categoryId"
-          className="block text-sm font-medium text-txt-primary"
-        >
-          Category
-        </label>
+      <div className="grid gap-6 sm:grid-cols-2">
+        <div>
+          <label htmlFor="categoryId" className={labelClass}>
+            Category
+          </label>
+          <select
+            id="categoryId"
+            name="categoryId"
+            value={formData.categoryId}
+            onChange={handleChange}
+            disabled={isLoading}
+            aria-invalid={Boolean(errors.categoryId)}
+            aria-describedby={describedBy("categoryId")}
+            className="field h-11"
+          >
+            <option value="">Choose a category</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+          {errorText("categoryId")}
+        </div>
 
-        <select
-          id="categoryId"
-          name="categoryId"
-          value={formData.categoryId}
-          onChange={handleChange}
-          disabled={isLoading}
-          aria-invalid={Boolean(errors.categoryId)}
-          className={`mt-2 block w-full rounded-lg border bg-surface-card px-3 py-2.5 text-sm text-txt-primary shadow-sm outline-none transition focus:border-focus focus:ring-2 focus:ring-focus/15 disabled:cursor-not-allowed disabled:opacity-60 ${
-            errors.categoryId ? "border-error" : "border-br-secondary"
-          }`}
-        >
-          <option value="">Select a category</option>
-
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-
-        {errors.categoryId && (
-          <p className="mt-2 text-sm text-error">{errors.categoryId}</p>
-        )}
+        <div>
+          <label htmlFor="tags" className={labelClass}>
+            Tags <span className="font-normal text-txt-muted">(optional)</span>
+          </label>
+          <input
+            id="tags"
+            name="tags"
+            type="text"
+            value={tags}
+            onChange={handleTagsChange}
+            disabled={isLoading}
+            placeholder="resin, supports, help"
+            aria-describedby="tags-hint"
+            className="field h-11"
+          />
+          <p id="tags-hint" className="mt-1.5 text-xs text-txt-muted">
+            Separate tags with commas.
+          </p>
+        </div>
       </div>
 
-      {/* Tags */}
       <div>
-        <label htmlFor="tags" className="block text-sm font-medium text-txt-primary">
-          Tags
+        <label htmlFor="content" className={labelClass}>
+          Message
         </label>
-
-        <input
-          id="tags"
-          name="tags"
-          type="text"
-          value={tags}
-          onChange={handleTagsChange}
-          disabled={isLoading}
-          placeholder="e.g. question, help, tutorial"
-          className="mt-2 block w-full rounded-lg border border-br-secondary bg-surface-card px-3 py-2.5 text-sm text-txt-primary shadow-sm outline-none transition placeholder:text-txt-muted focus:border-focus focus:ring-2 focus:ring-focus/15 disabled:cursor-not-allowed disabled:opacity-60"
-        />
-
-        <p className="mt-2 text-xs text-txt-muted">Separate tags with commas.</p>
-      </div>
-
-      {/* Content */}
-      <div>
-        <label htmlFor="content" className="block text-sm font-medium text-txt-primary">
-          Content
-        </label>
-
         <textarea
           id="content"
           name="content"
@@ -197,41 +192,26 @@ export function ThreadEditor({
           onChange={handleChange}
           disabled={isLoading}
           rows={10}
-          placeholder="Write your thread content here..."
+          placeholder="Give enough detail for someone to help: printer, material, settings, photos of the problem."
           aria-invalid={Boolean(errors.content)}
-          className={`mt-2 block w-full resize-y rounded-lg border bg-surface-card px-4 py-3 text-sm leading-relaxed text-txt-primary shadow-sm outline-none transition placeholder:text-txt-muted focus:border-focus focus:ring-2 focus:ring-focus/15 disabled:cursor-not-allowed disabled:opacity-60 ${
-            errors.content ? "border-error" : "border-br-secondary"
-          }`}
+          aria-describedby={describedBy("content")}
+          className="field resize-y py-3 leading-relaxed"
         />
-
-        {errors.content && <p className="mt-2 text-sm text-error">{errors.content}</p>}
-
-        <p className="mt-2 text-xs text-txt-muted">
-          Basic formatting is supported: **bold**, *italic*, [link](url)
-        </p>
+        {errorText("content")}
       </div>
 
-      {/* Actions */}
-      <div className="flex flex-wrap justify-end gap-3 border-t border-br-subtle pt-5">
+      <div className="flex flex-wrap justify-end gap-2 border-t border-br-subtle pt-5">
         {onCancel && (
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onCancel}
-            disabled={isLoading}
-            leftIcon={<FaTimes size={12} aria-hidden="true" />}
-          >
+          <Button type="button" variant="ghost" onClick={onCancel} disabled={isLoading}>
             Cancel
           </Button>
         )}
-
         <Button
           type="submit"
-          disabled={isLoading}
           isLoading={isLoading}
-          leftIcon={<FaSave size={12} aria-hidden="true" />}
+          leftIcon={<Check className="size-4" aria-hidden="true" />}
         >
-          {isEdit ? "Save Changes" : "Create Thread"}
+          {isEdit ? "Save changes" : "Post thread"}
         </Button>
       </div>
     </form>

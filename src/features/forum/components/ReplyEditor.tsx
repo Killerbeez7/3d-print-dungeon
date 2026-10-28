@@ -1,5 +1,5 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
-import { FaReply, FaTimes } from "react-icons/fa";
+import { useId, useState, type ChangeEvent, type FormEvent } from "react";
+import { Send } from "lucide-react";
 
 import { Button } from "@/components";
 
@@ -22,6 +22,7 @@ export function ReplyEditor({
   isEdit = false,
   replyId = null,
 }: ReplyEditorProps) {
+  const fieldId = useId();
   const [content, setContent] = useState(initialContent);
   const [validationError, setValidationError] = useState<string | null>(null);
 
@@ -104,50 +105,41 @@ export function ReplyEditor({
     }
   };
 
+  const errorText = validationError ?? mutationError?.message;
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
-        <textarea
-          value={content}
-          onChange={handleChange}
-          disabled={isPending}
-          rows={5}
-          placeholder="Write your reply here..."
-          aria-invalid={Boolean(validationError || mutationError)}
-          className={`block w-full resize-y rounded-lg border bg-surface-card px-4 py-3 text-sm leading-relaxed text-txt-primary shadow-sm outline-none transition placeholder:text-txt-muted focus:border-focus focus:ring-2 focus:ring-focus/15 disabled:cursor-not-allowed disabled:opacity-60 ${
-            validationError || mutationError ? "border-error" : "border-br-secondary"
-          }`}
-        />
+    <form onSubmit={handleSubmit} className="space-y-3">
+      <label htmlFor={fieldId} className="sr-only">
+        Reply
+      </label>
+      <textarea
+        id={fieldId}
+        value={content}
+        onChange={handleChange}
+        disabled={isPending}
+        rows={5}
+        placeholder="Write your reply"
+        aria-invalid={Boolean(errorText)}
+        aria-describedby={errorText ? `${fieldId}-error` : undefined}
+        className="field resize-y py-3 leading-relaxed"
+      />
 
-        {validationError && <p className="mt-2 text-sm text-error">{validationError}</p>}
-
-        {mutationError && (
-          <p className="mt-2 text-sm text-error">{mutationError.message}</p>
-        )}
-
-        <p className="mt-2 text-xs text-txt-muted">
-          Basic formatting is supported: **bold**, *italic*, [link](url)
+      {errorText && (
+        <p id={`${fieldId}-error`} className="text-sm text-error">
+          {errorText}
         </p>
-      </div>
+      )}
 
-      <div className="flex flex-wrap justify-end gap-3">
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={onCancel}
-          disabled={isPending}
-          leftIcon={<FaTimes size={12} aria-hidden="true" />}
-        >
+      <div className="flex flex-wrap justify-end gap-2">
+        <Button type="button" variant="ghost" onClick={onCancel} disabled={isPending}>
           Cancel
         </Button>
-
         <Button
           type="submit"
-          disabled={isPending}
           isLoading={isPending}
-          leftIcon={<FaReply size={12} aria-hidden="true" />}
+          leftIcon={<Send className="size-4" aria-hidden="true" />}
         >
-          {isEdit ? "Update Reply" : "Post Reply"}
+          {isEdit ? "Save reply" : "Post reply"}
         </Button>
       </div>
     </form>
