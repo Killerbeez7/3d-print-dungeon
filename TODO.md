@@ -28,8 +28,12 @@ https://claude.ai/artifact/LuGUKVXqRe6iGmgMEUY5cZ
 
 - [ ] Deploy the new Firestore index for profile models (`uploaderId` + `createdAt`):
       `firebase deploy --only firestore:indexes`
-- [ ] Firebase Auth → Authorized domains: add the preview domain
-      (`print-dungeon-3d--claude-redesign-v2-*.web.app`) so Google sign-in works on previews
+- [ ] Deploy the Cloud Functions fix (stops logging new users' passwords in plain text):
+      `firebase deploy --only functions`
+- [ ] GitHub → Settings → Secrets: delete `FIREBASE_WEB_CONFIG`. It held an invalid API key
+      and previews now read the web config from Firebase Hosting instead
+- [ ] Firebase Auth → Authorized domains: add each new preview domain
+      (`print-dungeon-3d--<branch>-*.web.app`) so Google sign-in works there; v1 and v2 are added
 - [ ] Firebase Auth → Templates → password reset → action URL: set it to
       `https://printdungeon.com/reset-password` to use the site's own reset page (now routed)
 
