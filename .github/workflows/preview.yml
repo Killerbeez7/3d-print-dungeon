@@ -1,13 +1,15 @@
 name: Preview deploy
 
-# Builds every claude/* branch and, when the Firebase secrets are set,
+# Builds every claude/* branch and, when the service account secret is set,
 # deploys it to its own Firebase Hosting preview channel. The live site
 # (printdungeon.com) is never touched by this workflow.
 #
 # Repository secrets (Settings > Secrets and variables > Actions):
 #   FIREBASE_SERVICE_ACCOUNT     service account JSON with the Firebase Hosting Admin role
-#   FIREBASE_WEB_CONFIG          contents of src/keys/firebase_key.json
 #   VITE_STRIPE_PUBLISHABLE_KEY  optional, Stripe publishable key (pk_...)
+#
+# The Firebase web config is not a secret (it ships in every page). It is read
+# from the project's own Hosting site, so previews use the same keys as live.
 
 on:
   push:
@@ -23,8 +25,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       HAS_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
-      HAS_WEB_CONFIG: ${{ secrets.FIREBASE_WEB_CONFIG != '' }}
-      HAS_DEPLOY_SECRETS: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' && secrets.FIREBASE_WEB_CONFIG != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -36,13 +36,21 @@ jobs:
       - run: npm ci
 
       - name: Write Firebase web config
-        env:
-          FIREBASE_WEB_CONFIG: ${{ secrets.FIREBASE_WEB_CONFIG }}
         run: |
-          if [ -n "$FIREBASE_WEB_CONFIG" ]; then
-            printf '%s' "$FIREBASE_WEB_CONFIG" > src/keys/firebase_key.json
-          else
-            cp src/keys/firebase_key.example.json src/keys/firebase_key.json
+          curl -fsS --retry 3 https://print-dungeon-3d.web.app/__/firebase/init.json \
+            | jq 'with_entries(select(.value != ""))' > src/keys/firebase_key.json
+          jq -e '.apiKey and .projectId == "print-dungeon-3d"' src/keys/firebase_key.json > /dev/null
+
+      # Fail here rather than ship a preview where nobody can sign in.
+      - name: Check the Firebase API key
+        run: |
+          key=$(jq -r .apiKey src/keys/firebase_key.json)
+          status=$(curl -sS -o "$RUNNER_TEMP/auth-config.json" -w '%{http_code}' \
+            -H 'Referer: https://print-dungeon-3d.web.app/' \
+            "https://www.googleapis.com/identitytoolkit/v3/relyingparty/getProjectConfig?key=$key")
+          if [ "$status" != "200" ]; then
+            echo "::error::Firebase rejected the web API key (HTTP $status): $(jq -r '.error.message // empty' "$RUNNER_TEMP/auth-config.json")"
+            exit 1
           fi
 
       - run: npm run type-check
@@ -59,7 +67,7 @@ jobs:
 
       - name: Deploy to preview channel
         id: deploy
-        if: env.HAS_DEPLOY_SECRETS == 'true'
+        if: env.HAS_SERVICE_ACCOUNT == 'true'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
@@ -74,9 +82,7 @@ jobs:
           echo "Preview: ${{ steps.deploy.outputs.details_url }}" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Deploy skipped
-        if: env.HAS_DEPLOY_SECRETS != 'true'
+        if: env.HAS_SERVICE_ACCOUNT != 'true'
         run: |
-          echo "Build passed. Preview not deployed - missing repository secrets:" >> "$GITHUB_STEP_SUMMARY"
-          [ "$HAS_SERVICE_ACCOUNT" = "true" ] || echo "- FIREBASE_SERVICE_ACCOUNT" >> "$GITHUB_STEP_SUMMARY"
-          [ "$HAS_WEB_CONFIG" = "true" ] || echo "- FIREBASE_WEB_CONFIG" >> "$GITHUB_STEP_SUMMARY"
-          echo "::notice::Missing secrets - service account: $HAS_SERVICE_ACCOUNT, web config: $HAS_WEB_CONFIG"
+          echo "Build passed. Preview not deployed - missing repository secret FIREBASE_SERVICE_ACCOUNT" >> "$GITHUB_STEP_SUMMARY"
+          echo "::notice::Missing secret FIREBASE_SERVICE_ACCOUNT"
