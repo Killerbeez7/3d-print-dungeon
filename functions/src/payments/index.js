@@ -93,62 +93,6 @@ export const createPaymentIntent = onCall(
     }
 );
 
-// Create subscription
-export const createSubscription = onCall(
-    { secrets: [stripeSecretKey], invoker: "public" },
-    async (request) => {
-        try {
-            const { uid } = requireAuth(request);
-            const { priceId, paymentMethodId } = request.data;
-
-            validateRequiredFields(request.data, ["priceId"]);
-
-            const customerId = await getOrCreateStripeCustomerId(uid, request.auth.token);
-            const stripe = getStripe();
-
-            if (paymentMethodId) {
-                await stripe.paymentMethods.attach(paymentMethodId, {
-                    customer: customerId,
-                });
-                await stripe.customers.update(customerId, {
-                    invoice_settings: { default_payment_method: paymentMethodId },
-                });
-            }
-
-            const subscription = await stripe.subscriptions.create({
-                customer: customerId,
-                items: [{ price: priceId }],
-                payment_behavior: "default_incomplete",
-                payment_settings: { save_default_payment_method: "on_subscription" },
-                expand: ["latest_invoice.payment_intent"],
-            });
-
-            await db
-                .collection("subscriptions")
-                .doc(subscription.id)
-                .set({
-                    id: subscription.id,
-                    userId: uid,
-                    customerId,
-                    priceId,
-                    status: subscription.status,
-                    currentPeriodStart: new Date(
-                        subscription.current_period_start * 1000
-                    ),
-                    currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-                    createdAt: FieldValue.serverTimestamp(),
-                });
-
-            return {
-                subscriptionId: subscription.id,
-                clientSecret: subscription.latest_invoice.payment_intent.client_secret,
-            };
-        } catch (error) {
-            handleError(error, "createSubscription");
-        }
-    }
-);
-
 // Records a succeeded payment as a purchase. Safe to call more than once for
 // the same payment (from the browser and from the webhook): the purchase is
 // keyed by the payment intent id and written in a transaction.
