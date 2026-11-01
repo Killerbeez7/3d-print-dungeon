@@ -2,61 +2,65 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { FieldValue } from "firebase-admin/firestore";
 import { db } from "../shared/config.js";
+import { createHash } from "node:crypto";
 import { validateRequiredFields, handleError } from "../auth/utils.js";
 import { constants } from "../shared/constants.js";
 
-const { COOLDOWN_MS, BATCH_SIZE, VIEW_BUFFER_COLLECTION, CACHE_TTL } = constants;
+const { COOLDOWN_MS, BATCH_SIZE, VIEW_BUFFER_COLLECTION, RECENT_VIEWS_COLLECTION } = constants;
 
-// Cache for recent views
-const recentViewsCache = new Map();
+// Views count once per viewer per hour. The viewer is the signed-in account
+// or, for visitors, a hash of the IP address and the day; never an ID the
+// browser picks, so a script can't inflate counts by inventing viewers.
+const viewerKeyOf = (request) => {
+    if (request.auth?.uid) return `u_${request.auth.uid}`;
+    const ip = request.rawRequest?.ip ?? "unknown";
+    const day = new Date().toISOString().slice(0, 10);
+    return `ip_${createHash("sha256").update(`${ip}|${day}`).digest("hex").slice(0, 24)}`;
+};
 
-// Clean cache periodically
-setInterval(() => {
-    const now = Date.now();
-    for (const [key, timestamp] of recentViewsCache.entries()) {
-        if (now - timestamp > CACHE_TTL) {
-            recentViewsCache.delete(key);
-        }
-    }
-}, CACHE_TTL);
-
-// Hybrid view tracking - immediate update + buffer for analytics
 export const trackModelView = onCall(async (request) => {
     try {
-        const { modelId, viewerId } = request.data;
-
-        validateRequiredFields(request.data, ["modelId", "viewerId"]);
-
-        const viewKey = `${modelId}_${viewerId}`;
-        const now = Date.now();
-
-        // Check cache first
-        const lastView = recentViewsCache.get(viewKey);
-        if (lastView && now - lastView < COOLDOWN_MS) {
-            return { success: false, reason: "cooldown" };
+        const { modelId } = request.data ?? {};
+        if (typeof modelId !== "string" || !modelId || modelId.includes("/")) {
+            throw new HttpsError("invalid-argument", "Model ID is required.");
         }
 
-        // Use transaction for immediate update
-        await db.runTransaction(async (transaction) => {
-            const modelRef = db.collection("models").doc(modelId);
+        const viewerKey = viewerKeyOf(request);
+        const modelRef = db.collection("models").doc(modelId);
+        const recentRef = db.collection(RECENT_VIEWS_COLLECTION).doc(`${modelId}_${viewerKey}`);
+
+        const counted = await db.runTransaction(async (transaction) => {
+            const [modelDoc, recentDoc] = await Promise.all([
+                transaction.get(modelRef),
+                transaction.get(recentRef),
+            ]);
+            if (!modelDoc.exists) {
+                throw new HttpsError("not-found", "Model not found.");
+            }
+            const lastViewAt = recentDoc.exists ? recentDoc.get("at")?.toMillis() : 0;
+            if (lastViewAt && Date.now() - lastViewAt < COOLDOWN_MS) {
+                return false;
+            }
+
             transaction.update(modelRef, {
                 views: FieldValue.increment(1),
                 lastViewedAt: FieldValue.serverTimestamp(),
             });
+            transaction.set(recentRef, { at: FieldValue.serverTimestamp() });
 
-            // Log to buffer for analytics/deduplication
-            const viewBufferRef = db.collection(VIEW_BUFFER_COLLECTION).doc();
-            transaction.set(viewBufferRef, {
+            // Log to buffer for analytics
+            transaction.set(db.collection(VIEW_BUFFER_COLLECTION).doc(), {
                 modelId,
-                viewerId,
+                viewerId: viewerKey,
                 timestamp: FieldValue.serverTimestamp(),
                 processed: false,
             });
+            return true;
         });
 
-        recentViewsCache.set(viewKey, now);
-
-        return { success: true, message: "View tracked immediately" };
+        return counted
+            ? { success: true, message: "View tracked" }
+            : { success: false, reason: "cooldown" };
     } catch (error) {
         handleError(error, "trackModelView");
     }
@@ -162,16 +166,23 @@ export const cleanupViewBuffer = onSchedule("0 2 * * *", async () => {
             .limit(500)
             .get();
 
-        if (oldViews.empty) {
-            console.log("No old view buffer entries to clean up");
+        const oldRecentViews = await db
+            .collection(RECENT_VIEWS_COLLECTION)
+            .where("at", "<", oneDayAgo)
+            .limit(500)
+            .get();
+
+        const stale = [...oldViews.docs, ...oldRecentViews.docs];
+        if (stale.length === 0) {
+            console.log("No old view entries to clean up");
             return null;
         }
 
         const batch = db.batch();
-        oldViews.docs.forEach((doc) => batch.delete(doc.ref));
+        stale.forEach((doc) => batch.delete(doc.ref));
         await batch.commit();
 
-        console.log(`Cleaned up ${oldViews.size} old view buffer entries`);
+        console.log(`Cleaned up ${stale.length} old view entries`);
         return null;
     } catch (error) {
         console.error("Error cleaning up view buffer:", error);
