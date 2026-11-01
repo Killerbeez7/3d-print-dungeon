@@ -37,7 +37,6 @@ export const updateArtistProfile = onCall(async ({ auth, data }) => {
             updatedAt: now,
         };
         // Whitelist private fields if provided
-        if (artistData?.stripeConnectId) privateUpdates["stripeConnectId"] = artistData.stripeConnectId;
         if (artistData?.taxSettings) privateUpdates["taxSettings"] = artistData.taxSettings;
         if (artistData?.payoutSettings) privateUpdates["payoutSettings"] = artistData.payoutSettings;
         if (artistData?.commissionRates) privateUpdates["commissionRates"] = artistData.commissionRates;
