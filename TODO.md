@@ -53,6 +53,11 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 
 ## Firebase console / deploys (owner)
 
+- [ ] Stripe test secret key: it was printed by `firebase deploy --debug` (1 Nov 2026). Roll it in
+      Stripe (test mode → Developers → API keys), store the new one with
+      `firebase functions:secrets:set STRIPE_SECRET_KEY`, then remove the old copy from the
+      retired runtime config with `firebase functions:config:unset stripe`
+
 - [ ] Account clean-up: move billing to the main Google account, then remove fawin.angel7 from
       Project settings → Users and permissions
 - [ ] Service account keys: `firebase-adminsdk` has 4 active keys (2 from June 2025, 2 from
