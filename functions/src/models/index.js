@@ -1,6 +1,10 @@
 import admin from "firebase-admin";
 import { onDocumentCreated, onDocumentDeleted } from "firebase-functions/v2/firestore";
-import { onCall } from "firebase-functions/v2/https";
+import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { requireAuth } from "../auth/utils.js";
+import { originalPathOf } from "../shared/storagePaths.js";
+
+const DOWNLOAD_LINK_MINUTES = 5;
 
 // When a like is created, increment model.likes, uploader public stats.likesCount, and create notification
 export const onLikeCreated = onDocumentCreated("likes/{likeId}", async (event) => {
@@ -253,4 +257,69 @@ export const deleteModel = onCall({ maxInstances: 10 }, async (request) => {
         console.error("Error deleting model:", error);
         throw new Error(`Failed to delete model: ${error.message}`);
     }
+});
+
+// Short-lived download link for a model's original file. Free models: any
+// signed-in user. Paid models: the uploader, admins and buyers.
+export const getModelDownloadUrl = onCall(async (request) => {
+    const { uid, token } = requireAuth(request);
+    const { modelId } = request.data ?? {};
+    if (typeof modelId !== "string" || !modelId) {
+        throw new HttpsError("invalid-argument", "Model ID is required.");
+    }
+
+    const db = admin.firestore();
+    const modelSnap = await db.doc(`models/${modelId}`).get();
+    if (!modelSnap.exists) {
+        throw new HttpsError("not-found", "Model not found.");
+    }
+    const model = modelSnap.data();
+
+    const isOwner = model.uploaderId === uid;
+    const isAdmin = token.admin === true || token.super === true;
+    const isFree = !model.isPaid || !(Number(model.price) > 0);
+    let reason = isOwner ? "owner" : isAdmin ? "admin" : isFree ? "free" : null;
+    if (!reason) {
+        const purchase = await db.doc(`users/${uid}/purchases/${modelId}`).get();
+        if (purchase.exists) reason = "purchase";
+    }
+    if (!reason) {
+        throw new HttpsError("permission-denied", "Buy this model to download it.");
+    }
+
+    const path = originalPathOf(model);
+    if (!path) {
+        throw new HttpsError("not-found", "This model has no file to download.");
+    }
+
+    const fileName = (model.originalFileName || path.split("/").pop()).replace(
+        /[^\w.\- ]+/g,
+        "_"
+    );
+
+    let url;
+    try {
+        [url] = await admin
+            .storage()
+            .bucket()
+            .file(path)
+            .getSignedUrl({
+                version: "v4",
+                action: "read",
+                expires: Date.now() + DOWNLOAD_LINK_MINUTES * 60 * 1000,
+                responseDisposition: `attachment; filename="${fileName}"`,
+            });
+    } catch (error) {
+        console.error("getModelDownloadUrl: signing failed", error.code ?? error.message);
+        throw new HttpsError("unavailable", "Downloads are temporarily unavailable.");
+    }
+
+    await db.collection("downloads").add({
+        modelId,
+        userId: uid,
+        reason,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    return { url, fileName };
 });

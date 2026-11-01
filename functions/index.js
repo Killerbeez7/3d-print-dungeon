@@ -40,4 +40,4 @@ export const { createArtistProfile, updateArtistProfile, deleteArtistProfile } =
 export const { toggleFollow, getFollowStatus } = user;
 
 // Models functions
-export const { onLikeCreated, onLikeDeleted, deleteModel } = models;
+export const { onLikeCreated, onLikeDeleted, deleteModel, getModelDownloadUrl } = models;
