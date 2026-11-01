@@ -165,7 +165,7 @@ service cloud.firestore {
     // -------------- Comments --------------
     match /comments/{commentId} {
       allow read: if true;
-      allow create: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
       allow update, delete: if isSignedIn() 
         && (resource.data.userId == request.auth.uid || isAdmin());
     }
@@ -246,15 +246,20 @@ service cloud.firestore {
 
     match /forumThreads/{threadId} {
       allow read: if true;  // Public threads
-      allow create: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
       // Only thread author, moderators or admins can update/delete
       allow update, delete: if isSignedIn() && 
         (resource.data.authorId == request.auth.uid || isAdmin());
+      // Replying, deleting a reply and viewing move the counters by one.
+      allow update: if isSignedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["replyCount", "lastActivity", "views"])
+        && request.resource.data.get("replyCount", 0) - resource.data.get("replyCount", 0) in [-1, 0, 1]
+        && request.resource.data.get("views", 0) - resource.data.get("views", 0) in [0, 1];
     }
 
     match /forumReplies/{replyId} {
       allow read: if true;  // Public replies
-      allow create: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
       // Only reply author, moderators or admins can update/delete
       allow update, delete: if isSignedIn() && 
         (resource.data.authorId == request.auth.uid || isAdmin());
