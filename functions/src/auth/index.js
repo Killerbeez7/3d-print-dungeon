@@ -33,6 +33,16 @@ export const setUserRole = onCall(async (request) => {
             );
         }
 
+        // Only the roles the admin screen manages. Only a super admin
+        // can grant or remove admin, and super is never granted from here.
+        const ASSIGNABLE_ROLES = ["user", "artist", "moderator", "admin"];
+        if (!ASSIGNABLE_ROLES.includes(role)) {
+            throw new HttpsError("invalid-argument", "Unknown role.");
+        }
+        if (role === "admin" && request.auth.token.super !== true) {
+            throw new HttpsError("permission-denied", "Only a super admin can change admin access.");
+        }
+
         // Get current claims
         const user = await admin.auth().getUser(uid);
         const claims = { ...user.customClaims };
