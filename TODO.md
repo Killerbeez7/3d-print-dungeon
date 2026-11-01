@@ -53,6 +53,12 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 
 ## Firebase console / deploys (owner)
 
+- [ ] Account clean-up: move billing to the main Google account, then remove fawin.angel7 from
+      Project settings → Users and permissions
+- [ ] Service account keys: `firebase-adminsdk` has 4 active keys (2 from June 2025, 2 from
+      28 Oct 2026); each one gives full control of the project. Delete the ones not in use (keep
+      the one stored in GitHub for preview builds)
+
 - [ ] Deploy the new Firestore index for profile models (`uploaderId` + `createdAt`):
       `firebase deploy --only firestore:indexes`
 - [ ] GitHub → Settings → Secrets: delete `FIREBASE_WEB_CONFIG`. It held an invalid API key
