@@ -113,15 +113,11 @@ export const onLikeDeleted = onDocumentDeleted("likes/{likeId}", async (event) =
 
 // Delete model and all related data
 export const deleteModel = onCall({ maxInstances: 10 }, async (request) => {
-    const { modelId } = request.data;
-    const { uid } = request.auth;
+    const { uid, token } = requireAuth(request);
+    const { modelId } = request.data ?? {};
 
-    if (!uid) {
-        throw new Error("Unauthorized");
-    }
-
-    if (!modelId) {
-        throw new Error("Model ID is required");
+    if (typeof modelId !== "string" || !modelId) {
+        throw new HttpsError("invalid-argument", "Model ID is required.");
     }
 
     const db = admin.firestore();
@@ -133,21 +129,15 @@ export const deleteModel = onCall({ maxInstances: 10 }, async (request) => {
         const modelSnap = await modelRef.get();
 
         if (!modelSnap.exists) {
-            throw new Error("Model not found");
+            throw new HttpsError("not-found", "Model not found.");
         }
 
         const model = modelSnap.data();
 
-        // Check if user is authorized to delete this model
-        if (model.uploaderId !== uid) {
-            // Check if user is admin
-            const userRef = db.doc(`users/${uid}`);
-            const userSnap = await userRef.get();
-            const userData = userSnap.data();
-
-            if (!userData?.roles?.includes("admin")) {
-                throw new Error("Unauthorized to delete this model");
-            }
+        // Owners and admins (custom claims, never a field users can write).
+        const isAdmin = token.admin === true || token.super === true;
+        if (model.uploaderId !== uid && !isAdmin) {
+            throw new HttpsError("permission-denied", "You can't delete this model.");
         }
 
         // Delete in a transaction to ensure consistency
@@ -185,24 +175,16 @@ export const deleteModel = onCall({ maxInstances: 10 }, async (request) => {
                 transaction.delete(doc.ref);
             });
 
-            // Remove from all users' favorites and uploads
-            const usersQuery = db.collection("users");
-            const usersSnap = await transaction.get(usersQuery);
-            usersSnap.docs.forEach((userDoc) => {
-                const userData = userDoc.data();
-                const updates = {};
-
-                if (userData.favorites && userData.favorites.includes(modelId)) {
-                    updates.favorites = admin.firestore.FieldValue.arrayRemove(modelId);
-                }
-
-                if (userData.uploads && userData.uploads.includes(modelId)) {
-                    updates.uploads = admin.firestore.FieldValue.arrayRemove(modelId);
-                }
-
-                if (Object.keys(updates).length > 0) {
-                    transaction.update(userDoc.ref, updates);
-                }
+            // Remove from the uploader's list (only users who have it, not
+            // every user document).
+            const uploadersQuery = db
+                .collection("users")
+                .where("uploads", "array-contains", modelId);
+            const uploadersSnap = await transaction.get(uploadersQuery);
+            uploadersSnap.docs.forEach((userDoc) => {
+                transaction.update(userDoc.ref, {
+                    uploads: admin.firestore.FieldValue.arrayRemove(modelId),
+                });
             });
 
             // Delete the model document
@@ -247,8 +229,9 @@ export const deleteModel = onCall({ maxInstances: 10 }, async (request) => {
 
         return { success: true, message: "Model deleted successfully" };
     } catch (error) {
-        console.error("Error deleting model:", error);
-        throw new Error(`Failed to delete model: ${error.message}`);
+        if (error instanceof HttpsError) throw error;
+        console.error("Error deleting model:", error.code ?? error.message);
+        throw new HttpsError("internal", "Could not delete the model.");
     }
 });
 
