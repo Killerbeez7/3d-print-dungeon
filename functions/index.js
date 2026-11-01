@@ -1,3 +1,4 @@
+import "./src/shared/globalOptions.js";
 import * as payments from "./src/payments/index.js";
 import * as analytics from "./src/analytics/index.js";
 import * as auth from "./src/auth/index.js";
