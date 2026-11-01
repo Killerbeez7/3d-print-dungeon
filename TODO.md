@@ -26,10 +26,10 @@ https://claude.ai/artifact/LuGUKVXqRe6iGmgMEUY5cZ
 
 ## Security fixes: deploy in this order (owner)
 
-Today anyone can download every original STL and a buyer can choose the price they pay. The
-fixes are on the branch; nothing reaches the live site until these steps. Steps 3 and 4 belong
-together: the new site uploads to a folder the old rules don't allow, and the old site uploads
-to a folder the new rules don't allow.
+Today anyone can download every original STL, grant themselves any paid model, choose the price
+they pay, make themselves admin and post as other users. The fixes are on the branch; nothing
+reaches the live site until these steps. Steps 3 and 4 belong together: the new site uploads to a
+folder the old rules don't allow, and the old site uploads to a folder the new rules don't allow.
 
 1. [ ] Let the functions sign download links: Google Cloud console → IAM & Admin → Service
        accounts → `PROJECT_NUMBER-compute@developer.gserviceaccount.com` → Permissions → grant
@@ -37,14 +37,18 @@ to a folder the new rules don't allow.
        **IAM Service Account Credentials API**. (Project number: Firebase console → Project
        settings.)
 2. [ ] `firebase deploy --only functions`. It also stops logging new users' passwords. Say yes
-       when it asks to delete `testStripeConnection`.
+       when it asks to delete `testStripeConnection` and `createSubscription`.
 3. [ ] `firebase deploy --only firestore:rules,storage`
 4. [ ] Deploy the site (merge the branch, then `firebase deploy --only hosting`)
 5. [ ] Move the existing originals out of the public folder, from `functions/`:
        `GOOGLE_APPLICATION_CREDENTIALS=../src/keys/service_key.json node scripts/protect-original-files.js`
        (dry run), then the same with `--apply`. Add `--delete-orphans` to also delete originals no
        listing uses.
-6. [ ] Stripe dashboard → Developers → Webhooks → the `stripeWebhook` endpoint: add the
+6. [ ] Give the existing listings light 3D previews and delete their full-detail viewer files,
+       from the repo root:
+       `GOOGLE_APPLICATION_CREDENTIALS=src/keys/service_key.json npx tsx scripts/make-light-previews.ts`
+       (dry run), then the same with `--apply`. Run it after step 5.
+7. [ ] Stripe dashboard → Developers → Webhooks → the `stripeWebhook` endpoint: add the
        `payment_intent.succeeded` event, so purchases are recorded even if the buyer closes the tab
 
 ## Firebase console / deploys (owner)
@@ -60,8 +64,14 @@ to a folder the new rules don't allow.
 
 ## Engineering follow-ups
 
-- [ ] Light previews: the 3D viewer still loads full-detail files (50–165 MB) that can be
-      converted back to a printable model. Next round
+- [ ] Light previews show fine detail with fewer triangles if the detail is baked into a
+      normal map; that would allow a lower triangle count (more protection) at the same look
+- [ ] Add `.3mf` (common for Bambu printers) to the allowed upload formats; most other formats
+      in the list can't be previewed in 3D
+- [ ] `checkEmailAvailability` lets anyone check whether an email has an account (needed for the
+      sign-up form; consider rate limiting)
+- [ ] Following/unfollowing or liking/unliking repeatedly sends a notification each time
+- [ ] Anyone signed in can delete anyone's forum thread like (`forumThreadLikes` rules)
 - [ ] Creator payouts: sales go to the platform's Stripe account; nothing pays creators yet
       (Stripe Connect destination charges)
 - [ ] New listings still default to US dollars; the plan says euro
