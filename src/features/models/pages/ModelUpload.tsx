@@ -46,7 +46,6 @@ export function ModelUpload() {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [files, setFiles] = useState<File[]>([]);
   const [posterDataUrl, setPosterDataUrl] = useState<string | null>(null);
-  const [convertedBlob, setConvertedBlob] = useState<Blob | null>(null);
   const [showSellerVerification, setShowSellerVerification] = useState(false);
   const modelViewerLoaded = useModelViewer("timeout");
   const [isPollingConnectStatus, setIsPollingConnectStatus] = useState(false);
@@ -146,7 +145,6 @@ export function ModelUpload() {
     setUploadProgress(0);
     setFiles([]);
     setPosterDataUrl(null);
-    setConvertedBlob(null);
     setShowSellerVerification(false);
 
     setModelData({ ...INITIAL_MODEL_DATA });
@@ -247,15 +245,12 @@ export function ModelUpload() {
         try {
           const { blob } = await finalConvertFileToGLB(files[0]);
           blobToLoad = blob;
-          setConvertedBlob(blob);
         } catch (err) {
           console.error("Conversion to .glb failed:", err);
           return () => {
             // No cleanup needed
           };
         }
-      } else {
-        setConvertedBlob(null);
       }
 
       const objUrl = URL.createObjectURL(blobToLoad);
@@ -450,7 +445,6 @@ export function ModelUpload() {
         uploaderDisplayName: currentUser?.displayName ?? "",
         onProgress: setUploadProgress,
         posterBlob: posterBlob ?? undefined,
-        preConvertedFile: convertedBlob ?? undefined,
         price: modelData.price,
         isPaid: modelData.isPaid,
         isAI: modelData.isAI,

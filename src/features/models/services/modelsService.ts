@@ -17,7 +17,8 @@ import {
 import { db, functions, storage } from "@/config/firebaseConfig";
 import { STORAGE_PATHS } from "@/constants/storagePaths";
 import type { ModelUpdateData } from "@/features/models/types/model";
-import { finalConvertFileToGLB } from "@/features/models/utils/converter";
+import { fileToTriangles } from "@/features/models/utils/converter";
+import { makeLightPreview } from "@/features/models/utils/lightPreview";
 
 const CACHE_CONTROL = "public,max-age=31536000,immutable";
 
@@ -67,7 +68,6 @@ export interface CreateModelParams {
     uploaderDisplayName: string;
     onProgress?: (progress: number) => void;
     posterBlob?: Blob;
-    preConvertedFile?: Blob;
     price?: number;
     isPaid?: boolean;
     isAI?: boolean;
@@ -95,7 +95,6 @@ export async function createAdvancedModel({
     uploaderDisplayName,
     onProgress,
     posterBlob,
-    preConvertedFile,
     price = 0,
     isPaid = false,
     isAI = false,
@@ -124,28 +123,27 @@ export async function createAdvancedModel({
         }
     );
 
-    // Convert STL/OBJ models to GLB when needed.
-    const lowerFileName = file.name.toLowerCase();
-
+    // Public 3D preview: a reduced copy (see lightPreview.ts), never the
+    // printable original. Formats the viewer can't show get images only.
     let convertedFileUrl = "";
+    let previewTriangles: number | null = null;
+    let sourceTriangles: number | null = null;
 
-    if (
-        lowerFileName.endsWith(".stl") ||
-        lowerFileName.endsWith(".obj")
-    ) {
-        const convertedBlob =
-            preConvertedFile ?? (await finalConvertFileToGLB(file)).blob;
+    const triangles = await fileToTriangles(file);
+    if (triangles) {
+        const preview = await makeLightPreview(triangles);
+        previewTriangles = preview.triangles;
+        sourceTriangles = preview.sourceTriangles;
 
         const baseName = file.name.replace(/\.[^.]+$/, "");
-
-        const convertedRef = ref(
+        const previewRef = ref(
             storage,
-            `${STORAGE_PATHS.CONVERTED}/${uploadKey}/${baseName}.glb`
+            `${STORAGE_PATHS.CONVERTED}/${uploadKey}/${baseName}-preview.glb`
         );
 
         convertedFileUrl = await uploadAndGetUrl(
-            convertedRef,
-            convertedBlob,
+            previewRef,
+            new Blob([preview.glb], { type: "model/gltf-binary" }),
             "model/gltf-binary",
             (snapshot) => {
                 const progress =
@@ -156,24 +154,7 @@ export async function createAdvancedModel({
             }
         );
     } else {
-        // GLB/GLTF files are viewable as they are; the viewer gets a public copy.
-        const viewerRef = ref(
-            storage,
-            `${STORAGE_PATHS.CONVERTED}/${uploadKey}/${file.name}`
-        );
-
-        convertedFileUrl = await uploadAndGetUrl(
-            viewerRef,
-            file,
-            file.type || "model/gltf-binary",
-            (snapshot) => {
-                const progress =
-                    20 +
-                    (snapshot.bytesTransferred / snapshot.totalBytes) * 20;
-
-                progressFn(progress);
-            }
-        );
+        progressFn(40);
     }
 
     // Upload primary and additional renders.
@@ -253,6 +234,9 @@ export async function createAdvancedModel({
         originalFileName: file.name,
         originalFileSize: file.size,
         convertedFileUrl,
+        previewTriangles,
+        sourceTriangles,
+        previewVersion: triangles ? 1 : null,
         renderPrimaryUrl,
         renderExtraUrls,
         posterUrl,

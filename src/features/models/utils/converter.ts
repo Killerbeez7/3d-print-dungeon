@@ -123,3 +123,39 @@ function centerMesh(
     mesh.position.set(-centerX, -centerY, -centerZ);
     return mesh;
 }
+
+/**
+ * All triangles of an STL or OBJ file as one flat position list, ready for
+ * makeLightPreview. Null for formats the 3D preview doesn't support.
+ */
+export async function fileToTriangles(file: File): Promise<Float32Array | null> {
+    const lowerName = file.name.toLowerCase();
+    if (!lowerName.endsWith(".stl") && !lowerName.endsWith(".obj")) return null;
+
+    const { STLLoader, OBJLoader } = await loadThree();
+    const buffer = await file.arrayBuffer();
+
+    if (lowerName.endsWith(".stl")) {
+        const geometry = new STLLoader().parse(buffer);
+        return geometry.getAttribute("position").array as Float32Array;
+    }
+
+    const object = new OBJLoader().parse(new TextDecoder().decode(buffer)) as import("three").Group;
+    object.updateMatrixWorld(true);
+    const parts: Float32Array[] = [];
+    object.traverse((child: import("three").Object3D) => {
+        const mesh = child as import("three").Mesh;
+        if (!mesh.isMesh) return;
+        const geometry = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
+        geometry.applyMatrix4(mesh.matrixWorld);
+        parts.push(geometry.getAttribute("position").array as Float32Array);
+    });
+
+    const soup = new Float32Array(parts.reduce((total, part) => total + part.length, 0));
+    let offset = 0;
+    for (const part of parts) {
+        soup.set(part, offset);
+        offset += part.length;
+    }
+    return soup;
+}
