@@ -2,7 +2,7 @@ import admin from "firebase-admin";
 import { onDocumentCreated, onDocumentDeleted } from "firebase-functions/v2/firestore";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { requireAuth } from "../auth/utils.js";
-import { originalPathOf } from "../shared/storagePaths.js";
+import { originalPathOf, pathFromDownloadUrl } from "../shared/storagePaths.js";
 
 const DOWNLOAD_LINK_MINUTES = 5;
 
@@ -209,46 +209,39 @@ export const deleteModel = onCall({ maxInstances: 10 }, async (request) => {
             transaction.delete(modelRef);
         });
 
-        // Delete files from storage (outside transaction for better performance)
-        const fileNames = [];
-        if (model.originalFileUrl)
-            fileNames.push(model.originalFileUrl.split("/").pop()?.split("?")[0]);
-        if (model.convertedFileUrl)
-            fileNames.push(model.convertedFileUrl.split("/").pop()?.split("?")[0]);
-        if (model.renderPrimaryUrl)
-            fileNames.push(model.renderPrimaryUrl.split("/").pop()?.split("?")[0]);
-        if (model.posterUrl)
-            fileNames.push(model.posterUrl.split("/").pop()?.split("?")[0]);
+        // Delete files from storage (outside the transaction). Media shared with
+        // another listing stays.
+        const mediaUrls = [
+            model.convertedFileUrl,
+            model.renderPrimaryUrl,
+            model.posterUrl,
+            ...(Array.isArray(model.renderExtraUrls) ? model.renderExtraUrls : []),
+        ].filter((url) => typeof url === "string" && url);
 
-        if (model.renderExtraUrls && Array.isArray(model.renderExtraUrls)) {
-            model.renderExtraUrls.forEach((url) => {
-                fileNames.push(url.split("/").pop()?.split("?")[0]);
-            });
+        const sharedUrls = new Set();
+        for (const url of mediaUrls) {
+            const [converted, primary, poster, extra] = await Promise.all([
+                db.collection("models").where("convertedFileUrl", "==", url).limit(1).get(),
+                db.collection("models").where("renderPrimaryUrl", "==", url).limit(1).get(),
+                db.collection("models").where("posterUrl", "==", url).limit(1).get(),
+                db.collection("models").where("renderExtraUrls", "array-contains", url).limit(1).get(),
+            ]);
+            if (!converted.empty || !primary.empty || !poster.empty || !extra.empty) {
+                sharedUrls.add(url);
+            }
         }
 
         const storagePaths = [
-            `original/${fileNames[0]}`,
-            `converted/${fileNames[1]}`,
-            `render-primary/${fileNames[2]}`,
-            `posters/${fileNames[3]}`,
-        ];
+            originalPathOf(model),
+            ...mediaUrls.filter((url) => !sharedUrls.has(url)).map(pathFromDownloadUrl),
+        ].filter(Boolean);
 
-        if (model.renderExtraUrls && Array.isArray(model.renderExtraUrls)) {
-            model.renderExtraUrls.forEach((url, i) => {
-                storagePaths.push(`render-extras/${fileNames[4 + i]}`);
-            });
-        }
-
-        // Delete files from storage
         const bucket = storage.bucket();
-        for (const path of storagePaths) {
-            if (path && typeof path === "string") {
-                try {
-                    await bucket.file(path).delete();
-                } catch (error) {
-                    // Ignore if file doesn't exist
-                    console.log(`File ${path} not found, skipping deletion`);
-                }
+        for (const path of new Set(storagePaths)) {
+            try {
+                await bucket.file(path).delete();
+            } catch {
+                console.log(`File ${path} not found, skipping deletion`);
             }
         }
 
