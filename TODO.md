@@ -24,12 +24,33 @@ https://claude.ai/artifact/LuGUKVXqRe6iGmgMEUY5cZ
 - [ ] Social profile URLs if you want them in the footer
 - [ ] Stripe publishable key for the production build (`VITE_STRIPE_PUBLISHABLE_KEY`)
 
+## Security fixes: deploy in this order (owner)
+
+Today anyone can download every original STL and a buyer can choose the price they pay. The
+fixes are on the branch; nothing reaches the live site until these steps. Steps 3 and 4 belong
+together: the new site uploads to a folder the old rules don't allow, and the old site uploads
+to a folder the new rules don't allow.
+
+1. [ ] Let the functions sign download links: Google Cloud console → IAM & Admin → Service
+       accounts → `PROJECT_NUMBER-compute@developer.gserviceaccount.com` → Permissions → grant
+       that same account the role **Service Account Token Creator**. Also enable the
+       **IAM Service Account Credentials API**. (Project number: Firebase console → Project
+       settings.)
+2. [ ] `firebase deploy --only functions`. It also stops logging new users' passwords. Say yes
+       when it asks to delete `testStripeConnection`.
+3. [ ] `firebase deploy --only firestore:rules,storage`
+4. [ ] Deploy the site (merge the branch, then `firebase deploy --only hosting`)
+5. [ ] Move the existing originals out of the public folder, from `functions/`:
+       `GOOGLE_APPLICATION_CREDENTIALS=../src/keys/service_key.json node scripts/protect-original-files.js`
+       (dry run), then the same with `--apply`. Add `--delete-orphans` to also delete originals no
+       listing uses.
+6. [ ] Stripe dashboard → Developers → Webhooks → the `stripeWebhook` endpoint: add the
+       `payment_intent.succeeded` event, so purchases are recorded even if the buyer closes the tab
+
 ## Firebase console / deploys (owner)
 
 - [ ] Deploy the new Firestore index for profile models (`uploaderId` + `createdAt`):
       `firebase deploy --only firestore:indexes`
-- [ ] Deploy the Cloud Functions fix (stops logging new users' passwords in plain text):
-      `firebase deploy --only functions`
 - [ ] GitHub → Settings → Secrets: delete `FIREBASE_WEB_CONFIG`. It held an invalid API key
       and previews now read the web config from Firebase Hosting instead
 - [ ] Firebase Auth → Authorized domains: add each new preview domain
@@ -39,11 +60,18 @@ https://claude.ai/artifact/LuGUKVXqRe6iGmgMEUY5cZ
 
 ## Engineering follow-ups
 
+- [ ] Light previews: the 3D viewer still loads full-detail files (50–165 MB) that can be
+      converted back to a printable model. Next round
+- [ ] Creator payouts: sales go to the platform's Stripe account; nothing pays creators yet
+      (Stripe Connect destination charges)
+- [ ] New listings still default to US dollars; the plan says euro
+- [ ] Deleting a listing removes it for its buyers too; keep purchased files available
+- [ ] Admin "delete all models" script still uses the old file paths
 - [ ] Artists list loads up to 200 user documents one by one (`fetchArtistsForSearch`); move to
       a single query on public profiles with `isArtist == true`
 - [ ] Search sorting: the old sort menu was removed because `fetchModels` ignores `sortBy`;
       add server-side sorting before bringing it back
-- [ ] Pre-existing lint errors (7) and warnings (14), e.g. unused `ModelData` in
+- [ ] Pre-existing lint errors (6) and warnings (14), e.g. unused `ModelData` in
       `useFetchUserModels`, `no-console` disables
 
 ## Design system follow-ups
