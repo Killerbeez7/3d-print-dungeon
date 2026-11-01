@@ -17,8 +17,6 @@ import {
 import { db, functions, storage } from "@/config/firebaseConfig";
 import { STORAGE_PATHS } from "@/constants/storagePaths";
 import type { ModelUpdateData } from "@/features/models/types/model";
-import { fileToTriangles } from "@/features/models/utils/converter";
-import { makeLightPreview } from "@/features/models/utils/lightPreview";
 
 const CACHE_CONTROL = "public,max-age=31536000,immutable";
 
@@ -129,6 +127,11 @@ export async function createAdvancedModel({
     let previewTriangles: number | null = null;
     let sourceTriangles: number | null = null;
 
+    // Loaded here so the mesh tools only download when someone uploads.
+    const [{ fileToTriangles }, { makeLightPreview }] = await Promise.all([
+        import("@/features/models/utils/converter"),
+        import("@/features/models/utils/lightPreview"),
+    ]);
     const triangles = await fileToTriangles(file);
     if (triangles) {
         const preview = await makeLightPreview(triangles);
