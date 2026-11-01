@@ -37,15 +37,25 @@ service cloud.firestore {
       allow create: if isSignedIn() && isOwner(userId);
       allow update, delete: if isAdmin();
 
-      // Public profile - readable by anyone
+      // Public profile - readable by anyone. Owners edit the profile text and
+      // picture; stats, username and artist status are set on the server.
       match /public/{docId} {
         allow read: if true;
-        allow write: if isSignedIn() && isOwner(userId);
+        allow update: if isSignedIn() && isOwner(userId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            "displayName", "bio", "location", "socialLinks", "photoURL", "lastActiveAt", "updatedAt"
+          ]);
+        allow create, update, delete: if isAdmin();
       }
 
-      // Private profile - only owner or admins
+      // Private profile - only owner or admins can read. Owners only change
+      // their favorites; roles, account status and payout accounts are set on
+      // the server.
       match /private/{docId} {
-        allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
+        allow read: if isSignedIn() && (isOwner(userId) || isAdmin());
+        allow update: if isSignedIn() && isOwner(userId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["favorites"]);
+        allow create, update, delete: if isAdmin();
       }
 
       // Settings - only owner or admins
@@ -58,9 +68,11 @@ service cloud.firestore {
         allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
       }
 
-      // Purchases (private)
+      // Purchases (private). Written only by the payment functions: a purchase
+      // record is what unlocks a paid model's download.
       match /purchases/{purchaseId} {
-        allow read, write: if isSignedIn() && (isOwner(userId) || isAdmin());
+        allow read: if isSignedIn() && (isOwner(userId) || isAdmin());
+        allow write: if false;
       }
 
       // Uploads (private metadata per user)
