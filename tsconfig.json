@@ -29,7 +29,8 @@
         "vite.config.ts",
         "__tests__",
         "src/types/react.d.ts",
-        "scripts/switch-firebase-config.js"
+        "scripts/switch-firebase-config.js",
+        "scripts/make-light-previews.ts"
     ],
     "exclude": [
         "dist",
