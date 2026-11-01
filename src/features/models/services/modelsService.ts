@@ -21,12 +21,12 @@ import { finalConvertFileToGLB } from "@/features/models/utils/converter";
 
 const CACHE_CONTROL = "public,max-age=31536000,immutable";
 
-function uploadAndGetUrl(
+function uploadFile(
     fileRef: StorageReference,
     data: Blob,
     contentType: string,
     onProgress?: (snapshot: UploadTaskSnapshot) => void
-): Promise<string> {
+): Promise<void> {
     const task = uploadBytesResumable(fileRef, data, {
         contentType: contentType || "application/octet-stream",
         cacheControl: CACHE_CONTROL,
@@ -39,13 +39,19 @@ function uploadAndGetUrl(
                 onProgress?.(snapshot);
             },
             reject,
-            () => {
-                getDownloadURL(task.snapshot.ref)
-                    .then(resolve)
-                    .catch(reject);
-            }
+            () => resolve()
         );
     });
+}
+
+async function uploadAndGetUrl(
+    fileRef: StorageReference,
+    data: Blob,
+    contentType: string,
+    onProgress?: (snapshot: UploadTaskSnapshot) => void
+): Promise<string> {
+    await uploadFile(fileRef, data, contentType, onProgress);
+    return getDownloadURL(fileRef);
 }
 
 export interface CreateModelParams {
@@ -69,7 +75,7 @@ export interface CreateModelParams {
 
 export interface CreateModelResult {
     modelId: string;
-    originalFileUrl: string;
+    originalFilePath: string;
     convertedFileUrl: string;
     renderPrimaryUrl: string | null;
     renderExtraUrls: string[];
@@ -101,13 +107,12 @@ export async function createAdvancedModel({
 
     progressFn(0);
 
-    // Upload original model file.
-    const originalRef = ref(
-        storage,
-        `${STORAGE_PATHS.ORIGINAL}/${uploadKey}/${file.name}`
-    );
+    // Upload the original model file to the private folder. It gets no public
+    // URL; downloads go through getModelDownloadUrl.
+    const originalFilePath = `${STORAGE_PATHS.PRIVATE_ORIGINALS}/${uploadKey}/${file.name}`;
+    const originalRef = ref(storage, originalFilePath);
 
-    const originalFileUrl = await uploadAndGetUrl(
+    await uploadFile(
         originalRef,
         file,
         file.type,
@@ -122,7 +127,7 @@ export async function createAdvancedModel({
     // Convert STL/OBJ models to GLB when needed.
     const lowerFileName = file.name.toLowerCase();
 
-    let convertedFileUrl = originalFileUrl;
+    let convertedFileUrl = "";
 
     if (
         lowerFileName.endsWith(".stl") ||
@@ -151,7 +156,24 @@ export async function createAdvancedModel({
             }
         );
     } else {
-        progressFn(40);
+        // GLB/GLTF files are viewable as they are; the viewer gets a public copy.
+        const viewerRef = ref(
+            storage,
+            `${STORAGE_PATHS.CONVERTED}/${uploadKey}/${file.name}`
+        );
+
+        convertedFileUrl = await uploadAndGetUrl(
+            viewerRef,
+            file,
+            file.type || "model/gltf-binary",
+            (snapshot) => {
+                const progress =
+                    20 +
+                    (snapshot.bytesTransferred / snapshot.totalBytes) * 20;
+
+                progressFn(progress);
+            }
+        );
     }
 
     // Upload primary and additional renders.
@@ -227,7 +249,9 @@ export async function createAdvancedModel({
         uploaderUsername,
         uploaderDisplayName,
 
-        originalFileUrl,
+        originalFilePath,
+        originalFileName: file.name,
+        originalFileSize: file.size,
         convertedFileUrl,
         renderPrimaryUrl,
         renderExtraUrls,
@@ -294,7 +318,7 @@ export async function createAdvancedModel({
 
     return {
         modelId: modelDoc.id,
-        originalFileUrl,
+        originalFilePath,
         convertedFileUrl,
         renderPrimaryUrl,
         renderExtraUrls,
@@ -323,4 +347,16 @@ export async function deleteModel(
     >(functions, "deleteModel");
 
     await deleteModelFunction({ modelId });
+}
+/** Short-lived link to the original file, for the uploader, buyers and free models. */
+export async function getModelDownloadUrl(
+    modelId: string
+): Promise<{ url: string; fileName: string }> {
+    const getDownloadUrl = httpsCallable<
+        { modelId: string },
+        { url: string; fileName: string }
+    >(functions, "getModelDownloadUrl");
+
+    const result = await getDownloadUrl({ modelId });
+    return result.data;
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Download, ShoppingCart } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { paymentService } from "@/features/payment/services/paymentService";
+import { getModelDownloadUrl } from "@/features/models/services/modelsService";
 import { PaymentModal } from "./PaymentModal";
 import type { PurchaseButtonProps } from "@/features/payment/types/payment";
 import { useModal } from "@/features/shared/modal/hooks/useModal";
@@ -41,14 +42,13 @@ export const PurchaseButton = ({ model, className = "" }: PurchaseButtonProps) =
     }
     setIsLoading(true);
     try {
-      if (model.originalFileUrl) {
-        const link = document.createElement("a");
-        link.href = model.originalFileUrl;
-        link.download = `${model.name}.${model.originalFileUrl.split(".").pop()}`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      }
+      // The server checks ownership or purchase and returns a 5-minute link.
+      const { url } = await getModelDownloadUrl(model.id);
+      const link = document.createElement("a");
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     } catch (error) {
       console.error("Download error:", error);
       alert("Download failed. Please try again.");

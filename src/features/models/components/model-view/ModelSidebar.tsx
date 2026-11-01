@@ -175,7 +175,7 @@ export function ModelSidebar({
 
   const category = MODEL_CATEGORIES.find((item) => model.categoryIds?.includes(item.id));
   const createdAt = toDate(model.createdAt);
-  const fileFormat = getFileFormat(model.originalFileUrl);
+  const fileFormat = getFileFormat(model.originalFileName ?? model.originalFileUrl);
   const tags = formData.tags
     .split(",")
     .map((tag) => tag.trim())

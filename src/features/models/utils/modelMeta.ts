@@ -10,16 +10,17 @@ export function toDate(value: ModelData["createdAt"]): Date | null {
     return Number.isNaN(date.getTime()) ? null : date;
 }
 
-/** Upper-case file extension of the uploaded file, e.g. "STL". */
-export function getFileFormat(fileUrl?: string): string | null {
-    if (!fileUrl) return null;
+/** Upper-case file extension of a file name or download URL, e.g. "STL". */
+export function getFileFormat(fileNameOrUrl?: string): string | null {
+    if (!fileNameOrUrl) return null;
+    let path = fileNameOrUrl;
     try {
-        const path = decodeURIComponent(new URL(fileUrl).pathname);
-        const match = path.match(/\.([a-z0-9]{2,5})$/i);
-        return match ? match[1].toUpperCase() : null;
+        path = decodeURIComponent(new URL(fileNameOrUrl).pathname);
     } catch {
-        return null;
+        // A plain file name.
     }
+    const match = path.match(/\.([a-z0-9]{2,5})$/i);
+    return match ? match[1].toUpperCase() : null;
 }
 
 export function formatPrice(price: number, currency = "usd"): string {

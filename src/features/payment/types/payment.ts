@@ -8,7 +8,6 @@ export interface ModelPaymentInfo {
   uploaderDisplayName?: string;
   renderPrimaryUrl?: string | null;
   isPaid?: boolean;
-  originalFileUrl?: string;
 }
 
 export interface CheckoutFormProps {

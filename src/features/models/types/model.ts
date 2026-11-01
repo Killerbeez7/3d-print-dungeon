@@ -22,7 +22,12 @@ export const modelSchema = z.object({
   uploaderUsername: z.string().optional(),
   uploaderDisplayName: z.string().optional(),
 
+  /** Legacy public link to the original; removed by the migration script. */
   originalFileUrl: z.string().optional(),
+  /** Private storage path of the original; downloads go through getModelDownloadUrl. */
+  originalFilePath: z.string().optional(),
+  originalFileName: z.string().optional(),
+  originalFileSize: z.number().optional(),
   convertedFileUrl: z.string().optional(),
 
   renderPrimaryUrl: z.string().nullable().optional(),
