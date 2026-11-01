@@ -80,10 +80,35 @@ service cloud.firestore {
     }
 
     // -------------- Models --------------
+    // Listings are created in the uploader's own name. Counters and revenue
+    // change only on the server, and the original file must sit in the
+    // uploader's private folder.
+    function serverOnlyModelFields() {
+      return ["uploaderId", "views", "likes", "purchaseCount", "totalRevenue",
+              "originalFileUrl", "lastViewed", "lastPurchased"];
+    }
+    function hasOwnOriginalPath(data) {
+      return !("originalFilePath" in data)
+        || (data.originalFilePath is string
+            && data.originalFilePath.matches("private/originals/" + data.uploaderId + "/[^.][^/]*/.+")
+            && !data.originalFilePath.matches(".*\\.\\..*"));
+    }
+
     match /models/{modelId} {
       allow read:   if true;
-      allow create: if isSignedIn();
-      allow update, delete: if isSignedIn()
+      allow create: if isAdmin() || (isSignedIn()
+        && request.resource.data.uploaderId == request.auth.uid
+        && request.resource.data.get("views", 0) == 0
+        && request.resource.data.get("likes", 0) == 0
+        && request.resource.data.get("purchaseCount", 0) == 0
+        && request.resource.data.get("totalRevenue", 0) == 0
+        && !("originalFileUrl" in request.resource.data)
+        && hasOwnOriginalPath(request.resource.data));
+      allow update: if isAdmin() || (isSignedIn()
+        && resource.data.uploaderId == request.auth.uid
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(serverOnlyModelFields())
+        && hasOwnOriginalPath(request.resource.data));
+      allow delete: if isSignedIn()
         && (resource.data.uploaderId == request.auth.uid || isAdmin());
     }
     
