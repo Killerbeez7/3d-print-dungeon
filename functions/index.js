@@ -15,7 +15,6 @@ export const {
 
 // Payment functions
 export const {
-    testStripeConnection,
     createStripeCustomer,
     createPaymentIntent,
     createSubscription,

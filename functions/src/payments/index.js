@@ -9,23 +9,6 @@ import {
 } from "../shared/config.js";
 import { requireAuth, validateRequiredFields, handleError } from "../auth/utils.js";
 
-// Test Stripe connection
-export const testStripeConnection = onCall(
-    { secrets: [stripeSecretKey], invoker: "public" },
-    async () => {
-        try {
-            const stripe = getStripe();
-            const balance = await stripe.balance.retrieve();
-            return { success: true, balance };
-        } catch (err) {
-            console.error("❌ Stripe test error:", err);
-            throw new HttpsError("internal", "Stripe test failed", {
-                error: err.message,
-            });
-        }
-    }
-);
-
 // Create Stripe customer
 export const createStripeCustomer = onCall(
     { secrets: [stripeSecretKey], cors: true, invoker: "public" },
@@ -40,15 +23,16 @@ export const createStripeCustomer = onCall(
     }
 );
 
-// Create payment intent
+// Create payment intent. The price and currency always come from the model
+// document, never from the buyer's browser.
 export const createPaymentIntent = onCall(
     { secrets: [stripeSecretKey], cors: true, invoker: "public" },
     async (request) => {
         try {
             const { uid, token } = requireAuth(request);
-            const { modelId, amount, currency = "usd" } = request.data;
+            const { modelId } = request.data;
 
-            validateRequiredFields(request.data, ["modelId", "amount"]);
+            validateRequiredFields(request.data, ["modelId"]);
 
             const modelDoc = await db.collection("models").doc(modelId).get();
             if (!modelDoc.exists) {
@@ -56,11 +40,26 @@ export const createPaymentIntent = onCall(
             }
             const modelData = modelDoc.data();
 
+            const price = Number(modelData.price);
+            if (!modelData.isPaid || !Number.isFinite(price) || price <= 0) {
+                throw new HttpsError("failed-precondition", "This model is not for sale.");
+            }
+            if (modelData.uploaderId === uid) {
+                throw new HttpsError("failed-precondition", "You can't buy your own model.");
+            }
+            const owned = await db.doc(`users/${uid}/purchases/${modelId}`).get();
+            if (owned.exists) {
+                throw new HttpsError("already-exists", "You already own this model.");
+            }
+
+            const currency = String(modelData.currency || "usd").toLowerCase();
+            const amountCents = Math.round(price * 100);
+
             const customerId = await getOrCreateStripeCustomerId(uid, token);
             const stripe = getStripe();
 
             const paymentIntent = await stripe.paymentIntents.create({
-                amount: Math.round(amount * 100),
+                amount: amountCents,
                 currency,
                 customer: customerId,
                 metadata: {
@@ -77,7 +76,8 @@ export const createPaymentIntent = onCall(
                 modelId,
                 buyerId: uid,
                 sellerId: modelData.uploaderId,
-                amount,
+                amount: price,
+                amountCents,
                 currency,
                 status: "created",
                 createdAt: FieldValue.serverTimestamp(),
@@ -149,12 +149,72 @@ export const createSubscription = onCall(
     }
 );
 
-// Handle payment success
+// Records a succeeded payment as a purchase. Safe to call more than once for
+// the same payment (from the browser and from the webhook): the purchase is
+// keyed by the payment intent id and written in a transaction.
+const recordPurchase = async (paymentIntent) => {
+    const paymentRef = db.collection("paymentIntents").doc(paymentIntent.id);
+    const purchaseRef = db.collection("purchases").doc(paymentIntent.id);
+
+    return db.runTransaction(async (tx) => {
+        const [paymentDoc, purchaseDoc] = await Promise.all([
+            tx.get(paymentRef),
+            tx.get(purchaseRef),
+        ]);
+        if (!paymentDoc.exists) {
+            throw new HttpsError("not-found", "Payment intent not found.");
+        }
+        if (purchaseDoc.exists) {
+            return purchaseRef.id;
+        }
+
+        const paymentData = paymentDoc.data();
+        const expectedCents =
+            paymentData.amountCents ?? Math.round(paymentData.amount * 100);
+        if (
+            paymentIntent.status !== "succeeded" ||
+            paymentIntent.amount !== expectedCents ||
+            paymentIntent.currency !== paymentData.currency ||
+            paymentIntent.metadata?.modelId !== paymentData.modelId
+        ) {
+            throw new HttpsError("failed-precondition", "Payment does not match the order.");
+        }
+
+        tx.set(purchaseRef, {
+            ...paymentData,
+            id: purchaseRef.id,
+            status: "completed",
+            purchasedAt: FieldValue.serverTimestamp(),
+        });
+        tx.set(
+            db.doc(`users/${paymentData.buyerId}/purchases/${paymentData.modelId}`),
+            {
+                modelId: paymentData.modelId,
+                purchaseId: purchaseRef.id,
+                purchasedAt: FieldValue.serverTimestamp(),
+                pricePaidCents: expectedCents,
+                currency: paymentData.currency,
+            },
+            { merge: true }
+        );
+        tx.update(db.collection("models").doc(paymentData.modelId), {
+            purchaseCount: FieldValue.increment(1),
+            totalRevenue: FieldValue.increment(paymentData.amount),
+        });
+        tx.update(paymentRef, {
+            status: "completed",
+            completedAt: FieldValue.serverTimestamp(),
+        });
+        return purchaseRef.id;
+    });
+};
+
+// Handle payment success (called by the buyer's browser after checkout)
 export const handlePaymentSuccess = onCall(
     { secrets: [stripeSecretKey], invoker: "public" },
     async (request) => {
         try {
-            requireAuth(request);
+            const { uid } = requireAuth(request);
             const { paymentIntentId } = request.data;
 
             validateRequiredFields(request.data, ["paymentIntentId"]);
@@ -166,7 +226,9 @@ export const handlePaymentSuccess = onCall(
             if (!paymentDoc.exists) {
                 throw new HttpsError("not-found", "Payment intent not found.");
             }
-            const paymentData = paymentDoc.data();
+            if (paymentDoc.data().buyerId !== uid) {
+                throw new HttpsError("permission-denied", "This payment belongs to another account.");
+            }
 
             const stripe = getStripe();
             const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -174,52 +236,7 @@ export const handlePaymentSuccess = onCall(
                 throw new HttpsError("failed-precondition", "Payment not completed.");
             }
 
-            const purchaseId = db.collection("purchases").doc().id;
-            await db
-                .collection("purchases")
-                .doc(purchaseId)
-                .set({
-                    id: purchaseId,
-                    ...paymentData,
-                    status: "completed",
-                    purchasedAt: FieldValue.serverTimestamp(),
-                });
-
-            // Record private purchase doc instead of array field
-            await db
-                .doc(`users/${paymentData.buyerId}/purchases/${paymentData.modelId}`)
-                .set(
-                    {
-                        modelId: paymentData.modelId,
-                        purchasedAt: FieldValue.serverTimestamp(),
-                        pricePaidCents: Math.round(paymentData.amount * 100),
-                        currency: paymentData.currency,
-                    },
-                    { merge: true }
-                );
-
-            // Increment seller public stats
-            await db
-                .doc(`users/${paymentData.sellerId}/public/data`)
-                .set({}, { merge: true });
-            await db.doc(`users/${paymentData.sellerId}/public/data`).update({
-                "stats.viewsCount": FieldValue.increment(0),
-                "stats.uploadsCount": FieldValue.increment(0),
-            });
-
-            await db
-                .collection("models")
-                .doc(paymentData.modelId)
-                .update({
-                    purchaseCount: FieldValue.increment(1),
-                    totalRevenue: FieldValue.increment(paymentData.amount),
-                });
-
-            await db.collection("paymentIntents").doc(paymentIntentId).update({
-                status: "completed",
-                completedAt: FieldValue.serverTimestamp(),
-            });
-
+            const purchaseId = await recordPurchase(paymentIntent);
             return { success: true, purchaseId };
         } catch (error) {
             handleError(error, "handlePaymentSuccess");
@@ -300,25 +317,43 @@ export const getSellerSales = onCall(
     }
 );
 
-// Create account link
+// Return URLs must point back at this site.
+const isOwnSiteUrl = (value) => {
+    try {
+        const { protocol, hostname } = new URL(value);
+        if (hostname === "localhost") return true;
+        return (
+            protocol === "https:" &&
+            (hostname === "printdungeon.com" ||
+                hostname === "www.printdungeon.com" ||
+                hostname === "print-dungeon-3d.web.app" ||
+                hostname === "print-dungeon-3d.firebaseapp.com" ||
+                (hostname.startsWith("print-dungeon-3d--") && hostname.endsWith(".web.app")))
+        );
+    } catch {
+        return false;
+    }
+};
+
+// Create account link for the caller's own Connect account
 export const createAccountLink = onCall(
     { secrets: [stripeSecretKey], invoker: "public" },
     async (request) => {
-        console.log("⚡️ [createAccountLink] Triggered");
-
         try {
-            requireAuth(request);
-            const { accountId, refreshUrl, returnUrl } = request.data;
+            const { uid } = requireAuth(request);
+            const { refreshUrl, returnUrl } = request.data;
 
-            console.log("ℹ️ [createAccountLink] Data received:", {
-                accountId,
-                refreshUrl,
-                returnUrl,
-            });
+            if (!isOwnSiteUrl(refreshUrl) || !isOwnSiteUrl(returnUrl)) {
+                throw new HttpsError("invalid-argument", "Invalid return address.");
+            }
+
+            const privateDoc = await db.doc(`users/${uid}/private/data`).get();
+            const accountId = privateDoc.data()?.stripeConnectId;
+            if (!accountId) {
+                throw new HttpsError("failed-precondition", "No payout account yet.");
+            }
 
             const stripe = getStripe();
-            console.log("✅ [createAccountLink] Stripe initialized");
-
             const accountLink = await stripe.accountLinks.create({
                 account: accountId,
                 refresh_url: refreshUrl,
@@ -326,14 +361,9 @@ export const createAccountLink = onCall(
                 type: "account_onboarding",
             });
 
-            console.log("✅ [createAccountLink] Link created:", { url: accountLink.url });
-
             return { url: accountLink.url };
         } catch (error) {
-            console.error("❌ [createAccountLink] Error:", error.message || error);
-            throw new HttpsError("internal", "Failed to create account onboarding link", {
-                error: error.message,
-            });
+            handleError(error, "createAccountLink");
         }
     }
 );
@@ -346,10 +376,7 @@ export const createConnectAccount = onCall(
 
         try {
             const { uid, token } = requireAuth(request);
-            console.log("✅ [createConnectAccount] Authenticated:", {
-                uid,
-                email: token.email,
-            });
+            console.log("✅ [createConnectAccount] Authenticated:", { uid });
 
             const stripe = getStripe();
             console.log("Stripe initialized successfully.");
@@ -495,25 +522,9 @@ export const stripeWebhook = onRequest(
         invoker: "public", // Allow unauthenticated invocations for Stripe webhooks
     },
     async (request, response) => {
-        console.log("🔄 [Webhook] ===== WEBHOOK REQUEST RECEIVED =====");
-        console.log("🔄 [Webhook] Timestamp:", new Date().toISOString());
-        console.log("🔄 [Webhook] Method:", request.method);
-        console.log("🔄 [Webhook] URL:", request.url);
-        console.log("🔄 [Webhook] Content-Type:", request.headers["content-type"]);
-        console.log(
-            "🔄 [Webhook] Stripe-Signature present:",
-            !!request.headers["stripe-signature"]
-        );
-        console.log(
-            "🔄 [Webhook] Raw body length:",
-            request.rawBody?.length || "undefined"
-        );
-
         const sig = request.headers["stripe-signature"];
         const endpointSecret = stripeWebhookSecret.value();
 
-        console.log("🔄 [Webhook] Stripe signature present:", !!sig);
-        console.log("🔄 [Webhook] Endpoint secret present:", !!endpointSecret);
 
         let event;
 
@@ -521,19 +532,10 @@ export const stripeWebhook = onRequest(
             const stripe = getStripe();
             console.log("🔄 [Webhook] Constructing event from raw body...");
             event = stripe.webhooks.constructEvent(request.rawBody, sig, endpointSecret);
-            console.log("✅ [Webhook] Event constructed successfully:", {
-                type: event.type,
-                id: event.id,
-                created: event.created,
-                data: {
-                    object: event.data.object.id,
-                    objectType: event.data.object.object,
-                },
-            });
+            console.log("✅ [Webhook] Event received:", { type: event.type, id: event.id });
         } catch (err) {
             console.error("❌ [Webhook] Signature verification failed:", err.message);
-            console.error("❌ [Webhook] Error details:", err);
-            response.status(400).send(`Webhook Error: ${err.message}`);
+            response.status(400).send("Webhook signature verification failed");
             return;
         }
 
@@ -547,13 +549,6 @@ export const stripeWebhook = onRequest(
                     "🔄 [Webhook] Account updated event received for account:",
                     account.id
                 );
-                console.log("🔄 [Webhook] Account details:", {
-                    charges_enabled: account.charges_enabled,
-                    details_submitted: account.details_submitted,
-                    requirements: account.requirements,
-                    country: account.country,
-                    business_type: account.business_type,
-                });
                 // Prefer resolving the user via Stripe account metadata
                 const uidFromMetadata = account?.metadata?.firebaseUID;
                 if (uidFromMetadata) {
@@ -699,12 +694,24 @@ export const stripeWebhook = onRequest(
                 }
                 break;
             }
+            case "payment_intent.succeeded": {
+                // Backup for buyers who close the tab before the browser
+                // reports the payment; recordPurchase ignores repeats.
+                const paymentIntent = event.data.object;
+                if (paymentIntent.metadata?.modelId) {
+                    try {
+                        await recordPurchase(paymentIntent);
+                    } catch (err) {
+                        console.error("❌ [Webhook] Could not record purchase:", {
+                            paymentIntentId: paymentIntent.id,
+                            code: err.code ?? err.message,
+                        });
+                    }
+                }
+                break;
+            }
             default:
                 console.log("🔄 [Webhook] Unhandled event type:", event.type);
-                console.log(
-                    "🔄 [Webhook] Event data:",
-                    JSON.stringify(event.data, null, 2)
-                );
         }
 
         console.log("✅ [Webhook] Sending success response");
@@ -714,12 +721,7 @@ export const stripeWebhook = onRequest(
 );
 
 // Simple health check endpoint for webhook debugging
-export const webhookHealthCheck = onRequest(async (request, response) => {
-    console.log("🔄 [HealthCheck] Health check request received");
-    console.log("🔄 [HealthCheck] Method:", request.method);
-    console.log("🔄 [HealthCheck] URL:", request.url);
-    console.log("🔄 [HealthCheck] Headers:", JSON.stringify(request.headers, null, 2));
-
+export const webhookHealthCheck = onRequest(async (_request, response) => {
     response.json({
         status: "healthy",
         timestamp: new Date().toISOString(),

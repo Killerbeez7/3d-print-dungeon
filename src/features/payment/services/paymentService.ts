@@ -36,15 +36,9 @@ export class PaymentService {
             if (!auth.currentUser) {
                 throw new Error("User not authenticated. Please log in.");
             }
-            console.log("currentUser", auth.currentUser);
-            console.log("currentToken", auth.currentUser.getIdToken());
-            console.log("refreshing token...");
             await auth.currentUser.getIdToken(true);
-            console.log("token refreshed", auth.currentUser);
-            console.log("newToken", auth.currentUser.getIdToken());
             const callable = httpsCallable<unknown, T>(functions, fnName);
             const result = await callable(data);
-            console.log("result", result);
             return result.data;
         } catch (error) {
             console.error(`❌ [${fnName}] Error:`, (error as Error).message || error);
@@ -56,8 +50,9 @@ export class PaymentService {
         return this.withRetry(() => this.callWithAuth("createConnectAccount"), "createConnectAccount");
     }
 
-    async createAccountLink(accountId: string, refreshUrl: string, returnUrl: string): Promise<string> {
-        const data = { accountId, refreshUrl, returnUrl };
+    /** Onboarding link for the signed-in user's own payout account. */
+    async createAccountLink(refreshUrl: string, returnUrl: string): Promise<string> {
+        const data = { refreshUrl, returnUrl };
         const result = await this.withRetry(() => this.callWithAuth<{ url: string }>("createAccountLink", data), "createAccountLink");
         return result.url;
     }
@@ -91,10 +86,11 @@ export class PaymentService {
         }
     }
 
-    async createPaymentIntent(modelId: string, amount: number, currency = "usd"): Promise<unknown> {
+    /** The server charges the model's own price; the browser never sends one. */
+    async createPaymentIntent(modelId: string): Promise<unknown> {
         return this.withRetry(async () => {
-            const fn = httpsCallable<{ modelId: string; amount: number; currency: string }, unknown>(functions, "createPaymentIntent");
-            const res = await fn({ modelId, amount, currency });
+            const fn = httpsCallable<{ modelId: string }, unknown>(functions, "createPaymentIntent");
+            const res = await fn({ modelId });
             return res.data;
         }, "createPaymentIntent");
     }

@@ -56,11 +56,7 @@ export const SellerVerification = ({
       setStep("linking");
       const finalReturnUrl = returnUrl || `${window.location.origin}/seller/dashboard`;
       const finalRefreshUrl = returnUrl || `${window.location.origin}/seller/onboarding`;
-      const url = await paymentService.createAccountLink(
-        accountId,
-        finalRefreshUrl,
-        finalReturnUrl
-      );
+      const url = await paymentService.createAccountLink(finalRefreshUrl, finalReturnUrl);
       if (!url) {
         throw new Error("createAccountLink did not return a URL.");
       }

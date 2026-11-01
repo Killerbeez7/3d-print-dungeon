@@ -32,8 +32,7 @@ export const PaymentModal = ({
       try {
         setPaymentStatus("processing");
         const { clientSecret: secret } = (await paymentService.createPaymentIntent(
-          model.id,
-          model.price
+          model.id
         )) as {
           clientSecret: string;
         };
@@ -46,7 +45,7 @@ export const PaymentModal = ({
     };
 
     initPayment();
-  }, [isOpen, model.id, model.price]);
+  }, [isOpen, model.id]);
 
   const { close } = useModal("payment");
 
