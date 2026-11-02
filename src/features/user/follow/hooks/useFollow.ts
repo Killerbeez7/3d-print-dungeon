@@ -32,7 +32,11 @@ export const useFollow = (targetUserId: string) => {
     let ignore = false;
 
     const loadFollowStatus = async () => {
-      if (!targetUserId) {
+      // Signed out, the button only opens sign-in: nothing to look up, so it
+      // shows ready straight away instead of dimmed while loading.
+      if (!targetUserId || !currentUser?.uid) {
+        setStatus(EMPTY_FOLLOW_STATUS);
+        setLoading(false);
         return;
       }
 
