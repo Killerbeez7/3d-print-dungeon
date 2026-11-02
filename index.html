@@ -27,6 +27,12 @@
       fetchpriority="high"
     />
 
+    <!-- Page colour before the stylesheet arrives, so reloads don't flash white (tokens: --bg-page). -->
+    <style>
+      html { background: #0a0a0c; color-scheme: dark; }
+      html[data-theme="light"] { background: #f6f6f7; color-scheme: light; }
+    </style>
+
     <script>
       try {
         var theme = localStorage.getItem("theme") === "light" ? "light" : "dark";

@@ -6,20 +6,51 @@ import { fileURLToPath } from "url";
 import compression from "vite-plugin-compression"; // gzip+br
 import webFontDownload from "vite-plugin-webfont-dl";
 
-function nonBlockingCss() {
+/**
+ * Starts the downloads the first render needs at the same time as the entry
+ * script, instead of one after another:
+ * - the App chunk (main.tsx imports it dynamically) and its CSS,
+ * - the latin files of the two fonts visible above the fold (otherwise the
+ *   browser only asks for them after React has rendered text, and the heading
+ *   visibly swaps font).
+ */
+function startupPreloads() {
+  const FONTS = [/\/geist-latin-wght-normal-[^/]+\.woff2$/, /\/unbounded-latin-wght-normal-[^/]+\.woff2$/];
   return {
-    name: "html-non-blocking-css",
+    name: "startup-preloads",
     apply: "build",
-    enforce: "post",
-    transformIndexHtml(html) {
-      return html.replace(
-        /<link[^>]*rel="stylesheet"[^>]*href="([^"]+\.css)"[^>]*>/g,
-        (_fullMatch, href) => {
-          const preload = `<link rel="preload" href="${href}" as="style" onload="this.onload=null;this.rel='stylesheet'">`;
-          const fallback = `<noscript><link rel="stylesheet" href="${href}"></noscript>`;
-          return `${preload}\n${fallback}`;
+    transformIndexHtml: {
+      order: "post",
+      handler(html, ctx) {
+        const files = Object.values(ctx.bundle ?? {});
+        const tags = [];
+        for (const pattern of FONTS) {
+          const font = files.find((file) => file.type === "asset" && pattern.test(`/${file.fileName}`));
+          if (font) {
+            tags.push({
+              tag: "link",
+              attrs: { rel: "preload", href: `/${font.fileName}`, as: "font", type: "font/woff2", crossorigin: "" },
+              injectTo: "head",
+            });
+          }
         }
-      );
+        const app = files.find(
+          (file) =>
+            file.type === "chunk" &&
+            file.isDynamicEntry &&
+            (file.moduleIds ?? Object.keys(file.modules ?? {})).some((id) => id.endsWith("/src/App.tsx"))
+        );
+        if (app) {
+          const entry = files.find((file) => file.type === "chunk" && file.isEntry);
+          for (const chunk of [app.fileName, ...app.imports.filter((name) => name !== entry?.fileName)]) {
+            tags.push({ tag: "link", attrs: { rel: "modulepreload", href: `/${chunk}`, crossorigin: "" }, injectTo: "head" });
+          }
+          for (const css of app.viteMetadata?.importedCss ?? []) {
+            tags.push({ tag: "link", attrs: { rel: "stylesheet", href: `/${css}`, crossorigin: "" }, injectTo: "head" });
+          }
+        }
+        return { html, tags };
+      },
     },
   };
 }
@@ -32,7 +63,7 @@ export default defineConfig({
     tailwindcss(),
     compression({ algorithm: "brotliCompress" }),
     webFontDownload(),
-    nonBlockingCss(),
+    startupPreloads(),
   ],
   resolve: {
     alias: {
@@ -41,7 +72,9 @@ export default defineConfig({
   },
   base: "/",
   build: {
-    target: "es2017",
+    // Every browser the site supports runs ES2020; older targets only add
+    // helper code for syntax like ?. and ?? that browsers already understand.
+    target: "es2020",
     chunkSizeWarningLimit: 1500,
     assetsInlineLimit: 4096,
     rollupOptions: {
