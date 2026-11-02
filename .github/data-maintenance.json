@@ -1,1 +1,1 @@
-{ "script": "set-super-admins", "apply": false, "deleteOrphans": false, "request": 4 }
+{ "script": "set-super-admins", "apply": true, "deleteOrphans": false, "request": 5 }
