@@ -72,8 +72,10 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
       28 Oct 2026); each one gives full control of the project. Delete the ones not in use (keep
       the one stored in GitHub for preview builds)
 
-- [ ] Deploy the new Firestore index for profile models (`uploaderId` + `createdAt`):
-      `firebase deploy --only firestore:indexes`
+- [ ] Deploy the Firestore indexes (`firebase deploy --only firestore:indexes`). Profiles no longer
+      need them (they load a creator's listings with a plain filter), but other queries may
+- [ ] Profile totals (models, views, likes) are counted from up to 500 listings per creator; past
+      that, move the totals to the server
 - [ ] GitHub → Settings → Secrets: delete `FIREBASE_WEB_CONFIG`. It held an invalid API key
       and previews now read the web config from Firebase Hosting instead
 - [ ] Firebase Auth → Authorized domains: add each new preview domain
