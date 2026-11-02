@@ -1,1 +1,1 @@
-{ "script": "protect-original-files", "apply": false, "deleteOrphans": false, "request": 2 }
+{ "script": "protect-original-files", "apply": true, "deleteOrphans": false, "request": 3 }
