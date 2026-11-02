@@ -103,6 +103,21 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 - [ ] Pre-existing lint errors (6) and warnings (14), e.g. unused `ModelData` in
       `useFetchUserModels`, `no-console` disables
 
+## Admin dashboard: next steps
+
+- [ ] Reports: a real moderation queue (report button on models and comments, reasons,
+      resolve/dismiss with a note); the Reports section still uses the old screen
+- [ ] Users: a detail panel per user (their listings, sales, purchases) and suspend/ban
+- [ ] Audit log of admin actions (deletes, role changes)
+- [ ] Sales: per-creator totals once creator payouts exist
+- [ ] The models table loads up to 1000 listings at once; page it from the server past that
+
+## Checks after the next deploy
+
+- [ ] View counts go up on the live site (`trackModelView`; could not be tested from the dev
+      sandbox)
+- [ ] The scroll-to-top button covers the cookie banner's "Manage" link on desktop
+
 ## Design system follow-ups
 
 - [ ] Replace AI-generated hero artwork with real photos of printed models
