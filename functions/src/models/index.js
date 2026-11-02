@@ -213,8 +213,15 @@ export const deleteModel = onCall({ maxInstances: 10 }, async (request) => {
             }
         }
 
+        // The original stays too if another listing uses the same file.
+        const originalField = model.originalFilePath ? "originalFilePath" : "originalFileUrl";
+        const originalShared =
+            typeof model[originalField] === "string" &&
+            model[originalField] &&
+            !(await db.collection("models").where(originalField, "==", model[originalField]).limit(1).get()).empty;
+
         const storagePaths = [
-            originalPathOf(model),
+            originalShared ? null : originalPathOf(model),
             ...mediaUrls.filter((url) => !sharedUrls.has(url)).map(pathFromDownloadUrl),
         ].filter(Boolean);
 
