@@ -18,10 +18,10 @@ export const HomeModelsGrid = ({ models }: { models: ModelData[] }) => {
   );
 };
 
-export const HomeModelsGridSkeleton = ({ count = 14 }: { count?: number }) => (
+export const HomeModelsGridSkeleton = ({ count = 24 }: { count?: number }) => (
   <div className={gridClass} role="status" aria-label="Loading models">
     {Array.from({ length: count }, (_, index) => (
-      <ModelCardSkeleton key={index} />
+      <ModelCardSkeleton key={index} index={index} />
     ))}
   </div>
 );

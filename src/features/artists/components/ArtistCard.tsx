@@ -26,7 +26,7 @@ export function ArtistCard({
   return (
     <Link
       to={`/${urlSafeUsername}`}
-      className="reveal-up group flex h-full flex-col overflow-hidden rounded-xl border border-br-subtle bg-surface-card transition-[border-color,transform] duration-300 ease-forge hover:-translate-y-1 hover:border-br-primary"
+      className="group flex h-full flex-col overflow-hidden rounded-xl border border-br-subtle bg-surface-card transition-[border-color,transform] duration-300 ease-forge hover:-translate-y-1 hover:border-br-primary"
     >
       {/* Generated cover, unique per username */}
       <div

@@ -73,7 +73,7 @@ export const ModelCard = ({ model, priority = false }: ModelCardProps) => {
   return (
     <Link
       to={`/model/${model.id}`}
-      className="reveal-print group relative block overflow-hidden bg-muted focus-visible:outline-offset-[-3px]"
+      className="group relative block overflow-hidden bg-muted focus-visible:outline-offset-[-3px]"
     >
       <div className="tile-scan relative aspect-square overflow-hidden">
         {stage !== "error" && (
@@ -92,8 +92,8 @@ export const ModelCard = ({ model, priority = false }: ModelCardProps) => {
             draggable={false}
             onLoad={handleLoad}
             onError={handleError}
-            className={`absolute inset-0 size-full select-none object-cover transition-[opacity,transform] duration-700 ease-forge group-hover:scale-[1.06] ${
-              loaded ? "opacity-100" : "opacity-0"
+            className={`tile-image absolute inset-0 size-full select-none object-cover ${
+              loaded ? "is-loaded" : ""
             }`}
           />
         )}
@@ -125,6 +125,10 @@ export const ModelCard = ({ model, priority = false }: ModelCardProps) => {
   );
 };
 
-export const ModelCardSkeleton = () => (
-  <div className="skeleton-print aspect-square" aria-hidden="true" />
+export const ModelCardSkeleton = ({ index = 0 }: { index?: number }) => (
+  <div
+    className="skeleton-print aspect-square"
+    style={{ ["--skeleton-delay" as string]: `${(index % 7) * 120}ms` }}
+    aria-hidden="true"
+  />
 );

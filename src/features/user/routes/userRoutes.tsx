@@ -1,3 +1,4 @@
+import { SettingsPageSkeleton } from "../settings/components/SettingsPageSkeleton";
 import { lazy, Suspense } from "react";
 import type { RouteObject } from "react-router-dom";
 
@@ -22,11 +23,6 @@ const SettingsPage = lazy(() =>
   }))
 );
 
-const SettingsPageSkeleton = lazy(() =>
-  import("../settings/components/SettingsPageSkeleton").then((m) => ({
-    default: m.SettingsPageSkeleton,
-  }))
-);
 
 const NotificationsPage = lazy(() =>
   import("../notifications/pages/NotificationsPage").then((m) => ({

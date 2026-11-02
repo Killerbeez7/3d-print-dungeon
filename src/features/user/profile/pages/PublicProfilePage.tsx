@@ -20,8 +20,8 @@ const ProfileSkeleton = () => (
       <div className="-mt-14 flex items-end gap-4 sm:-mt-16">
         <div className="skeleton-print chamfer size-[7.75rem] [--cut:20px] sm:size-[8.75rem]" />
         <div className="space-y-2 pb-2">
-          <div className="skeleton-print h-8 w-56" />
-          <div className="skeleton-print h-4 w-28" />
+          <div className="skeleton-line h-8 w-56" />
+          <div className="skeleton-line h-4 w-28" />
         </div>
       </div>
       <div className="skeleton-print mt-6 h-16" />

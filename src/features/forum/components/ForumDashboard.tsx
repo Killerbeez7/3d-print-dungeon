@@ -39,9 +39,9 @@ const Panel = ({
     </div>
     {isLoading ? (
       <div className="space-y-3 p-5" role="status" aria-label="Loading">
-        <div className="skeleton-print h-4 w-3/4" />
-        <div className="skeleton-print h-4 w-1/2" />
-        <div className="skeleton-print h-4 w-2/3" />
+        <div className="skeleton-line h-4 w-3/4" />
+        <div className="skeleton-line h-4 w-1/2" />
+        <div className="skeleton-line h-4 w-2/3" />
       </div>
     ) : (
       empty ?? <div className="divide-y divide-br-subtle">{children}</div>

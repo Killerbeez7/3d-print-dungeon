@@ -90,8 +90,8 @@ export const NotificationsPage = () => {
             <div key={item} className="flex items-center gap-4 px-5 py-4">
               <div className="skeleton-print chamfer size-11 [--cut:9px]" />
               <div className="flex-1 space-y-2">
-                <div className="skeleton-print h-4 w-3/4" />
-                <div className="skeleton-print h-3 w-16" />
+                <div className="skeleton-line h-4 w-3/4" />
+                <div className="skeleton-line h-3 w-16" />
               </div>
             </div>
           ))}

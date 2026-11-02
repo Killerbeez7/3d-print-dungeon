@@ -53,7 +53,7 @@ export const LazyImage = ({
     >
       {!loaded && (
         <div
-          className="absolute inset-0 bg-muted animate-pulse"
+          className="skeleton-print absolute inset-0"
           style={{ transition: "opacity 0.5s ease" }}
         ></div>
       )}

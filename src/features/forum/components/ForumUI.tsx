@@ -207,9 +207,9 @@ export const ThreadListSkeleton = ({ rows = 4 }: { rows?: number }) => (
         <div key={index} className="grid grid-cols-[auto_1fr] gap-4 px-4 py-5 sm:px-5">
           <div className="skeleton-print chamfer size-10 [--cut:8px]" />
           <div className="space-y-2.5">
-            <div className="skeleton-print h-3 w-20" />
-            <div className="skeleton-print h-5 w-3/4" />
-            <div className="skeleton-print h-3 w-1/2" />
+            <div className="skeleton-line h-3 w-20" />
+            <div className="skeleton-line h-5 w-3/4" />
+            <div className="skeleton-line h-3 w-1/2" />
           </div>
         </div>
       ))}
@@ -269,8 +269,8 @@ export const ForumFormShell = ({
 export const ForumFormSkeleton = () => (
   <div className="mx-auto w-full max-w-3xl space-y-6" role="status" aria-label="Loading">
     <div className="space-y-3 border-b border-br-subtle pb-6">
-      <div className="skeleton-print h-3 w-24" />
-      <div className="skeleton-print h-9 w-64" />
+      <div className="skeleton-line h-3 w-24" />
+      <div className="skeleton-line h-9 w-64" />
     </div>
     <div className="space-y-5 rounded-xl border border-br-subtle bg-surface-card p-6">
       <div className="skeleton-print h-12" />

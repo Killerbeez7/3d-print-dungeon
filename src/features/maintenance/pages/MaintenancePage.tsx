@@ -86,7 +86,7 @@ export const MaintenancePage = () => {
       </p>
 
       {/* Print-progress bar: purely decorative */}
-      <div className="skeleton-print mt-10 h-2 w-64 max-w-full" aria-hidden="true" />
+      <div className="skeleton-line mt-10 h-2 w-64 max-w-full" aria-hidden="true" />
 
       {timeLeft && (
         <div className="mt-10" role="timer" aria-live="off">

@@ -130,14 +130,14 @@ export function ForumThread() {
   if (isThreadLoading) {
     return (
       <div className="space-y-5" role="status" aria-label="Loading thread">
-        <div className="skeleton-print h-4 w-40" />
+        <div className="skeleton-line h-4 w-40" />
         <div className="rounded-xl border border-br-subtle bg-surface-card p-6">
-          <div className="skeleton-print h-8 w-3/4" />
-          <div className="skeleton-print mt-4 h-4 w-1/3" />
+          <div className="skeleton-line h-8 w-3/4" />
+          <div className="skeleton-line mt-4 h-4 w-1/3" />
           <div className="mt-8 space-y-3">
-            <div className="skeleton-print h-4 w-full" />
-            <div className="skeleton-print h-4 w-full" />
-            <div className="skeleton-print h-4 w-2/3" />
+            <div className="skeleton-line h-4 w-full" />
+            <div className="skeleton-line h-4 w-full" />
+            <div className="skeleton-line h-4 w-2/3" />
           </div>
         </div>
       </div>
@@ -296,9 +296,9 @@ export function ForumThread() {
               <div key={item} className="flex gap-3">
                 <div className="skeleton-print chamfer size-9 [--cut:7px]" />
                 <div className="flex-1 space-y-2">
-                  <div className="skeleton-print h-3 w-32" />
-                  <div className="skeleton-print h-4 w-full" />
-                  <div className="skeleton-print h-4 w-2/3" />
+                  <div className="skeleton-line h-3 w-32" />
+                  <div className="skeleton-line h-4 w-full" />
+                  <div className="skeleton-line h-4 w-2/3" />
                 </div>
               </div>
             ))}

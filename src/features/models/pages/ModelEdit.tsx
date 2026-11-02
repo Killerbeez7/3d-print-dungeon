@@ -89,7 +89,7 @@ export function ModelEdit() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-2xl space-y-5 px-4 pb-16 pt-8 sm:px-6" role="status" aria-label="Loading">
-        <div className="skeleton-print h-9 w-56" />
+        <div className="skeleton-line h-9 w-56" />
         <div className="skeleton-print h-12" />
         <div className="skeleton-print h-32" />
         <div className="skeleton-print h-11" />

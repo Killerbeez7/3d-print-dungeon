@@ -6,7 +6,7 @@ export const ModelPageSkeleton = () => {
       role="status"
       aria-label="Loading model"
     >
-      <div className="skeleton-print mb-4 h-3 w-48" />
+      <div className="skeleton-line mb-4 h-3 w-48" />
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
         <div className="min-w-0 flex-1 space-y-3">
           <div className="skeleton-print h-[52vh] rounded-lg lg:h-[calc(100vh-15rem)]" />
@@ -17,13 +17,13 @@ export const ModelPageSkeleton = () => {
           </div>
         </div>
         <div className="w-full space-y-5 lg:w-[400px]">
-          <div className="skeleton-print h-3 w-24" />
-          <div className="skeleton-print h-9 w-4/5" />
+          <div className="skeleton-line h-3 w-24" />
+          <div className="skeleton-line h-9 w-4/5" />
           <div className="flex items-center gap-3">
             <div className="skeleton-print chamfer size-12 [--cut:9px]" />
             <div className="flex-1 space-y-2">
-              <div className="skeleton-print h-4 w-2/5" />
-              <div className="skeleton-print h-3 w-1/4" />
+              <div className="skeleton-line h-4 w-2/5" />
+              <div className="skeleton-line h-3 w-1/4" />
             </div>
           </div>
           <div className="skeleton-print h-16" />
