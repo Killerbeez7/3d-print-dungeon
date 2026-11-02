@@ -29,7 +29,7 @@ const ALL_ROLES = [
 
 const ROLE_CLASSES: Record<Role, string> = {
   user: "bg-muted text-txt-secondary",
-  artist: "bg-violet-500/15 text-violet-300",
+  artist: "bg-info/15 text-info",
   moderator: "bg-accent-soft text-accent",
   admin: "bg-error/15 text-error",
   superadmin: "bg-warning/15 text-warning",
