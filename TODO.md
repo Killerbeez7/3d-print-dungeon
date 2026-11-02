@@ -45,7 +45,8 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
    - [ ] The build had no Stripe publishable key, so paying is broken on the live site: put
          `VITE_STRIPE_PUBLISHABLE_KEY=pk_...` in `.env` (not `.env.txt`), then `npm run build` and
          `firebase deploy --only hosting` again
-5. [ ] `firebase deploy --only functions:deleteModel`, so deleting a listing keeps an original
+5. [x] (done 2 Nov 2026: 13 private copies, 10 public originals deleted; `Barbarian4.stl` in
+       `models/original/` is unused and still public) `firebase deploy --only functions:deleteModel`, so deleting a listing keeps an original
        file other listings still use, then move the existing originals out of the public folder.
        This runs on GitHub: set `.github/data-maintenance.json` and push. By hand, from `functions/`:
        `GOOGLE_APPLICATION_CREDENTIALS=../src/keys/service_key.json node scripts/protect-original-files.js`
