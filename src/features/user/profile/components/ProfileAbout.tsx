@@ -10,14 +10,14 @@ export const ProfileAbout = ({ user }: { user: PublicProfile }) => {
 
   if (!hasContent) {
     return (
-      <p className="px-4 py-16 text-center text-sm text-txt-muted sm:px-6 lg:px-8">
+      <p className="rounded-xl border border-dashed border-br-secondary px-4 py-16 text-center text-sm text-txt-muted">
         {user.displayName} hasn&apos;t written anything about themselves yet.
       </p>
     );
   }
 
   return (
-    <div className="mx-auto grid max-w-[1600px] gap-10 px-4 py-10 sm:px-6 lg:grid-cols-[2fr_1fr] lg:px-8">
+    <div className="grid gap-10 py-2 xl:grid-cols-[2fr_1fr]">
       <div className="space-y-8">
         {user.bio && (
           <section>

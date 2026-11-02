@@ -5,26 +5,33 @@ import { buttonClassName } from "@/components";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { StatePanel } from "@/features/shared/components/StatePanel";
 import { usePublicProfileByUsername } from "../hooks/usePublicProfile";
+import { useCreatorModels } from "../hooks/useCreatorModels";
 
 import { ProfileAbout } from "../components/ProfileAbout";
-import { ProfileHero } from "../components/ProfileHero";
-import { ProfileModels } from "../components/ProfileModels";
-import { ProfileStats } from "../components/ProfileStats";
+import { ProfileCard } from "../components/ProfileCard";
+import { ProfileCover } from "../components/ProfileCover";
+import { ProfileModels, ProfileModelsSkeleton } from "../components/ProfileModels";
 
 type ProfileTab = "models" | "about";
 
+const layoutClass =
+  "mx-auto grid max-w-[1600px] gap-8 px-4 sm:px-6 lg:grid-cols-[20rem_minmax(0,1fr)] lg:gap-10 lg:px-8 xl:grid-cols-[22rem_minmax(0,1fr)]";
+
 const ProfileSkeleton = () => (
   <div role="status" aria-label="Loading profile">
-    <div className="skeleton-print h-40 sm:h-56" />
-    <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-      <div className="-mt-14 flex items-end gap-4 sm:-mt-16">
-        <div className="skeleton-print chamfer size-[7.75rem] [--cut:20px] sm:size-[8.75rem]" />
-        <div className="space-y-2 pb-2">
-          <div className="skeleton-line h-8 w-56" />
-          <div className="skeleton-line h-4 w-28" />
-        </div>
+    <div className="skeleton-print h-44 sm:h-60 lg:h-72" />
+    <div className={layoutClass}>
+      <div>
+        <div className="skeleton-print chamfer -mt-16 size-[7.75rem] [--cut:20px] sm:-mt-20 sm:size-[9.75rem]" />
+        <div className="skeleton-line mt-4 h-8 w-48" />
+        <div className="skeleton-line mt-2 h-4 w-28" />
+        <div className="skeleton-line mt-5 h-4 w-full" />
+        <div className="skeleton-line mt-2 h-4 w-4/5" />
+        <div className="skeleton-line mt-6 h-16 w-full" />
       </div>
-      <div className="skeleton-print mt-6 h-16" />
+      <div className="pt-6">
+        <ProfileModelsSkeleton />
+      </div>
     </div>
   </div>
 );
@@ -35,6 +42,7 @@ export const PublicProfilePage = () => {
   const { currentUser } = useAuth();
 
   const { data: profile, isLoading, isError } = usePublicProfileByUsername(username);
+  const creator = useCreatorModels(profile?.uid);
   const tab: ProfileTab = searchParams.get("tab") === "about" ? "about" : "models";
 
   if (isLoading) {
@@ -62,58 +70,63 @@ export const PublicProfilePage = () => {
   const isOwner = currentUser?.uid === profile.uid;
 
   const tabs: { id: ProfileTab; label: string; count?: number }[] = [
-    { id: "models", label: "Models", count: profile.stats.uploadsCount },
+    { id: "models", label: "Models", count: creator.totals?.models },
     { id: "about", label: "About" },
   ];
 
   return (
     <div className="min-h-screen bg-page pb-16">
-      <ProfileHero user={profile} isOwner={isOwner} />
+      <ProfileCover seed={profile.username} models={creator.models} />
 
-      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
-        <ProfileStats user={profile} />
-      </div>
+      <div className={layoutClass}>
+        <aside className="lg:sticky lg:top-20 lg:self-start">
+          <ProfileCard user={profile} isOwner={isOwner} totals={creator.totals} />
+        </aside>
 
-      {/* Sticky tab bar under the header */}
-      <div className="sticky top-16 z-30 mt-6 border-b border-br-subtle bg-page/85 backdrop-blur-xl">
-        <div
-          role="tablist"
-          aria-label="Profile sections"
-          className="mx-auto flex max-w-[1600px] gap-1 px-4 sm:px-6 lg:px-8"
-        >
-          {tabs.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-selected={tab === item.id}
-              onClick={() =>
-                setSearchParams(item.id === "models" ? {} : { tab: item.id }, {
-                  replace: true,
-                  preventScrollReset: true,
-                })
-              }
-              className={`relative flex h-12 items-center gap-2 px-3 text-sm font-semibold transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:origin-left after:bg-accent after:transition-transform after:duration-300 after:ease-forge ${
-                tab === item.id
-                  ? "text-txt-primary after:scale-x-100"
-                  : "text-txt-muted after:scale-x-0 hover:text-txt-primary"
-              }`}
-            >
-              {item.label}
-              {item.count !== undefined && (
-                <span className="font-mono text-xs text-txt-muted">{item.count}</span>
-              )}
-            </button>
-          ))}
+        <div className="min-w-0 lg:pt-6">
+          <div
+            role="tablist"
+            aria-label="Profile sections"
+            className="sticky top-16 z-30 -mx-4 mb-6 flex gap-1 border-b border-br-subtle bg-page/85 px-4 backdrop-blur-xl sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0"
+          >
+            {tabs.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={tab === item.id}
+                onClick={() =>
+                  setSearchParams(item.id === "models" ? {} : { tab: item.id }, {
+                    replace: true,
+                    preventScrollReset: true,
+                  })
+                }
+                className={`relative flex h-12 items-center gap-2 px-3 text-sm font-semibold transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:origin-left after:bg-accent after:transition-transform after:duration-300 after:ease-forge ${
+                  tab === item.id
+                    ? "text-txt-primary after:scale-x-100"
+                    : "text-txt-muted after:scale-x-0 hover:text-txt-primary"
+                }`}
+              >
+                {item.label}
+                {item.count !== undefined && <span className="font-mono text-xs text-txt-muted">{item.count}</span>}
+              </button>
+            ))}
+          </div>
+
+          <div role="tabpanel">
+            {tab === "about" ? (
+              <ProfileAbout user={profile} />
+            ) : creator.isLoading ? (
+              <ProfileModelsSkeleton />
+            ) : creator.isError ? (
+              <p className="rounded-lg border border-error/40 bg-error/10 p-4 text-sm text-txt-primary">
+                We couldn&apos;t load these models. Refresh to try again.
+              </p>
+            ) : (
+              <ProfileModels models={creator.models} displayName={profile.displayName} isOwner={isOwner} />
+            )}
+          </div>
         </div>
-      </div>
-
-      <div role="tabpanel" className={tab === "models" ? "px-1 pt-1" : ""}>
-        {tab === "models" ? (
-          <ProfileModels userId={profile.uid} displayName={profile.displayName} isOwner={isOwner} />
-        ) : (
-          <ProfileAbout user={profile} />
-        )}
       </div>
     </div>
   );
