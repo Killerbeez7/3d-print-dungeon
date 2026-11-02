@@ -1,1 +1,1 @@
-{ "script": "protect-original-files", "apply": true, "deleteOrphans": false, "request": 3 }
+{ "script": "set-super-admins", "apply": false, "deleteOrphans": false, "request": 4 }
