@@ -42,7 +42,7 @@ export function ModelPage() {
 
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
-  const { data: model, isLoading: modelLoading } = useFetchModel(modelId);
+  const { data: model, isLoading: modelLoading } = useFetchModel(modelId, { fromGallery: true });
 
   const { data: uploader, isLoading: uploaderLoading } = usePublicProfile(
     model?.uploaderId

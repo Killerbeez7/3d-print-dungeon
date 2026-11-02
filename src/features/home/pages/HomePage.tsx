@@ -1,6 +1,5 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
 
 import { Button, buttonClassName } from "@/components";
@@ -13,6 +12,7 @@ import { Spinner } from "@/features/shared/reusable/Spinner";
 import { CategoryChips } from "../components/CategoryChips";
 import { HomeHero } from "../components/HomeHero";
 import { HomeModelsGrid, HomeModelsGridSkeleton } from "../components/HomeModelsGrid";
+import { readHomeSnapshot, writeHomeSnapshot } from "../utils/homeSnapshot";
 
 const CATEGORY_PARAM = "category";
 
@@ -21,27 +21,35 @@ export const HomePage = (): React.ReactNode => {
   const category =
     MODEL_CATEGORIES.find((item) => item.id === searchParams.get(CATEGORY_PARAM)) ?? null;
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, refetch } =
-    useFetchModels(category ? { categoryIds: [category.id] } : {});
+  // Last visit's first rows, shown while the gallery loads (read once per category).
+  const snapshotKey = category?.id ?? "all";
+  const [snapshot] = useState(() => new Map<string, ReturnType<typeof readHomeSnapshot>>());
+  if (!snapshot.has(snapshotKey)) snapshot.set(snapshotKey, readHomeSnapshot(snapshotKey));
 
-  const queryClient = useQueryClient();
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    isPlaceholderData,
+    refetch,
+  } = useFetchModels(category ? { categoryIds: [category.id] } : {}, snapshot.get(snapshotKey));
 
-  // Clear models cache whenever route changes away from home
+  const firstPage = isPlaceholderData ? undefined : data?.pages[0]?.models;
   useEffect(() => {
-    return () => {
-      queryClient.removeQueries({
-        predicate: (q) => Array.isArray(q.queryKey) && q.queryKey[0] === "models",
-      });
-    };
-  }, [queryClient]);
+    if (firstPage?.length) writeHomeSnapshot(snapshotKey, firstPage);
+  }, [firstPage, snapshotKey]);
 
   const { hideFooter } = useLayout();
+  const moreToLoad = Boolean(hasNextPage || isPlaceholderData);
 
   useEffect(() => {
-    hideFooter(hasNextPage ?? false);
+    hideFooter(moreToLoad);
 
     return () => hideFooter(false);
-  }, [hasNextPage, hideFooter]);
+  }, [moreToLoad, hideFooter]);
 
   const selectCategory = useCallback(
     (categoryId: string | null) => {
