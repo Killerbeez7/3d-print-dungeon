@@ -35,7 +35,9 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
        accounts → `PROJECT_NUMBER-compute@developer.gserviceaccount.com` → Permissions → grant
        that same account the role **Service Account Token Creator**. Also enable the
        **IAM Service Account Credentials API**. (Project number: Firebase console → Project
-       settings.)
+       settings.) Then Cloud Storage → bucket `print-dungeon-3d.firebasestorage.app` →
+       Permissions → grant the same account **Storage Object Admin**: links only work if the
+       account that signs them can read the file, and `deleteModel` deletes files as it
 2. [ ] `firebase deploy --only functions`. It also stops logging new users' passwords. Say yes
        when it asks to delete `testStripeConnection` and `createSubscription`.
 3. [ ] `firebase deploy --only firestore:rules,storage`
