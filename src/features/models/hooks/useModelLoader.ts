@@ -5,6 +5,7 @@ export type ModelStatus = "idle" | "loading" | "loaded" | "error";
 interface Entry {
     status: ModelStatus;
     progress: number; // 0-1
+    totalBytes: number; // 0 when the server doesn't say
     controller?: AbortController;
     blob?: Blob; // Cache model data
     lastAccessed?: number; // Track when model was last accessed
@@ -25,6 +26,7 @@ async function startDownload(url: string) {
     entry.controller = controller;
     entry.status = "loading";
     entry.progress = 0;
+    entry.totalBytes = 0;
     activeDownloads.add(url);
     notify(url);
 
@@ -36,6 +38,7 @@ async function startDownload(url: string) {
 
         const reader = res.body?.getReader();
         const contentLength = +(res.headers.get("Content-Length") || 0);
+        entry.totalBytes = contentLength;
         if (!reader) {
             throw new Error("No response body reader available");
         }
@@ -53,10 +56,11 @@ async function startDownload(url: string) {
                 chunks.push(normalizedChunk);
                 receivedLength += normalizedChunk.length;
 
+                // Without a size, approach 95% gradually (half way at 3 MB).
                 const progress =
                     contentLength > 0
                         ? receivedLength / contentLength
-                        : Math.min(receivedLength / 1000000, 0.95);
+                        : 0.95 * (receivedLength / (receivedLength + 3_000_000));
 
                 entry.progress = Math.min(progress, 0.99);
 
@@ -98,6 +102,7 @@ function getEntry(url: string): Entry {
         entry = {
             status: "idle",
             progress: 0,
+            totalBytes: 0,
             lastAccessed: Date.now()
         };
         registry.set(url, entry);
@@ -141,17 +146,22 @@ export function useModelLoader(url: string) {
     };
 
     // Cache snapshot to avoid returning new reference when data hasn't changed
-    let lastSnap: { status: ModelStatus; progress: number } | null = null;
+    let lastSnap: { status: ModelStatus; progress: number; totalBytes: number } | null = null;
     const snapshot = () => {
         const entry = getEntry(url);
         const rounded = Math.round(entry.progress * 100) / 100; // 2-dec precision
-        if (lastSnap && lastSnap.status === entry.status && lastSnap.progress === rounded) {
+        if (
+            lastSnap &&
+            lastSnap.status === entry.status &&
+            lastSnap.progress === rounded &&
+            lastSnap.totalBytes === entry.totalBytes
+        ) {
             return lastSnap; // same object -> no update
         }
-        lastSnap = { status: entry.status, progress: rounded } as const;
+        lastSnap = { status: entry.status, progress: rounded, totalBytes: entry.totalBytes } as const;
         return lastSnap;
     };
-    const { status, progress } = useSyncExternalStore(subscribe, snapshot, snapshot);
+    const { status, progress, totalBytes } = useSyncExternalStore(subscribe, snapshot, snapshot);
 
     // Simple cleanup - reset model state when component unmounts
     useEffect(() => {
@@ -231,11 +241,25 @@ export function useModelLoader(url: string) {
         notify(url);
     }, [url]);
 
+    /** Drops a downloaded file the viewer couldn't open, so a retry downloads it again. */
+    const forget = useCallback(() => {
+        modelCache.delete(url);
+        const entry = getEntry(url);
+        if (entry.controller) entry.controller.abort();
+        entry.status = "idle";
+        entry.progress = 0;
+        delete entry.blob;
+        delete entry.controller;
+        notify(url);
+    }, [url]);
+
     const isCached = modelCache.has(url);
 
     return {
         status,
         progress,
+        totalBytes,
+        forget,
         markLoading,
         cancelLoading,
         resetToIdle,

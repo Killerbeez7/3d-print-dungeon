@@ -1,10 +1,11 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { fullscreenConfig } from "@/config/fullscreenConfig";
 // import { LazyImage } from "@/features/shared/reusable/LazyImage";
 import { useModelLoader } from "@/features/models/hooks/useModelLoader";
 //components
 import { NavigationArrow, NavigationDots, ModelControls } from "./controls";
 import { LoadModelButton, LoadingOverlay } from "./loading";
+import type { ViewerLoadPhase } from "./loading/LoadingOverlay";
 //utils
 import { getContainerClasses } from "@/features/models/utils/getContainerClasses";
 import { getResponsiveThumbnails } from "@/utils/imageUtils";
@@ -52,13 +53,16 @@ export const ModelViewer = ({
     const {
         status: modelGlobalStatus,
         progress: modelGlobalProgress,
+        totalBytes: modelTotalBytes,
         markLoading: markModelLoading,
-        markLoaded: markModelLoaded,
-        updateProgress: updateModelProgress,
         cancelLoading: cancelModelLoading,
         getBlob: getModelBlob,
-        isCached: isModelCached,
+        forget: forgetModel,
     } = useModelLoader(modelUrl);
+
+    // The viewer has drawn the model / couldn't open the file.
+    const [viewerReady, setViewerReady] = useState(false);
+    const [viewerFailed, setViewerFailed] = useState(false);
 
     // Use global status directly instead of local state to reduce re-renders
     const modelFileLoaded = modelGlobalStatus === "loaded";
@@ -76,7 +80,6 @@ export const ModelViewer = ({
                     return URL.createObjectURL(blob);
                 });
                 blobUrlCreatedRef.current = true;
-                console.log("🔄 Model viewer: recieved the model");
             }
         }
     }, [modelFileLoaded, getModelBlob]);
@@ -84,6 +87,8 @@ export const ModelViewer = ({
     // Reset blob URL ref when model URL changes
     useEffect(() => {
         blobUrlCreatedRef.current = false;
+        setViewerReady(false);
+        setViewerFailed(false);
     }, [modelUrl]);
 
     //////////////////////////////////////////////      Navigation Handlers    ///////////////////////////////////////////////////////
@@ -273,11 +278,6 @@ export const ModelViewer = ({
     }, [customFullscreen]);
     /////////////////////////////////////////////         Load Model Handlers       ///////////////////////////////////////////////////////
     const handleLoadModel = () => {
-        console.log("🚀 Load Model button clicked:", {
-            currentStatus: modelGlobalStatus,
-            isCached: isModelCached,
-        });
-
         setIsLoadButtonClicked(true);
 
         // Otherwise initiate download if idle
@@ -305,52 +305,49 @@ export const ModelViewer = ({
         };
     }, []);
 
-    // Model Load Handlers
-    const listenersAttachedRef = useRef(false);
+    // Retry after a failed download or a file the viewer couldn't open.
+    const retryLoad = () => {
+        setViewerFailed(false);
+        setViewerReady(false);
+        setModelBlobUrl((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return null;
+        });
+        blobUrlCreatedRef.current = false;
+        forgetModel();
+        markModelLoading();
+    };
 
-    const handleProgress = useCallback(
-        (e: Event) => {
-            const event = e as CustomEvent<{ totalProgress: number }>;
-            const currentProgress = event.detail.totalProgress;
-
-            updateModelProgress(currentProgress);
-        },
-        [updateModelProgress]
-    );
-
-    const handleLoad = useCallback(() => {
-        console.log("✅ Model viewer: loaded the model");
-        markModelLoaded();
-    }, [markModelLoaded]);
-
-    const handleError = useCallback(() => {
-        console.error("❌ Model viewer failed to load");
-    }, []);
-
+    // Ready once the viewer has drawn the model, not just when the file arrived.
     useEffect(() => {
-        if (!threeImported || !isLoadButtonClicked || listenersAttachedRef.current)
-            return;
+        const viewer = modelViewerRef.current;
+        if (!threeImported || !isLoadButtonClicked || !viewer || !modelBlobUrl) return;
 
-        console.log("🎯 Setting up model viewer event listeners");
-        listenersAttachedRef.current = true;
-
-        const timeout = setTimeout(() => {
-            const viewer = modelViewerRef.current;
-            if (!viewer) {
-                console.log("❌ Model viewer element not found");
-                return;
-            }
-
-            viewer.addEventListener("progress", handleProgress);
-            viewer.addEventListener("load", handleLoad);
-            viewer.addEventListener("error", handleError);
-        }, 50);
-
-        return () => {
-            clearTimeout(timeout);
-            listenersAttachedRef.current = false;
+        if ((viewer as ModelViewerElement & { loaded?: boolean }).loaded) setViewerReady(true);
+        const onLoad = () => setViewerReady(true);
+        // Fires as soon as the model is on screen, a moment before "load".
+        const onVisibility = (event: Event) => {
+            if ((event as CustomEvent<{ visible?: boolean }>).detail?.visible) setViewerReady(true);
         };
-    }, [threeImported, isLoadButtonClicked, handleProgress, handleLoad, handleError]);
+        const onError = () => setViewerFailed(true);
+        viewer.addEventListener("load", onLoad);
+        viewer.addEventListener("model-visibility", onVisibility);
+        viewer.addEventListener("error", onError);
+        return () => {
+            viewer.removeEventListener("load", onLoad);
+            viewer.removeEventListener("model-visibility", onVisibility);
+            viewer.removeEventListener("error", onError);
+        };
+    }, [threeImported, isLoadButtonClicked, modelBlobUrl]);
+
+    const loadPhase: ViewerLoadPhase =
+        viewerFailed || modelGlobalStatus === "error"
+            ? "error"
+            : viewerReady
+              ? "ready"
+              : modelGlobalStatus === "loaded"
+                ? "prepare"
+                : "download";
 
     const modelMainView =
         selectedRenderIndex === -1 ? (
@@ -390,9 +387,10 @@ export const ModelViewer = ({
                         />
 
                         <LoadingOverlay
-                            isVisible={!modelFileLoaded}
-                            isDownloading={modelGlobalStatus === "loading"}
-                            downloadProgress={modelLoadProgress}
+                            phase={loadPhase}
+                            progress={modelLoadProgress}
+                            totalBytes={modelTotalBytes}
+                            onRetry={retryLoad}
                         />
 
                         <ModelControls

@@ -633,6 +633,20 @@ body {
     animation: sheen 1.6s var(--ease-forge) var(--skeleton-delay, 0ms) infinite;
   }
 
+  /* Progress bar with no known end: a band sweeps across. */
+  .progress-indeterminate {
+    width: 40%;
+    animation: indeterminate 1.2s var(--ease-forge) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .progress-indeterminate {
+      width: 100%;
+      animation: none;
+      opacity: 0.6;
+    }
+  }
+
   /* Gallery image: settles in once loaded; slow zoom on hover. */
   .tile-image {
     opacity: 0;
@@ -762,6 +776,15 @@ body {
   100% {
     bottom: calc(100% - 2px);
     opacity: 0;
+  }
+}
+
+@keyframes indeterminate {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(250%);
   }
 }
 
