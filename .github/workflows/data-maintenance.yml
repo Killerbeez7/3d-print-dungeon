@@ -1,0 +1,71 @@
+name: Data maintenance
+
+# Runs the one-time data scripts against the live project with the
+# FIREBASE_SERVICE_ACCOUNT secret, so no key file is needed on anyone's computer.
+#
+# Triggered by a change to .github/data-maintenance.json on claude/redesign-v2:
+#   { "script": "make-light-previews" | "protect-original-files",
+#     "apply": false, "deleteOrphans": false }
+# "apply": false is a dry run that changes nothing; it only prints the plan.
+
+on:
+  push:
+    branches: ["claude/redesign-v2"]
+    paths: [".github/data-maintenance.json"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: data-maintenance
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Read the request
+        id: request
+        run: |
+          script=$(jq -r '.script' .github/data-maintenance.json)
+          apply=$(jq -r '.apply == true' .github/data-maintenance.json)
+          orphans=$(jq -r '.deleteOrphans == true' .github/data-maintenance.json)
+          case "$script" in
+            make-light-previews|protect-original-files) ;;
+            *) echo "::error::Unknown script: $script"; exit 1 ;;
+          esac
+          echo "script=$script" >> "$GITHUB_OUTPUT"
+          echo "apply=$apply" >> "$GITHUB_OUTPUT"
+          echo "orphans=$orphans" >> "$GITHUB_OUTPUT"
+          echo "Script: $script, apply: $apply, delete orphans: $orphans" >> "$GITHUB_STEP_SUMMARY"
+
+      - run: npm ci
+      - run: npm ci
+        working-directory: functions
+
+      - name: Run
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SCRIPT: ${{ steps.request.outputs.script }}
+          APPLY: ${{ steps.request.outputs.apply }}
+          ORPHANS: ${{ steps.request.outputs.orphans }}
+        run: |
+          key="$RUNNER_TEMP/service-account.json"
+          trap 'rm -f "$key"' EXIT
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$key"
+          export GOOGLE_APPLICATION_CREDENTIALS="$key"
+          flags=()
+          [ "$APPLY" = "true" ] && flags+=(--apply)
+          if [ "$SCRIPT" = "make-light-previews" ]; then
+            npx --yes tsx scripts/make-light-previews.ts "${flags[@]}"
+          else
+            [ "$ORPHANS" = "true" ] && flags+=(--delete-orphans)
+            (cd functions && node scripts/protect-original-files.js "${flags[@]}")
+          fi
