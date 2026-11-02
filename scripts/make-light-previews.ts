@@ -40,7 +40,10 @@ const main = async () => {
     // nothing uses any more.
     const viewerAfter = new Map(models.map((doc) => [doc.id, doc.data().convertedFileUrl as string | undefined]));
     const oldViewerPaths = new Set<string>();
+    // Listings that share an original file share one preview.
+    const previewByOriginal = new Map<string, { url: string; triangles: number; sourceTriangles: number } | null>();
     let made = 0;
+    let reused = 0;
     let cleared = 0;
     let skipped = 0;
 
@@ -57,6 +60,30 @@ const main = async () => {
             continue;
         }
 
+        const cacheKey = `${data.uploaderId}|${originalPath}`;
+        const cached = previewByOriginal.get(cacheKey);
+        if (cached !== undefined) {
+            if (cached === null) {
+                console.log(`CLEAR ${label}: same file as an earlier listing; viewer link removed`);
+                if (apply) await doc.ref.update({ convertedFileUrl: "", previewVersion: 1 });
+                cleared += 1;
+            } else {
+                console.log(`REUSE ${label}: preview of an earlier listing with the same file`);
+                if (apply) {
+                    await doc.ref.update({
+                        convertedFileUrl: cached.url,
+                        previewTriangles: cached.triangles,
+                        sourceTriangles: cached.sourceTriangles,
+                        previewVersion: 1,
+                    });
+                }
+                reused += 1;
+            }
+            viewerAfter.set(doc.id, cached?.url ?? "");
+            if (oldViewerPath) oldViewerPaths.add(oldViewerPath);
+            continue;
+        }
+
         const fileName: string = data.originalFileName ?? originalPath.split("/").pop();
         const [bytes] = await bucket.file(originalPath).download();
         const triangles = await fileToTriangles(new File([new Uint8Array(bytes)], fileName));
@@ -69,6 +96,7 @@ const main = async () => {
                 await doc.ref.update({ convertedFileUrl: "", previewVersion: 1 });
             }
             viewerAfter.set(doc.id, "");
+            previewByOriginal.set(cacheKey, null);
             if (oldViewerPath) oldViewerPaths.add(oldViewerPath);
             cleared += 1;
             continue;
@@ -96,8 +124,15 @@ const main = async () => {
                 previewVersion: 1,
             });
             viewerAfter.set(doc.id, url);
+            previewByOriginal.set(cacheKey, { url, triangles: preview.triangles, sourceTriangles: preview.sourceTriangles });
         } else {
-            viewerAfter.set(doc.id, `planned:${previewPath}`);
+            const planned = `planned:${previewPath}`;
+            viewerAfter.set(doc.id, planned);
+            previewByOriginal.set(cacheKey, {
+                url: planned,
+                triangles: preview.triangles,
+                sourceTriangles: preview.sourceTriangles,
+            });
         }
         if (oldViewerPath) oldViewerPaths.add(oldViewerPath);
         made += 1;
@@ -129,7 +164,8 @@ const main = async () => {
     }
 
     console.log(
-        `\nPreviews ${apply ? "made" : "to make"}: ${made}. Viewer links removed: ${cleared}. ` +
+        `\nPreviews ${apply ? "made" : "to make"}: ${made}, shared with other listings: ${reused}. ` +
+            `Viewer links removed: ${cleared}. ` +
             `Skipped: ${skipped}. Old viewer files ${apply ? "deleted" : "to delete"}: ${deleted}.`
     );
 };
