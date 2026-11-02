@@ -51,11 +51,12 @@ export function ModelPage() {
   const { threeImported, importThreeJs } = useThreeJsImporter();
   const { isDesktop } = useScreenSize();
 
-  // Load Three.js when the page opens
-  useEffect(() => {
-    importThreeJs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // The 3D engine (~300 KB) loads when someone reaches for the viewer
+  // (hover, touch or keyboard focus), always before they can press "Load 3D
+  // model", so visitors who only look at the images never download it.
+  const prepareViewer = () => {
+    if (!threeImported) void importThreeJs();
+  };
 
   useViewTracker(modelId ?? "", currentUser ?? undefined);
   const { count: viewCount, loading: viewCountLoading } = useModelViewCount(
@@ -133,7 +134,13 @@ export function ModelPage() {
 
       <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
         {/* Viewer */}
-        <div className="flex min-w-0 flex-1 flex-col gap-3">
+        <div
+          className="flex min-w-0 flex-1 flex-col gap-3"
+          onPointerEnter={prepareViewer}
+          onTouchStart={prepareViewer}
+          onFocus={prepareViewer}
+          onClickCapture={prepareViewer}
+        >
           <Suspense fallback={<div className="skeleton-print h-[52vh] rounded-lg lg:h-[calc(100vh-15rem)]" />}>
             <ModelViewer
               model={viewerModel}
