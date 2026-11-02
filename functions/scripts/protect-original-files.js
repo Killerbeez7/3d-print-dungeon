@@ -58,7 +58,11 @@ const main = async () => {
     // Public originals that skipped listings still point at, and those moved.
     const legacyPathsInUse = new Set();
     const movedPaths = new Set();
+    // Listings by one uploader that point at the same public file share one
+    // private copy; deleteModel keeps a copy another listing still uses.
+    const copyByLegacyPath = new Map();
     let moved = 0;
+    let shared = 0;
     let skipped = 0;
 
     for (const doc of models) {
@@ -88,10 +92,26 @@ const main = async () => {
         }
 
         const fileName = legacyPath.split("/").pop();
-        // One copy per listing, so deleting one listing never breaks another.
+        const copyKey = `${data.uploaderId}|${legacyPath}`;
+        const existingCopy = copyByLegacyPath.get(copyKey);
+        if (existingCopy) {
+            console.log(`SHARE ${doc.id} "${data.name ?? ""}": same file as an earlier listing, ${existingCopy.path}`);
+            if (apply) {
+                await doc.ref.update({
+                    originalFilePath: existingCopy.path,
+                    originalFileName: fileName,
+                    originalFileSize: existingCopy.size,
+                    originalFileUrl: FieldValue.delete(),
+                });
+            }
+            shared += 1;
+            continue;
+        }
+
         const privatePath = `${PRIVATE_ORIGINALS}/${data.uploaderId}/${randomUUID()}/${fileName}`;
         console.log(`MOVE ${doc.id} "${data.name ?? ""}": ${legacyPath} -> ${privatePath}`);
 
+        let size = 0;
         if (apply) {
             // Stream into a new object instead of copying: a copy would keep the
             // old download token, and with it the old public link.
@@ -108,14 +128,16 @@ const main = async () => {
             if (metadata.size !== sourceMetadata.size) {
                 throw new Error(`Copy of ${legacyPath} is incomplete; nothing was changed for ${doc.id}.`);
             }
+            size = Number(metadata.size);
 
             await doc.ref.update({
                 originalFilePath: privatePath,
                 originalFileName: fileName,
-                originalFileSize: Number(metadata.size),
+                originalFileSize: size,
                 originalFileUrl: FieldValue.delete(),
             });
         }
+        copyByLegacyPath.set(copyKey, { path: privatePath, size });
         movedPaths.add(legacyPath);
         moved += 1;
     }
@@ -145,7 +167,7 @@ const main = async () => {
     }
 
     console.log(
-        `\nListings moved: ${moved}, skipped: ${skipped}. ` +
+        `\nListings moved: ${moved}, sharing a moved file: ${shared}, skipped: ${skipped}. ` +
             `Public files ${apply ? "deleted" : "to delete"}: ${deleted}. Orphans found: ${orphans}.`
     );
 };
