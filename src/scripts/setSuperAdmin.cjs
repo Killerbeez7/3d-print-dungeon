@@ -19,7 +19,6 @@ admin.initializeApp({
 });
 
 const users = [
-  { uid: "5wjwku8RE8hO5E58095NryTHoHV2", note: "plamen secondary" },
   { uid: "IVzzXjLMI3bF47tH8lZrPCDHtlz1", note: "plamen main" },
   { uid: "lKrp06oT0zLtEspBiSTukXbxtr33", note: "jaram" },
 ];
