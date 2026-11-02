@@ -119,6 +119,12 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 - [ ] View counts go up on the live site (`trackModelView`; could not be tested from the dev
       sandbox)
 - [ ] The scroll-to-top button covers the cookie banner's "Manage" link on desktop
+- [ ] Page HTML is revalidated on every visit: `curl -sI https://printdungeon.com/model/x` should
+      show `cache-control: no-cache`, and `/assets/...` files `max-age=31536000, immutable`
+- [ ] `theme-color` (#0f0f12 / #ffffff) doesn't match the page background (#0a0a0c / #f6f6f7),
+      so iPhone Safari's bars are a slightly different shade; decide which to keep
+- [ ] `public/assets/images/logo.svg` and `logo.png` are no longer used by the site; delete them if
+      nothing outside the site (emails, social posts) links to them
 
 ## Design system follow-ups
 
