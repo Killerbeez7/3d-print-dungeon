@@ -4,7 +4,7 @@ name: Data maintenance
 # FIREBASE_SERVICE_ACCOUNT secret, so no key file is needed on anyone's computer.
 #
 # Triggered by a change to .github/data-maintenance.json on claude/redesign-v2:
-#   { "script": "make-light-previews" | "protect-original-files",
+#   { "script": "make-light-previews" | "protect-original-files" | "set-super-admins",
 #     "apply": false, "deleteOrphans": false }
 # "apply": false is a dry run that changes nothing; it only prints the plan.
 
@@ -38,7 +38,7 @@ jobs:
           apply=$(jq -r '.apply == true' .github/data-maintenance.json)
           orphans=$(jq -r '.deleteOrphans == true' .github/data-maintenance.json)
           case "$script" in
-            make-light-previews|protect-original-files) ;;
+            make-light-previews|protect-original-files|set-super-admins) ;;
             *) echo "::error::Unknown script: $script"; exit 1 ;;
           esac
           echo "script=$script" >> "$GITHUB_OUTPUT"
@@ -65,6 +65,8 @@ jobs:
           [ "$APPLY" = "true" ] && flags+=(--apply)
           if [ "$SCRIPT" = "make-light-previews" ]; then
             npx --yes tsx scripts/make-light-previews.ts "${flags[@]}"
+          elif [ "$SCRIPT" = "set-super-admins" ]; then
+            node src/scripts/setSuperAdmin.cjs "${flags[@]}"
           else
             [ "$ORPHANS" = "true" ] && flags+=(--delete-orphans)
             (cd functions && node scripts/protect-original-files.js "${flags[@]}")
