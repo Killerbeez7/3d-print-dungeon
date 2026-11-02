@@ -7,16 +7,16 @@ const LazyAdmin = lazy(() =>
   import("../pages/AdminPage").then((m) => ({ default: m.AdminPage }))
 );
 
-export const adminRoutes: RouteObject[] = [
+const adminElement = withProtected(
+  <Suspense>
+    <LazyAdmin />
+  </Suspense>,
   {
-    path: ROUTES.ADMIN_DASHBOARD,
-    element: withProtected(
-      <Suspense>
-        <LazyAdmin />
-      </Suspense>,
-      {
-        allowedRoles: ["admin"],
-      }
-    ),
-  },
+    allowedRoles: ["admin"],
+  }
+);
+
+export const adminRoutes: RouteObject[] = [
+  { path: ROUTES.ADMIN_DASHBOARD, element: adminElement },
+  { path: `${ROUTES.ADMIN_DASHBOARD}/:section`, element: adminElement },
 ];
