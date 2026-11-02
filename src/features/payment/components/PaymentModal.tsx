@@ -8,6 +8,7 @@ import { CheckoutForm } from "./CheckoutForm";
 import { LazyStripeProvider } from "../providers/LazyStripeProvider";
 import type { PaymentModalProps } from "@/features/payment/types/payment";
 import { paymentService } from "@/features/payment/services/paymentService";
+import { getThumbnailUrl } from "@/utils/imageUtils";
 
 export interface PaymentModalWithSuccessProps extends PaymentModalProps {
   onSuccess?: () => void;
@@ -140,7 +141,13 @@ export const PaymentModal = ({
               <div className="flex items-center gap-4 border-b border-dashed border-br-secondary px-6 py-4">
                 {model.renderPrimaryUrl && (
                   <img
-                    src={model.renderPrimaryUrl}
+                    src={getThumbnailUrl(model.renderPrimaryUrl, "SMALL") ?? model.renderPrimaryUrl}
+                    onError={(event) => {
+                      const image = event.currentTarget;
+                      if (model.renderPrimaryUrl && image.src !== model.renderPrimaryUrl) {
+                        image.src = model.renderPrimaryUrl;
+                      }
+                    }}
                     alt=""
                     className="chamfer size-16 shrink-0 bg-muted object-cover [--cut:9px]"
                   />
