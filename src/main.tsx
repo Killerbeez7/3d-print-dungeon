@@ -45,6 +45,21 @@ function renderBootstrapError(error: unknown): void {
   document.body.appendChild(wrapper);
 }
 
+// After a deploy, a tab opened earlier can ask for script files that no longer
+// exist. Reload once to pick up the new version (not again within a minute,
+// so a real outage can't cause a reload loop).
+window.addEventListener("vite:preloadError", (event) => {
+  try {
+    const last = Number(sessionStorage.getItem("chunk-reload-at") || 0);
+    if (Date.now() - last < 60_000) return;
+    sessionStorage.setItem("chunk-reload-at", String(Date.now()));
+  } catch {
+    return;
+  }
+  event.preventDefault();
+  window.location.reload();
+});
+
 async function bootstrap(): Promise<void> {
   const container = document.getElementById("root");
 
