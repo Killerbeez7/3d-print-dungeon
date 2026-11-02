@@ -1,5 +1,4 @@
-import { httpsCallable } from "firebase/functions";
-import { functions } from "@/config/firebaseConfig";
+import { lazyCallable } from "@/config/firebaseLazy";
 
 type UsernameAvailabilityResponse = {
   available: boolean;
@@ -11,15 +10,15 @@ type EmailAvailabilityResponse = {
   error?: string;
 };
 
-const checkUsernameAvailability = httpsCallable<
+const checkUsernameAvailability = lazyCallable<
   { username: string },
   UsernameAvailabilityResponse
->(functions, "checkUsernameAvailability");
+>("checkUsernameAvailability");
 
-const checkEmailAvailability = httpsCallable<
+const checkEmailAvailability = lazyCallable<
   { email: string },
   EmailAvailabilityResponse
->(functions, "checkEmailAvailability");
+>("checkEmailAvailability");
 
 export const isUsernameAvailableInDB = async (username: string): Promise<boolean> => {
   try {

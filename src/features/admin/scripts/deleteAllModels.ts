@@ -1,4 +1,5 @@
-import { db, storage } from "../../../config/firebaseConfig";
+import { db } from "../../../config/firebaseConfig";
+import { loadStorage } from "@/config/firebaseLazy";
 import {
   collection,
   getDocs,
@@ -9,12 +10,12 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { ref, deleteObject } from "firebase/storage";
 import { STORAGE_PATHS } from '../../../constants/storagePaths';
 import type { AdminModel, AdminUser } from "@/features/admin/types/admin";
 
 
 export async function deleteAllModelsAndRelated(onProgress?: (progress: number) => void): Promise<void> {
+  const { ref, deleteObject, storage } = await loadStorage();
   const modelsSnap = await getDocs(collection(db, "models"));
   const models = modelsSnap.docs.map((d) => ({ id: d.id, ...d.data() })) as AdminModel[];
   const total = models.length;
@@ -97,6 +98,7 @@ export async function deleteAllModelsAndRelated(onProgress?: (progress: number) 
 
 
 export async function deleteModelAndRelated(modelId: string): Promise<void> {
+  const { ref, deleteObject, storage } = await loadStorage();
   const modelDoc = await getDocs(query(collection(db, "models"), where("__name__", "==", modelId)));
   if (modelDoc.empty) throw new Error("Model not found");
   const model = { id: modelId, ...modelDoc.docs[0].data() } as AdminModel;

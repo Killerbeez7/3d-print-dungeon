@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { doc, onSnapshot, DocumentData, FirestoreError } from "firebase/firestore";
-import { httpsCallable, getFunctions, HttpsCallableResult } from "firebase/functions";
+import type { HttpsCallableResult } from "firebase/functions";
+import { lazyCallable } from "@/config/firebaseLazy";
 import { db } from "@/config/firebaseConfig";
 import { getViewerId } from "@/features/models/utils/getViewerId";
 
-const functions = getFunctions();
 
 export async function sendViewEvent(
     modelId: string,
@@ -18,7 +18,7 @@ export async function sendViewEvent(
         const viewerId = await getViewerId(currentUser);
         // eslint-disable-next-line no-console
         console.log(`Tracking view event for model: ${modelId}, viewer: ${viewerId}`);
-        const trackView = httpsCallable(functions, "trackModelView");
+        const trackView = lazyCallable("trackModelView");
         const result: HttpsCallableResult<unknown> = await trackView({ modelId, viewerId });
         // eslint-disable-next-line no-console
         if ((result.data as { success?: boolean }).success) {
@@ -105,7 +105,7 @@ export function useModelViewCount(
 export async function getModelViewCount(modelId: string): Promise<number> {
     if (!modelId) return 0;
     try {
-        const getViewCount = httpsCallable(functions, "getModelViewCount");
+        const getViewCount = lazyCallable("getModelViewCount");
         const result: HttpsCallableResult<unknown> = await getViewCount({ modelId });
         return (result.data as { viewCount?: number }).viewCount ?? 0;
     } catch (error) {

@@ -1,4 +1,3 @@
-import { httpsCallable } from "firebase/functions";
 import {
     doc,
     addDoc,
@@ -7,31 +6,27 @@ import {
     runTransaction,
     serverTimestamp,
 } from "firebase/firestore";
-import {
-    ref,
-    getDownloadURL,
-    uploadBytesResumable,
-    type StorageReference,
-    type UploadTaskSnapshot,
-} from "firebase/storage";
-import { db, functions, storage } from "@/config/firebaseConfig";
+import type { StorageReference, UploadTaskSnapshot } from "firebase/storage";
+import { db } from "@/config/firebaseConfig";
+import { lazyCallable, loadStorage } from "@/config/firebaseLazy";
 import { STORAGE_PATHS } from "@/constants/storagePaths";
 import type { ModelUpdateData } from "@/features/models/types/model";
 
 const CACHE_CONTROL = "public,max-age=31536000,immutable";
 
-function uploadFile(
+async function uploadFile(
     fileRef: StorageReference,
     data: Blob,
     contentType: string,
     onProgress?: (snapshot: UploadTaskSnapshot) => void
 ): Promise<void> {
+    const { uploadBytesResumable } = await loadStorage();
     const task = uploadBytesResumable(fileRef, data, {
         contentType: contentType || "application/octet-stream",
         cacheControl: CACHE_CONTROL,
     });
 
-    return new Promise((resolve, reject) => {
+    await new Promise<void>((resolve, reject) => {
         task.on(
             "state_changed",
             (snapshot) => {
@@ -50,6 +45,7 @@ async function uploadAndGetUrl(
     onProgress?: (snapshot: UploadTaskSnapshot) => void
 ): Promise<string> {
     await uploadFile(fileRef, data, contentType, onProgress);
+    const { getDownloadURL } = await loadStorage();
     return getDownloadURL(fileRef);
 }
 
@@ -98,6 +94,7 @@ export async function createAdvancedModel({
     isAI = false,
 }: CreateModelParams): Promise<CreateModelResult> {
     const progressFn = onProgress ?? (() => undefined);
+    const { ref, storage } = await loadStorage();
 
     // Unique folder prevents files with the same name from overwriting each other.
     const uploadKey = `${uploaderId}/${crypto.randomUUID()}`;
@@ -328,10 +325,10 @@ export async function updateModel(
 export async function deleteModel(
     modelId: string
 ): Promise<void> {
-    const deleteModelFunction = httpsCallable<
+    const deleteModelFunction = lazyCallable<
         { modelId: string },
         unknown
-    >(functions, "deleteModel");
+    >("deleteModel");
 
     await deleteModelFunction({ modelId });
 }
@@ -339,10 +336,10 @@ export async function deleteModel(
 export async function getModelDownloadUrl(
     modelId: string
 ): Promise<{ url: string; fileName: string }> {
-    const getDownloadUrl = httpsCallable<
+    const getDownloadUrl = lazyCallable<
         { modelId: string },
         { url: string; fileName: string }
-    >(functions, "getModelDownloadUrl");
+    >("getModelDownloadUrl");
 
     const result = await getDownloadUrl({ modelId });
     return result.data;

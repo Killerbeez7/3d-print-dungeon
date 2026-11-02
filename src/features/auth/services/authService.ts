@@ -12,7 +12,6 @@ import {
 } from "firebase/auth";
 
 import { doc, onSnapshot } from "firebase/firestore";
-import { httpsCallable } from "firebase/functions";
 
 import { auth, db } from "@/config/firebaseConfig";
 import { isUsernameAvailableInDB } from "../utils/authUtils";
@@ -21,9 +20,9 @@ import type { PrivateProfile } from "@/features/user/types/user";
 import type { PublicProfile } from "@/features/user/profile";
 import { handleAuthError } from "../utils/errorHandling";
 
-import { functions } from "@/config/firebaseConfig";
+import { lazyCallable } from "@/config/firebaseLazy";
 
-const ensureUserDocument = httpsCallable(functions, "ensureUserDocument");
+const ensureUserDocument = lazyCallable("ensureUserDocument");
 
 const ensureUserDoc = async () => {
   try {
@@ -69,7 +68,7 @@ export const signUpWithEmail = async (
   password: string
 ): Promise<FirebaseUser> => {
   try {
-    const createValidatedUser = httpsCallable(functions, "createValidatedUser");
+    const createValidatedUser = lazyCallable("createValidatedUser");
 
     await createValidatedUser({
       email,
@@ -158,7 +157,7 @@ export const updateUserUsername = async (
     if (!isAvailable) {
       throw new Error("Username is already taken");
     }
-    const updateUsername = httpsCallable(functions, "updateUsername");
+    const updateUsername = lazyCallable("updateUsername");
     await updateUsername({ username: newUsername });
   } catch (error) {
     console.error("Error updating username:", error);

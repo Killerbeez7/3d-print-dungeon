@@ -5,8 +5,8 @@ import {
   type DocumentData,
 } from "firebase/firestore";
 
-import { httpsCallable } from "firebase/functions";
-import { db, functions } from "@/config/firebaseConfig";
+import { db } from "@/config/firebaseConfig";
+import { lazyCallable } from "@/config/firebaseLazy";
 
 import type { FollowStatus } from "../types/follow";
 
@@ -62,10 +62,7 @@ export const followService = {
       throw new Error("Target user ID is required.");
     }
 
-    const toggleFollowCallable = httpsCallable<{ targetUserId: string }, FollowStatus>(
-      functions,
-      "toggleFollow"
-    );
+    const toggleFollowCallable = lazyCallable<{ targetUserId: string }, FollowStatus>("toggleFollow");
 
     const result = await toggleFollowCallable({
       targetUserId,

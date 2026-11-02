@@ -1,9 +1,8 @@
-import { getFunctions, httpsCallable, Functions } from "firebase/functions";
-import { app } from "@/config/firebaseConfig";
 import { auth } from "@/config/firebaseConfig";
+import { lazyCallable } from "@/config/firebaseLazy";
 import type { Purchase, SellerSale } from "@/features/payment/types/payment";
 
-const functions: Functions = getFunctions(app, "us-central1");
+const REGION = "us-central1";
 
 export class PaymentService {
     private maxRetries = 2;
@@ -37,7 +36,7 @@ export class PaymentService {
                 throw new Error("User not authenticated. Please log in.");
             }
             await auth.currentUser.getIdToken(true);
-            const callable = httpsCallable<unknown, T>(functions, fnName);
+            const callable = lazyCallable<unknown, T>(fnName, REGION);
             const result = await callable(data);
             return result.data;
         } catch (error) {
@@ -89,7 +88,7 @@ export class PaymentService {
     /** The server charges the model's own price; the browser never sends one. */
     async createPaymentIntent(modelId: string): Promise<unknown> {
         return this.withRetry(async () => {
-            const fn = httpsCallable<{ modelId: string }, unknown>(functions, "createPaymentIntent");
+            const fn = lazyCallable<{ modelId: string }, unknown>("createPaymentIntent", REGION);
             const res = await fn({ modelId });
             return res.data;
         }, "createPaymentIntent");
@@ -97,7 +96,7 @@ export class PaymentService {
 
     async handlePaymentSuccess(paymentIntentId: string): Promise<unknown> {
         return this.withRetry(async () => {
-            const fn = httpsCallable<{ paymentIntentId: string }, unknown>(functions, "handlePaymentSuccess");
+            const fn = lazyCallable<{ paymentIntentId: string }, unknown>("handlePaymentSuccess", REGION);
             const res = await fn({ paymentIntentId });
             return res.data;
         }, "handlePaymentSuccess");
@@ -105,7 +104,7 @@ export class PaymentService {
 
     async getUserPurchases(): Promise<Purchase[]> {
         return this.withRetry(async () => {
-            const fn = httpsCallable<undefined, { purchases?: Purchase[] }>(functions, "getUserPurchases");
+            const fn = lazyCallable<undefined, { purchases?: Purchase[] }>("getUserPurchases", REGION);
             const res = await fn();
             return res.data.purchases || [];
         }, "getUserPurchases");
@@ -113,7 +112,7 @@ export class PaymentService {
 
     async getSellerSales(): Promise<SellerSale[]> {
         return this.withRetry(async () => {
-            const fn = httpsCallable<undefined, { sales?: SellerSale[] }>(functions, "getSellerSales");
+            const fn = lazyCallable<undefined, { sales?: SellerSale[] }>("getSellerSales", REGION);
             const res = await fn();
             return res.data.sales || [];
         }, "getSellerSales");

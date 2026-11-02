@@ -1,8 +1,8 @@
-import { getDownloadURL, uploadBytes, ref } from "firebase/storage";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { updateProfile as updateFirebaseProfile, type User } from "firebase/auth";
 
-import { db, storage } from "@/config/firebaseConfig";
+import { db } from "@/config/firebaseConfig";
+import { loadStorage } from "@/config/firebaseLazy";
 
 import { getPublicProfileById } from "@/features/user/profile/services/profileService";
 
@@ -37,6 +37,7 @@ const buildLocation = (city: string, country: string): string | null => {
 
 export const profileService = {
   async uploadImage(file: File, userId: string, type: ProfileImageType): Promise<string> {
+    const { ref, storage, uploadBytes, getDownloadURL } = await loadStorage();
     const imageRef = ref(storage, `users/${userId}/${type}`);
 
     const snapshot = await uploadBytes(imageRef, file, {

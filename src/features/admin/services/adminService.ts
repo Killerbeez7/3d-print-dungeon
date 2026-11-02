@@ -1,6 +1,6 @@
 import { doc, getDoc } from "firebase/firestore";
-import { httpsCallable } from "firebase/functions";
-import { db, functions, auth } from "@/config/firebaseConfig";
+import { db, auth } from "@/config/firebaseConfig";
+import { lazyCallable } from "@/config/firebaseLazy";
 import { refreshIdToken } from "@/features/auth/utils/refreshIdToken";
 
 const adminCache = new Map<string, { ok: boolean; t: number }>(); // uid → { ok, t }
@@ -29,7 +29,7 @@ export async function isAdmin(uid: string): Promise<boolean> {
     return ok;
 }
 
-const setUserRole = httpsCallable(functions, "setUserRole");
+const setUserRole = lazyCallable("setUserRole");
 
 type SetUserRoleResult = { success: boolean; message?: string }; // Adjust as needed
 
