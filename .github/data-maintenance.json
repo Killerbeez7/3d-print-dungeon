@@ -1,0 +1,5 @@
+{
+  "script": "make-light-previews",
+  "apply": false,
+  "deleteOrphans": false
+}
