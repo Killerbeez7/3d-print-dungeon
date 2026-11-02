@@ -32,6 +32,8 @@ export interface AuthContextValue {
   claims: CustomClaims | null;
 
   loading: boolean;
+  /** Whether someone is signed in is known (profiles may still be loading). */
+  authReady: boolean;
   authError: string | null;
 
   handleEmailSignUp(email: string, password: string): Promise<void>;

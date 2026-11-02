@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, RefObject, useCallback } from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { ChevronDown, Menu, Search, Upload } from "lucide-react";
+import { Bell, ChevronDown, Menu, Search, Upload } from "lucide-react";
 // hooks
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useUserRole } from "@/features/auth/hooks/useUserRole";
@@ -18,6 +18,7 @@ import { NotificationDropdown } from "@/features/user/notifications";
 import { buttonClassName } from "@/components";
 import { BrandMark } from "@/features/shared/components/BrandMark";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
+import { readSessionHint } from "@/features/auth/utils/sessionHint";
 
 const iconButtonClass =
   "flex size-10 items-center justify-center rounded-lg text-txt-secondary transition-colors hover:bg-muted hover:text-txt-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus";
@@ -30,16 +31,13 @@ const navLinkClass = (isActive: boolean) =>
       : "text-txt-secondary after:scale-x-0 hover:text-txt-primary hover:after:scale-x-100"
   }`;
 
-const NavbarAuthSkeleton = () => (
-  <div className="flex h-10 items-center justify-end gap-2" aria-hidden="true">
-    <div className="skeleton-print chamfer h-9 w-20 [--cut:7px]" />
-    <div className="skeleton-print chamfer size-10 [--cut:7px]" />
-  </div>
-);
-
 export const Navbar = () => {
   const { isAdmin } = useUserRole();
-  const { authUser, currentUser, publicProfile, handleSignOut, loading } = useAuth();
+  const { authUser, currentUser, publicProfile, handleSignOut, authReady } = useAuth();
+  // Until Firebase restores the session, show what this browser had last
+  // time instead of a placeholder (signed out if it never signed in).
+  const [sessionHint] = useState(readSessionHint);
+  const signedIn = authReady ? Boolean(currentUser) : Boolean(sessionHint);
   const { open } = useModal("auth");
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
@@ -89,10 +87,15 @@ export const Navbar = () => {
     closeAll();
   }, [closeAll, location.pathname]);
 
-  const urlSafeUsername = toUrlSafeUsername(publicProfile?.username);
-  const profileAvatarSrc = authUser?.photoURL ?? currentUser?.photoURL ?? null;
+  const urlSafeUsername = toUrlSafeUsername(publicProfile?.username ?? sessionHint?.username ?? undefined);
+  const profileAvatarSrc = authUser?.photoURL ?? currentUser?.photoURL ?? sessionHint?.photoURL ?? null;
   const profileDisplayName =
-    authUser?.username ?? authUser?.displayName ?? currentUser?.displayName ?? "User";
+    authUser?.username ??
+    authUser?.displayName ??
+    currentUser?.displayName ??
+    sessionHint?.username ??
+    sessionHint?.displayName ??
+    "User";
   const profileEmail = authUser?.email ?? currentUser?.email ?? "";
 
   return (
@@ -213,9 +216,7 @@ export const Navbar = () => {
               <Search className="size-5" aria-hidden="true" />
             </Link>
 
-            {loading ? (
-              <NavbarAuthSkeleton />
-            ) : !currentUser ? (
+            {!signedIn ? (
               <AuthButtons
                 onLoginClick={() => openAuth("signin")}
                 onSignUpClick={() => openAuth("signup")}
@@ -234,7 +235,14 @@ export const Navbar = () => {
                   Upload
                 </Link>
 
-                <NotificationDropdown className="text-txt-secondary" />
+                {currentUser ? (
+                  <NotificationDropdown className="text-txt-secondary" />
+                ) : (
+                  // Same footprint as the bell while the session is restored.
+                  <span className="flex size-9 items-center justify-center text-txt-muted" aria-hidden="true">
+                    <Bell className="size-5" />
+                  </span>
+                )}
 
                 <ProfileMenu
                   isOpen={activeDropdown === "profile"}
@@ -243,7 +251,7 @@ export const Navbar = () => {
                   onLogout={() => void handleLogout()}
                   isAdmin={isAdmin}
                   displayName={profileDisplayName}
-                  username={publicProfile?.username ?? null}
+                  username={publicProfile?.username ?? sessionHint?.username ?? null}
                   email={profileEmail}
                   avatarSrc={profileAvatarSrc}
                   profilePath={`/${urlSafeUsername}`}

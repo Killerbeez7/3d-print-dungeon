@@ -3,6 +3,7 @@ import { onAuthStateChanged, type User } from "firebase/auth";
 import { auth } from "@/config/firebaseConfig";
 // services, context, utils
 import { refreshIdToken } from "../utils/refreshIdToken";
+import { clearSessionHint, writeSessionHint } from "../utils/sessionHint";
 import { AuthContext } from "../context/authContext";
 import {
   signUpWithEmail,
@@ -29,6 +30,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [privateProfile, setPrivateProfile] = useState<PrivateProfile | null>(null);
   const [publicProfile, setPublicProfile] = useState<PublicProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  // Session and claims known; profiles may still be loading.
+  const [authReady, setAuthReady] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
   const [claims, setClaims] = useState<CustomClaims | null>(null);
   const oauthPopupPendingRef = useRef(false);
@@ -154,10 +157,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       clearProfileSubscriptions();
 
       if (!user) {
+        clearSessionHint();
         setCurrentUser(null);
         setPublicProfile(null);
         setPrivateProfile(null);
         setClaims(null);
+        setAuthReady(true);
         setLoading(false);
         return;
       }
@@ -165,9 +170,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setCurrentUser(user);
 
       try {
-        const nextClaims = await refreshIdToken();
+        // The token on this device is enough to start; a fresh one follows in
+        // the background so role changes still arrive without signing out.
+        const nextClaims = await refreshIdToken(false);
 
         setClaims(nextClaims as CustomClaims);
+        setAuthReady(true);
+
+        refreshIdToken(true)
+          .then((freshClaims) => {
+            if (auth.currentUser?.uid === user.uid) setClaims(freshClaims as CustomClaims);
+          })
+          .catch(() => {
+            // Offline or signed out meanwhile: keep the claims we have.
+          });
 
         unsubscribePublicProfile = fetchPublicProfile(user.uid, (profile) => {
           setPublicProfile(profile);
@@ -186,6 +202,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setPublicProfile(null);
         setPrivateProfile(null);
         setClaims(null);
+        setAuthReady(true);
         setLoading(false);
       }
     });
@@ -271,6 +288,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isModerator,
   ]);
 
+  // Remember who is signed in on this browser for the header on next reload.
+  useEffect(() => {
+    if (authUser) {
+      writeSessionHint({
+        displayName: authUser.displayName,
+        username: authUser.username ?? null,
+        photoURL: authUser.photoURL ?? null,
+      });
+    }
+  }, [authUser]);
+
   const handlePasswordReset = async (email: string) => {
     setLoading(true);
     try {
@@ -295,6 +323,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     claims,
     authError,
     loading,
+    authReady,
     handleEmailSignUp,
     handleEmailSignIn,
     handleGoogleSignIn,
