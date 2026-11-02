@@ -31,22 +31,27 @@ they pay, make themselves admin and post as other users. The fixes are on the br
 reaches the live site until these steps. Steps 3 and 4 belong together: the new site uploads to a
 folder the old rules don't allow, and the old site uploads to a folder the new rules don't allow.
 
-1. [ ] Let the functions sign download links: Google Cloud console → IAM & Admin → Service
+1. [x] Let the functions sign download links: Google Cloud console → IAM & Admin → Service
        accounts → `PROJECT_NUMBER-compute@developer.gserviceaccount.com` → Permissions → grant
        that same account the role **Service Account Token Creator**. Also enable the
        **IAM Service Account Credentials API**. (Project number: Firebase console → Project
        settings.) Then Cloud Storage → bucket `print-dungeon-3d.firebasestorage.app` →
        Permissions → grant the same account **Storage Object Admin**: links only work if the
        account that signs them can read the file, and `deleteModel` deletes files as it
-2. [ ] `firebase deploy --only functions`. It also stops logging new users' passwords. Say yes
+2. [x] `firebase deploy --only functions`. It also stops logging new users' passwords. Say yes
        when it asks to delete `testStripeConnection` and `createSubscription`.
-3. [ ] `firebase deploy --only firestore:rules,storage`
-4. [ ] Deploy the site (merge the branch, then `firebase deploy --only hosting`)
-5. [ ] Move the existing originals out of the public folder, from `functions/`:
+3. [x] `firebase deploy --only firestore:rules,storage`
+4. [x] Deploy the site (`firebase deploy --only hosting`, 2 Nov 2026)
+   - [ ] The build had no Stripe publishable key, so paying is broken on the live site: put
+         `VITE_STRIPE_PUBLISHABLE_KEY=pk_...` in `.env` (not `.env.txt`), then `npm run build` and
+         `firebase deploy --only hosting` again
+5. [ ] `firebase deploy --only functions:deleteModel`, so deleting a listing keeps an original
+       file other listings still use, then move the existing originals out of the public folder.
+       This runs on GitHub: set `.github/data-maintenance.json` and push. By hand, from `functions/`:
        `GOOGLE_APPLICATION_CREDENTIALS=../src/keys/service_key.json node scripts/protect-original-files.js`
        (dry run), then the same with `--apply`. Add `--delete-orphans` to also delete originals no
        listing uses.
-6. [ ] Give the existing listings light 3D previews and delete their full-detail viewer files,
+6. [x] Give the existing listings light 3D previews (done 2 Nov 2026: 13 previews, 10 old files deleted) and delete their full-detail viewer files,
        from the repo root:
        `GOOGLE_APPLICATION_CREDENTIALS=src/keys/service_key.json npx tsx scripts/make-light-previews.ts`
        (dry run), then the same with `--apply`. Run it after step 5.
