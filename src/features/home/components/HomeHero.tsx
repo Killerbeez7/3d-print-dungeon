@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowDown, Upload } from "lucide-react";
 
@@ -7,6 +8,18 @@ import { MODEL_CATEGORIES } from "@/features/models/constants/modelCategories";
 import { useModal } from "@/features/shared/modal/hooks/useModal";
 
 const HERO_IMAGE = "/assets/images/hero-miniatures.webp";
+const PRINTED_KEY = "hero-printed";
+
+/** The print-in plays once per browser session; reloads show the artwork at once. */
+const shouldPrintIn = (): boolean => {
+  try {
+    if (sessionStorage.getItem(PRINTED_KEY)) return false;
+    sessionStorage.setItem(PRINTED_KEY, "1");
+  } catch {
+    // Storage blocked: play it.
+  }
+  return true;
+};
 
 interface HomeHeroProps {
   onBrowse: () => void;
@@ -15,6 +28,7 @@ interface HomeHeroProps {
 export const HomeHero = ({ onBrowse }: HomeHeroProps) => {
   const { currentUser } = useAuth();
   const { open } = useModal("auth");
+  const [printIn] = useState(shouldPrintIn);
 
   return (
     // data-theme="dark" keeps the hero a dark band in both themes: the artwork
@@ -23,14 +37,14 @@ export const HomeHero = ({ onBrowse }: HomeHeroProps) => {
       data-theme="dark"
       className="relative isolate overflow-hidden border-b border-br-subtle bg-page"
     >
-      {/* The artwork "prints" in, layer by layer, when the page loads. */}
+      {/* The artwork "prints" in, layer by layer, on the first visit of a session. */}
       <img
         src={HERO_IMAGE}
         alt=""
         width={768}
         height={512}
         fetchPriority="high"
-        className="hero-print pointer-events-none absolute inset-y-0 right-0 -z-10 h-full w-full object-cover opacity-40 md:w-[62%] md:opacity-100"
+        className={`${printIn ? "hero-print " : ""}pointer-events-none absolute inset-y-0 right-0 -z-10 h-full w-full object-cover opacity-40 md:w-[62%] md:opacity-100`}
       />
       <div className="bg-layer-lines absolute inset-0 -z-10" aria-hidden="true" />
       <div
