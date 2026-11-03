@@ -3,9 +3,10 @@ import { DIE_FACES, type DieFace } from "./dieFaces";
 
 // The logo die: a CSS 3D cube seen at the isometric angle, with a dungeon symbol on each side.
 //
-// Arrangement: the maze (a dungeon plan seen from above) is on top and looks the same after
-// every quarter turn; gate, dragon eye, keyhole and fire go round the sides and always stand
-// upright; bricks are the foundation underneath. At rest you see the gate and the eye.
+// Arrangement: a small real maze (a dungeon plan seen from above) is on top; a maze has no up
+// or down, so it never looks crooked as the die turns. Gate, dragon eye, keyhole and fire go
+// round the sides and always stand upright; bricks are the foundation underneath. At rest you
+// see the gate and the eye.
 //
 // Motion: now and then it makes a quarter turn on the spot, bringing the next side round.
 // Pointed at (or loading), it is thrown: it hops, tumbles one full flip with a quarter turn and
