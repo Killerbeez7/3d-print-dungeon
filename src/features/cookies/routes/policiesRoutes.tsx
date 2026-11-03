@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { ROUTES } from "@/constants/routeConstants";
 import type { RouteObject } from "react-router-dom";
+import { PageLoader } from "@/features/shared/components/Die";
 
 const PoliciesHome = lazy(() =>
   import("../pages/PoliciesHome").then((m) => ({
@@ -36,7 +37,7 @@ export const policiesRoutes: RouteObject[] = [
   {
     path: ROUTES.POLICIES,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <PoliciesHome />
       </Suspense>
     ),
@@ -44,7 +45,7 @@ export const policiesRoutes: RouteObject[] = [
   {
     path: ROUTES.PRIVACY_POLICY,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <PrivacyPolicyPage />
       </Suspense>
     ),
@@ -52,7 +53,7 @@ export const policiesRoutes: RouteObject[] = [
   {
     path: ROUTES.TERMS_OF_USE,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <TermsOfUsePage />
       </Suspense>
     ),
@@ -60,7 +61,7 @@ export const policiesRoutes: RouteObject[] = [
   {
     path: ROUTES.COOKIE_POLICY,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <CookiePolicyPage />
       </Suspense>
     ),
@@ -68,7 +69,7 @@ export const policiesRoutes: RouteObject[] = [
   {
     path: ROUTES.REFUND_POLICY,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <RefundPolicyPage />
       </Suspense>
     ),

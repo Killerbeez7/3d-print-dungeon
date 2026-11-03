@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { ROUTES } from "@/constants/routeConstants";
 
 import type { RouteObject } from "react-router-dom";
+import { PageLoader } from "@/features/shared/components/Die";
 
 const CollectionsPage = lazy(() =>
   import("../pages/CollectionsPage").then((module) => {
@@ -23,7 +24,7 @@ export const collectionsRoutes: RouteObject[] = [
   {
     path: ROUTES.COLLECTIONS,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <CollectionsPage />
       </Suspense>
     ),
@@ -31,7 +32,7 @@ export const collectionsRoutes: RouteObject[] = [
   {
     path: ROUTES.COLLECTIONS_RISING,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <RisingModelsPage />
       </Suspense>
     ),

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { ROUTES } from "@/constants/routeConstants";
 import type { RouteObject } from "react-router-dom";
+import { PageLoader } from "@/features/shared/components/Die";
 
 const BulkOrders = lazy(() =>
   import("../components/BulkOrders").then((m) => ({ default: m.BulkOrders }))
@@ -16,7 +17,7 @@ export const businessRoutes: RouteObject[] = [
   {
     path: ROUTES.BUSINESS_BULK_ORDERS,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <BulkOrders />
       </Suspense>
     ),
@@ -24,7 +25,7 @@ export const businessRoutes: RouteObject[] = [
   {
     path: ROUTES.BUSINESS_CUSTOM_SOLUTIONS,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <CustomSolutions />
       </Suspense>
     ),
@@ -32,7 +33,7 @@ export const businessRoutes: RouteObject[] = [
   {
     path: ROUTES.BUSINESS_ENTERPRISE_SUITE,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <Enterprise />
       </Suspense>
     ),

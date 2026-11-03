@@ -4,6 +4,7 @@ import type { RouteObject } from "react-router-dom";
 
 import { withProtected } from "@/helpers/routeHelpers";
 import { ROUTES } from "@/constants/routeConstants";
+import { PageLoader } from "@/features/shared/components/Die";
 
 const PublicProfilePage = lazy(() =>
   import("../profile/pages/PublicProfilePage").then((module) => ({
@@ -41,7 +42,7 @@ export const userRoutes: RouteObject[] = [
   {
     path: ROUTES.PASSWORD_RESET,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <PasswordResetPage />
       </Suspense>
     ),
@@ -49,7 +50,7 @@ export const userRoutes: RouteObject[] = [
   {
     path: ROUTES.USER_PROFILE_REDIRECT,
     element: withProtected(
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <ProfileRedirect />
       </Suspense>
     ),
@@ -57,7 +58,7 @@ export const userRoutes: RouteObject[] = [
   {
     path: ROUTES.USER_PROFILE,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <PublicProfilePage />
       </Suspense>
     ),
@@ -74,7 +75,7 @@ export const userRoutes: RouteObject[] = [
   {
     path: ROUTES.USER_NOTIFICATIONS,
     element: withProtected(
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <NotificationsPage />
       </Suspense>
     ),

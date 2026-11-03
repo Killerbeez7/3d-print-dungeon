@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { withProtected } from "@/helpers/routeHelpers";
 import type { RouteObject } from "react-router-dom";
+import { PageLoader } from "@/features/shared/components/Die";
 
 const ForumLayout = lazy(() =>
   import("../components/Layout").then((m) => ({ default: m.ForumLayout }))
@@ -51,7 +52,7 @@ export const forumRoutes: RouteObject[] = [
   {
     path: FORUM_ROUTES.FORUM,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <ForumLayout />
       </Suspense>
     ),
@@ -59,7 +60,7 @@ export const forumRoutes: RouteObject[] = [
       {
         index: true,
         element: (
-          <Suspense>
+          <Suspense fallback={<PageLoader />}>
             <ForumHome />
           </Suspense>
         ),
@@ -67,7 +68,7 @@ export const forumRoutes: RouteObject[] = [
       {
         path: "category/:categoryId",
         element: (
-          <Suspense>
+          <Suspense fallback={<PageLoader />}>
             <ForumCategory />
           </Suspense>
         ),
@@ -75,7 +76,7 @@ export const forumRoutes: RouteObject[] = [
       {
         path: "thread/:threadId",
         element: (
-          <Suspense>
+          <Suspense fallback={<PageLoader />}>
             <ForumThread />
           </Suspense>
         ),
@@ -83,7 +84,7 @@ export const forumRoutes: RouteObject[] = [
       {
         path: "dashboard",
         element: (
-          <Suspense>
+          <Suspense fallback={<PageLoader />}>
             <ForumDashboard />
           </Suspense>
         ),
@@ -91,7 +92,7 @@ export const forumRoutes: RouteObject[] = [
       {
         path: "my-threads",
         element: (
-          <Suspense>
+          <Suspense fallback={<PageLoader />}>
             <ForumMyThreads />
           </Suspense>
         ),
@@ -99,7 +100,7 @@ export const forumRoutes: RouteObject[] = [
       {
         path: "rules",
         element: (
-          <Suspense>
+          <Suspense fallback={<PageLoader />}>
             <ForumRules />
           </Suspense>
         ),
@@ -107,7 +108,7 @@ export const forumRoutes: RouteObject[] = [
       {
         path: "help",
         element: (
-          <Suspense>
+          <Suspense fallback={<PageLoader />}>
             <ForumHelp />
           </Suspense>
         ),
@@ -115,7 +116,7 @@ export const forumRoutes: RouteObject[] = [
       {
         path: "new-thread",
         element: withProtected(
-          <Suspense>
+          <Suspense fallback={<PageLoader />}>
             <CreateThread />
           </Suspense>
         ),
@@ -123,7 +124,7 @@ export const forumRoutes: RouteObject[] = [
       {
         path: "thread/:threadId/edit",
         element: withProtected(
-          <Suspense>
+          <Suspense fallback={<PageLoader />}>
             <EditThread />
           </Suspense>
         ),
@@ -131,7 +132,7 @@ export const forumRoutes: RouteObject[] = [
       {
         path: "reply/:replyId/edit",
         element: withProtected(
-          <Suspense>
+          <Suspense fallback={<PageLoader />}>
             <EditReply />
           </Suspense>
         ),

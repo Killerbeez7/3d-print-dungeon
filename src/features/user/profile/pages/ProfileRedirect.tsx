@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 
 import { useAuth } from "@/features/auth/hooks/useAuth";
-import { Spinner } from "@/features/shared/reusable/Spinner";
+import { DieLoader } from "@/features/shared/components/Die";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
 
 export const ProfileRedirect = () => {
@@ -11,7 +11,7 @@ export const ProfileRedirect = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Spinner size={32} />
+          <DieLoader edge={22} />
           <p className="mt-4 text-txt-secondary">Redirecting to your profile...</p>
         </div>
       </div>
@@ -26,7 +26,7 @@ export const ProfileRedirect = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <Spinner size={32} />
+          <DieLoader edge={22} />
           <p className="mt-4 text-txt-secondary">Loading your profile...</p>
         </div>
       </div>

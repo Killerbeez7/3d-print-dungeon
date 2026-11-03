@@ -128,3 +128,9 @@ export const DieLoader = ({ edge = 28, delay = 300, label = "Loading", className
   );
 };
 
+/** Fallback for lazily loaded pages: the rolling die in the middle of the content area. */
+export const PageLoader = () => (
+  <div className="flex h-[60vh] items-center justify-center">
+    <DieLoader edge={30} />
+  </div>
+);

@@ -5,7 +5,7 @@ import { Outlet } from "react-router-dom";
 import { Navbar } from "./navbar/Navbar";
 import { Footer } from "./footer/Footer";
 import { AuthModal } from "../auth/components/AuthModal";
-import { Spinner } from "@/features/shared/reusable/Spinner";
+import { PageLoader } from "@/features/shared/components/Die";
 import { ScrollToTopButton } from "@/features/shared/ScrollToTopButton";
 import { LayoutProvider, useLayout } from "./context/layoutContext";
 import { CookieBanner } from "../cookies/components/CookieBanner";
@@ -17,11 +17,7 @@ const AppLayout = () => {
       <Navbar />
       <main className="flex-1 min-h-screen">
         <Suspense
-          fallback={
-            <div className="h-full flex items-center justify-center">
-              <Spinner size={48} />
-            </div>
-          }
+          fallback={<PageLoader />}
         >
           <Outlet />
           <ScrollToTopButton />

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { ROUTES } from "@/constants/routeConstants";
 import type { RouteObject } from "react-router-dom";
+import { PageLoader } from "@/features/shared/components/Die";
 
 const MarketplaceHome = lazy(() =>
   import("../pages/MarketplaceHome").then((m) => ({ default: m.MarketplaceHome }))
@@ -19,7 +20,7 @@ export const marketplaceRoutes: RouteObject[] = [
   {
     path: "/marketplace",
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <MarketplaceHome />
       </Suspense>
     ),
@@ -27,7 +28,7 @@ export const marketplaceRoutes: RouteObject[] = [
   {
     path: ROUTES.MARKETPLACE_FEATURED,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <Featured />
       </Suspense>
     ),
@@ -35,7 +36,7 @@ export const marketplaceRoutes: RouteObject[] = [
   {
     path: ROUTES.MARKETPLACE_NEW_ARRIVALS,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <NewArrivals />
       </Suspense>
     ),
@@ -43,7 +44,7 @@ export const marketplaceRoutes: RouteObject[] = [
   {
     path: ROUTES.MARKETPLACE_BEST_SELLERS,
     element: (
-      <Suspense>
+      <Suspense fallback={<PageLoader />}>
         <BestSellers />
       </Suspense>
     ),
