@@ -1,6 +1,7 @@
 import { useRef, type RefObject } from "react";
 import { Link } from "react-router-dom";
 import {
+  Bell,
   CircleUserRound,
   LayoutDashboard,
   LifeBuoy,
@@ -26,6 +27,8 @@ interface ProfileMenuProps {
   email: string;
   avatarSrc: string | null;
   profilePath: string;
+  /** Unread notifications: a dot on the avatar and a menu row on phones, where the bell is hidden. */
+  unreadCount?: number;
 }
 
 const Avatar = ({ src, className }: { src: string | null; className: string }) => {
@@ -72,6 +75,7 @@ export const ProfileMenu = ({
   email,
   avatarSrc,
   profilePath,
+  unreadCount = 0,
 }: ProfileMenuProps) => {
   const menuRef = useRef<HTMLDivElement | null>(null);
 
@@ -92,10 +96,14 @@ export const ProfileMenu = ({
         id="profile-button"
         type="button"
         onClick={onToggle}
-        className={`flex size-10 items-center justify-center transition-[filter,transform] duration-200 ${
+        className={`relative flex size-10 items-center justify-center transition-[filter,transform] duration-200 ${
           isOpen ? "brightness-110" : "hover:brightness-110"
         }`}
-        aria-label="Account menu"
+        aria-label={
+          unreadCount > 0
+            ? `Account menu, ${unreadCount} unread notification${unreadCount === 1 ? "" : "s"}`
+            : "Account menu"
+        }
         aria-haspopup="menu"
         aria-expanded={isOpen}
       >
@@ -103,6 +111,12 @@ export const ProfileMenu = ({
         <span className="chamfer block size-8 overflow-hidden [--cut:6px] md:size-9">
           <Avatar src={avatarSrc} className="size-full" />
         </span>
+        {unreadCount > 0 && (
+          <span
+            className="absolute right-0.5 top-0.5 size-2.5 rounded-full bg-ember-fill ring-2 ring-section md:hidden"
+            aria-hidden="true"
+          />
+        )}
       </button>
 
       <div
@@ -159,6 +173,21 @@ export const ProfileMenu = ({
             </Link>
           ))}
         </div>
+
+        <Link
+          to="/notifications"
+          role="menuitem"
+          onClick={onClose}
+          className="mx-3 mb-3 flex items-center gap-3 rounded-lg border border-br-subtle px-3 py-2.5 text-sm text-txt-secondary transition-colors hover:border-br-primary hover:text-txt-primary md:hidden"
+        >
+          <Bell className="size-4" aria-hidden="true" />
+          Notifications
+          {unreadCount > 0 && (
+            <span className="label-mono ml-auto rounded-full bg-ember-fill px-1.5 text-[0.65rem] leading-5 text-ember-on">
+              {unreadCount > 99 ? "99+" : unreadCount}
+            </span>
+          )}
+        </Link>
 
         {isAdmin && (
           <Link

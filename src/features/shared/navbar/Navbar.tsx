@@ -15,6 +15,7 @@ import { MobileMenu } from "./MobileMenu";
 import { ProfileMenu } from "./ProfileMenu";
 import { GlobalSearch } from "@/features/search/components/GlobalSearch";
 import { NotificationDropdown } from "@/features/user/notifications";
+import { useUserNotification } from "@/features/user/notifications/hooks/useUserNotification";
 import { buttonClassName } from "@/components";
 import { BrandMark } from "@/features/shared/components/BrandMark";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
@@ -39,6 +40,7 @@ export const Navbar = () => {
   const [sessionHint] = useState(readSessionHint);
   const signedIn = authReady ? Boolean(currentUser) : Boolean(sessionHint);
   const { open } = useModal("auth");
+  const { unreadCount } = useUserNotification();
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -89,12 +91,13 @@ export const Navbar = () => {
 
   const urlSafeUsername = toUrlSafeUsername(publicProfile?.username ?? sessionHint?.username ?? undefined);
   const profileAvatarSrc = authUser?.photoURL ?? currentUser?.photoURL ?? sessionHint?.photoURL ?? null;
+  // The menu shows the name, then @username underneath.
   const profileDisplayName =
-    authUser?.username ??
     authUser?.displayName ??
     currentUser?.displayName ??
-    sessionHint?.username ??
     sessionHint?.displayName ??
+    authUser?.username ??
+    sessionHint?.username ??
     "User";
   const profileEmail = authUser?.email ?? currentUser?.email ?? "";
 
@@ -116,15 +119,6 @@ export const Navbar = () => {
           >
             <Menu className="size-6" aria-hidden="true" />
           </button>
-
-          {/* Phones: search sits beside the menu, so two buttons flank the centred logo on each side. */}
-          <Link
-            to={`${ROUTES.SEARCH}?sort_by=relevance`}
-            className={`${iconButtonClass} md:hidden`}
-            aria-label="Search"
-          >
-            <Search className="size-5" aria-hidden="true" />
-          </Link>
 
           {/* Logo */}
           <Link
@@ -244,11 +238,12 @@ export const Navbar = () => {
                   Upload
                 </Link>
 
+                {/* Phones reach notifications from the avatar menu (dot on the avatar). */}
                 {currentUser ? (
-                  <NotificationDropdown className="text-txt-secondary" />
+                  <NotificationDropdown className="text-txt-secondary max-md:hidden" />
                 ) : (
                   // Same footprint as the bell while the session is restored.
-                  <span className="flex size-9 items-center justify-center text-txt-muted" aria-hidden="true">
+                  <span className="flex size-9 items-center justify-center text-txt-muted max-md:hidden" aria-hidden="true">
                     <Bell className="size-5" />
                   </span>
                 )}
@@ -264,6 +259,7 @@ export const Navbar = () => {
                   email={profileEmail}
                   avatarSrc={profileAvatarSrc}
                   profilePath={`/${urlSafeUsername}`}
+                  unreadCount={currentUser ? unreadCount : 0}
                 />
               </>
             )}
