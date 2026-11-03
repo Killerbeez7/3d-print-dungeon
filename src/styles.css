@@ -33,6 +33,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* iPhone Safari zooms into any field with text under 16px when it's tapped.
+   Touch screens get 16px field text; desktop keeps the design's 14px. Outside
+   any layer on purpose, so it wins over text-sm on the fields (Tailwind
+   utilities live in a layer). Pinch-to-zoom stays available. Fields that are
+   already larger (text-lg and up, like the search page box) keep their size. */
+@media (hover: none) and (pointer: coarse) {
+  :is(
+      input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"]),
+      select,
+      textarea
+    ):not([class~="text-lg"], [class~="text-xl"], [class~="text-2xl"], [class~="text-3xl"], [class~="text-4xl"]) {
+    font-size: 16px;
+  }
+}
+
 *,
 *::before,
 *::after {
