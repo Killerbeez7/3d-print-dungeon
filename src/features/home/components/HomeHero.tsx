@@ -6,6 +6,7 @@ import { Button, buttonClassName } from "@/components";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { MODEL_CATEGORIES } from "@/features/models/constants/modelCategories";
 import { useModal } from "@/features/shared/modal/hooks/useModal";
+import { PrintIntro } from "@/features/home/intro/PrintIntro";
 
 const HERO_IMAGE = "/assets/images/hero-miniatures.webp";
 const PRINTED_KEY = "hero-printed";
@@ -52,7 +53,9 @@ export const HomeHero = ({ onBrowse }: HomeHeroProps) => {
         aria-hidden="true"
       />
 
-      <div className="mx-auto max-w-[1600px] px-4 pb-10 pt-14 sm:px-6 md:pb-16 md:pt-24 lg:px-8">
+      <div className="mx-auto max-w-[1600px] px-4 pb-10 pt-8 sm:px-6 md:pb-16 md:pt-14 lg:px-8">
+        {/* The logo prints itself on the first visit of a session (see PrintIntro). */}
+        <PrintIntro className="mb-4 max-w-[30rem] md:mb-6" />
         <p className="label-mono flex items-center gap-2 text-accent">
           <span className="inline-block size-1.5 animate-pulse bg-ember-fill" aria-hidden="true" />
           Community 3D print library
