@@ -1,18 +1,16 @@
 import {
   BADGE_PATH,
   BADGE_VIEWBOX,
-  IRIS_PATH,
   LABEL_PATH,
   LETTERS_PATH,
-  PUPIL_PATH,
   WORDMARK_RATIO,
   WORDMARK_VIEWBOX,
 } from "./brandPaths";
 
-// The logo: keep badge + "3D PRINT" + DUNGEON with a dragon-eye O.
+// The logo: keep badge + "3D PRINT" + DUNGEON.
 // Both parts are inline SVGs of the same height, so the badge always spans the text block
 // (top of "3D PRINT" to the baseline of DUNGEON) and the gap equals one letter stem.
-// Colours come from theme tokens; the pupil stays dark in both themes.
+// Colours come from theme tokens.
 
 interface BrandMarkProps {
   showWordmark?: boolean;
@@ -55,8 +53,6 @@ export const BrandMark = ({
         >
           <path d={LABEL_PATH} className="fill-txt-muted" />
           <path fillRule="evenodd" d={LETTERS_PATH} className="fill-txt-primary" />
-          <path d={IRIS_PATH} className="fill-accent" />
-          <path d={PUPIL_PATH} className="fill-page [[data-theme=light]_&]:fill-txt-primary" />
         </svg>
       )}
     </span>
