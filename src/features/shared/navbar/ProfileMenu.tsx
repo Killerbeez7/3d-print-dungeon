@@ -92,14 +92,17 @@ export const ProfileMenu = ({
         id="profile-button"
         type="button"
         onClick={onToggle}
-        className={`chamfer flex size-10 items-center justify-center overflow-hidden transition-[filter,transform] duration-200 [--cut:7px] ${
+        className={`flex size-10 items-center justify-center transition-[filter,transform] duration-200 ${
           isOpen ? "brightness-110" : "hover:brightness-110"
         }`}
         aria-label="Account menu"
         aria-haspopup="menu"
         aria-expanded={isOpen}
       >
-        <Avatar src={avatarSrc} className="size-10" />
+        {/* Same 40px tap area as the icons, with a lighter-looking avatar inside. */}
+        <span className="chamfer block size-8 overflow-hidden [--cut:6px] md:size-9">
+          <Avatar src={avatarSrc} className="size-full" />
+        </span>
       </button>
 
       <div

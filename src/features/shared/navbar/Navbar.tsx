@@ -117,6 +117,15 @@ export const Navbar = () => {
             <Menu className="size-6" aria-hidden="true" />
           </button>
 
+          {/* Phones: search sits beside the menu, so two buttons flank the centred logo on each side. */}
+          <Link
+            to={`${ROUTES.SEARCH}?sort_by=relevance`}
+            className={`${iconButtonClass} md:hidden`}
+            aria-label="Search"
+          >
+            <Search className="size-5" aria-hidden="true" />
+          </Link>
+
           {/* Logo */}
           <Link
             to="/"
@@ -207,10 +216,10 @@ export const Navbar = () => {
           </div>
 
           {/* Right side */}
-          <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2 lg:ml-0">
+          <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0">
             <Link
               to={`${ROUTES.SEARCH}?sort_by=relevance`}
-              className={`${iconButtonClass} lg:hidden`}
+              className={`${iconButtonClass} max-md:hidden lg:hidden`}
               aria-label="Search"
             >
               <Search className="size-5" aria-hidden="true" />
