@@ -61,6 +61,12 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 
 ## Firebase console / deploys (owner)
 
+- [ ] Google sign-in on iPhone Safari ("missing initial state"): the site now signs in through its own
+      domain. Google Cloud console → APIs & Services → Credentials → OAuth 2.0 Client IDs →
+      "Web client (auto created by Google Service)" → Authorized redirect URIs: add
+      `https://printdungeon.com/__/auth/handler`, `https://print-dungeon-3d.web.app/__/auth/handler`
+      and each preview domain's `/__/auth/handler` (wildcards aren't allowed), before deploying hosting
+
 - [ ] Stripe test secret key: it was printed by `firebase deploy --debug` (1 Nov 2026). Roll it in
       Stripe (test mode → Developers → API keys), store the new one with
       `firebase functions:secrets:set STRIPE_SECRET_KEY`, then remove the old copy from the
