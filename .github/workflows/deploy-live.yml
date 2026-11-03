@@ -1,0 +1,64 @@
+name: Deploy live
+
+# Publishes a tested preview to the live site (printdungeon.com) by copying its Firebase Hosting
+# preview channel to the live channel. Nothing is rebuilt, so exactly the build that was checked
+# on the preview goes live (same files, headers and rewrites).
+#
+# Triggered by a change to .github/deploy-live.json on claude/redesign-v2:
+#   { "channel": "claude-redesign-v2", "commit": "<commit the preview was built from>" }
+# "commit" is a note for the history; the channel's current build is what gets published.
+#
+# Roll back: Firebase console > Hosting > Release history > Roll back (or copy an older channel).
+# Uses the FIREBASE_SERVICE_ACCOUNT secret (Firebase Hosting Admin role).
+
+on:
+  push:
+    branches: ["claude/redesign-v2"]
+    paths: [".github/deploy-live.json"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-live
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Read the request
+        id: request
+        run: |
+          channel=$(jq -r '.channel' .github/deploy-live.json)
+          commit=$(jq -r '.commit // ""' .github/deploy-live.json)
+          if ! [[ "$channel" =~ ^[a-z0-9-]+$ ]] || [ "$channel" = "live" ]; then
+            echo "::error::Not a preview channel: $channel"; exit 1
+          fi
+          echo "channel=$channel" >> "$GITHUB_OUTPUT"
+          echo "Publishing preview channel \`$channel\` (built from \`$commit\`) to live" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Copy the preview channel to live
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          CHANNEL: ${{ steps.request.outputs.channel }}
+        run: |
+          key="$RUNNER_TEMP/service-account.json"
+          trap 'rm -f "$key"' EXIT
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$key"
+          export GOOGLE_APPLICATION_CREDENTIALS="$key"
+          npx --yes firebase-tools@13.35.1 hosting:clone "print-dungeon-3d:$CHANNEL" print-dungeon-3d:live --project print-dungeon-3d
+
+      - name: Check the live site
+        run: |
+          for url in https://printdungeon.com/ https://print-dungeon-3d.web.app/; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$url")
+            echo "$url -> $code" >> "$GITHUB_STEP_SUMMARY"
+            [ "$code" = "200" ] || { echo "::error::$url returned $code"; exit 1; }
+          done
