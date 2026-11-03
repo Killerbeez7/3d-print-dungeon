@@ -1,0 +1,4 @@
+# generated while running the scripts
+*.json
+*.html
+__pycache__/
