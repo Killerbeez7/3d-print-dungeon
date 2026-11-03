@@ -55,19 +55,17 @@ export const HomeHero = ({ onBrowse }: HomeHeroProps) => {
 
       <div className="mx-auto max-w-[1600px] px-4 pb-10 pt-8 sm:px-6 md:pb-16 md:pt-14 lg:px-8">
         {/* The logo prints itself on the first visit of a session (see PrintIntro). */}
-        <PrintIntro className="mb-4 max-w-[30rem] md:mb-6" />
-        <p className="label-mono flex items-center gap-2 text-accent">
-          <span className="inline-block size-1.5 animate-pulse bg-ember-fill" aria-hidden="true" />
-          Community 3D print library
-        </p>
-        <h1 className="mt-5 max-w-2xl text-4xl font-bold leading-[1.02] tracking-tight text-txt-primary sm:text-5xl lg:text-6xl">
-          3D printable models for your{" "}
+        <PrintIntro className="mb-6 max-w-[30rem] md:mb-8" />
+        {/* The logo above already says "3D PRINT", so the headline doesn't repeat it. */}
+        <h1 className="max-w-2xl text-4xl font-bold leading-[1.02] tracking-tight text-txt-primary sm:text-5xl lg:text-6xl">
+          Models for your{" "}
           <span className="bg-gradient-to-r from-accent to-ember-fill bg-clip-text text-transparent">
             tabletop
           </span>
         </h1>
         <p className="mt-5 max-w-lg text-base leading-relaxed text-txt-secondary md:text-lg">
-          Discover, download and share miniatures, terrain and props made by the community.
+          Discover, download and share 3D printable miniatures, terrain and props made by the
+          community.
         </p>
 
         <div className="mt-8 flex flex-wrap gap-3">
