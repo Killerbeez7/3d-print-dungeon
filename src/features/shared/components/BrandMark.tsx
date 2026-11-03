@@ -1,6 +1,10 @@
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 
-const logoMask = `url(${STATIC_ASSETS.LOGO}) center / contain no-repeat`;
+// The layered keep, tinted with the accent colour. Small sizes use the compact
+// drawing (6 thicker layers) so the gaps don't blur together.
+const maskFor = (url: string) => `url(${url}) center / contain no-repeat`;
+const LOGO_MASK = maskFor(STATIC_ASSETS.LOGO);
+const LOGO_COMPACT_MASK = maskFor(STATIC_ASSETS.LOGO_COMPACT);
 
 interface BrandMarkProps {
   showWordmark?: boolean;
@@ -23,7 +27,10 @@ export const BrandMark = ({
       <span
         aria-hidden="true"
         className={`shrink-0 bg-accent ${isLarge ? "size-12" : "size-9"}`}
-        style={{ mask: logoMask, WebkitMask: logoMask }}
+        style={{
+          mask: isLarge ? LOGO_MASK : LOGO_COMPACT_MASK,
+          WebkitMask: isLarge ? LOGO_MASK : LOGO_COMPACT_MASK,
+        }}
       />
       {showWordmark && (
         <span className={`flex flex-col leading-none ${wordmarkClassName}`}>

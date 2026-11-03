@@ -26,6 +26,8 @@ export interface ThreeDViewImages {
 
 export interface StaticAssets {
     LOGO: string;
+    /** Fewer, thicker layers: stays crisp at header size (40px and under). */
+    LOGO_COMPACT: string;
     USER_DEFAULT: string;
     DEFAULT_AVATAR: string;
     PLACEHOLDER_IMAGE: string;
@@ -35,13 +37,14 @@ export interface StaticAssets {
 }
 
 export const STATIC_ASSETS: StaticAssets = {
-    LOGO: "/assets/images/logo-mark.webp",
+    LOGO: "/assets/images/logo-keep.svg",
+    LOGO_COMPACT: "/assets/images/logo-keep-compact.svg",
     USER_DEFAULT: "/assets/images/user.png",
     DEFAULT_AVATAR: "/assets/images/user.png",
     PLACEHOLDER_IMAGE: "/assets/images/image.png",
 
     // Icons
-    FAVICON: "/assets/icons/favicon.svg",
+    FAVICON: "/assets/icons/pd-keep-v1.svg",
 
     // Carousel images
     CAROUSEL: {
