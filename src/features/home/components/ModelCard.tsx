@@ -26,10 +26,12 @@ const SIZES =
 interface ModelCardProps {
   model: ModelData;
   priority?: boolean;
+  /** Off on a creator's own profile, where every model is theirs. */
+  showCreator?: boolean;
 }
 
 /** Gallery tile: edge-to-edge render, details on hover (always on touch). */
-export const ModelCard = ({ model, priority = false }: ModelCardProps) => {
+export const ModelCard = ({ model, priority = false, showCreator = true }: ModelCardProps) => {
   const original = model.renderPrimaryUrl ?? null;
   const thumbs = useMemo(() => {
     if (thumbsLikelyMissing()) return null;
@@ -116,7 +118,7 @@ export const ModelCard = ({ model, priority = false }: ModelCardProps) => {
 
         <div className="tile-caption absolute inset-x-0 bottom-0 bg-gradient-to-t from-scrim/85 via-scrim/45 to-transparent p-3 pt-12">
           <h3 className="truncate text-sm font-semibold text-on-scrim">{model.name}</h3>
-          {model.uploaderDisplayName && (
+          {showCreator && model.uploaderDisplayName && (
             <p className="mt-0.5 truncate text-xs text-on-scrim/70">{model.uploaderDisplayName}</p>
           )}
         </div>

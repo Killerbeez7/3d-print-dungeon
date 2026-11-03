@@ -49,18 +49,20 @@ export const ProfileModels = ({ models, displayName, isOwner }: ProfileModelsPro
   const [shown, setShown] = useState(PAGE);
 
   const popular = useMemo(
-    () =>
-      models.length >= 6
-        ? [...models]
-            .sort(SORTS.views.compare)
-            // One tile per image, in case listings share a render.
-            .filter(
-              (model, index, list) =>
-                !model.renderPrimaryUrl ||
-                list.findIndex((other) => other.renderPrimaryUrl === model.renderPrimaryUrl) === index
-            )
-            .slice(0, 3)
-        : [],
+    () => {
+      if (models.length < 6) return [];
+      const top = [...models]
+        .sort(SORTS.views.compare)
+        // One tile per image, in case listings share a render.
+        .filter(
+          (model, index, list) =>
+            !model.renderPrimaryUrl ||
+            list.findIndex((other) => other.renderPrimaryUrl === model.renderPrimaryUrl) === index
+        )
+        .slice(0, 3);
+      // A full row or nothing: one or two tiles leave a gap beside them.
+      return top.length === 3 ? top : [];
+    },
     [models]
   );
 
@@ -111,7 +113,7 @@ export const ProfileModels = ({ models, displayName, isOwner }: ProfileModelsPro
           <div className="grid grid-cols-2 gap-1 sm:grid-cols-3">
             {popular.map((model, index) => (
               <div key={model.id} className={index === 2 ? "hidden sm:block" : ""}>
-                <ModelCard model={model} priority />
+                <ModelCard model={model} priority showCreator={false} />
               </div>
             ))}
           </div>
@@ -163,7 +165,7 @@ export const ProfileModels = ({ models, displayName, isOwner }: ProfileModelsPro
 
         <div className={gridClass}>
           {visible.slice(0, shown).map((model) => (
-            <ModelCard key={model.id} model={model} />
+            <ModelCard key={model.id} model={model} showCreator={false} />
           ))}
         </div>
 
