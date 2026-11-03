@@ -127,7 +127,7 @@ export const Navbar = () => {
             className="flex shrink-0 items-center gap-2 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus max-md:absolute max-md:left-1/2 max-md:-translate-x-1/2"
             aria-label="3D Print Dungeon home"
           >
-            <BrandMark wordmarkClassName="max-xl:hidden" />
+            <BrandMark wordmarkClassName="max-xl:hidden" animated />
           </Link>
 
           {/* Desktop nav */}

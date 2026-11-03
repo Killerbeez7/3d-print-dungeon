@@ -39,7 +39,7 @@ export const STATIC_ASSETS: StaticAssets = {
     PLACEHOLDER_IMAGE: "/assets/images/image.png",
 
     // Icons
-    FAVICON: "/assets/icons/pd-badge-v3.svg",
+    FAVICON: "/assets/icons/pd-die-v4.svg",
 
     // Carousel images
     CAROUSEL: {

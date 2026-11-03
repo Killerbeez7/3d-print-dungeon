@@ -599,6 +599,69 @@ body {
     mask-image: radial-gradient(closest-side, #000, transparent);
   }
 
+  /* The logo die (components/Die.tsx): a cube at the isometric angle. --die-e is the edge;
+     the drawn die is 1.414 x 1.633 edges. Symbols are dark in both themes. */
+  .die {
+    --die-ink: var(--txt-primary);
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: calc(var(--die-e) * 1.414);
+    height: calc(var(--die-e) * 1.633);
+  }
+  [data-theme="dark"] .die {
+    --die-ink: var(--bg-page);
+  }
+  .die__hop,
+  .die__iso,
+  .die__cube {
+    display: block;
+    transform-style: preserve-3d;
+  }
+  .die__hop {
+    width: var(--die-e);
+    height: var(--die-e);
+  }
+  .die__iso {
+    width: 100%;
+    height: 100%;
+    transform: rotateX(-35.264deg) rotateY(-45deg);
+  }
+  .die__cube {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 700ms cubic-bezier(0.5, -0.12, 0.28, 1.22);
+  }
+  .die__face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  .die__face svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .die__face--front { transform: translateZ(calc(var(--die-e) / 2)); }
+  .die__face--back { transform: rotateY(180deg) translateZ(calc(var(--die-e) / 2)); }
+  .die__face--right { transform: rotateY(90deg) translateZ(calc(var(--die-e) / 2)); }
+  .die__face--left { transform: rotateY(-90deg) translateZ(calc(var(--die-e) / 2)); }
+  .die__face--top { transform: rotateX(90deg) translateZ(calc(var(--die-e) / 2)); }
+  .die__face--bottom { transform: rotateX(-90deg) translateZ(calc(var(--die-e) / 2)); }
+  .die__plate {
+    fill: var(--accent);
+  }
+  .die__ink {
+    fill: var(--die-ink);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .die__cube {
+      transition: none;
+    }
+  }
+
   /* Loading placeholder for media blocks: "prints" bottom-up, layer by
      layer, then fades and starts again. Stagger tiles with --skeleton-delay. */
   .skeleton-print {
