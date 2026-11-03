@@ -1,7 +1,7 @@
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 
 // The layered keep, tinted with the accent colour. Small sizes use the compact
-// drawing (6 thicker layers) so the gaps don't blur together.
+// drawing (fewer, thicker layer lines) so they stay visible at header size.
 const maskFor = (url: string) => `url(${url}) center / contain no-repeat`;
 const LOGO_MASK = maskFor(STATIC_ASSETS.LOGO);
 const LOGO_COMPACT_MASK = maskFor(STATIC_ASSETS.LOGO_COMPACT);
