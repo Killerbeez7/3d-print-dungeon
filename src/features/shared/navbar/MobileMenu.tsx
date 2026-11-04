@@ -125,7 +125,11 @@ export const MobileMenu = ({
           role="dialog"
           aria-modal="true"
           aria-label="Menu"
-          className={`absolute inset-y-0 left-0 flex w-[88%] max-w-sm flex-col border-r border-br-secondary bg-section shadow-2xl transition-transform duration-300 ease-forge ${
+          // Focus lands on the panel itself when the menu opens, not on the logo link, so no
+          // ring shows until the user tabs. The panel is not a control, so it draws no outline.
+          tabIndex={-1}
+          data-autofocus
+          className={`absolute inset-y-0 left-0 flex w-[88%] max-w-sm flex-col border-r border-br-secondary bg-section shadow-2xl outline-none transition-transform duration-300 ease-forge ${
             isOpen ? "translate-x-0" : "-translate-x-full"
           }`}
         >
