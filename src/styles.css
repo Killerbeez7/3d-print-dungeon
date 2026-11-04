@@ -660,6 +660,13 @@ body {
   .die__ink {
     fill: var(--die-ink);
   }
+  /* The gate's portcullis rises (and drops) slowly, like a heavy iron gate. */
+  .die__portcullis {
+    transition: transform 1.6s cubic-bezier(0.55, 0, 0.25, 1);
+  }
+  .die__portcullis.is-open {
+    transform: translateY(-34px);
+  }
   @media (prefers-reduced-motion: reduce) {
     .die__cube {
       transition: none !important;

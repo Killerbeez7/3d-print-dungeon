@@ -13,9 +13,9 @@ const apple = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><re
     await p.close();
   };
   await shot(fav, 32, "pd-die-v4-32.png");
-  await shot(apple, 180, "pd-die-v6-apple-180.png");
+  await shot(apple, 180, "pd-die-v7-apple-180.png");
   const p = await b.newPage({ viewport: { width: 420, height: 200 } });
-  await p.setContent(`<body style="margin:0;display:flex;gap:20px;padding:10px;background:#DEE1E6">${fav.replace("<svg ", '<svg width="16" height="16" ')}${fav.replace("<svg ", '<svg width="32" height="32" ')}<img src="file://${repo}pd-die-v6-apple-180.png" width="180" height="180"><div style="background:#202124;padding:6px">${fav.replace("<svg ", '<svg width="16" height="16" ')}</div></body>`);
+  await p.setContent(`<body style="margin:0;display:flex;gap:20px;padding:10px;background:#DEE1E6">${fav.replace("<svg ", '<svg width="16" height="16" ')}${fav.replace("<svg ", '<svg width="32" height="32" ')}<img src="file://${repo}pd-die-v7-apple-180.png" width="180" height="180"><div style="background:#202124;padding:6px">${fav.replace("<svg ", '<svg width="16" height="16" ')}</div></body>`);
   await p.screenshot({ path: __dirname + "/die-icons-check.png" });
   await b.close();
 })();

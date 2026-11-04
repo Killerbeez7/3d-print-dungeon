@@ -23,7 +23,7 @@ live on the logo canvas: https://claude.ai/artifact/YXZPzuJjAnSTjaFKLLHo6T
 | `scripts/die_icons.cjs` | Renders the PNG tab and home-screen icons from the die |
 | `scripts/wordmark_letters.py` | The earlier DUNGEON (Unbounded with a redrawn E and G); the intro in `intro/` still draws this version |
 | `fonts/ChakraPetch-Bold.ttf` | The wordmark font (SIL Open Font License 1.1, `fonts/ChakraPetch-OFL.txt`); only the outlines ship |
-| `scripts/die_faces.py`, `scripts/maze.py` | The six die faces; the maze is a seeded 6 x 6 perfect maze |
+| `scripts/die_faces.py`, `scripts/maze.py` | The six die faces and the gate's portcullis; the maze is a seeded 6 x 6 perfect maze |
 | `scripts/fontword.py`, `scripts/lockups.py`, `scripts/geo.py` | Shared helpers (font outlines, path transforms, geometry) |
 
 The intro is not on the site for now. Its site version is kept in `intro/site/`: `printIntro.ts`

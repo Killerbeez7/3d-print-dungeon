@@ -34,6 +34,15 @@ faces = {}  # each: ink shapes drawn on a violet face (100 box)
 # gate: arched doorway reaching the bottom edge (as on W2)
 faces["gate"] = {"ink": arch(32, 68, 56, 101).intersection(FACE)}
 
+# portcullis: two bars and a crossbar with spiked ends, drawn in the face colour over the
+# doorway. At rest it hangs half raised (spikes at y 85); the site slides it up to open the gate.
+def _portcullis():
+    xs, w = (44, 56), 5
+    bars = [box(x - w / 2, 20, x + w / 2, 79) for x in xs]
+    spikes = [Polygon([(x - w / 2, 79), (x + w / 2, 79), (x, 85)]) for x in xs]
+    return unary_union(bars + spikes + [box(20, 61.5, 80, 66.5)])
+faces["portcullis"] = {"ink": _portcullis()}  # whole; the site masks it with the doorway
+
 # keyhole
 faces["lock"] = {"ink": keyhole(50, 42, 13, 5.5, 12, 78)}
 

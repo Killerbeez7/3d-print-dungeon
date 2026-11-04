@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
-import { DIE_FACES, type DieFace } from "./dieFaces";
+import { useCallback, useEffect, useId, useRef, useState, type CSSProperties } from "react";
+import { DIE_FACES, PORTCULLIS, type DieFace } from "./dieFaces";
 
 // The logo die: a CSS 3D cube seen at the isometric angle, with a dungeon symbol on each side.
 //
@@ -28,6 +28,7 @@ const MOVES = {
 type Move = keyof typeof MOVES;
 
 const IDLE_FIRST_MS = 6_000;
+const GATE_OPEN_AFTER_MS = 1_200;
 const IDLE_EVERY_MS = 30_000;
 const LOADER_EVERY_MS = MOVES.throw.ms + 150;
 
@@ -53,13 +54,22 @@ export const Die = ({
   className = "",
 }: DieProps) => {
   const [pose, setPose] = useState({ flips: 0, turns: 0, move: "turn" as Move });
+  // The die has come to rest (shortly after it appears, and after each move).
+  const [settled, setSettled] = useState(false);
   const hopRef = useRef<HTMLSpanElement>(null);
   const busy = useRef(false);
+  const doorClip = `die-door-${useId().replace(/[^a-zA-Z0-9-]/g, "")}`;
+
+  useEffect(() => {
+    const id = window.setTimeout(() => setSettled(true), GATE_OPEN_AFTER_MS);
+    return () => window.clearTimeout(id);
+  }, []);
 
   const play = useCallback(
     (move: Move) => {
       if (busy.current || reducedMotion()) return;
       busy.current = true;
+      setSettled(false);
       const { ms, hop } = MOVES[move];
       setPose((p) => ({ flips: p.flips + (move === "throw" ? 1 : 0), turns: p.turns + 1, move }));
       const up = -edge * hop;
@@ -81,6 +91,7 @@ export const Die = ({
       );
       window.setTimeout(() => {
         busy.current = false;
+        setSettled(true);
       }, ms + 50);
     },
     [edge],
@@ -101,6 +112,10 @@ export const Die = ({
   }, [mode, play]);
 
   const { ms, ease } = MOVES[pose.move];
+  // The gate side is on the left (front) when the turns come round to a whole circle; there,
+  // once the die is at rest, the portcullis slides up. Anywhere else it hangs half raised.
+  const gateOpen =
+    settled && mode !== "loader" && ((pose.turns % 4) + 4) % 4 === 0 && !reducedMotion();
   const Root = asButton ? "button" : "span";
   return (
     <Root
@@ -125,6 +140,19 @@ export const Die = ({
                 <svg viewBox="0 0 100 100" focusable="false">
                   <rect x="3" y="3" width="94" height="94" rx="5" className="die__plate" />
                   <path d={DIE_FACES[face]} fillRule="evenodd" className="die__ink" />
+                  {face === "gate" && (
+                    <>
+                      <clipPath id={doorClip}>
+                        <path d={DIE_FACES.gate} />
+                      </clipPath>
+                      <g clipPath={`url(#${doorClip})`}>
+                        <path
+                          d={PORTCULLIS}
+                          className={`die__plate die__portcullis ${gateOpen ? "is-open" : ""}`}
+                        />
+                      </g>
+                    </>
+                  )}
                 </svg>
               </span>
             ))}

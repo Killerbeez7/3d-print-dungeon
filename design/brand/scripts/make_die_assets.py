@@ -16,7 +16,9 @@ order = ["gate", "eye", "lock", "fire", "maze", "bricks"]
 ts = ("// Generated from the logo canvas (round 9). Symbols for the six sides of the die, drawn in a\n"
       "// 100 x 100 face; the face plate is a rounded square from 3 to 97. Do not edit by hand.\n"
       "export const DIE_FACES = {\n" + "".join(f'  {k}: "{F[k]}",\n' for k in order) + "} as const;\n"
-      "export type DieFace = keyof typeof DIE_FACES;\n")
+      "export type DieFace = keyof typeof DIE_FACES;\n"
+      "/** The gate's portcullis, in the face colour over the doorway; half raised at rest. */\n"
+      f'export const PORTCULLIS = "{F["portcullis"]}";\n')
 open(os.path.join(REPO, "src/features/shared/components/dieFaces.ts"), "w").write(ts)
 
 # --- still icon: the resting pose drawn flat (top = maze, left = gate, right = eye)
@@ -25,13 +27,19 @@ def onto(g, o, u, v):
     ux, uy = (u[0] - o[0]) / 100, (u[1] - o[1]) / 100
     vx, vy = (v[0] - o[0]) / 100, (v[1] - o[1]) / 100
     return affinity.affine_transform(g, [ux, vx, uy, vy, o[0], o[1]])
-def side(sym):
+def side(sym, bars=True):
     plate = FACE
-    return plate.difference(FACES_G[sym]["ink"]) if sym else plate
-def icon(top, left, right):
-    return unary_union([onto(side(top), UL, T, C), onto(side(left), UL, C, LL), onto(side(right), C, UR, B)])
+    if not sym:
+        return plate
+    ink = FACES_G[sym]["ink"]
+    if sym == "gate" and bars:  # the gate closed: portcullis down, half raised
+        ink = ink.difference(FACES_G["portcullis"]["ink"])
+    return plate.difference(ink)
+def icon(top, left, right, bars=True):
+    return unary_union([onto(side(top), UL, T, C), onto(side(left, bars), UL, C, LL), onto(side(right), C, UR, B)])
 full = icon("maze", "gate", "eye")
-compact = icon(None, "gate", None)
+# The tab icon is 16-32 px, where the portcullis bars turn to mush: it keeps the plain doorway.
+compact = icon(None, "gate", None, bars=False)
 paths = {"full": to_d(full.simplify(0.05)), "compact": to_d(compact.simplify(0.05))}
 json.dump(paths, open(os.path.join(here, "die_icon.json"), "w"))
 open(os.path.join(REPO, "public/assets/icons/pd-die-v4.svg"), "w").write(
