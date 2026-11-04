@@ -6,6 +6,7 @@ import { HomeModelsGrid, HomeModelsGridSkeleton } from "@/features/home/componen
 import { MODEL_CATEGORIES } from "@/features/models/constants/modelCategories";
 import { useRisingModels } from "@/features/rising-models/hooks/useRisingModels";
 import { PageHeader } from "@/features/shared/components/PageHeader";
+import { YourCollections } from "../components/YourCollections";
 
 const PREVIEW_COUNT = 7;
 
@@ -35,8 +36,10 @@ export const CollectionsPage = () => {
       <PageHeader
         eyebrow="Collections"
         title="Browse the vault"
-        description="This month's rising uploads and every category, in one place."
+        description="Your saved models and collections, this month's rising uploads and every category."
       />
+
+      <YourCollections />
 
       {/* Hidden when nothing was uploaded this month */}
       {(isPending || isError || rising.length > 0) && (

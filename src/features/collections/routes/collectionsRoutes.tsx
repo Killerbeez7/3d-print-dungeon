@@ -20,6 +20,16 @@ const RisingModelsPage = lazy(() =>
   })
 );
 
+const SavedPage = lazy(() =>
+  import("../pages/SavedPage").then((module) => ({ default: module.SavedPage }))
+);
+
+const CollectionDetailsPage = lazy(() =>
+  import("../pages/CollectionDetailsPage").then((module) => ({
+    default: module.CollectionDetailsPage,
+  }))
+);
+
 export const collectionsRoutes: RouteObject[] = [
   {
     path: ROUTES.COLLECTIONS,
@@ -34,6 +44,22 @@ export const collectionsRoutes: RouteObject[] = [
     element: (
       <Suspense fallback={<PageLoader />}>
         <RisingModelsPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: ROUTES.COLLECTIONS_SAVED,
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <SavedPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: ROUTES.COLLECTION_DETAILS,
+    element: (
+      <Suspense fallback={<PageLoader />}>
+        <CollectionDetailsPage />
       </Suspense>
     ),
   },

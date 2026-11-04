@@ -11,6 +11,8 @@ export const ROUTES = {
   /* Collections */
   COLLECTIONS: "/collections",
   COLLECTIONS_RISING: "/collections/rising",
+  COLLECTIONS_SAVED: "/collections/saved",
+  COLLECTION_DETAILS: "/collections/:collectionId",
 
   /* Events */
   EVENTS: "/events",

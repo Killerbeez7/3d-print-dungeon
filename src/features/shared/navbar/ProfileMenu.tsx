@@ -2,6 +2,7 @@ import { useRef, type RefObject } from "react";
 import { Link } from "react-router-dom";
 import {
   Bell,
+  Bookmark,
   LayoutDashboard,
   LifeBuoy,
   LogOut,
@@ -61,8 +62,8 @@ export const ProfileMenu = ({
   const tiles: Tile[] = [
     { to: "/model/upload", label: "Upload", hint: "Share a model", icon: Upload, featured: true },
     { to: profilePath, label: "Profile", hint: "Your page", icon: User },
+    { to: "/collections", label: "Saved", hint: "Your collections", icon: Bookmark },
     { to: "/settings", label: "Settings", hint: "Account", icon: Settings },
-    { to: "/forum/help", label: "Help", hint: "Guides & FAQ", icon: LifeBuoy },
   ];
 
   return (
@@ -160,6 +161,17 @@ export const ProfileMenu = ({
               {unreadCount > 99 ? "99+" : unreadCount}
             </span>
           )}
+        </Link>
+
+        <Link
+          to="/forum/help"
+          role="menuitem"
+          onClick={onClose}
+          className="mx-3 mb-3 flex items-center gap-3 rounded-lg border border-br-subtle px-3 py-2.5 text-sm text-txt-secondary transition-colors hover:border-br-primary hover:text-txt-primary"
+        >
+          <LifeBuoy className="size-4" aria-hidden="true" />
+          Help
+          <span className="ml-auto text-xs text-txt-muted">Guides &amp; FAQ</span>
         </Link>
 
         {isAdmin && (
