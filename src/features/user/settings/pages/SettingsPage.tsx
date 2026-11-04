@@ -23,7 +23,7 @@ interface SettingsTab {
 
 const SETTINGS_TABS: SettingsTab[] = [
   { id: "profile", label: "Profile", hint: "Name, bio, picture", icon: User },
-  { id: "account", label: "Account", hint: "Language, timezone, theme", icon: Settings },
+  { id: "account", label: "Account", hint: "Language, theme, currency", icon: Settings },
   { id: "notifications", label: "Notifications", hint: "What we tell you", icon: Bell },
   { id: "privacy", label: "Privacy", hint: "What others see", icon: Lock },
   { id: "security", label: "Security", hint: "Password, sign-in", icon: ShieldCheck },

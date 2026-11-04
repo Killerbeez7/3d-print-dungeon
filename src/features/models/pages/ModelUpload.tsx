@@ -16,6 +16,7 @@ import { InfoForm } from "../components/model-upload/InfoForm";
 import { PricingForm } from "../components/model-upload/PricingForm";
 import { SellerVerification } from "@/features/payment/components/SellerVerification";
 import { paymentService } from "@/features/payment/services/paymentService";
+import { useSellingCurrency } from "@/features/user/settings/hooks/useSellingCurrency";
 
 import type { ModelUploadData } from "@/features/models/types/model";
 
@@ -37,6 +38,7 @@ const INITIAL_MODEL_DATA: ModelUploadData = {
 export function ModelUpload() {
   const { currentUser, privateProfile } = useAuth();
   const navigate = useNavigate();
+  const sellingCurrency = useSellingCurrency();
   const location = useLocation();
   const notification = useSystemAlert();
 
@@ -448,6 +450,7 @@ export function ModelUpload() {
         price: modelData.price,
         isPaid: modelData.isPaid,
         isAI: modelData.isAI,
+        currency: sellingCurrency,
       });
 
       handleUploadSuccess();

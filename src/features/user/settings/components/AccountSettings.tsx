@@ -5,6 +5,7 @@ import { useSystemAlert } from "@/features/system-alerts";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 
 import { settingsService } from "../services/settingsService";
+import type { SellingCurrency } from "../types/settings";
 import { SaveChanges } from "./parts/SaveChanges";
 
 export interface ThemeOption {
@@ -31,6 +32,8 @@ export const AccountSettings = () => {
 
   const [isTimezoneOpen, setIsTimezoneOpen] = useState<boolean>(false);
 
+  const [isCurrencyOpen, setIsCurrencyOpen] = useState<boolean>(false);
+
   const [, setThemeRaw] = useTheme();
 
   const { success, error: showError } = useSystemAlert();
@@ -46,16 +49,25 @@ export const AccountSettings = () => {
 
   const [localTimezone, setLocalTimezone] = useState<string>("UTC");
 
+  const [localCurrency, setLocalCurrency] = useState<SellingCurrency>("eur");
+
   const [originalSettings, setOriginalSettings] = useState({
     theme: "dark",
     language: "en",
     timezone: "UTC",
+    currency: "eur" as SellingCurrency,
   });
 
   const hasChanges =
     localTheme !== originalSettings.theme ||
     localLanguage !== originalSettings.language ||
-    localTimezone !== originalSettings.timezone;
+    localTimezone !== originalSettings.timezone ||
+    localCurrency !== originalSettings.currency;
+
+  const currencies: { id: SellingCurrency; label: string }[] = [
+    { id: "eur", label: "Euro (€)" },
+    { id: "usd", label: "US dollar ($)" },
+  ];
 
   const setTheme: (theme: string) => void =
     typeof setThemeRaw === "function"
@@ -196,11 +208,13 @@ export const AccountSettings = () => {
         setLocalTheme(themeValue);
         setLocalLanguage(userSettings.language);
         setLocalTimezone(userSettings.timezone);
+        setLocalCurrency(userSettings.currency);
 
         setOriginalSettings({
           theme: themeValue,
           language: userSettings.language,
           timezone: userSettings.timezone,
+          currency: userSettings.currency,
         });
       } catch (error) {
         console.error("Error loading user settings:", error);
@@ -249,6 +263,7 @@ export const AccountSettings = () => {
         theme: localTheme as "light" | "dark",
         language: localLanguage,
         timezone: localTimezone,
+        currency: localCurrency,
       });
 
       // Apply the saved theme to the app
@@ -259,6 +274,7 @@ export const AccountSettings = () => {
         theme: localTheme,
         language: localLanguage,
         timezone: localTimezone,
+        currency: localCurrency,
       });
 
       success("Settings Updated", "Account settings saved successfully");
@@ -277,6 +293,8 @@ export const AccountSettings = () => {
     setLocalLanguage(originalSettings.language);
 
     setLocalTimezone(originalSettings.timezone);
+
+    setLocalCurrency(originalSettings.currency);
   };
 
   const handleDropdownKeyDown = (
@@ -430,6 +448,28 @@ export const AccountSettings = () => {
         </div>
       </div>
 
+      <div className="overflow-visible rounded-xl border border-br-subtle bg-surface-card">
+        <div className="p-6">
+          <h3 className="text-lg font-semibold text-txt-primary mb-1">Selling</h3>
+          <p className="mb-2 text-sm text-txt-secondary">
+            New listings are priced in this currency. Listings you already have keep theirs.
+          </p>
+
+          <DropdownSelector
+            label="Selling currency"
+            value={localCurrency}
+            options={currencies}
+            isOpen={isCurrencyOpen}
+            setIsOpen={setIsCurrencyOpen}
+            onSelect={(option) => {
+              setLocalCurrency(option.id === "usd" ? "usd" : "eur");
+              setIsCurrencyOpen(false);
+            }}
+            placeholder="Select currency"
+          />
+        </div>
+      </div>
+
       <SaveChanges
         hasChanges={hasChanges}
         loading={loading}
@@ -437,13 +477,14 @@ export const AccountSettings = () => {
         onReset={handleReset}
       />
 
-      {(isThemeOpen || isLanguageOpen || isTimezoneOpen) && (
+      {(isThemeOpen || isLanguageOpen || isTimezoneOpen || isCurrencyOpen) && (
         <div
           className="fixed inset-0 z-40"
           onClick={() => {
             setIsThemeOpen(false);
             setIsLanguageOpen(false);
             setIsTimezoneOpen(false);
+            setIsCurrencyOpen(false);
           }}
         />
       )}

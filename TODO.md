@@ -101,7 +101,8 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 - [ ] Anyone signed in can delete anyone's forum thread like (`forumThreadLikes` rules)
 - [ ] Creator payouts: sales go to the platform's Stripe account; nothing pays creators yet
       (Stripe Connect destination charges)
-- [ ] New listings still default to US dollars; the plan says euro
+- [x] New listings default to euro; sellers can switch to US dollars in Settings → Account (branch `claude/new-features`).
+- [ ] Deploy `firestore.rules` from `claude/new-features`: listings may only be priced in `eur` or `usd`
 - [ ] Deleting a listing removes it for its buyers too; keep purchased files available
 - [ ] Admin "delete all models" script still uses the old file paths
 - [ ] Artists list loads up to 200 user documents one by one (`fetchArtistsForSearch`); move to

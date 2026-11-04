@@ -4,6 +4,9 @@ export type ProfileVisibility = "public" | "private" | "friends";
 
 export type MessagePermission = "everyone" | "followers" | "none";
 
+/** The currency a seller's new listings are priced in. */
+export type SellingCurrency = "eur" | "usd";
+
 export interface NotificationPreferences {
   email: boolean;
   push: boolean;
@@ -35,6 +38,7 @@ export interface UserSettings {
   privacy: PrivacyPreferences;
   security: SecurityPreferences;
   theme: ThemePreference;
+  currency: SellingCurrency;
 }
 
 export interface SocialAccounts {
