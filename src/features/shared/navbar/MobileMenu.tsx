@@ -93,13 +93,15 @@ export const MobileMenu = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
-    const previousOverflow = document.body.style.overflow;
-
-    document.body.style.overflow = "hidden";
+    // Freeze the page behind the menu. iPhone Safari only honours this on the root element;
+    // swipes outside the menu's list are also blocked (touch-none below).
+    const root = document.documentElement;
+    const previousOverflow = root.style.overflow;
+    root.style.overflow = "hidden";
     document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = previousOverflow;
+      root.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [isOpen, onClose]);
@@ -118,7 +120,7 @@ export const MobileMenu = ({
   // cookie banner (z-50), but below the auth modal.
   return createPortal(
     <div
-      className={`fixed inset-0 z-[70] md:hidden ${isOpen ? "" : "pointer-events-none"}`}
+      className={`fixed inset-0 z-[70] touch-none md:hidden ${isOpen ? "" : "pointer-events-none"}`}
       inert={!isOpen}
     >
       <div
@@ -165,7 +167,7 @@ export const MobileMenu = ({
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-3 py-4">
+          <div className="flex-1 touch-pan-y overflow-y-auto overscroll-contain px-3 py-4">
             <div className="px-1">
               <GlobalSearch />
             </div>
