@@ -429,11 +429,12 @@ body {
     --btn-fg: var(--btn-primary-text);
   }
 
+  /* Hover: no glow; like the secondary button it lifts and its edge lights up. */
   .btn-primary:hover {
     --btn-bg: var(--btn-primary-hover);
-    --btn-edge: var(--btn-primary-hover);
+    --btn-edge: color-mix(in oklab, var(--btn-primary) 55%, white);
+    --btn-edge-w: 1px;
     transform: translateY(-1px);
-    filter: drop-shadow(0 8px 18px rgba(var(--accent-rgb), 0.35));
   }
 
   .btn-secondary {
@@ -480,8 +481,10 @@ body {
   }
 
   .btn-ember:hover {
+    --btn-edge: color-mix(in oklab, var(--ember-fill) 55%, white);
+    --btn-edge-w: 1px;
     transform: translateY(-1px);
-    filter: drop-shadow(0 8px 18px rgba(var(--ember-rgb), 0.4)) brightness(1.06);
+    filter: brightness(1.06);
   }
 
   .btn-sm {
