@@ -124,7 +124,7 @@ export const Navbar = () => {
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
           >
-            <Menu className="size-6" aria-hidden="true" />
+            <Menu className="size-5" aria-hidden="true" />
           </button>
 
           {/* Logo */}

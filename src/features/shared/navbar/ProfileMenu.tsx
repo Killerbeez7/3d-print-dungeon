@@ -86,7 +86,7 @@ export const ProfileMenu = ({
         <UserAvatar sources={avatarSources} className="size-8 md:size-9" />
         {unreadCount > 0 && (
           <span
-            className="absolute right-0.5 top-0.5 size-2.5 rounded-full bg-ember-fill ring-2 ring-section md:hidden"
+            className="absolute right-1 top-1 size-2 rounded-full bg-ember-fill ring-2 ring-section md:hidden"
             aria-hidden="true"
           />
         )}
