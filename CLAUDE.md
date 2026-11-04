@@ -12,6 +12,9 @@ Site content is in English.
   `chore:`, so any single change can be reverted.
 - Do not open a pull request, deploy hosting, deploy functions or deploy rules unless the
   owner asks. Firestore/Storage rules and Cloud Functions are shared with production.
+- Rules are deployed only by the Deploy rules workflow, on the owner's go: commit
+  `.github/deploy-rules.json` `{ "targets": "firestore,storage", "commit": "<HEAD sha>" }` on
+  `claude/redesign-v2`. Never deploy rules from a local checkout.
 - Before every push: `npm run lint`, `npm run type-check`, `npm run build`, then check
   changed pages at 390px and 1440px for console errors, broken links and horizontal scroll.
 - Never invent business facts (prices, reviews, ratings, stats, company details, service

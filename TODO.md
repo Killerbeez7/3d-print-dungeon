@@ -61,6 +61,11 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 
 ## Firebase console / deploys (owner)
 
+- [ ] Let GitHub deploy rules (one time): Google Cloud console → IAM & Admin → IAM → the service
+      account whose key is in the `FIREBASE_SERVICE_ACCOUNT` GitHub secret → Edit → Add role
+      **Firebase Rules Admin** and **Service Usage Consumer**. After that, rules are deployed by
+      the Deploy rules workflow (`.github/deploy-rules.json`), never from a local checkout.
+
 - [ ] Google sign-in on iPhone Safari ("missing initial state"): the site now signs in through its own
       domain. Google Cloud console → APIs & Services → Credentials → OAuth 2.0 Client IDs →
       "Web client (auto created by Google Service)" → Authorized redirect URIs: add
@@ -102,11 +107,11 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 - [ ] Creator payouts: sales go to the platform's Stripe account; nothing pays creators yet
       (Stripe Connect destination charges)
 - [x] New listings default to euro; sellers can switch to US dollars in Settings → Account (branch `claude/new-features`).
-- [ ] Deploy `firestore.rules` from `claude/new-features` (`firebase deploy --only firestore:rules`): listings may only be priced in `eur` or `usd`, and the new `makes` collection (photos of prints) becomes readable and postable. Until then the Makes section shows empty and posting says it isn't switched on yet. Photos go to `users/{uid}/makes/`, which the current storage rules already allow.
+- [ ] Deploy `firestore.rules` from `claude/redesign-v2` (now through the Deploy rules workflow, see Firebase console / deploys): listings may only be priced in `eur` or `usd`, and the new `makes` collection (photos of prints) becomes readable and postable. Until then the Makes section shows empty and posting says it isn't switched on yet.
 - [ ] Deleting a listing removes it for its buyers too; keep purchased files available
 - [ ] Admin "delete all models" script still uses the old file paths
-- [ ] Artists list loads up to 200 user documents one by one (`fetchArtistsForSearch`); move to
-      a single query on public profiles with `isArtist == true`
+- [x] Artists list no longer reads 200 user documents one by one: one models query, cached
+      (see "Later: artists and collections")
 - [ ] Search sorting: the old sort menu was removed because `fetchModels` ignores `sortBy`;
       add server-side sorting before bringing it back
 - [ ] Pre-existing lint errors (6) and warnings (14), e.g. unused `ModelData` in
