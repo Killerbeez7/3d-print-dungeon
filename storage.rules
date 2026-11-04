@@ -5,12 +5,36 @@ service firebase.storage {
     function isSignedIn()   { return request.auth != null; }
     function isAdmin()      { return isSignedIn() && (request.auth.token.admin == true || request.auth.token.super == true); }
 
-    // Public model media: viewer files, renders, posters. Original files used to
-    // live in models/original; nobody reads them directly any more.
+    // Uploads into a folder named after the uploader, with a size cap and the right file type,
+    // so nobody can fill the bucket with large files or drop files into someone else's folder.
+    function ownsUpload(ownerId) { return isSignedIn() && request.auth.uid == ownerId && resource == null; }
+    function isImageUnder(mb)    { return request.resource.contentType.matches('image/.*') && request.resource.size < mb * 1024 * 1024; }
+
+    // Public model media: viewer files, renders, posters (and the thumbnails the resize
+    // extension writes next to them). Original files used to live in models/original;
+    // nobody reads them directly any more.
     match /models/{folder}/{allPaths=**} {
       allow read: if folder != "original";
-      allow create: if isSignedIn() && folder != "original" && resource == null;
       allow update, delete: if isAdmin();
+    }
+
+    // Light 3D previews (see src/features/models/utils/lightPreview.ts).
+    match /models/converted/{ownerId}/{allPaths=**} {
+      allow create: if ownsUpload(ownerId)
+        && request.resource.contentType == 'model/gltf-binary'
+        && request.resource.size < 40 * 1024 * 1024;
+    }
+
+    // Listing images: the main render and the extra ones.
+    match /models/renders/{kind}/{ownerId}/{allPaths=**} {
+      allow create: if ownsUpload(ownerId)
+        && kind in ['renderPrimary', 'renderExtras']
+        && isImageUnder(25);
+    }
+
+    // Still images of the 3D preview.
+    match /models/posters/{ownerId}/{allPaths=**} {
+      allow create: if ownsUpload(ownerId) && isImageUnder(5);
     }
 
     // Original (printable) model files. Only the uploader can add them and no
@@ -25,16 +49,18 @@ service firebase.storage {
       allow update, delete: if false;
     }
 
-    // User uploads folder
+    // Profile pictures and photos of prints (makes); images only.
     match /users/{userId}/{allPaths=**} {
       allow read: if true;
-      allow write: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create, update: if isSignedIn() && (request.auth.uid == userId || isAdmin()) && isImageUnder(10);
+      allow delete: if isSignedIn() && (request.auth.uid == userId || isAdmin());
     }
 
-    // Profile pictures
+    // Profile pictures (older location)
     match /profiles/{userId} {
       allow read: if true;
-      allow write: if isSignedIn() && (request.auth.uid == userId || isAdmin());
+      allow create, update: if isSignedIn() && (request.auth.uid == userId || isAdmin()) && isImageUnder(10);
+      allow delete: if isSignedIn() && (request.auth.uid == userId || isAdmin());
     }
   }
 }

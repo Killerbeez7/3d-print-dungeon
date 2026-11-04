@@ -12,6 +12,9 @@ import type { ProfileSettingsData } from "../types/settings";
 
 import { SaveChanges } from "./parts/SaveChanges";
 
+// Matches the limit in storage.rules.
+const MAX_PICTURE_BYTES = 10 * 1024 * 1024;
+
 interface OriginalProfileData {
   displayName: string;
   city: string;
@@ -187,6 +190,15 @@ export const ProfileSettings = () => {
       return;
     }
 
+    if (!file.type.startsWith("image/") || file.size >= MAX_PICTURE_BYTES) {
+      const message = "Pick an image under 10 MB.";
+      setError(message);
+      showError("Profile picture", message);
+      event.target.value = "";
+      return;
+    }
+
+    setError(null);
     setProfilePicture(file);
   };
 
