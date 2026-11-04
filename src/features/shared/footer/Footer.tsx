@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUp, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 
 import { buttonClassName } from "@/components";
 import { ROUTES } from "@/constants/routeConstants";
 import { CookieSettingsModal } from "@/features/cookies/components/CookieSettingsModal";
 import { FORUM_PATHS } from "@/features/forum/constants/forumPaths";
 import { BrandMark } from "@/features/shared/components/BrandMark";
-import { LETTERS_PATH } from "@/features/shared/components/brandPaths";
 
 interface FooterLink {
   label: string;
@@ -108,35 +107,10 @@ export const Footer = () => {
             </div>
           </div>
 
-          <div className="mt-12 flex flex-col gap-3 border-t border-br-subtle py-5 text-xs text-txt-muted sm:flex-row sm:items-center sm:justify-between">
-            <p>
-              © {new Date().getFullYear()} 3D Print Dungeon
-              <span className="label-mono ml-3 hidden text-[0.65rem] sm:inline">
-                Printed layer by layer
-              </span>
-            </p>
-            <button
-              type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="inline-flex items-center gap-1.5 self-start text-txt-secondary transition-colors hover:text-txt-primary sm:self-auto"
-            >
-              Back to top
-              <ArrowUp className="size-3.5" aria-hidden="true" />
-            </button>
+          <div className="mt-12 flex items-center justify-between gap-4 border-t border-br-subtle py-6 text-xs text-txt-muted">
+            <p>© {new Date().getFullYear()} 3D Print Dungeon</p>
+            <p className="label-mono text-[0.65rem]">Printed layer by layer</p>
           </div>
-        </div>
-
-        {/* The logo's DUNGEON as an oversized outline, cut off by the page edge. */}
-        <div className="pointer-events-none mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8" aria-hidden="true">
-          <svg viewBox="5 -77 500.5 44" className="block w-full" focusable="false">
-            <path
-              d={LETTERS_PATH}
-              fill="none"
-              className="stroke-br-primary"
-              strokeWidth="1"
-              vectorEffect="non-scaling-stroke"
-            />
-          </svg>
         </div>
       </footer>
 
