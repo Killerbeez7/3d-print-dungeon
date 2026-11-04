@@ -303,9 +303,11 @@ service cloud.firestore {
         (resource.data.authorId == request.auth.uid || isAdmin());
     }
 
+    // Not used by the site yet; a like can only be added or removed by the person who gave it.
     match /forumThreadLikes/{likeId} {
       allow read: if true;
-      allow create, delete: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
 
     match /forumUserProfiles/{userId} {
