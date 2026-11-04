@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
 import { ArrowUp } from "lucide-react";
 
+import { useCookies } from "@/features/cookies/hooks/useCookies";
+
 export const ScrollToTopButton = () => {
     const [isVisible, setIsVisible] = useState(false);
+    // The cookie banner has its own buttons in this corner; wait until it is answered.
+    const { consent } = useCookies();
+    const isShown = isVisible && consent.accepted;
 
     useEffect(() => {
         const handleScroll = () => {
@@ -27,7 +32,7 @@ export const ScrollToTopButton = () => {
         <button
             onClick={scrollToTop}
             className={`btn btn-primary fixed bottom-5 right-5 max-md:hidden z-[101] size-12 p-0 transition-[opacity,transform,visibility] duration-300 ease-forge ${
-                isVisible ? "visible translate-y-0 opacity-100" : "invisible translate-y-3 opacity-0"
+                isShown ? "visible translate-y-0 opacity-100" : "invisible translate-y-3 opacity-0"
             }`}
             aria-label="Scroll to top"
         >
