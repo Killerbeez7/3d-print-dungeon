@@ -43,8 +43,6 @@ interface DieProps {
   rollOnHover?: boolean;
   /** Render as a button that throws the die when pressed (and does nothing else). */
   asButton?: boolean;
-  /** Throws the die each time this number changes (for a button that wraps the die). */
-  rollSignal?: number;
   className?: string;
 }
 
@@ -53,7 +51,6 @@ export const Die = ({
   mode = "still",
   rollOnHover = false,
   asButton = false,
-  rollSignal = 0,
   className = "",
 }: DieProps) => {
   const [pose, setPose] = useState({ flips: 0, turns: 0, move: "turn" as Move });
@@ -113,10 +110,6 @@ export const Die = ({
       window.clearInterval(id);
     };
   }, [mode, play]);
-
-  useEffect(() => {
-    if (rollSignal) play("throw");
-  }, [rollSignal, play]);
 
   const { ms, ease } = MOVES[pose.move];
   // The gate starts on the left; three quarter turns bring it to the right side of the die.
