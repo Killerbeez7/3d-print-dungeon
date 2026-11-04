@@ -4,14 +4,16 @@ import { db } from "../../../config/firebaseConfig";
 import { Save } from "lucide-react";
 import type { SiteSettingsType } from "@/features/admin/types/admin";
 
+const DEFAULT_SETTINGS: SiteSettingsType = {
+  allowNewRegistrations: true,
+  maxUploadSizeMB: 50,
+  defaultUserQuotaMB: 500,
+  featuredCategories: [],
+  newCategoryName: "",
+};
+
 export const SiteSettings = () => {
-  const [settings, setSettings] = useState<SiteSettingsType>({
-    allowNewRegistrations: true,
-    maxUploadSizeMB: 50,
-    defaultUserQuotaMB: 500,
-    featuredCategories: [],
-    newCategoryName: "",
-  });
+  const [settings, setSettings] = useState<SiteSettingsType>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<{
@@ -35,10 +37,10 @@ export const SiteSettings = () => {
           console.log("Creating initial settings document");
           // Create initial settings document if it doesn't exist
           await setDoc(settingsRef, {
-            allowNewRegistrations: settings.allowNewRegistrations,
-            maxUploadSizeMB: settings.maxUploadSizeMB,
-            defaultUserQuotaMB: settings.defaultUserQuotaMB,
-            featuredCategories: settings.featuredCategories,
+            allowNewRegistrations: DEFAULT_SETTINGS.allowNewRegistrations,
+            maxUploadSizeMB: DEFAULT_SETTINGS.maxUploadSizeMB,
+            defaultUserQuotaMB: DEFAULT_SETTINGS.defaultUserQuotaMB,
+            featuredCategories: DEFAULT_SETTINGS.featuredCategories,
           });
         }
       } catch (error) {
