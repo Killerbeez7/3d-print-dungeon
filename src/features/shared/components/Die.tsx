@@ -112,10 +112,10 @@ export const Die = ({
   }, [mode, play]);
 
   const { ms, ease } = MOVES[pose.move];
-  // The gate side is on the left (front) when the turns come round to a whole circle; there,
-  // once the die is at rest, the portcullis slides up. Anywhere else it hangs half raised.
+  // The gate starts on the left; three quarter turns bring it to the right side of the die.
+  // There, once the die is at rest, the portcullis slides up. Anywhere else it hangs half raised.
   const gateOpen =
-    settled && mode !== "loader" && ((pose.turns % 4) + 4) % 4 === 0 && !reducedMotion();
+    settled && mode !== "loader" && ((pose.turns % 4) + 4) % 4 === 3 && !reducedMotion();
   const Root = asButton ? "button" : "span";
   return (
     <Root
