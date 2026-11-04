@@ -79,7 +79,9 @@ export const PublicProfilePage = () => {
       <ProfileCover seed={profile.username} models={creator.models} />
 
       <div className={layoutClass}>
-        <aside className="lg:sticky lg:top-20 lg:self-start">
+        {/* Part of the page, not sticky: it scrolls with everything else, so it never slides
+            under the header or gets pushed up by the footer. */}
+        <aside className="lg:self-start">
           <ProfileCard user={profile} isOwner={isOwner} totals={creator.totals} />
         </aside>
 
