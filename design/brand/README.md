@@ -18,10 +18,11 @@ live on the logo canvas: https://claude.ai/artifact/YXZPzuJjAnSTjaFKLLHo6T
 | `intro/data.json` | Wordmark and die-face outlines the prototype draws |
 | `intro/render-video.cjs` | Renders the video from `engine.js` |
 | `intro/site/` | The site version of the intro (React component + TypeScript engine), not in use |
-| `scripts/make_logo_assets.py` | Writes `src/features/shared/components/brandPaths.ts` (the "3D PRINT / DUNGEON" wordmark) |
+| `scripts/make_logo_assets.py` | Writes `src/features/shared/components/brandPaths.ts`: the "3D PRINT / DUNGEON" wordmark, DUNGEON in Chakra Petch Bold and "3D PRINT" in Geist Mono |
 | `scripts/make_die_assets.py` | Writes `src/features/shared/components/dieFaces.ts` and the tab icon `public/assets/icons/pd-die-v4.svg` |
 | `scripts/die_icons.cjs` | Renders the PNG tab and home-screen icons from the die |
-| `scripts/wordmark_letters.py` | Outlines DUNGEON from Unbounded and redraws the E (straight spine) and G (no spur) |
+| `scripts/wordmark_letters.py` | The earlier DUNGEON (Unbounded with a redrawn E and G); the intro in `intro/` still draws this version |
+| `fonts/ChakraPetch-Bold.ttf` | The wordmark font (SIL Open Font License 1.1, `fonts/ChakraPetch-OFL.txt`); only the outlines ship |
 | `scripts/die_faces.py`, `scripts/maze.py` | The six die faces; the maze is a seeded 6 x 6 perfect maze |
 | `scripts/fontword.py`, `scripts/lockups.py`, `scripts/geo.py` | Shared helpers (font outlines, path transforms, geometry) |
 
@@ -34,7 +35,7 @@ homepage hero. Keep it in step with `intro/engine.js` when changing the motion.
 ## Regenerating
 
 ```sh
-npm install                      # the scripts read the fonts from node_modules
+npm install                      # the scripts read Geist Mono and Unbounded from node_modules
 pip install shapely fonttools brotli uharfbuzz skia-pathops
 python3 design/brand/scripts/make_logo_assets.py
 python3 design/brand/scripts/make_die_assets.py
