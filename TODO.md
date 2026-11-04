@@ -138,3 +138,16 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 - [ ] Replace AI-generated hero artwork with real photos of printed models
 - [ ] Hidden demo pages (marketplace, business, printed figures) still use the old styles
 - [ ] `stateMonitor.tsx` (3D viewer debug overlay) still uses raw black/white
+
+## Later: artists and collections
+
+- [ ] The Artists page and artist search build their list from the newest 1000 models (one
+      read per model, then one profile read per artist), cached for 5 minutes. Past a few
+      hundred models, keep an `artists` index on the server (a Cloud Function updating model
+      count, newest upload and preview images when a model is added or removed) and read that.
+- [ ] Two accounts with models are not listed because their public profile has no username
+      registered to them (shown as "Pacman" and as "Anonymous" with someone else's username on
+      their models). Fix their `users/{uid}/public/data.username` + `usernames/{name}` entries,
+      or leave them off.
+- [ ] Public collections (step 3): needs its own Firestore collection and rules. Collections are
+      private for now, stored in `users/{uid}/settings/collections`.
