@@ -1,0 +1,119 @@
+name: Deploy rules
+
+# Deploys firestore.rules and/or storage.rules to production from claude/redesign-v2, so rules
+# always come from the branch the live site is built from, never from an old local checkout.
+#
+# Triggered by a change to .github/deploy-rules.json on claude/redesign-v2:
+#   { "targets": "firestore,storage", "commit": "<commit whose rules you checked>" }
+# "targets" is "firestore", "storage" or "firestore,storage". The rules deployed are the ones in
+# the pushed commit; "commit" is a note for the history and must match it, so a stale request
+# is refused instead of silently deploying something else.
+#
+# Can also be run by hand: GitHub > Actions > Deploy rules > Run workflow (on claude/redesign-v2).
+#
+# Roll back: Firebase console > Firestore (or Storage) > Rules > history, pick a version, Publish.
+# Uses the FIREBASE_SERVICE_ACCOUNT secret; it needs the Firebase Rules Admin and Service Usage
+# Consumer roles in addition to Firebase Hosting Admin.
+
+on:
+  push:
+    branches: ["claude/redesign-v2"]
+    paths: [".github/deploy-rules.json"]
+  workflow_dispatch:
+    inputs:
+      targets:
+        description: "firestore, storage or firestore,storage"
+        default: "firestore,storage"
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-rules
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Only from claude/redesign-v2
+        if: github.ref != 'refs/heads/claude/redesign-v2'
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          echo "::error::Rules deploy only from claude/redesign-v2 (got $REF)"
+          exit 1
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the commit named in the request must be in the history
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Read the request
+        id: request
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_TARGETS: ${{ inputs.targets }}
+        run: |
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            targets="$INPUT_TARGETS"
+          else
+            targets=$(jq -r '.targets' .github/deploy-rules.json)
+            commit=$(jq -r '.commit // ""' .github/deploy-rules.json)
+            # The request names the commit it was checked against; refuse if the rules files
+            # changed after it, so what goes out is exactly what was reviewed.
+            if [ -z "$commit" ] || ! git cat-file -e "$commit^{commit}" 2>/dev/null; then
+              echo "::error::Unknown commit in deploy-rules.json: '$commit'"; exit 1
+            fi
+            if ! git diff --quiet "$commit" HEAD -- firestore.rules storage.rules; then
+              echo "::error::The rules changed after $commit. Update deploy-rules.json to the latest commit."; exit 1
+            fi
+          fi
+          only=""
+          IFS=',' read -ra parts <<< "$targets"
+          for part in "${parts[@]}"; do
+            case "$(echo "$part" | tr -d ' ')" in
+              firestore) only="${only:+$only,}firestore:rules" ;;
+              storage) only="${only:+$only,}storage" ;;
+              *) echo "::error::Unknown target: $part"; exit 1 ;;
+            esac
+          done
+          [ -n "$only" ] || { echo "::error::No targets"; exit 1; }
+          echo "only=$only" >> "$GITHUB_OUTPUT"
+          echo "Deploying \`$only\` from \`$(git rev-parse --short HEAD)\`" >> "$GITHUB_STEP_SUMMARY"
+
+      # Every test before anything reaches production.
+      - run: npm ci
+      - name: Run every test
+        run: npx vitest run
+
+      - name: Check and deploy the rules
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          ONLY: ${{ steps.request.outputs.only }}
+        run: |
+          key="$RUNNER_TEMP/service-account.json"
+          trap 'rm -f "$key"' EXIT
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > "$key"
+          export GOOGLE_APPLICATION_CREDENTIALS="$key"
+          tools="npx --yes firebase-tools@13.35.1"
+          # Compiles the rules on Firebase's side without publishing; a syntax error stops here.
+          $tools deploy --only "$ONLY" --project print-dungeon-3d --dry-run --non-interactive
+          $tools deploy --only "$ONLY" --project print-dungeon-3d --non-interactive
+
+      - name: Check the rules are live
+        if: contains(steps.request.outputs.only, 'firestore')
+        run: |
+          # makes is publicly readable under the current rules; a 403 means old rules are still active.
+          url='https://firestore.googleapis.com/v1/projects/print-dungeon-3d/databases/(default)/documents/makes?pageSize=1'
+          for attempt in 1 2 3 4 5 6; do
+            code=$(curl -s -o /dev/null -w '%{http_code}' "$url")
+            [ "$code" = "200" ] && { echo "Firestore rules live (makes readable)" >> "$GITHUB_STEP_SUMMARY"; exit 0; }
+            sleep 10
+          done
+          echo "::error::makes still returns $code after a minute"; exit 1
