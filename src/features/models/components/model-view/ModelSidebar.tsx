@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components";
 import { MODEL_CATEGORIES } from "@/features/models/constants/modelCategories";
 import { formatPrice, getFileFormat, toDate } from "@/features/models/utils/modelMeta";
+import { PrintDetails } from "./PrintDetails";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useSystemAlert } from "@/features/system-alerts/hooks/useSystemAlert";
@@ -382,6 +383,8 @@ export function ModelSidebar({
           </dl>
         </section>
       )}
+
+      {!isEditing && <PrintDetails url={model.convertedFileUrl} />}
 
       {/* Tags */}
       {!isEditing && tags.length > 0 && (

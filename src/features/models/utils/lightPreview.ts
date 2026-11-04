@@ -181,7 +181,7 @@ function creasedNormals(
 }
 
 /** Minimal binary glTF: one mesh with positions, normals and indices. */
-function writeGlb(positions: Float32Array, normals: Float32Array, indices: Uint32Array): ArrayBuffer {
+export function writeGlb(positions: Float32Array, normals: Float32Array, indices: Uint32Array): ArrayBuffer {
     const min = [Infinity, Infinity, Infinity];
     const max = [-Infinity, -Infinity, -Infinity];
     for (let i = 0; i < positions.length; i += 3) {
