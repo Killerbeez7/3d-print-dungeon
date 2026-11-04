@@ -4,6 +4,7 @@ import { BadgeCheck } from "lucide-react";
 import { STATIC_ASSETS } from "@/config/assetsConfig";
 import { profileCoverBackground } from "@/features/user/profile/utils/profileCover";
 import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
+import { getThumbnailUrl } from "@/utils/imageUtils";
 import { toUrlSafeUsername } from "@/utils/stringUtils";
 import type { ArtistCardProps } from "../types/artists";
 
@@ -19,6 +20,7 @@ export function ArtistCard({
   bio,
   isVerified,
   stats,
+  previews = [],
 }: ArtistCardProps) {
   const name = displayName || username || "Unnamed artist";
   const urlSafeUsername = toUrlSafeUsername(username);
@@ -38,6 +40,26 @@ export function ArtistCard({
           style={{ background: profileCoverBackground(username || name) }}
         />
         <div className="bg-layer-lines absolute inset-0" />
+        {/* Their newest models, over the generated cover. */}
+        {previews.length > 0 && (
+          <div className="absolute inset-0 grid grid-flow-col auto-cols-fr gap-px">
+            {previews.map((url) => (
+              <img
+                key={url}
+                src={getThumbnailUrl(url, "SMALL") ?? url}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                onError={(event) => {
+                  const image = event.currentTarget;
+                  if (image.src !== url) image.src = url;
+                  else image.style.visibility = "hidden";
+                }}
+                className="size-full object-cover transition-transform duration-700 ease-forge group-hover:scale-110"
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col px-4 pb-4">

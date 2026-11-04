@@ -21,4 +21,6 @@ export interface ArtistCardProps {
   bio?: string;
   isVerified?: boolean;
   stats?: Partial<PublicProfileView["stats"]>;
+  /** Renders of their newest models, for the card's cover. */
+  previews?: string[];
 }
