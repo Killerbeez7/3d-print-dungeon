@@ -66,6 +66,28 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
       **Firebase Rules Admin** and **Service Usage Consumer**. After that, rules are deployed by
       the Deploy rules workflow (`.github/deploy-rules.json`), never from a local checkout.
 
+- [ ] Deploy the security round of 4 Nov 2026 (branch `claude/redesign-v2`):
+      - Rules: say "deploy rules" (upload size/type limits and own-folder uploads in Storage,
+        forum likes, `rateLimits`). Tested in the emulator.
+      - Functions: from an up-to-date checkout of the branch,
+        `firebase deploy --only functions:getModelDownloadUrl,functions:checkEmailAvailability`
+        (download links: 30 per person per hour; email checks: 30 per network address per
+        10 minutes)
+      - Firestore → TTL policies → collection group `rateLimits`, field `expireAt`, so old
+        counters delete themselves
+- [ ] App Check, so only the site (not scripts) can call the functions. In this order:
+      1. Google Cloud console → Security → reCAPTCHA → Create key: Website; domains
+         `printdungeon.com`, `print-dungeon-3d.web.app`,
+         `print-dungeon-3d--claude-redesign-v2-6mscel08.web.app` (each preview domain), `localhost`
+      2. Firebase console → App Check → Apps → the web app → reCAPTCHA Enterprise → paste the
+         site key → Save. Do not press "Enforce" for any product yet.
+      3. GitHub → Settings → Secrets and variables → Actions → Variables → New variable
+         `VITE_APP_CHECK_SITE_KEY` = the site key (it's public, not a secret). The next preview
+         build includes App Check; then publish live.
+      4. A few days later, Cloud Logging for the functions: calls should show
+         `"app":"VALID"` in "Callable request verification passed". Then set
+         `ENFORCE_APP_CHECK = true` in `functions/src/shared/globalOptions.js` and deploy all
+         functions. Enforcing Firestore/Storage in the console is a later, separate step.
 - [ ] Google sign-in on iPhone Safari ("missing initial state"): the site now signs in through its own
       domain. Google Cloud console → APIs & Services → Credentials → OAuth 2.0 Client IDs →
       "Web client (auto created by Google Service)" → Authorized redirect URIs: add
@@ -100,10 +122,15 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
       normal map; that would allow a lower triangle count (more protection) at the same look
 - [ ] Add `.3mf` (common for Bambu printers) to the allowed upload formats; most other formats
       in the list can't be previewed in 3D
-- [ ] `checkEmailAvailability` lets anyone check whether an email has an account (needed for the
-      sign-up form; consider rate limiting)
+- [x] `checkEmailAvailability` lets anyone check whether an email has an account: now limited
+      per network address (deploy pending, see above)
 - [ ] Following/unfollowing or liking/unliking repeatedly sends a notification each time
-- [ ] Anyone signed in can delete anyone's forum thread like (`forumThreadLikes` rules)
+- [x] Anyone signed in can delete anyone's forum thread like (`forumThreadLikes` rules; deploy
+      pending)
+- [ ] Theft, later: a weaker 3D preview (fewer triangles, unprintable noise) or another approach;
+      a per-buyer watermark in downloaded files; fingerprinting uploads to catch re-uploads;
+      a report button and a copyright/DMCA page (a registered DMCA agent is needed for US
+      safe harbour; owner's details)
 - [ ] Creator payouts: sales go to the platform's Stripe account; nothing pays creators yet
       (Stripe Connect destination charges)
 - [x] New listings default to euro; sellers can switch to US dollars in Settings → Account (branch `claude/new-features`).
