@@ -6,12 +6,12 @@ interface CategoryChipsProps {
   onSelect: (categoryId: string | null) => void;
 }
 
+// Ghost buttons; the selected one gets the quiet tinted look from `.chip` (styles.css).
 const chipClass = (isSelected: boolean) =>
   buttonClassName({
-    variant: isSelected ? "primary" : "ghost",
+    variant: "ghost",
     size: "sm",
-    // Smaller than a standard small button, so the selected chip doesn't dominate the strip.
-    className: `h-7 shrink-0 px-2.5 text-[13px] [--cut:4px] ${isSelected ? "" : "text-txt-secondary"}`,
+    className: `chip h-7 shrink-0 px-2.5 text-[13px] [--cut:4px] ${isSelected ? "" : "text-txt-secondary"}`,
   });
 
 /** One sideways-scrolling row of category filters. */
