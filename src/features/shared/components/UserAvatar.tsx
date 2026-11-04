@@ -10,12 +10,12 @@ interface UserAvatarProps {
    * next one is tried before falling back to the default picture.
    */
   sources: ReadonlyArray<string | null | undefined>;
-  /** Size and rim, e.g. "size-9" or "size-32 [--rim:2.5px] [--rim-gap:3px]". */
+  /** Size, e.g. "size-9". */
   className?: string;
   alt?: string;
 }
 
-/** A profile picture as a round token with a rim, like a miniature's base. */
+/** A round profile picture. */
 export const UserAvatar = ({ sources, className = "", alt = "" }: UserAvatarProps) => {
   const urls = [...new Set(sources.filter((url): url is string => Boolean(url?.trim())))];
   // Remembers which list it counted failures for, so a new list starts from the first address.

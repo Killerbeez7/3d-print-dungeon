@@ -83,7 +83,7 @@ export const ProfileMenu = ({
         aria-expanded={isOpen}
       >
         {/* Same 40px tap area as the icons, with a lighter-looking avatar inside. */}
-        <UserAvatar sources={avatarSources} className="size-7 md:size-8" />
+        <UserAvatar sources={avatarSources} className="size-8 md:size-9" />
         {unreadCount > 0 && (
           <span
             className="absolute right-0.5 top-0.5 size-2.5 rounded-full bg-ember-fill ring-2 ring-section md:hidden"
@@ -109,7 +109,7 @@ export const ProfileMenu = ({
 
         <div className="-mt-7 flex items-end gap-3 px-4">
           <span className="rounded-full bg-surface-elevated p-1.5">
-            <UserAvatar sources={avatarSources} className="size-14 [--rim:2px]" />
+            <UserAvatar sources={avatarSources} className="size-14" />
           </span>
           <div className="min-w-0 flex-1 pb-1">
             <p className="truncate text-sm font-semibold text-txt-primary">{displayName}</p>

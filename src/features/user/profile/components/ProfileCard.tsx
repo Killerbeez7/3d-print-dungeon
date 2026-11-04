@@ -96,7 +96,7 @@ export const ProfileCard = ({ user, isOwner, totals }: ProfileCardProps) => {
           src={avatarUrl}
           alt=""
           referrerPolicy="no-referrer"
-          className="avatar-token size-28 bg-muted object-cover [--rim:2.5px] [--rim-gap:3px] sm:size-36"
+          className="avatar-token size-28 bg-muted object-cover sm:size-36"
           onError={(event) => {
             const image = event.currentTarget;
             if (!image.src.endsWith(STATIC_ASSETS.DEFAULT_AVATAR)) image.src = STATIC_ASSETS.DEFAULT_AVATAR;

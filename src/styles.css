@@ -330,12 +330,9 @@ body {
     opacity: 0.6;
   }
 
-  /* Profile pictures: a round token with a rim, like a miniature's base. The rim is an
-     outline, so the gap shows whatever is behind it. --rim and --rim-gap scale it. */
+  /* Profile pictures: round, no border. */
   .avatar-token {
     border-radius: 9999px;
-    outline: var(--rim, 1.5px) solid var(--accent);
-    outline-offset: var(--rim-gap, 2px);
   }
 
   /* Chamfered (cut-corner) shape. --cut sets the corner size. */

@@ -328,7 +328,7 @@ export const ProfileSettings = () => {
                 </label>
 
                 <div className="flex flex-col space-y-4">
-                  <div className="avatar-token size-32 overflow-hidden bg-muted [--rim:2.5px] [--rim-gap:3px]">
+                  <div className="avatar-token size-32 overflow-hidden bg-muted">
                     <img
                       src={displayedAvatarUrl}
                       alt="Profile avatar"
