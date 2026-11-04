@@ -90,7 +90,9 @@ export const Navbar = () => {
     closeAll();
   }, [closeAll, location.pathname]);
 
-  const urlSafeUsername = toUrlSafeUsername(publicProfile?.username ?? sessionHint?.username ?? undefined);
+  const urlSafeUsername = toUrlSafeUsername(
+    publicProfile?.username ?? sessionHint?.username ?? undefined,
+  );
   // Profile photo first, then the sign-in provider's, then the one remembered from last visit.
   const profileAvatarSources = [
     authUser?.photoURL,
@@ -109,181 +111,191 @@ export const Navbar = () => {
   const profileEmail = authUser?.email ?? currentUser?.email ?? "";
 
   return (
-    // transform-gpu keeps the bar on its own layer: on iPhone, fast-scrolling tiles were
-    // drawn over it for a frame once the blur (which used to do this) was dropped on phones.
-    <div className="sticky top-0 left-0 right-0 z-50 transform-gpu">
-      <header className="relative z-50 border-b border-br-subtle bg-section md:bg-section/85 md:backdrop-blur-xl">
-        {/* Print progress: fills as the page scrolls (CSS scroll timeline). */}
-        <div className="scroll-progress" aria-hidden="true" />
-        <div className="relative mx-auto flex h-16 max-w-[1600px] items-center gap-2 px-3 sm:px-6 md:gap-4 lg:px-8">
-          {/* Mobile menu button */}
-          <button
-            id="hamburger-button"
-            type="button"
-            className={`${iconButtonClass} -ml-1 md:hidden`}
-            onClick={() => setIsMobileMenuOpen(true)}
-            aria-label="Open menu"
-            aria-expanded={isMobileMenuOpen}
-            aria-controls="mobile-menu"
-          >
-            <Menu className="size-6" aria-hidden="true" />
-          </button>
-
-          {/* Logo */}
-          <Link
-            to="/"
-            onClick={handleLogoClick}
-            className="flex shrink-0 items-center gap-2 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus max-md:absolute max-md:left-1/2 max-md:-translate-x-1/2"
-            aria-label="3D Print Dungeon home"
-          >
-            <BrandMark wordmarkClassName="max-xl:hidden" animated />
-          </Link>
-
-          {/* Desktop nav */}
-          <nav
-            ref={desktopNavRef}
-            className="ml-2 hidden items-center gap-1 md:flex"
-            aria-label="Primary navigation"
-          >
-            {NAV_SECTIONS.map((section) =>
-              section.to ? (
-                <NavLink
-                  key={section.label}
-                  to={section.to}
-                  end={section.to === "/"}
-                  className={({ isActive }) => navLinkClass(isActive)}
-                >
-                  {section.label}
-                </NavLink>
-              ) : (
-                <div
-                  key={section.label}
-                  className="relative"
-                  onMouseEnter={() => setActiveDropdown(section.label)}
-                  onMouseLeave={() => setActiveDropdown(null)}
-                >
-                  <button
-                    type="button"
-                    className={navLinkClass(activeDropdown === section.label)}
-                    onClick={() => toggleDropdown(section.label)}
-                    aria-haspopup="menu"
-                    aria-expanded={activeDropdown === section.label}
-                  >
-                    {section.label}
-                    <ChevronDown
-                      className={`size-4 transition-transform ${
-                        activeDropdown === section.label ? "rotate-180" : ""
-                      }`}
-                      aria-hidden="true"
-                    />
-                  </button>
-                  <div
-                    role="menu"
-                    className={`absolute left-0 top-full z-40 pt-2 transition-[opacity,transform] duration-200 ease-forge ${
-                      activeDropdown === section.label
-                        ? "visible translate-y-0 opacity-100"
-                        : "invisible -translate-y-1 opacity-0"
-                    }`}
-                  >
-                    <div className="w-60 rounded-xl border border-br-secondary bg-surface-elevated p-1.5 shadow-popover">
-                      {section.items.map((item) => (
-                        <Link
-                          key={item.to}
-                          to={item.to}
-                          role="menuitem"
-                          className="group/item flex flex-col rounded-lg px-3 py-2.5 transition-colors hover:bg-muted"
-                          onClick={() => setActiveDropdown(null)}
-                        >
-                          <span className="text-sm font-medium text-txt-primary">
-                            {item.label}
-                            <span
-                              className="ml-1 inline-block text-accent opacity-0 transition-[opacity,transform] duration-200 group-hover/item:translate-x-0.5 group-hover/item:opacity-100"
-                              aria-hidden="true"
-                            >
-                              →
-                            </span>
-                          </span>
-                          {item.hint && <span className="text-xs text-txt-muted">{item.hint}</span>}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )
-            )}
-          </nav>
-
-          {/* Search (desktop) */}
-          <div className="mx-auto hidden w-full min-w-0 max-w-xl flex-1 lg:block">
-            <GlobalSearch />
-          </div>
-
-          {/* Right side */}
-          <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0">
-            <Link
-              to={`${ROUTES.SEARCH}?sort_by=relevance`}
-              className={`${iconButtonClass} max-md:hidden lg:hidden`}
-              aria-label="Search"
+    <>
+      {/* Holds the header's place in the page, since the header itself is fixed. */}
+      <div className="h-16 shrink-0" aria-hidden="true" />
+      {/* Fixed, not sticky: when iPhone Safari bounces past the end of the page it slides
+        sticky elements away with the content, uncovering the footer behind the header.
+        transform-gpu keeps the bar on its own layer so scrolling tiles never draw over it. */}
+      <div className="fixed inset-x-0 top-0 z-50 transform-gpu">
+        <header className="relative z-50 border-b border-br-subtle bg-section md:bg-section/85 md:backdrop-blur-xl">
+          {/* Print progress: fills as the page scrolls (CSS scroll timeline). */}
+          <div className="scroll-progress" aria-hidden="true" />
+          <div className="relative mx-auto flex h-16 max-w-[1600px] items-center gap-2 px-3 sm:px-6 md:gap-4 lg:px-8">
+            {/* Mobile menu button */}
+            <button
+              id="hamburger-button"
+              type="button"
+              className={`${iconButtonClass} -ml-1 md:hidden`}
+              onClick={() => setIsMobileMenuOpen(true)}
+              aria-label="Open menu"
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-menu"
             >
-              <Search className="size-6" aria-hidden="true" />
+              <Menu className="size-6" aria-hidden="true" />
+            </button>
+
+            {/* Logo */}
+            <Link
+              to="/"
+              onClick={handleLogoClick}
+              className="flex shrink-0 items-center gap-2 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus max-md:absolute max-md:left-1/2 max-md:-translate-x-1/2"
+              aria-label="3D Print Dungeon home"
+            >
+              <BrandMark wordmarkClassName="max-xl:hidden" animated />
             </Link>
 
-            {!signedIn ? (
-              <AuthButtons
-                onLoginClick={() => openAuth("signin")}
-                onSignUpClick={() => openAuth("signup")}
-              />
-            ) : (
-              <>
-                <Link
-                  to="/model/upload"
-                  className={buttonClassName({
-                    variant: "secondary",
-                    size: "sm",
-                    className: "max-md:hidden",
-                  })}
-                >
-                  <Upload className="size-4" aria-hidden="true" />
-                  Upload
-                </Link>
-
-                {/* Phones reach notifications from the avatar menu (dot on the avatar). */}
-                {currentUser ? (
-                  <NotificationDropdown className="text-txt-secondary max-md:hidden" />
+            {/* Desktop nav */}
+            <nav
+              ref={desktopNavRef}
+              className="ml-2 hidden items-center gap-1 md:flex"
+              aria-label="Primary navigation"
+            >
+              {NAV_SECTIONS.map((section) =>
+                section.to ? (
+                  <NavLink
+                    key={section.label}
+                    to={section.to}
+                    end={section.to === "/"}
+                    className={({ isActive }) => navLinkClass(isActive)}
+                  >
+                    {section.label}
+                  </NavLink>
                 ) : (
-                  // Same footprint as the bell while the session is restored.
-                  <span className="flex size-9 items-center justify-center text-txt-muted max-md:hidden" aria-hidden="true">
-                    <Bell className="size-6" />
-                  </span>
-                )}
+                  <div
+                    key={section.label}
+                    className="relative"
+                    onMouseEnter={() => setActiveDropdown(section.label)}
+                    onMouseLeave={() => setActiveDropdown(null)}
+                  >
+                    <button
+                      type="button"
+                      className={navLinkClass(activeDropdown === section.label)}
+                      onClick={() => toggleDropdown(section.label)}
+                      aria-haspopup="menu"
+                      aria-expanded={activeDropdown === section.label}
+                    >
+                      {section.label}
+                      <ChevronDown
+                        className={`size-4 transition-transform ${
+                          activeDropdown === section.label ? "rotate-180" : ""
+                        }`}
+                        aria-hidden="true"
+                      />
+                    </button>
+                    <div
+                      role="menu"
+                      className={`absolute left-0 top-full z-40 pt-2 transition-[opacity,transform] duration-200 ease-forge ${
+                        activeDropdown === section.label
+                          ? "visible translate-y-0 opacity-100"
+                          : "invisible -translate-y-1 opacity-0"
+                      }`}
+                    >
+                      <div className="w-60 rounded-xl border border-br-secondary bg-surface-elevated p-1.5 shadow-popover">
+                        {section.items.map((item) => (
+                          <Link
+                            key={item.to}
+                            to={item.to}
+                            role="menuitem"
+                            className="group/item flex flex-col rounded-lg px-3 py-2.5 transition-colors hover:bg-muted"
+                            onClick={() => setActiveDropdown(null)}
+                          >
+                            <span className="text-sm font-medium text-txt-primary">
+                              {item.label}
+                              <span
+                                className="ml-1 inline-block text-accent opacity-0 transition-[opacity,transform] duration-200 group-hover/item:translate-x-0.5 group-hover/item:opacity-100"
+                                aria-hidden="true"
+                              >
+                                →
+                              </span>
+                            </span>
+                            {item.hint && (
+                              <span className="text-xs text-txt-muted">{item.hint}</span>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ),
+              )}
+            </nav>
 
-                <ProfileMenu
-                  isOpen={activeDropdown === "profile"}
-                  onToggle={() => toggleDropdown("profile")}
-                  onClose={() => setActiveDropdown(null)}
-                  onLogout={() => void handleLogout()}
-                  isAdmin={isAdmin}
-                  displayName={profileDisplayName}
-                  username={publicProfile?.username ?? sessionHint?.username ?? null}
-                  email={profileEmail}
-                  avatarSources={profileAvatarSources}
-                  profilePath={`/${urlSafeUsername}`}
-                  unreadCount={currentUser ? unreadCount : 0}
+            {/* Search (desktop) */}
+            <div className="mx-auto hidden w-full min-w-0 max-w-xl flex-1 lg:block">
+              <GlobalSearch />
+            </div>
+
+            {/* Right side */}
+            <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0">
+              <Link
+                to={`${ROUTES.SEARCH}?sort_by=relevance`}
+                className={`${iconButtonClass} max-md:hidden lg:hidden`}
+                aria-label="Search"
+              >
+                <Search className="size-6" aria-hidden="true" />
+              </Link>
+
+              {!signedIn ? (
+                <AuthButtons
+                  onLoginClick={() => openAuth("signin")}
+                  onSignUpClick={() => openAuth("signup")}
                 />
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+              ) : (
+                <>
+                  <Link
+                    to="/model/upload"
+                    className={buttonClassName({
+                      variant: "secondary",
+                      size: "sm",
+                      className: "max-md:hidden",
+                    })}
+                  >
+                    <Upload className="size-4" aria-hidden="true" />
+                    Upload
+                  </Link>
 
-      <MobileMenu
-        isOpen={isMobileMenuOpen}
-        onClose={closeMobileMenu}
-        sections={NAV_SECTIONS}
-        isSignedIn={Boolean(currentUser)}
-        onSignIn={() => openAuth("signin")}
-        onSignUp={() => openAuth("signup")}
-      />
-    </div>
+                  {/* Phones reach notifications from the avatar menu (dot on the avatar). */}
+                  {currentUser ? (
+                    <NotificationDropdown className="text-txt-secondary max-md:hidden" />
+                  ) : (
+                    // Same footprint as the bell while the session is restored.
+                    <span
+                      className="flex size-9 items-center justify-center text-txt-muted max-md:hidden"
+                      aria-hidden="true"
+                    >
+                      <Bell className="size-6" />
+                    </span>
+                  )}
+
+                  <ProfileMenu
+                    isOpen={activeDropdown === "profile"}
+                    onToggle={() => toggleDropdown("profile")}
+                    onClose={() => setActiveDropdown(null)}
+                    onLogout={() => void handleLogout()}
+                    isAdmin={isAdmin}
+                    displayName={profileDisplayName}
+                    username={publicProfile?.username ?? sessionHint?.username ?? null}
+                    email={profileEmail}
+                    avatarSources={profileAvatarSources}
+                    profilePath={`/${urlSafeUsername}`}
+                    unreadCount={currentUser ? unreadCount : 0}
+                  />
+                </>
+              )}
+            </div>
+          </div>
+        </header>
+
+        <MobileMenu
+          isOpen={isMobileMenuOpen}
+          onClose={closeMobileMenu}
+          sections={NAV_SECTIONS}
+          isSignedIn={Boolean(currentUser)}
+          onSignIn={() => openAuth("signin")}
+          onSignUp={() => openAuth("signup")}
+        />
+      </div>
+    </>
   );
 };
