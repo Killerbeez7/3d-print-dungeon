@@ -25,7 +25,7 @@ const SearchPageContent = () => {
       />
 
       {/* Filters stay under the header while scrolling results */}
-      <div className="sticky top-16 z-30 border-b border-br-subtle bg-page md:bg-page/85 md:backdrop-blur-xl">
+      <div className="sticky top-16 z-30 transform-gpu border-b border-br-subtle bg-page md:bg-page/85 md:backdrop-blur-xl">
         <div className="mx-auto max-w-[1600px] px-4 py-2.5 sm:px-6 lg:px-8">
           <SearchFilters />
         </div>

@@ -87,7 +87,7 @@ export const PublicProfilePage = () => {
           <div
             role="tablist"
             aria-label="Profile sections"
-            className="sticky top-16 z-30 -mx-4 mb-6 flex gap-1 border-b border-br-subtle bg-page px-4 md:bg-page/85 md:backdrop-blur-xl sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0"
+            className="sticky top-16 z-30 -mx-4 transform-gpu mb-6 flex gap-1 border-b border-br-subtle bg-page px-4 md:bg-page/85 md:backdrop-blur-xl sm:-mx-6 sm:px-6 lg:mx-0 lg:px-0"
           >
             {tabs.map((item) => (
               <button

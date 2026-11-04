@@ -109,7 +109,9 @@ export const Navbar = () => {
   const profileEmail = authUser?.email ?? currentUser?.email ?? "";
 
   return (
-    <div className="sticky top-0 left-0 right-0 z-50">
+    // transform-gpu keeps the bar on its own layer: on iPhone, fast-scrolling tiles were
+    // drawn over it for a frame once the blur (which used to do this) was dropped on phones.
+    <div className="sticky top-0 left-0 right-0 z-50 transform-gpu">
       <header className="relative z-50 border-b border-br-subtle bg-section md:bg-section/85 md:backdrop-blur-xl">
         {/* Print progress: fills as the page scrolls (CSS scroll timeline). */}
         <div className="scroll-progress" aria-hidden="true" />
