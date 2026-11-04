@@ -31,15 +31,10 @@ export const LazyImage = ({
       }
     );
 
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
-    }
+    const img = imgRef.current;
+    if (img) observer.observe(img);
 
-    return () => {
-      if (imgRef.current) {
-        observer.unobserve(imgRef.current);
-      }
-    };
+    return () => observer.disconnect();
   }, []);
 
   const handleLoad = () => {
