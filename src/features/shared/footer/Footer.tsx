@@ -7,6 +7,7 @@ import { ROUTES } from "@/constants/routeConstants";
 import { CookieSettingsModal } from "@/features/cookies/components/CookieSettingsModal";
 import { FORUM_PATHS } from "@/features/forum/constants/forumPaths";
 import { BrandMark } from "@/features/shared/components/BrandMark";
+import { LETTERS_PATH } from "@/features/shared/components/brandPaths";
 
 interface FooterLink {
   label: string;
@@ -27,7 +28,8 @@ const columns: { title: string; links: FooterLink[] }[] = [
     title: "Community",
     links: [
       { label: "Forum", to: FORUM_PATHS.HOME },
-      { label: "Forum rules", to: "/forum/rules" },
+      { label: "Forum rules", to: FORUM_PATHS.RULES },
+      { label: "Help center", to: FORUM_PATHS.HELP },
     ],
   },
   {
@@ -36,7 +38,6 @@ const columns: { title: string; links: FooterLink[] }[] = [
       { label: "Upload a model", to: ROUTES.MODEL_UPLOAD },
       { label: "Settings", to: ROUTES.USER_SETTINGS },
       { label: "Notifications", to: ROUTES.USER_NOTIFICATIONS },
-      { label: "Help center", to: "/forum/help" },
     ],
   },
   {
@@ -125,13 +126,18 @@ export const Footer = () => {
           </div>
         </div>
 
-        {/* Oversized outline wordmark, cut off by the page edge. */}
-        <p
-          aria-hidden="true"
-          className="pointer-events-none -mb-[0.32em] select-none text-center font-display text-[13.5vw] font-bold uppercase leading-none tracking-tighter text-transparent [-webkit-text-stroke:1px_var(--br-primary)]"
-        >
-          Dungeon
-        </p>
+        {/* The logo's DUNGEON as an oversized outline, cut off by the page edge. */}
+        <div className="pointer-events-none mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8" aria-hidden="true">
+          <svg viewBox="5 -77 500.5 44" className="block w-full" focusable="false">
+            <path
+              d={LETTERS_PATH}
+              fill="none"
+              className="stroke-br-primary"
+              strokeWidth="1"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+        </div>
       </footer>
 
       <CookieSettingsModal
