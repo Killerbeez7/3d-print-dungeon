@@ -686,15 +686,17 @@ body {
     animation: print-fill 2.2s steps(22, end) var(--skeleton-delay, 0ms) infinite both;
   }
 
+  /* The nozzle: a full-height layer with the line drawn at its bottom, moved with transform
+     so the browser doesn't repaint the tile on every step. */
   .skeleton-print::after {
     content: "";
     position: absolute;
     left: 8%;
     right: 8%;
-    height: 2px;
-    border-radius: 2px;
-    background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), 0.85) 50%, transparent);
-    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(90deg, transparent, rgba(var(--accent-rgb), 0.95) 50%, transparent)
+      bottom / 100% 2px no-repeat;
     animation: print-nozzle 2.2s steps(22, end) var(--skeleton-delay, 0ms) infinite both;
   }
 
@@ -741,7 +743,7 @@ body {
     opacity: 1;
   }
 
-  @media (prefers-reduced-motion: no-preference) {
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
     .tile-image {
       transform: scale(1.03);
     }
@@ -847,16 +849,16 @@ body {
 
 @keyframes print-nozzle {
   0% {
-    bottom: 0;
+    transform: translateY(0);
     opacity: 1;
   }
   70% {
-    bottom: calc(100% - 2px);
+    transform: translateY(calc(-100% + 2px));
     opacity: 1;
   }
   80%,
   100% {
-    bottom: calc(100% - 2px);
+    transform: translateY(calc(-100% + 2px));
     opacity: 0;
   }
 }

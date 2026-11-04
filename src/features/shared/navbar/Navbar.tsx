@@ -110,7 +110,7 @@ export const Navbar = () => {
 
   return (
     <div className="sticky top-0 left-0 right-0 z-50">
-      <header className="relative z-50 border-b border-br-subtle bg-section/85 backdrop-blur-xl">
+      <header className="relative z-50 border-b border-br-subtle bg-section md:bg-section/85 md:backdrop-blur-xl">
         {/* Print progress: fills as the page scrolls (CSS scroll timeline). */}
         <div className="scroll-progress" aria-hidden="true" />
         <div className="relative mx-auto flex h-16 max-w-[1600px] items-center gap-2 px-3 sm:px-6 md:gap-4 lg:px-8">

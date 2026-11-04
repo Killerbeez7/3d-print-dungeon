@@ -138,7 +138,7 @@ export const HomePage = (): React.ReactNode => {
 
       <section id="models" aria-labelledby="models-heading" className="scroll-mt-16 pb-16">
         {/* Sticky filter bar under the header, like a gallery toolbar. */}
-        <div className="sticky top-16 z-30 border-b border-br-subtle bg-page/85 backdrop-blur-xl">
+        <div className="sticky top-16 z-30 border-b border-br-subtle bg-page md:bg-page/85 md:backdrop-blur-xl">
           <div className="flex items-center gap-4 px-4 py-2.5 sm:px-6 lg:px-8">
             <h2
               id="models-heading"

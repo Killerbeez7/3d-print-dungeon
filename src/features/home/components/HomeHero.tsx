@@ -96,7 +96,7 @@ export const HomeHero = ({ onBrowse }: HomeHeroProps) => {
 
       {/* Category ticker (decorative; the filters below are the real controls). */}
       <div
-        className="marquee relative border-t border-br-subtle bg-page/60 py-3 backdrop-blur-sm"
+        className="marquee relative border-t border-br-subtle bg-page/60 py-3 md:backdrop-blur-sm"
         aria-hidden="true"
       >
         <div className="marquee-track label-mono flex w-max text-txt-muted">
