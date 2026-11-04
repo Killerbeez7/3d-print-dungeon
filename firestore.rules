@@ -169,6 +169,37 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // -------------- Makes --------------
+    // Photos of printed models. Anyone can read them; signed-in users post their own, with the
+    // photo in their own Storage folder and a short caption. The poster, the model's creator or
+    // an admin can remove one; nobody edits them.
+    match /makes/{makeId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly([
+          "modelId", "userId", "userName", "username", "imageUrl", "imagePath", "caption", "createdAt"
+        ])
+        && request.resource.data.keys().hasAll(["modelId", "userId", "imageUrl", "imagePath", "createdAt"])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.modelId is string
+        && request.resource.data.imagePath is string
+        && request.resource.data.imagePath.matches("users/" + request.auth.uid + "/makes/[^/]+")
+        && request.resource.data.imageUrl is string
+        && request.resource.data.imageUrl.matches("https://firebasestorage[.]googleapis[.]com/.*")
+        && request.resource.data.get("caption", "") is string
+        && request.resource.data.get("caption", "").size() <= 280
+        && request.resource.data.get("userName", "") is string
+        && request.resource.data.get("userName", "").size() <= 80
+        && request.resource.data.createdAt == request.time
+        && exists(/databases/$(database)/documents/models/$(request.resource.data.modelId));
+      allow update: if false;
+      allow delete: if isSignedIn() && (
+        resource.data.userId == request.auth.uid
+        || isAdmin()
+        || get(/databases/$(database)/documents/models/$(resource.data.modelId)).data.uploaderId == request.auth.uid
+      );
+    }
+
     // -------------- Comments --------------
     match /comments/{commentId} {
       allow read: if true;

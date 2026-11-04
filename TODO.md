@@ -102,7 +102,7 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 - [ ] Creator payouts: sales go to the platform's Stripe account; nothing pays creators yet
       (Stripe Connect destination charges)
 - [x] New listings default to euro; sellers can switch to US dollars in Settings → Account (branch `claude/new-features`).
-- [ ] Deploy `firestore.rules` from `claude/new-features`: listings may only be priced in `eur` or `usd`
+- [ ] Deploy `firestore.rules` from `claude/new-features` (`firebase deploy --only firestore:rules`): listings may only be priced in `eur` or `usd`, and the new `makes` collection (photos of prints) becomes readable and postable. Until then the Makes section shows empty and posting says it isn't switched on yet. Photos go to `users/{uid}/makes/`, which the current storage rules already allow.
 - [ ] Deleting a listing removes it for its buyers too; keep purchased files available
 - [ ] Admin "delete all models" script still uses the old file paths
 - [ ] Artists list loads up to 200 user documents one by one (`fetchArtistsForSearch`); move to
