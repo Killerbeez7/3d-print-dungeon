@@ -18,6 +18,7 @@ import { ModelSidebar } from "../components/model-view/ModelSidebar";
 import { ModelThumbnails } from "../components/model-view/ModelThumbnails";
 
 import { ModelComments } from "../components/model-view/ModelComments";
+import { ModelMakes } from "../makes/ModelMakes";
 import { ModelPageSkeleton } from "../components/model-view/ModelPageSkeleton";
 import { PurchaseButton } from "@/features/payment/components/PurchaseButton";
 import { buttonClassName } from "@/components";
@@ -170,6 +171,14 @@ export function ModelPage() {
           showPurchase={isDesktop}
         />
       </div>
+
+      <section className="mt-12 border-t border-br-subtle pt-8">
+        <ModelMakes
+          modelId={model.id}
+          modelOwnerId={model.uploaderId}
+          openAuthModal={() => open({ mode: "login" })}
+        />
+      </section>
 
       <section className="mt-12 border-t border-br-subtle pt-8">
         <ModelComments modelId={model.id} openAuthModal={() => open({ mode: "login" })} />
