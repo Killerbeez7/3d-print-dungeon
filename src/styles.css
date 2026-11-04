@@ -607,7 +607,9 @@ body {
   /* The logo die (components/Die.tsx): a cube at the isometric angle. --die-e is the edge;
      the drawn die is 1.414 x 1.633 edges. Symbols are dark in both themes. */
   .die {
-    --die-ink: var(--txt-primary);
+    /* The symbols are "cut out" of the die: they take the surface colour behind it
+       (white in the light theme, near-black in the dark one). */
+    --die-ink: var(--bg-section);
     display: inline-grid;
     place-items: center;
     flex-shrink: 0;
