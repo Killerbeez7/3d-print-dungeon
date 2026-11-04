@@ -5,7 +5,7 @@ interface BestSellersProps {
   previewCount?: number;
 }
 
-export const BestSellers: FC<BestSellersProps> = ({ previewCount }) => {
+export const BestSellers: FC<BestSellersProps> = () => {
   // Fetch or filter best sellers (pseudo-code)
   // const { models, loading } = useModels();
   // const bestSellers = models.filter(...).slice(0, previewCount ?? models.length);

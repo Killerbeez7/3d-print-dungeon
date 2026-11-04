@@ -5,7 +5,7 @@ interface NewArrivalsProps {
   previewCount?: number;
 }
 
-export const NewArrivals: FC<NewArrivalsProps> = ({ previewCount }) => {
+export const NewArrivals: FC<NewArrivalsProps> = () => {
   // Fetch or filter new models (pseudo-code)
   // const { models, loading } = useModels();
   // const newModels = models.sort(...).slice(0, previewCount ?? models.length);

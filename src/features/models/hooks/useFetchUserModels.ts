@@ -1,5 +1,4 @@
 import { useFetchModels } from "./useFetchModels";
-import type { ModelData } from "../types/model";
 
 export const useFetchUserModels = (userId: string) => {
     const { data, isLoading, error, fetchNextPage, hasNextPage, isFetchingNextPage } = useFetchModels({

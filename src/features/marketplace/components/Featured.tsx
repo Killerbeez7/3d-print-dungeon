@@ -7,7 +7,6 @@ import { LazyImage } from "@/features/shared/reusable/LazyImage";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/config/firebaseConfig";
 import { getThumbnailUrl } from "@/utils/imageUtils";
-import type { ModelData } from "@/features/models/types/model";
 import type { FC } from "react";
 interface FeaturedProps {
   previewCount?: number;
@@ -24,7 +23,7 @@ interface FeaturedModel {
 
 export const Featured: FC<FeaturedProps> = ({ previewCount }) => {
   // const { models, loading } = useModels();
-  const [featuredModels, setFeaturedModels] = useState<FeaturedModel[]>([]);
+  const [featuredModels] = useState<FeaturedModel[]>([]);
   const [featuredCategories, setFeaturedCategories] = useState<string[]>([]);
 
   useEffect(() => {
