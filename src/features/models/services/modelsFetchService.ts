@@ -1,6 +1,7 @@
 import {
     collection,
     doc,
+    documentId,
     getDoc,
     getDocs,
     limit,
@@ -183,4 +184,31 @@ export async function getModelById(
         ...(modelSnap.data() as Omit<ModelData, "id">),
         id: modelSnap.id
     };
+}
+const ID_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+/**
+ * A random model's id, for "Roll for a model". Without a category it starts from a random
+ * point in the (randomly generated) document ids, so it costs one read; with a category it
+ * picks from that category's newest 60. Null when there is nothing to pick.
+ */
+export async function pickRandomModelId(categoryId?: string): Promise<string | null> {
+    if (categoryId) {
+        const { models } = await fetchModels({ categoryIds: [categoryId], limit: 60 });
+        if (!models.length) return null;
+        return models[Math.floor(Math.random() * models.length)].id;
+    }
+
+    const start = Array.from(
+        { length: 20 },
+        () => ID_CHARS[Math.floor(Math.random() * ID_CHARS.length)]
+    ).join("");
+    const models = collection(db, "models");
+    const after = await getDocs(
+        query(models, where(documentId(), ">=", start), orderBy(documentId()), limit(1))
+    );
+    if (!after.empty) return after.docs[0].id;
+    // Past the last id: wrap round to the first.
+    const first = await getDocs(query(models, orderBy(documentId()), limit(1)));
+    return first.empty ? null : first.docs[0].id;
 }

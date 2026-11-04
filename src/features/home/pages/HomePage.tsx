@@ -10,6 +10,7 @@ import { useLayout } from "@/features/shared/context/useLayout";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 
 import { CategoryChips } from "../components/CategoryChips";
+import { RollButton } from "../components/RollButton";
 import { HomeHero } from "../components/HomeHero";
 import { HomeModelsGrid, HomeModelsGridSkeleton } from "../components/HomeModelsGrid";
 import { readHomeSnapshot, writeHomeSnapshot } from "../utils/homeSnapshot";
@@ -153,6 +154,7 @@ export const HomePage = (): React.ReactNode => {
             <div className="min-w-0 flex-1">
               <CategoryChips selectedId={category?.id ?? null} onSelect={selectCategory} />
             </div>
+            <RollButton categoryId={category?.id} categoryName={category?.name} />
           </div>
         </div>
 
