@@ -16,6 +16,7 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
   language: "en",
   timezone: "UTC",
   theme: "dark",
+  currency: "eur",
 
   notifications: {
     email: true,
@@ -49,6 +50,8 @@ function normalizeUserSettings(settings?: StoredUserSettings): UserSettings {
     timezone: settings?.timezone ?? DEFAULT_USER_SETTINGS.timezone,
 
     theme: settings?.theme ?? DEFAULT_USER_SETTINGS.theme,
+
+    currency: settings?.currency === "usd" ? "usd" : DEFAULT_USER_SETTINGS.currency,
 
     notifications: {
       ...DEFAULT_USER_SETTINGS.notifications,

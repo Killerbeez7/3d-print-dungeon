@@ -2,6 +2,8 @@ import { Coins, Gift, TriangleAlert } from "lucide-react";
 import { useState, ChangeEvent, FC } from "react";
 import { paymentService } from "@/features/payment/services/paymentService";
 import type { ModelUploadData } from "@/features/models/types/model";
+import { Link } from "react-router-dom";
+import { CURRENCY_SYMBOL, useSellingCurrency } from "@/features/user/settings/hooks/useSellingCurrency";
 
 export interface PricingFormProps {
   modelData: ModelUploadData;
@@ -10,6 +12,9 @@ export interface PricingFormProps {
 
 export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) => {
   const [priceError, setPriceError] = useState<string>("");
+  const currency = useSellingCurrency();
+  const symbol = CURRENCY_SYMBOL[currency];
+  const money = (amount: number) => paymentService.formatPrice(amount, currency);
 
   // TODO: Replace with real seller verification check from private profile when available
   const isVerifiedSeller = false;
@@ -109,11 +114,11 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
         <div className="grid gap-6 rounded-xl border border-br-subtle bg-page p-5 md:grid-cols-2">
           <div>
             <label htmlFor="price" className="mb-1.5 block text-sm font-medium text-txt-secondary">
-              Price (USD)
+              Price ({currency.toUpperCase()})
             </label>
             <div className="relative">
               <span className="pointer-events-none absolute inset-y-0 left-4 flex items-center font-mono text-xl text-txt-muted">
-                $
+                {symbol}
               </span>
               <input
                 type="number"
@@ -130,7 +135,13 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
             </div>
             {priceError && <p className="mt-1.5 text-sm text-error">{priceError}</p>}
             <ul className="mt-4 space-y-1 text-xs text-txt-muted">
-              <li>Minimum price is $0.50.</li>
+              <li>Minimum price is {money(0.5)}.</li>
+              <li>
+                Priced in {currency === "eur" ? "euro" : "US dollars"}.{" "}
+                <Link to="/settings?tab=account" className="text-link hover:underline">
+                  Change in Settings
+                </Link>
+              </li>
               <li>Payments are processed by Stripe.</li>
               <li>You need a seller account to receive payments.</li>
             </ul>
@@ -139,15 +150,15 @@ export const PricingForm: FC<PricingFormProps> = ({ modelData, setModelData }) =
           <dl className="space-y-2 self-start rounded-lg border border-dashed border-br-secondary p-4 font-mono text-sm">
             <div className="flex justify-between">
               <dt className="text-txt-muted">Price</dt>
-              <dd className="text-txt-primary">{paymentService.formatPrice(price)}</dd>
+              <dd className="text-txt-primary">{money(price)}</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-txt-muted">Platform fee (5%)</dt>
-              <dd className="text-txt-primary">−{paymentService.formatPrice(price * 0.05)}</dd>
+              <dd className="text-txt-primary">−{money(price * 0.05)}</dd>
             </div>
             <div className="flex justify-between border-t border-br-secondary pt-2 text-base font-semibold">
               <dt className="text-txt-primary">You earn</dt>
-              <dd className="text-ember">{paymentService.formatPrice(price * 0.95)}</dd>
+              <dd className="text-ember">{money(price * 0.95)}</dd>
             </div>
           </dl>
         </div>

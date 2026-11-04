@@ -65,6 +65,8 @@ export interface CreateModelParams {
     price?: number;
     isPaid?: boolean;
     isAI?: boolean;
+    /** The seller's selling currency (Settings → Account). */
+    currency?: "eur" | "usd";
 }
 
 export interface CreateModelResult {
@@ -92,6 +94,7 @@ export async function createAdvancedModel({
     price = 0,
     isPaid = false,
     isAI = false,
+    currency = "eur",
 }: CreateModelParams): Promise<CreateModelResult> {
     const progressFn = onProgress ?? (() => undefined);
     const { ref, storage } = await loadStorage();
@@ -244,7 +247,7 @@ export async function createAdvancedModel({
         price: Number.isFinite(price) ? price : 0,
         isPaid,
         isAI,
-        currency: "usd",
+        currency: currency === "usd" ? "usd" : "eur",
 
         views: 0,
         likes: 0,
