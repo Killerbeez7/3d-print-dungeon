@@ -3,6 +3,7 @@ import { Bell, Lock, Settings, ShieldCheck, User } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { useAuth } from "@/features/auth/hooks/useAuth";
+import { googlePhotoURL } from "@/features/auth/utils/providerPhoto";
 import { UserAvatar } from "@/features/shared/components/UserAvatar";
 
 import { AccountSettings } from "../components/AccountSettings";
@@ -73,7 +74,7 @@ export const SettingsPage = () => {
         <aside className="md:sticky md:top-24 md:w-64 md:shrink-0 md:self-start">
           <div className="hidden items-center gap-3 border-b border-br-subtle pb-5 md:flex">
             <UserAvatar
-              sources={[authUser?.photoURL, currentUser?.photoURL]}
+              sources={[authUser?.photoURL, googlePhotoURL(currentUser), currentUser?.photoURL]}
               className="size-12 shrink-0"
             />
             <div className="min-w-0">

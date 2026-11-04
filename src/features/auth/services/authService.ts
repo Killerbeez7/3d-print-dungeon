@@ -7,11 +7,12 @@ import {
   signInWithPopup,
   signOut,
   updatePassword,
+  updateProfile,
   User as FirebaseUser,
   // UserCredential,
 } from "firebase/auth";
 
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, updateDoc } from "firebase/firestore";
 
 import { auth, db } from "@/config/firebaseConfig";
 import { isUsernameAvailableInDB } from "../utils/authUtils";
@@ -204,4 +205,12 @@ export const fetchPrivateProfile = (
     }
   );
   return unsubscribe;
+};
+
+/** Saves a newer sign-in photo on the account and its public profile (see providerPhoto.ts). */
+export const syncProfilePhoto = async (user: FirebaseUser, photoURL: string): Promise<void> => {
+  await Promise.all([
+    updateProfile(user, { photoURL }),
+    updateDoc(doc(db, "users", user.uid, "public", "data"), { photoURL }),
+  ]);
 };

@@ -11,6 +11,7 @@ import { NAV_SECTIONS } from "@/config/navConfig";
 import { ROUTES } from "@/constants/routeConstants";
 // components
 import { AuthButtons } from "./AuthButtons";
+import { googlePhotoURL } from "@/features/auth/utils/providerPhoto";
 import { MobileMenu } from "./MobileMenu";
 import { ProfileMenu } from "./ProfileMenu";
 import { GlobalSearch } from "@/features/search/components/GlobalSearch";
@@ -91,7 +92,12 @@ export const Navbar = () => {
 
   const urlSafeUsername = toUrlSafeUsername(publicProfile?.username ?? sessionHint?.username ?? undefined);
   // Profile photo first, then the sign-in provider's, then the one remembered from last visit.
-  const profileAvatarSources = [authUser?.photoURL, currentUser?.photoURL, sessionHint?.photoURL];
+  const profileAvatarSources = [
+    authUser?.photoURL,
+    googlePhotoURL(currentUser),
+    currentUser?.photoURL,
+    sessionHint?.photoURL,
+  ];
   // The menu shows the name, then @username underneath.
   const profileDisplayName =
     authUser?.displayName ??

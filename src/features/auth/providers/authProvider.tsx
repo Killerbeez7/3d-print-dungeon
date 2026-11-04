@@ -14,7 +14,9 @@ import {
   resetPassword,
   fetchPublicProfile,
   fetchPrivateProfile,
+  syncProfilePhoto,
 } from "../services/authService";
+import { googlePhotoURL, photoToSync } from "../utils/providerPhoto";
 
 // types
 import type { PrivateProfile } from "@/features/user/types/user";
@@ -261,7 +263,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email: privateProfile.email,
       displayName: publicProfile.displayName || currentUser.displayName || "Anonymous",
       username: publicProfile.username,
-      photoURL: publicProfile.photoURL ?? currentUser.photoURL ?? null,
+      photoURL: publicProfile.photoURL || googlePhotoURL(currentUser) || currentUser.photoURL || null,
 
       roles: allRoles,
       permissions,
@@ -287,6 +289,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     isArtist,
     isModerator,
   ]);
+
+  // Keep a Google-sourced profile photo current: Firebase refreshes the Google copy on each
+  // Google sign-in, but the saved one stays at the first sign-in's (and can stop loading).
+  const savedPhotoURL = publicProfile?.photoURL;
+  useEffect(() => {
+    if (!currentUser || publicProfile === null) return;
+    const next = photoToSync(savedPhotoURL, googlePhotoURL(currentUser));
+    if (!next) return;
+    syncProfilePhoto(currentUser, next).catch(() => {
+      // Not critical: the header already falls back to the Google photo.
+    });
+  }, [currentUser, publicProfile, savedPhotoURL]);
 
   // Remember who is signed in on this browser for the header on next reload.
   useEffect(() => {
