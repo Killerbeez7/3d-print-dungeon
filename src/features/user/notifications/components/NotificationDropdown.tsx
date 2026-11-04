@@ -239,7 +239,7 @@ export function NotificationDropdown({ className = "" }: NotificationDropdownPro
         aria-controls={isMobile ? undefined : "notification-dropdown"}
         className="relative inline-flex size-10 items-center justify-center rounded-lg text-txt-secondary transition-colors duration-200 hover:bg-muted hover:text-txt-primary"
       >
-        <Bell aria-hidden="true" className="size-5" />
+        <Bell aria-hidden="true" className="size-6" />
 
         {unreadCount > 0 && (
           <span

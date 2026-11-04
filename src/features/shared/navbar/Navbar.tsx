@@ -124,7 +124,7 @@ export const Navbar = () => {
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
           >
-            <Menu className="size-5" aria-hidden="true" />
+            <Menu className="size-6" aria-hidden="true" />
           </button>
 
           {/* Logo */}
@@ -223,7 +223,7 @@ export const Navbar = () => {
               className={`${iconButtonClass} max-md:hidden lg:hidden`}
               aria-label="Search"
             >
-              <Search className="size-5" aria-hidden="true" />
+              <Search className="size-6" aria-hidden="true" />
             </Link>
 
             {!signedIn ? (
@@ -251,7 +251,7 @@ export const Navbar = () => {
                 ) : (
                   // Same footprint as the bell while the session is restored.
                   <span className="flex size-9 items-center justify-center text-txt-muted max-md:hidden" aria-hidden="true">
-                    <Bell className="size-5" />
+                    <Bell className="size-6" />
                   </span>
                 )}
 
