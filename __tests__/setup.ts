@@ -1,6 +1,9 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
-import { afterEach } from "vitest";
+import { afterEach, vi } from "vitest";
+
+// Tests never talk to Firebase, and CI runs them before the web config file exists.
+vi.mock("@/config/firebaseConfig", () => ({ app: {}, auth: {}, db: {} }));
 
 afterEach(() => {
   cleanup();
