@@ -8,7 +8,8 @@ import { LABEL_PATH, LETTERS_PATH, WORDMARK_RATIO, WORDMARK_VIEWBOX } from "./br
 interface BrandMarkProps {
   showWordmark?: boolean;
   wordmarkClassName?: string;
-  size?: "md" | "lg";
+  /** sm: phone menu header; md: site header; lg: footer and full-page screens. */
+  size?: "sm" | "md" | "lg";
   /** Let the die roll on its own now and then (header only). */
   animated?: boolean;
   className?: string;
@@ -16,6 +17,7 @@ interface BrandMarkProps {
 
 // edge = text block height / 1.633 (the height of a cube seen at the isometric angle)
 const SIZES = {
+  sm: { height: "h-[26px]", gap: "gap-1.5", edge: 16 },
   md: { height: "h-8", gap: "gap-1.5", edge: 20 },
   lg: { height: "h-10", gap: "gap-2", edge: 24 },
 } as const;
