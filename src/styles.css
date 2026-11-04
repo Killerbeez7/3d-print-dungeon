@@ -757,6 +757,38 @@ body {
     }
   }
 
+  /* Gallery tiles far off screen are skipped for layout and paint. The size hint matches the
+     gallery columns (tiles are square); "auto" remembers a tile's real size once drawn. */
+  .model-tile {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 50vw;
+  }
+  @media (min-width: 640px) {
+    .model-tile {
+      contain-intrinsic-size: auto 33vw;
+    }
+  }
+  @media (min-width: 768px) {
+    .model-tile {
+      contain-intrinsic-size: auto 25vw;
+    }
+  }
+  @media (min-width: 1024px) {
+    .model-tile {
+      contain-intrinsic-size: auto 20vw;
+    }
+  }
+  @media (min-width: 1280px) {
+    .model-tile {
+      contain-intrinsic-size: auto 16.7vw;
+    }
+  }
+  @media (min-width: 1536px) {
+    .model-tile {
+      contain-intrinsic-size: auto 14.3vw;
+    }
+  }
+
   /* Gallery tile: a nozzle line sweeps down the image on hover. */
   .tile-scan::after {
     content: "";

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Box } from "lucide-react";
 
@@ -31,7 +31,7 @@ interface ModelCardProps {
 }
 
 /** Gallery tile: edge-to-edge render, details on hover (always on touch). */
-export const ModelCard = ({ model, priority = false, showCreator = true }: ModelCardProps) => {
+const ModelCardTile = ({ model, priority = false, showCreator = true }: ModelCardProps) => {
   const original = model.renderPrimaryUrl ?? null;
   const thumbs = useMemo(() => {
     if (thumbsLikelyMissing()) return null;
@@ -75,7 +75,7 @@ export const ModelCard = ({ model, priority = false, showCreator = true }: Model
   return (
     <Link
       to={`/model/${model.id}`}
-      className="group relative block overflow-hidden bg-muted focus-visible:outline-offset-[-3px]"
+      className="model-tile group relative block overflow-hidden bg-muted focus-visible:outline-offset-[-3px]"
     >
       <div className="tile-scan relative aspect-square overflow-hidden">
         {stage !== "error" && (
@@ -126,6 +126,12 @@ export const ModelCard = ({ model, priority = false, showCreator = true }: Model
     </Link>
   );
 };
+
+/**
+ * Memoised: when the next page of models is added, the tiles already on screen are not
+ * rendered again (the model objects keep their identity between pages).
+ */
+export const ModelCard = memo(ModelCardTile);
 
 export const ModelCardSkeleton = ({ index = 0 }: { index?: number }) => (
   <div

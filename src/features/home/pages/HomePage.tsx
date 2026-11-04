@@ -121,6 +121,9 @@ export const HomePage = (): React.ReactNode => {
         hasMore={hasNextPage}
         loadMore={fetchNextPage}
         isLoading={isFetchingNextPage}
+        // Fetch the next page well before the end, so a long swipe doesn't run out of models
+        // and the new tiles are added while there is still room to scroll.
+        scrollThreshold="1600px"
         loader={
           <div className="flex justify-center py-10">
             <Spinner size={24} />
