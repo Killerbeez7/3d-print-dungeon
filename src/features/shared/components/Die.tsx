@@ -67,11 +67,7 @@ export const Die = ({
         move === "throw"
           ? [
               { transform: "translateY(0)", easing: "cubic-bezier(.2,.7,.4,1)" },
-              {
-                transform: `translateY(${up}px)`,
-                offset: 0.38,
-                easing: "cubic-bezier(.6,0,.85,.4)",
-              },
+              { transform: `translateY(${up}px)`, offset: 0.38, easing: "cubic-bezier(.6,0,.85,.4)" },
               { transform: "translateY(0) scale(1.06, 0.94)", offset: 0.72, easing: "ease-out" },
               { transform: `translateY(${up * 0.12}px)`, offset: 0.84, easing: "ease-in" },
               { transform: "translateY(0)" },
@@ -117,25 +113,21 @@ export const Die = ({
     >
       <span ref={hopRef} className="die__hop">
         <span className="die__iso">
-          {/* In the header the die glances left and right now and then, as if the eye were
-              looking around; the turns and throws happen inside this layer. */}
-          <span className={`die__look ${mode === "idle" ? "die__look--on" : ""}`}>
-            <span
-              className="die__cube"
-              style={{
-                transform: `rotateX(${pose.flips * -360}deg) rotateY(${pose.turns * -90}deg)`,
-                transition: `transform ${ms}ms ${ease}`,
-              }}
-            >
-              {SIDES.map(([side, face]) => (
-                <span key={side} className={`die__face die__face--${side}`}>
-                  <svg viewBox="0 0 100 100" focusable="false">
-                    <rect x="3" y="3" width="94" height="94" rx="5" className="die__plate" />
-                    <path d={DIE_FACES[face]} fillRule="evenodd" className="die__ink" />
-                  </svg>
-                </span>
-              ))}
-            </span>
+          <span
+            className="die__cube"
+            style={{
+              transform: `rotateX(${pose.flips * -360}deg) rotateY(${pose.turns * -90}deg)`,
+              transition: `transform ${ms}ms ${ease}`,
+            }}
+          >
+            {SIDES.map(([side, face]) => (
+              <span key={side} className={`die__face die__face--${side}`}>
+                <svg viewBox="0 0 100 100" focusable="false">
+                  <rect x="3" y="3" width="94" height="94" rx="5" className="die__plate" />
+                  <path d={DIE_FACES[face]} fillRule="evenodd" className="die__ink" />
+                </svg>
+              </span>
+            ))}
           </span>
         </span>
       </span>
@@ -152,12 +144,7 @@ interface DieLoaderProps {
 }
 
 /** Page-level loading indicator: the die, being thrown until the content arrives. */
-export const DieLoader = ({
-  edge = 28,
-  delay = 300,
-  label = "Loading",
-  className = "",
-}: DieLoaderProps) => {
+export const DieLoader = ({ edge = 28, delay = 300, label = "Loading", className = "" }: DieLoaderProps) => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {

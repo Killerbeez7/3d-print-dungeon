@@ -351,7 +351,7 @@ body {
   /* Buttons: the chamfered fill lives on pseudo-elements so the element
      itself is not clipped and its focus outline stays visible. */
   .btn {
-    --cut: 6px;
+    --cut: 9px;
     --btn-edge-w: 0px;
     position: relative;
     isolation: isolate;
@@ -393,7 +393,6 @@ body {
 
   .btn::after {
     inset: var(--btn-edge-w);
-    box-shadow: var(--btn-shine, none);
     background:
       linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.16) 50%, transparent 65%)
         no-repeat,
@@ -424,34 +423,22 @@ body {
     opacity: 0.5;
   }
 
-  /* Primary: a soft top-to-bottom gradient with a thin light along the top edge, so the
-     fill reads as a lit surface rather than a flat block. */
   .btn-primary {
-    --btn-bg: linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--btn-primary) 86%, white),
-      var(--btn-primary)
-    );
+    --btn-bg: var(--btn-primary);
     --btn-edge: var(--btn-primary);
     --btn-fg: var(--btn-primary-text);
-    --btn-shine: inset 0 1px 0 rgb(255 255 255 / 0.22);
   }
 
   .btn-primary:hover {
-    --btn-bg: linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--btn-primary-hover) 86%, white),
-      var(--btn-primary-hover)
-    );
+    --btn-bg: var(--btn-primary-hover);
     --btn-edge: var(--btn-primary-hover);
     transform: translateY(-1px);
     filter: drop-shadow(0 8px 18px rgba(var(--accent-rgb), 0.35));
   }
 
-  /* Secondary: a faint edge instead of a hard outline. */
   .btn-secondary {
     --btn-bg: var(--surface-card);
-    --btn-edge: color-mix(in oklab, var(--txt-primary) 16%, transparent);
+    --btn-edge: var(--br-primary);
     --btn-edge-w: 1px;
     --btn-fg: var(--txt-primary);
   }
@@ -487,14 +474,9 @@ body {
   }
 
   .btn-ember {
-    --btn-bg: linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--ember-fill) 88%, white),
-      var(--ember-fill)
-    );
+    --btn-bg: var(--ember-fill);
     --btn-edge: var(--ember-fill);
     --btn-fg: var(--ember-on);
-    --btn-shine: inset 0 1px 0 rgb(255 255 255 / 0.22);
   }
 
   .btn-ember:hover {
@@ -503,7 +485,7 @@ body {
   }
 
   .btn-sm {
-    --cut: 5px;
+    --cut: 7px;
     height: 2.25rem;
     padding: 0 0.875rem;
     font-size: 0.875rem;
@@ -516,7 +498,7 @@ body {
   }
 
   .btn-lg {
-    --cut: 7px;
+    --cut: 11px;
     height: 3rem;
     padding: 0 1.5rem;
     font-size: 1rem;
@@ -637,7 +619,6 @@ body {
   }
   .die__hop,
   .die__iso,
-  .die__look,
   .die__cube {
     display: block;
     transform-style: preserve-3d;
@@ -651,16 +632,10 @@ body {
     height: 100%;
     transform: rotateX(-35.264deg) rotateY(-45deg);
   }
-  .die__cube,
-  .die__look {
+  .die__cube {
     position: relative;
     width: 100%;
     height: 100%;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .die__look--on {
-      animation: die-look 9s ease-in-out 2s infinite;
-    }
   }
   .die__face {
     position: absolute;
@@ -1000,26 +975,6 @@ body {
     .auth-panel {
       animation: pop-in 0.3s var(--ease-forge);
     }
-  }
-}
-
-/* The header die looks around: a glance left, a pause, a glance right, back to rest. */
-@keyframes die-look {
-  0%,
-  10% {
-    transform: rotateY(0deg);
-  }
-  20%,
-  34% {
-    transform: rotateY(-14deg);
-  }
-  48%,
-  62% {
-    transform: rotateY(12deg);
-  }
-  74%,
-  100% {
-    transform: rotateY(0deg);
   }
 }
 
