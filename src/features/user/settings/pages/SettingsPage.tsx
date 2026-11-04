@@ -1,12 +1,9 @@
-import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Bell, Lock, Settings, ShieldCheck, User } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { useAuth } from "@/features/auth/hooks/useAuth";
-
-import { STATIC_ASSETS } from "@/config/assetsConfig";
-import { getAvatarUrlWithCacheBust } from "@/utils/avatarUtils";
+import { UserAvatar } from "@/features/shared/components/UserAvatar";
 
 import { AccountSettings } from "../components/AccountSettings";
 import { NotificationSettings } from "../components/NotificationSettings";
@@ -43,9 +40,6 @@ export const SettingsPage = () => {
   const setActiveTab = (tab: SettingsTabId) =>
     setSearchParams(tab === "profile" ? {} : { tab }, { replace: true });
 
-  const photoURL = authUser?.photoURL ?? currentUser?.photoURL;
-  // Cache-busted URLs change every call; compute once per photo.
-  const avatarUrl = useMemo(() => getAvatarUrlWithCacheBust(photoURL), [photoURL]);
   const displayName = authUser?.displayName ?? currentUser?.displayName ?? "Anonymous";
   const email = authUser?.email ?? currentUser?.email ?? "";
 
@@ -78,20 +72,10 @@ export const SettingsPage = () => {
       <div className="flex flex-col gap-8 md:flex-row">
         <aside className="md:sticky md:top-24 md:w-64 md:shrink-0 md:self-start">
           <div className="hidden items-center gap-3 border-b border-br-subtle pb-5 md:flex">
-            <span className="chamfer size-12 shrink-0 overflow-hidden bg-muted [--cut:9px]">
-              <img
-                src={avatarUrl}
-                alt=""
-                referrerPolicy="no-referrer"
-                onError={(event) => {
-                  const image = event.currentTarget;
-                  if (!image.src.endsWith(STATIC_ASSETS.DEFAULT_AVATAR)) {
-                    image.src = STATIC_ASSETS.DEFAULT_AVATAR;
-                  }
-                }}
-                className="size-full object-cover"
-              />
-            </span>
+            <UserAvatar
+              sources={[authUser?.photoURL, currentUser?.photoURL]}
+              className="size-12 shrink-0"
+            />
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-txt-primary">{displayName}</p>
               {email && <p className="truncate text-xs text-txt-muted">{email}</p>}

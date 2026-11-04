@@ -2,7 +2,6 @@ import { useRef, type RefObject } from "react";
 import { Link } from "react-router-dom";
 import {
   Bell,
-  CircleUserRound,
   LayoutDashboard,
   LifeBuoy,
   LogOut,
@@ -13,8 +12,8 @@ import {
 import type { LucideIcon } from "lucide-react";
 
 import { useClickOutside } from "@/hooks/useClickOutside";
-import { STATIC_ASSETS } from "@/config/assetsConfig";
 import { ThemeToggle } from "@/features/shared/components/ThemeToggle";
+import { UserAvatar } from "@/features/shared/components/UserAvatar";
 
 interface ProfileMenuProps {
   isOpen: boolean;
@@ -25,36 +24,12 @@ interface ProfileMenuProps {
   displayName: string;
   username: string | null;
   email: string;
-  avatarSrc: string | null;
+  /** Photo addresses to try in order (profile photo, then the sign-in provider's). */
+  avatarSources: ReadonlyArray<string | null | undefined>;
   profilePath: string;
   /** Unread notifications: a dot on the avatar and a menu row on phones, where the bell is hidden. */
   unreadCount?: number;
 }
-
-const Avatar = ({ src, className }: { src: string | null; className: string }) => {
-  if (!src) {
-    return (
-      <span className={`flex items-center justify-center bg-muted text-txt-secondary ${className}`}>
-        <CircleUserRound className="size-3/5" aria-hidden="true" />
-      </span>
-    );
-  }
-
-  return (
-    <img
-      src={src}
-      alt=""
-      referrerPolicy="no-referrer"
-      className={`object-cover ${className}`}
-      onError={(event) => {
-        const image = event.currentTarget;
-        if (!image.src.endsWith(STATIC_ASSETS.DEFAULT_AVATAR)) {
-          image.src = STATIC_ASSETS.DEFAULT_AVATAR;
-        }
-      }}
-    />
-  );
-};
 
 interface Tile {
   to: string;
@@ -73,7 +48,7 @@ export const ProfileMenu = ({
   displayName,
   username,
   email,
-  avatarSrc,
+  avatarSources,
   profilePath,
   unreadCount = 0,
 }: ProfileMenuProps) => {
@@ -108,9 +83,7 @@ export const ProfileMenu = ({
         aria-expanded={isOpen}
       >
         {/* Same 40px tap area as the icons, with a lighter-looking avatar inside. */}
-        <span className="chamfer block size-8 overflow-hidden [--cut:6px] md:size-9">
-          <Avatar src={avatarSrc} className="size-full" />
-        </span>
+        <UserAvatar sources={avatarSources} className="size-7 md:size-8" />
         {unreadCount > 0 && (
           <span
             className="absolute right-0.5 top-0.5 size-2.5 rounded-full bg-ember-fill ring-2 ring-section md:hidden"
@@ -135,8 +108,8 @@ export const ProfileMenu = ({
         />
 
         <div className="-mt-7 flex items-end gap-3 px-4">
-          <span className="chamfer bg-surface-elevated p-1 [--cut:10px]">
-            <Avatar src={avatarSrc} className="chamfer size-14 [--cut:8px]" />
+          <span className="rounded-full bg-surface-elevated p-1.5">
+            <UserAvatar sources={avatarSources} className="size-14 [--rim:2px]" />
           </span>
           <div className="min-w-0 flex-1 pb-1">
             <p className="truncate text-sm font-semibold text-txt-primary">{displayName}</p>

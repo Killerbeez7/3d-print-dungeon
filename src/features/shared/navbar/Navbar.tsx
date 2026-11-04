@@ -90,7 +90,8 @@ export const Navbar = () => {
   }, [closeAll, location.pathname]);
 
   const urlSafeUsername = toUrlSafeUsername(publicProfile?.username ?? sessionHint?.username ?? undefined);
-  const profileAvatarSrc = authUser?.photoURL ?? currentUser?.photoURL ?? sessionHint?.photoURL ?? null;
+  // Profile photo first, then the sign-in provider's, then the one remembered from last visit.
+  const profileAvatarSources = [authUser?.photoURL, currentUser?.photoURL, sessionHint?.photoURL];
   // The menu shows the name, then @username underneath.
   const profileDisplayName =
     authUser?.displayName ??
@@ -257,7 +258,7 @@ export const Navbar = () => {
                   displayName={profileDisplayName}
                   username={publicProfile?.username ?? sessionHint?.username ?? null}
                   email={profileEmail}
-                  avatarSrc={profileAvatarSrc}
+                  avatarSources={profileAvatarSources}
                   profilePath={`/${urlSafeUsername}`}
                   unreadCount={currentUser ? unreadCount : 0}
                 />

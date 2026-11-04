@@ -91,12 +91,12 @@ export const ProfileCard = ({ user, isOwner, totals }: ProfileCardProps) => {
 
   return (
     <section aria-label="Profile" className="relative">
-      <span className="chamfer -mt-16 inline-block bg-page p-1.5 [--cut:20px] sm:-mt-20">
+      <span className="-mt-16 inline-block rounded-full bg-page p-2 sm:-mt-20">
         <img
           src={avatarUrl}
           alt=""
           referrerPolicy="no-referrer"
-          className="chamfer size-28 bg-muted object-cover [--cut:16px] sm:size-36"
+          className="avatar-token size-28 bg-muted object-cover [--rim:2.5px] [--rim-gap:3px] sm:size-36"
           onError={(event) => {
             const image = event.currentTarget;
             if (!image.src.endsWith(STATIC_ASSETS.DEFAULT_AVATAR)) image.src = STATIC_ASSETS.DEFAULT_AVATAR;
