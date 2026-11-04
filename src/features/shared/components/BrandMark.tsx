@@ -22,6 +22,26 @@ const SIZES = {
   lg: { height: "h-10", gap: "gap-2", edge: 24 },
 } as const;
 
+/** The "3D PRINT / DUNGEON" text on its own, for places where the die has its own job. */
+export const Wordmark = ({
+  size = "md",
+  className = "",
+}: {
+  size?: keyof typeof SIZES;
+  className?: string;
+}) => (
+  <svg
+    viewBox={WORDMARK_VIEWBOX}
+    aria-hidden="true"
+    focusable="false"
+    className={`${SIZES[size].height} w-auto shrink-0 ${className}`}
+    style={{ aspectRatio: WORDMARK_RATIO }}
+  >
+    <path d={LABEL_PATH} className="fill-txt-muted" />
+    <path fillRule="evenodd" d={LETTERS_PATH} className="fill-txt-primary" />
+  </svg>
+);
+
 export const BrandMark = ({
   showWordmark = true,
   wordmarkClassName = "",
@@ -29,23 +49,12 @@ export const BrandMark = ({
   animated = false,
   className = "",
 }: BrandMarkProps) => {
-  const { height, gap, edge } = SIZES[size];
+  const { gap, edge } = SIZES[size];
 
   return (
     <span className={`flex items-center ${gap} ${className}`}>
       <Die edge={edge} mode={animated ? "idle" : "still"} rollOnHover />
-      {showWordmark && (
-        <svg
-          viewBox={WORDMARK_VIEWBOX}
-          aria-hidden="true"
-          focusable="false"
-          className={`${height} w-auto shrink-0 ${wordmarkClassName}`}
-          style={{ aspectRatio: WORDMARK_RATIO }}
-        >
-          <path d={LABEL_PATH} className="fill-txt-muted" />
-          <path fillRule="evenodd" d={LETTERS_PATH} className="fill-txt-primary" />
-        </svg>
-      )}
+      {showWordmark && <Wordmark size={size} className={wordmarkClassName} />}
     </span>
   );
 };

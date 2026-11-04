@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
-import { Link, NavLink } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import FocusLock from "react-focus-lock";
 import { Upload, X } from "lucide-react";
 
 import { Button, buttonClassName } from "@/components";
 import type { NavItem, NavSection } from "@/config/navConfig";
-import { BrandMark } from "@/features/shared/components/BrandMark";
-import { ThemeToggle } from "@/features/shared/components/ThemeToggle";
+import { Wordmark } from "@/features/shared/components/BrandMark";
+import { Die } from "@/features/shared/components/Die";
 import { GlobalSearch } from "@/features/search/components/GlobalSearch";
 
 interface MobileMenuProps {
@@ -19,7 +19,16 @@ interface MobileMenuProps {
   onSignUp: () => void;
 }
 
+/** The menu path for this page: the longest match, so /forum/help is Help, not Forum as well. */
+const currentPath = (pathname: string, paths: string[]) =>
+  paths
+    .filter((to) =>
+      to === "/" ? pathname === "/" : pathname === to || pathname.startsWith(`${to}/`),
+    )
+    .sort((a, b) => b.length - a.length)[0];
+
 interface MenuLinkProps extends NavItem {
+  isCurrent: boolean;
   isOpen: boolean;
   order: number;
   primary?: boolean;
@@ -31,6 +40,7 @@ const MenuLink = ({
   label,
   to,
   icon: Icon,
+  isCurrent,
   isOpen,
   order,
   primary = false,
@@ -44,34 +54,28 @@ const MenuLink = ({
       transform: isOpen ? "none" : "translateX(-12px)",
     }}
   >
-    <NavLink
+    <Link
       to={to}
-      end={to === "/"}
       onClick={onClose}
-      className={({ isActive }) =>
-        `flex items-center gap-3 rounded-lg px-3 text-[15px] transition-colors ${
-          primary ? "h-12 font-medium" : "h-11"
-        } ${
-          isActive
-            ? "bg-accent-soft text-accent-text"
-            : `${primary ? "text-txt-primary" : "text-txt-secondary"} hover:bg-muted hover:text-txt-primary`
-        }`
-      }
+      aria-current={isCurrent ? "page" : undefined}
+      className={`flex items-center gap-3 rounded-lg px-3 text-[15px] transition-colors ${
+        primary ? "h-12 font-medium" : "h-11"
+      } ${
+        isCurrent
+          ? "bg-accent-soft text-accent-text"
+          : `${primary ? "text-txt-primary" : "text-txt-secondary"} hover:bg-muted hover:text-txt-primary`
+      }`}
     >
-      {({ isActive }) => (
-        <>
-          {Icon && (
-            <Icon
-              className={`${primary ? "size-5" : "size-[18px]"} shrink-0 ${
-                isActive ? "text-accent-text" : "text-txt-muted"
-              }`}
-              aria-hidden="true"
-            />
-          )}
-          {label}
-        </>
+      {Icon && (
+        <Icon
+          className={`${primary ? "size-5" : "size-[18px]"} shrink-0 ${
+            isCurrent ? "text-accent-text" : "text-txt-muted"
+          }`}
+          aria-hidden="true"
+        />
       )}
-    </NavLink>
+      {label}
+    </Link>
   </li>
 );
 
@@ -104,6 +108,11 @@ export const MobileMenu = ({
   const primary = sections.filter((section) => section.to);
   const groups = sections.filter((section) => !section.to && section.items.length);
   let order = 0;
+  const { pathname } = useLocation();
+  const current = currentPath(pathname, [
+    ...primary.map((section) => section.to as string),
+    ...groups.flatMap((group) => group.items.map((item) => item.to)),
+  ]);
 
   // Portalled so it sits above the sticky header's stacking context and the
   // cookie banner (z-50), but below the auth modal.
@@ -134,9 +143,18 @@ export const MobileMenu = ({
           }`}
         >
           <div className="flex h-14 shrink-0 items-center justify-between border-b border-br-subtle pl-4 pr-2">
-            <Link to="/" onClick={onClose} aria-label="3D Print Dungeon home">
-              <BrandMark size="sm" />
-            </Link>
+            {/* The die is a toy here (tap to roll); the name goes home. */}
+            <div className="flex items-center gap-1.5">
+              <Die edge={16} asButton />
+              <Link
+                to="/"
+                onClick={onClose}
+                aria-label="3D Print Dungeon home"
+                className="rounded-sm"
+              >
+                <Wordmark size="sm" />
+              </Link>
+            </div>
             <button
               type="button"
               onClick={onClose}
@@ -161,6 +179,7 @@ export const MobileMenu = ({
                     to={section.to as string}
                     icon={section.icon}
                     primary
+                    isCurrent={section.to === current}
                     isOpen={isOpen}
                     order={order++}
                     onClose={onClose}
@@ -176,6 +195,7 @@ export const MobileMenu = ({
                       <MenuLink
                         key={item.to}
                         {...item}
+                        isCurrent={item.to === current}
                         isOpen={isOpen}
                         order={order++}
                         onClose={onClose}
@@ -187,11 +207,7 @@ export const MobileMenu = ({
             </nav>
           </div>
 
-          <div className="shrink-0 space-y-3 border-t border-br-subtle bg-section p-4">
-            <div className="flex items-center justify-between">
-              <span className="label-mono text-txt-muted">Theme</span>
-              <ThemeToggle />
-            </div>
+          <div className="shrink-0 border-t border-br-subtle bg-section p-4">
             {isSignedIn ? (
               <Link
                 to="/model/upload"

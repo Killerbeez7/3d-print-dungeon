@@ -15,7 +15,7 @@ const setup = ({ isSignedIn = false, path = "/" } = {}) => {
   render(
     <MemoryRouter initialEntries={[path]}>
       <MobileMenu isOpen sections={NAV_SECTIONS} isSignedIn={isSignedIn} {...props} />
-    </MemoryRouter>
+    </MemoryRouter>,
   );
   return { ...props, menu: screen.getByRole("dialog", { name: "Menu" }) };
 };
@@ -32,8 +32,28 @@ describe("MobileMenu", () => {
 
   it("highlights the page you are on, and only that one", () => {
     const { menu } = setup({ path: "/artists" });
-    expect(within(menu).getByRole("link", { name: "Artists" })).toHaveAttribute("aria-current", "page");
+    expect(within(menu).getByRole("link", { name: "Artists" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
     expect(within(menu).getByRole("link", { name: "Models" })).not.toHaveAttribute("aria-current");
+  });
+
+  it("highlights only Help on the help page, not Forum as well", () => {
+    const { menu } = setup({ path: "/forum/help" });
+    expect(within(menu).getByRole("link", { name: "Help" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
+    expect(within(menu).getByRole("link", { name: "Forum" })).not.toHaveAttribute("aria-current");
+  });
+
+  it("keeps Forum highlighted inside a thread", () => {
+    const { menu } = setup({ path: "/forum/thread/abc" });
+    expect(within(menu).getByRole("link", { name: "Forum" })).toHaveAttribute(
+      "aria-current",
+      "page",
+    );
   });
 
   it("focuses the panel when it opens, not the logo link", async () => {
@@ -55,7 +75,7 @@ describe("MobileMenu", () => {
     const { menu } = setup({ isSignedIn: true });
     expect(within(menu).getByRole("link", { name: /upload a model/i })).toHaveAttribute(
       "href",
-      "/model/upload"
+      "/model/upload",
     );
     expect(within(menu).queryByRole("button", { name: "Sign in" })).toBeNull();
   });
@@ -68,8 +88,13 @@ describe("MobileMenu", () => {
     expect(onClose).toHaveBeenCalledTimes(3);
   });
 
-  it("has the theme switch", () => {
-    const { menu } = setup();
-    expect(within(menu).getByRole("radiogroup", { name: "Colour theme" })).toBeInTheDocument();
+  it("rolls the die without leaving the menu", () => {
+    const { menu, onClose } = setup();
+    fireEvent.click(within(menu).getByRole("button", { name: "Roll the die" }));
+    expect(onClose).not.toHaveBeenCalled();
+    expect(within(menu).getByRole("link", { name: "3D Print Dungeon home" })).toHaveAttribute(
+      "href",
+      "/",
+    );
   });
 });

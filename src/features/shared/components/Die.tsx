@@ -40,10 +40,18 @@ interface DieProps {
   /** still: moves only when pointed at (if rollOnHover); idle: also turns now and then; loader: keeps rolling. */
   mode?: "still" | "idle" | "loader";
   rollOnHover?: boolean;
+  /** Render as a button that throws the die when pressed (and does nothing else). */
+  asButton?: boolean;
   className?: string;
 }
 
-export const Die = ({ edge, mode = "still", rollOnHover = false, className = "" }: DieProps) => {
+export const Die = ({
+  edge,
+  mode = "still",
+  rollOnHover = false,
+  asButton = false,
+  className = "",
+}: DieProps) => {
   const [pose, setPose] = useState({ flips: 0, turns: 0, move: "turn" as Move });
   const hopRef = useRef<HTMLSpanElement>(null);
   const busy = useRef(false);
@@ -93,11 +101,14 @@ export const Die = ({ edge, mode = "still", rollOnHover = false, className = "" 
   }, [mode, play]);
 
   const { ms, ease } = MOVES[pose.move];
+  const Root = asButton ? "button" : "span";
   return (
-    <span
-      className={`die ${className}`}
+    <Root
+      className={`die ${asButton ? "rounded-md" : ""} ${className}`}
       style={{ "--die-e": `${edge}px` } as CSSProperties}
-      aria-hidden="true"
+      {...(asButton
+        ? { type: "button" as const, "aria-label": "Roll the die", onClick: () => play("throw") }
+        : { "aria-hidden": true })}
       onPointerEnter={rollOnHover ? () => play("throw") : undefined}
     >
       <span ref={hopRef} className="die__hop">
@@ -120,7 +131,7 @@ export const Die = ({ edge, mode = "still", rollOnHover = false, className = "" 
           </span>
         </span>
       </span>
-    </span>
+    </Root>
   );
 };
 
