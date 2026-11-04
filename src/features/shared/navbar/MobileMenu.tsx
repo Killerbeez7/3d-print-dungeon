@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation } from "react-router-dom";
 import FocusLock from "react-focus-lock";
@@ -87,22 +87,33 @@ export const MobileMenu = ({
   onSignIn,
   onSignUp,
 }: MobileMenuProps) => {
+  const listRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!isOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
-    // Freeze the page behind the menu. iPhone Safari only honours this on the root element;
-    // swipes outside the menu's list are also blocked (touch-none below).
+    // Freeze the page behind the menu. overflow:hidden alone is not enough on iPhone Safari,
+    // which keeps scrolling the page until something in the menu is tapped, so every swipe is
+    // stopped here unless it is on the menu's list and the list has room to scroll.
+    const handleTouchMove = (event: TouchEvent) => {
+      const list = listRef.current;
+      const onList = list?.contains(event.target as Node);
+      if (onList && list && list.scrollHeight > list.clientHeight) return;
+      event.preventDefault();
+    };
     const root = document.documentElement;
     const previousOverflow = root.style.overflow;
     root.style.overflow = "hidden";
     document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("touchmove", handleTouchMove, { passive: false });
 
     return () => {
       root.style.overflow = previousOverflow;
       document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("touchmove", handleTouchMove);
     };
   }, [isOpen, onClose]);
 
@@ -167,7 +178,10 @@ export const MobileMenu = ({
             </button>
           </div>
 
-          <div className="flex-1 touch-pan-y overflow-y-auto overscroll-contain px-3 py-4">
+          <div
+            ref={listRef}
+            className="flex-1 touch-pan-y overflow-y-auto overscroll-contain px-3 py-4"
+          >
             <div className="px-1">
               <GlobalSearch />
             </div>
