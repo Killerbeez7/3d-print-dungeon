@@ -32,6 +32,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+
+      # Every test, not only the ones for the latest changes, before anything goes live.
+      - run: npm ci
+      - name: Run every test
+        run: npx vitest run
 
       - name: Read the request
         id: request

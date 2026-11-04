@@ -1,0 +1,19 @@
+#!/bin/sh
+# Runs only the tests that cover the files in this commit: vitest follows the imports from each
+# staged file to the tests that use it. Changes outside src/ and __tests__/ run no tests; a change
+# to the test setup runs them all. The preview build tests each push the same way, and going live
+# runs every test. Skip once with: git commit --no-verify
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+
+if echo "$staged" | grep -qE '^(package(-lock)?\.json|vitest\.config\.ts|tsconfig\.json|__tests__/setup\.ts)$'; then
+  echo "Test setup changed: running every test..."
+  exec npx vitest run
+fi
+
+files=$(echo "$staged" | grep -E '^(src|__tests__)/.*\.(ts|tsx|js|jsx)$')
+[ -z "$files" ] && exit 0
+
+echo "Running the tests related to this commit..."
+# shellcheck disable=SC2086
+exec npx vitest related --run --passWithNoTests $files

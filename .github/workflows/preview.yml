@@ -35,6 +35,32 @@ jobs:
 
       - run: npm ci
 
+      # Only the tests that cover what this push changed (vitest follows the imports).
+      # A change to the test setup, a first push or a manual run tests everything;
+      # going live (deploy-live.yml) always runs every test.
+      - name: Tests for the changed files
+        env:
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ] \
+            || ! git fetch --no-tags --depth=1 origin "$BEFORE"; then
+            echo "Nothing to compare with: running every test"
+            npx vitest run
+            exit
+          fi
+          changed=$(git diff --name-only --diff-filter=ACMR "$BEFORE" "$GITHUB_SHA")
+          if echo "$changed" | grep -qE '^(package(-lock)?\.json|vitest\.config\.ts|tsconfig\.json|__tests__/setup\.ts)$'; then
+            echo "Test setup changed: running every test"
+            npx vitest run
+            exit
+          fi
+          files=$(echo "$changed" | grep -E '^(src|__tests__)/.*\.(ts|tsx|js|jsx)$' || true)
+          if [ -z "$files" ]; then
+            echo "No app code changed: no tests to run" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          npx vitest related --run --passWithNoTests $files
+
       - name: Write Firebase web config
         run: |
           curl -fsS --retry 3 https://print-dungeon-3d.web.app/__/firebase/init.json \
