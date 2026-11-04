@@ -11,7 +11,7 @@ const chipClass = (isSelected: boolean) =>
     variant: isSelected ? "primary" : "ghost",
     size: "sm",
     // Smaller than a standard small button, so the selected chip doesn't dominate the strip.
-    className: `h-8 shrink-0 px-3 [--cut:5px] ${isSelected ? "" : "text-txt-secondary"}`,
+    className: `h-7 shrink-0 px-2.5 text-[13px] [--cut:4px] ${isSelected ? "" : "text-txt-secondary"}`,
   });
 
 /** One sideways-scrolling row of category filters. */
