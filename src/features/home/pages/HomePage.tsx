@@ -6,7 +6,7 @@ import { Button, buttonClassName } from "@/components";
 import { useFetchModels } from "@/features/models/hooks/index";
 import { MODEL_CATEGORIES } from "@/features/models/constants/modelCategories";
 import { InfiniteScrollList } from "@/features/shared/InfiniteScrollList";
-import { useLayout } from "@/features/shared/context/layoutContext";
+import { useLayout } from "@/features/shared/context/useLayout";
 import { Spinner } from "@/features/shared/reusable/Spinner";
 
 import { CategoryChips } from "../components/CategoryChips";

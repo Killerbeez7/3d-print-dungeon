@@ -7,7 +7,8 @@ import { Footer } from "./footer/Footer";
 import { AuthModal } from "../auth/components/AuthModal";
 import { PageLoader } from "@/features/shared/components/Die";
 import { ScrollToTopButton } from "@/features/shared/ScrollToTopButton";
-import { LayoutProvider, useLayout } from "./context/layoutContext";
+import { LayoutProvider } from "./context/layoutContext";
+import { useLayout } from "./context/useLayout";
 import { CookieBanner } from "../cookies/components/CookieBanner";
 
 const AppLayout = () => {
