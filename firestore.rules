@@ -316,6 +316,11 @@ service cloud.firestore {
         (request.auth.uid == userId || isAdmin());
     }
 
+    // Rate-limit counters written by Cloud Functions (functions/src/shared/rateLimit.js).
+    match /rateLimits/{key} {
+      allow read, write: if false;
+    }
+
     // -------------- Model Categories --------------
     match /modelCategories/{docId} {
       allow read: if true;   // for production tighten this

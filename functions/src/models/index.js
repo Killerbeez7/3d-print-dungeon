@@ -3,8 +3,12 @@ import { onDocumentCreated, onDocumentDeleted } from "firebase-functions/v2/fire
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { requireAuth } from "../auth/utils.js";
 import { originalPathOf, pathFromDownloadUrl } from "../shared/storagePaths.js";
+import { enforceRateLimit } from "../shared/rateLimit.js";
 
 const DOWNLOAD_LINK_MINUTES = 5;
+// Download links per person per hour. Plenty for anyone printing; stops a script from pulling
+// every free model, or every model an account bought, in one go.
+const DOWNLOADS_PER_HOUR = 30;
 
 // When a like is created, increment model.likes, uploader public stats.likesCount, and create notification
 export const onLikeCreated = onDocumentCreated("likes/{likeId}", async (event) => {
@@ -250,6 +254,14 @@ export const getModelDownloadUrl = onCall(async (request) => {
     if (typeof modelId !== "string" || !modelId) {
         throw new HttpsError("invalid-argument", "Model ID is required.");
     }
+    const isAdmin = token.admin === true || token.super === true;
+    if (!isAdmin) {
+        await enforceRateLimit(`download_${uid}`, {
+            limit: DOWNLOADS_PER_HOUR,
+            windowSeconds: 60 * 60,
+            message: "You've downloaded a lot in the last hour. Try again a little later.",
+        });
+    }
 
     const db = admin.firestore();
     const modelSnap = await db.doc(`models/${modelId}`).get();
@@ -259,7 +271,6 @@ export const getModelDownloadUrl = onCall(async (request) => {
     const model = modelSnap.data();
 
     const isOwner = model.uploaderId === uid;
-    const isAdmin = token.admin === true || token.super === true;
     const isFree = !model.isPaid || !(Number(model.price) > 0);
     let reason = isOwner ? "owner" : isAdmin ? "admin" : isFree ? "free" : null;
     if (!reason) {

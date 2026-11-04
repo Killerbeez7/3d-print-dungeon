@@ -10,6 +10,7 @@ import {
     validatePassword,
     handleError,
 } from "./utils.js";
+import { clientKey, enforceRateLimit } from "../shared/rateLimit.js";
 
 // Set user role claims (admin only)
 export const setUserRole = onCall(async (request) => {
@@ -188,20 +189,15 @@ export const checkUsernameAvailability = onCall(async (request) => {
     }
 });
 
-// Check if email is available
+// Check if email is available. Sign-up needs this, but it also tells anyone whether an address
+// has an account, so it is limited per network address.
+const EMAIL_CHECKS_PER_WINDOW = 30;
+const EMAIL_CHECK_WINDOW_SECONDS = 10 * 60;
+
 export const checkEmailAvailability = onCall(async (request) => {
     try {
         const { data } = request;
-        console.log("checkEmailAvailability called");
 
-        // Log auth status for debugging
-        if (request.auth) {
-            console.log("Authenticated user:", request.auth.uid);
-        } else {
-            console.log("No authentication (emulator mode)");
-        }
-
-        // Validate input
         validateRequiredFields(data, ["email"]);
         const { email } = data;
 
@@ -219,33 +215,36 @@ export const checkEmailAvailability = onCall(async (request) => {
             };
         }
 
-        // Check if email exists in Firebase Auth
+        // The sign-up form treats a failed check as "not checked" and carries on; creating the
+        // account still refuses a taken address.
+        await enforceRateLimit(`email_${clientKey(request.rawRequest)}`, {
+            limit: EMAIL_CHECKS_PER_WINDOW,
+            windowSeconds: EMAIL_CHECK_WINDOW_SECONDS,
+            message: "Too many checks. Try again in a few minutes.",
+        });
+
         try {
             await admin.auth().getUserByEmail(email);
-            console.log("Email availability: TAKEN (Firebase Auth)");
             return {
                 available: false,
                 email: email,
                 error: "Email is already registered",
             };
         } catch (error) {
-            // If user not found, email is available
             if (error.code === "auth/user-not-found") {
-                console.log("Email availability: AVAILABLE");
                 return {
                     available: true,
                     email: email,
                 };
             }
-            // Re-throw other errors
             throw error;
         }
     } catch (err) {
-        console.error("checkEmailAvailability INTERNAL ERROR:", err);
         if (err instanceof HttpsError) {
             throw err;
         }
-        throw new HttpsError("internal", err.message || "Unknown error");
+        console.error("checkEmailAvailability failed:", err?.code ?? err?.message);
+        throw new HttpsError("internal", "Couldn't check the email. Try again.");
     }
 });
 
