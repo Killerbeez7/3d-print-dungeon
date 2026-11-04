@@ -58,7 +58,7 @@ export const Footer = () => {
 
   return (
     <>
-      <footer className="relative z-10 overflow-hidden border-t border-br-subtle bg-section">
+      <footer className="border-t border-br-subtle bg-section">
         <div className="mx-auto max-w-[1600px] px-4 pt-14 sm:px-6 lg:px-8">
           <div className="grid gap-10 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
             <div className="max-w-xs">
