@@ -160,10 +160,12 @@ export const ImagesUpload: FC<ImagesUploadProps> = ({ setModelData }) => {
 
   const primaryRender = renders.find((r) => r.id === primaryId);
 
-  // Cleanup on unmount
+  // Free the preview URLs still in use when the form goes away
+  const rendersRef = useRef(renders);
+  rendersRef.current = renders;
   useEffect(() => {
     return () => {
-      renders.forEach((render) => {
+      rendersRef.current.forEach((render) => {
         URL.revokeObjectURL(render.originalPreview);
         URL.revokeObjectURL(render.croppedPreview);
       });
