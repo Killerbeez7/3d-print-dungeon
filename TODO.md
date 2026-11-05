@@ -127,10 +127,28 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 - [ ] Following/unfollowing or liking/unliking repeatedly sends a notification each time
 - [x] Anyone signed in can delete anyone's forum thread like (`forumThreadLikes` rules; deploy
       pending)
-- [ ] Theft, later: a weaker 3D preview (fewer triangles, unprintable noise) or another approach;
-      a per-buyer watermark in downloaded files; fingerprinting uploads to catch re-uploads;
-      a report button and a copyright/DMCA page (a registered DMCA agent is needed for US
-      safe harbour; owner's details)
+- [ ] Theft, later: a per-buyer watermark in downloaded files (the main leak is buyers
+      re-sharing originals); fingerprinting uploads to catch re-uploads; a report button and a
+      copyright/DMCA page (a registered DMCA agent is needed for US safe harbour; owner's
+      details)
+- [ ] Preview defense, later (discussed 5 Nov 2026). Anything drawn in 3D in the browser can be
+      captured from the GPU, so only previews that send no geometry are safe. Options:
+  - [ ] **Recommended:** turntable for paid models. 48–72 frames rendered from the full original
+        in the browser at upload (where the cover renders are made), scrubbed by drag/swipe, slow
+        spin when idle. No 3D data sent; better looking than today's 100k-triangle copy. Costs
+        ~+15 s upload, 1–3 MB per model, a one-off script for existing models; no free orbit or
+        deep zoom. Optional second ring from ~35° above. Try it on one model first.
+  - [ ] **With it:** full 3D viewer stays for free models and for buyers of paid ones.
+  - [ ] **With it:** stop bulk scraping: App Check on Storage (after the App Check setup above),
+        and paid models' previews through short-lived links instead of a public path.
+  - [ ] **In reserve:** low-poly mesh (~5k triangles) + baked normal map. Looks close to the
+        original in the viewer, ripped copy is a blob. Needs UV unwrapping and baking on a
+        server (e.g. headless Blender on Cloud Run); the most work.
+  - [ ] **Stopgap only:** fewer triangles (`PREVIEW_TRIANGLES` in
+        `src/features/models/utils/lightPreview.ts`, 100k → 50k, then re-run
+        `scripts/make-light-previews.ts`). Weak for miniatures: at 28 mm a 25–50k mesh still
+        prints almost fine, while the viewer gets softer.
+  - Not worth it: encrypting or hiding the preview file; the browser must decode it to draw it.
 - [ ] Creator payouts: sales go to the platform's Stripe account; nothing pays creators yet
       (Stripe Connect destination charges)
 - [x] New listings default to euro; sellers can switch to US dollars in Settings → Account (branch `claude/new-features`).
