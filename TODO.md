@@ -61,13 +61,16 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 
 ## Firebase console / deploys (owner)
 
-- [ ] Let GitHub deploy rules (one time): Google Cloud console → IAM & Admin → IAM → the service
-      account whose key is in the `FIREBASE_SERVICE_ACCOUNT` GitHub secret → Edit → Add role
-      **Firebase Rules Admin** and **Service Usage Consumer**. After that, rules are deployed by
-      the Deploy rules workflow (`.github/deploy-rules.json`), never from a local checkout.
+- How to deploy rules and functions (owner, from your PC): in an up-to-date checkout of
+  `claude/redesign-v2` (`git checkout claude/redesign-v2`, `git pull`; on a fresh clone run
+  `npm ci` in the root and in `functions/` first), then
+  `firebase deploy --only firestore:rules,storage --project print-dungeon-3d` and/or
+  `firebase deploy --only functions:<name> --project print-dungeon-3d`. Never from `main`: it
+  has the old October rules. (The Deploy rules workflow stays in the repo but only works once its
+  service account has the Firebase Rules Admin and Service Usage Consumer roles.)
 
-- [ ] Deploy the security round of 4 Nov 2026 (branch `claude/redesign-v2`):
-      - Rules: say "deploy rules" (upload size/type limits and own-folder uploads in Storage,
+- [x] Deploy the security round of 4 Nov 2026 (done 5 Nov 2026 from `7cd386b`):
+      - Rules: (upload size/type limits and own-folder uploads in Storage,
         forum likes, `rateLimits`). Tested in the emulator.
       - Functions: from an up-to-date checkout of the branch,
         `firebase deploy --only functions:getModelDownloadUrl,functions:checkEmailAvailability`
@@ -105,7 +108,7 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
       28 Oct 2026); each one gives full control of the project. Delete the ones not in use (keep
       the one stored in GitHub for preview builds)
 
-- [ ] Deploy the Firestore indexes (`firebase deploy --only firestore:indexes`). Profiles no longer
+- [x] Deploy the Firestore indexes (`firebase deploy --only firestore:indexes`, 5 Nov 2026). Profiles no longer
       need them (they load a creator's listings with a plain filter), but other queries may
 - [ ] Profile totals (models, views, likes) are counted from up to 500 listings per creator; past
       that, move the totals to the server
@@ -152,7 +155,7 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 - [ ] Creator payouts: sales go to the platform's Stripe account; nothing pays creators yet
       (Stripe Connect destination charges)
 - [x] New listings default to euro; sellers can switch to US dollars in Settings → Account (branch `claude/new-features`).
-- [ ] Deploy `firestore.rules` from `claude/redesign-v2` (now through the Deploy rules workflow, see Firebase console / deploys): listings may only be priced in `eur` or `usd`, and the new `makes` collection (photos of prints) becomes readable and postable. Until then the Makes section shows empty and posting says it isn't switched on yet.
+- [x] Deploy `firestore.rules` from `claude/redesign-v2` (5 Nov 2026): listings may only be priced in `eur` or `usd`, and the new `makes` collection (photos of prints) becomes readable and postable. Until then the Makes section shows empty and posting says it isn't switched on yet.
 - [ ] Deleting a listing removes it for its buyers too; keep purchased files available
 - [ ] Admin "delete all models" script still uses the old file paths
 - [x] Artists list no longer reads 200 user documents one by one: one models query, cached
