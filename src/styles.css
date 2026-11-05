@@ -856,15 +856,15 @@ body {
     }
   }
 
-  /* Header line that fills with page scroll, violet to molten. */
+  /* Header line that fills with page scroll. The gradient spans the full width and is
+     revealed (not stretched), so the line starts violet and turns molten near the end. */
   .scroll-progress {
     position: absolute;
     left: 0;
     right: 0;
     bottom: -1px;
     height: 2px;
-    transform: scaleX(0);
-    transform-origin: left;
+    clip-path: inset(0 100% 0 0);
     background: linear-gradient(90deg, var(--accent), var(--ember-fill));
     pointer-events: none;
   }
@@ -872,7 +872,7 @@ body {
   @supports (animation-timeline: scroll()) {
     @media (prefers-reduced-motion: no-preference) {
       .scroll-progress {
-        animation: grow-x linear both;
+        animation: reveal-x linear both;
         animation-timeline: scroll(root block);
       }
     }
@@ -1006,12 +1006,12 @@ body {
   }
 }
 
-@keyframes grow-x {
+@keyframes reveal-x {
   from {
-    transform: scaleX(0);
+    clip-path: inset(0 100% 0 0);
   }
   to {
-    transform: scaleX(1);
+    clip-path: inset(0 0 0 0);
   }
 }
 
