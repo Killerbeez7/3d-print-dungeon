@@ -9,6 +9,8 @@ name: Preview deploy
 #   VITE_STRIPE_PUBLISHABLE_KEY  optional, Stripe publishable key (pk_...)
 # Repository variable (Settings > Secrets and variables > Actions > Variables):
 #   VITE_APP_CHECK_SITE_KEY      optional, reCAPTCHA Enterprise site key for App Check (public)
+#   VITE_SITE_LAUNCHED           optional; "true" opens printdungeon.com to everyone and lets search
+#                                engines index it. Until then: coming-soon page + noindex (see TODO.md)
 #
 # The Firebase web config is not a secret (it ships in every page). It is read
 # from the project's own Hosting site, so previews use the same keys as live.
@@ -87,6 +89,7 @@ jobs:
         env:
           VITE_STRIPE_PUBLISHABLE_KEY: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
           VITE_APP_CHECK_SITE_KEY: ${{ vars.VITE_APP_CHECK_SITE_KEY }}
+          VITE_SITE_LAUNCHED: ${{ vars.VITE_SITE_LAUNCHED }}
 
       - name: Channel name from branch
         id: channel

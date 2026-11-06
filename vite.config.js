@@ -55,6 +55,26 @@ function startupPreloads() {
   };
 }
 
+/**
+ * Until the site launches (VITE_SITE_LAUNCHED=true), every page tells search engines not to
+ * index it. The tag is in the HTML itself, so it works for crawlers that don't run JavaScript.
+ * After launch, an inline script in index.html still keeps previews and print-dungeon-3d.web.app
+ * out of the index.
+ */
+function searchIndexing() {
+  let launched = false;
+  return {
+    name: "search-indexing",
+    configResolved(config) {
+      launched = config.env.VITE_SITE_LAUNCHED === "true";
+    },
+    transformIndexHtml() {
+      if (launched) return [];
+      return [{ tag: "meta", attrs: { name: "robots", content: "noindex" }, injectTo: "head-prepend" }];
+    },
+  };
+}
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
@@ -64,6 +84,7 @@ export default defineConfig({
     compression({ algorithm: "brotliCompress" }),
     webFontDownload(),
     startupPreloads(),
+    searchIndexing(),
   ],
   resolve: {
     alias: {

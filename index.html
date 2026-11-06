@@ -18,6 +18,17 @@
 
     <title>3D Print Dungeon</title>
 
+    <!-- Only printdungeon.com belongs in search results: previews and print-dungeon-3d.web.app
+      serve the same pages. (Before launch the build also adds a noindex tag for every host.) -->
+    <script>
+      if (!/^(www\.)?printdungeon\.com$/.test(location.hostname)) {
+        var robots = document.createElement("meta");
+        robots.name = "robots";
+        robots.content = "noindex";
+        document.head.appendChild(robots);
+      }
+    </script>
+
     <!-- Firestore -->
     <link rel="preconnect" href="https://firestore.googleapis.com" crossorigin />
 
