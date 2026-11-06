@@ -17,7 +17,7 @@ live on the logo canvas: https://claude.ai/artifact/YXZPzuJjAnSTjaFKLLHo6T
 | `intro/engine.js` | The intro animation (prototype version, used for the video and the canvas board) |
 | `intro/data.json` | Wordmark and die-face outlines the prototype draws |
 | `intro/render-video.cjs` | Renders the video from `engine.js` |
-| `intro/site/` | The site version of the intro (React component + TypeScript engine), not in use |
+| `src/features/prelaunch/intro/` | The site version of the intro (React component + TypeScript engine), on the coming-soon page |
 | `scripts/make_logo_assets.py` | Writes `src/features/shared/components/brandPaths.ts`: the "3D PRINT / DUNGEON" wordmark, DUNGEON in Chakra Petch Bold and "3D PRINT" in Geist Mono |
 | `scripts/make_die_assets.py` | Writes `src/features/shared/components/dieFaces.ts` and the tab icon `public/assets/icons/pd-die-v4.svg` |
 | `scripts/die_icons.cjs` | Renders the PNG tab and home-screen icons from the die |
@@ -26,11 +26,12 @@ live on the logo canvas: https://claude.ai/artifact/YXZPzuJjAnSTjaFKLLHo6T
 | `scripts/die_faces.py`, `scripts/maze.py` | The six die faces and the gate's portcullis; the maze is a seeded 6 x 6 perfect maze |
 | `scripts/fontword.py`, `scripts/lockups.py`, `scripts/geo.py` | Shared helpers (font outlines, path transforms, geometry) |
 
-The intro is not on the site for now. Its site version is kept in `intro/site/`: `printIntro.ts`
-(a TypeScript port of `intro/engine.js`, colours from theme tokens, no background) and
-`PrintIntro.tsx` (plays once per browser session at 1.3x, click to skip, finished logo for reduced
-motion). To use it, move both files to `src/features/home/intro/` and put `<PrintIntro />` in the
-homepage hero. Keep it in step with `intro/engine.js` when changing the motion.
+The intro plays on the coming-soon page. Its site version is in `src/features/prelaunch/intro/`:
+`printIntro.ts` (a TypeScript port of `intro/engine.js`, colours from theme tokens, no background,
+laid out from the current wordmark's measured outlines) and `PrintIntro.tsx` (1.3x speed, click
+to skip or replay, finished logo for reduced motion; `once` plays it once per browser session,
+e.g. for a homepage hero). The prototype, video and canvas board still draw the earlier
+wordmark. Keep the motion in step with `intro/engine.js` when changing either.
 
 ## Regenerating
 

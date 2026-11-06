@@ -4,30 +4,40 @@
 //
 // Drawn into an <svg> from the die's 8 corners in 3D on every frame, so the fold is a real fold.
 // seek(t) is a pure function of time, so the caller decides playback (speed, skip, still).
-// Source and prototype: design/brand/ (the canvas board and the video use the same engine).
+// Source and prototype: design/brand/ (the canvas board and the video use the same engine; they
+// still draw the earlier wordmark). This version lays itself out from the wordmark it is given.
 
 type Vec2 = [number, number];
 type Vec3 = [number, number, number];
+
+/** Ink bounds of one line of the wordmark, in lockup units (baseline at y = 0, y grows down). */
+export interface InkBox {
+  x0: number;
+  x1: number;
+  top: number;
+  bottom: number;
+}
 
 export interface PrintIntroData {
   /** "3D PRINT" outline and DUNGEON outline (lockup units, baseline at 0). */
   label: string;
   letters: string;
+  /** Where the ink of each line is, so the print follows the actual letters. */
+  labelBox: InkBox;
+  lettersBox: InkBox;
   /** Die face symbols (100 x 100 face). */
   gate: string;
   eye: string;
   maze: string;
-  /** Ink width of the "3D PRINT" line in lockup units. */
-  labelWidth: number;
   colors: { accent: string; text: string; muted: string; ink: string; bed: string; hot: string };
-  /** Visible part of the 1000 x 360 stage. */
-  viewBox?: string;
 }
 
 export interface PrintIntro {
   duration: number;
   /** Time at which all motion has finished (the rest is the finished logo). */
   motionEnd: number;
+  /** The part of the stage the animation uses, with room above the name for the print head. */
+  viewBox: string;
   seek: (t: number) => void;
 }
 
@@ -77,7 +87,10 @@ export function createPrintIntro(svg: SVGSVGElement, D: PrintIntroData): PrintIn
   const HEAD = 0.5;
 
   // ---- layout (stage 1000 x 360)
-  const K = 0.95, WX0 = 7, WX1 = 638.9, WTOP = -108, WBOT = 2;
+  const LB = D.labelBox, WB = D.lettersBox;
+  const K = 0.95;
+  const WX0 = Math.min(LB.x0, WB.x0), WX1 = Math.max(LB.x1, WB.x1);
+  const WTOP = Math.min(LB.top, WB.top) - 1, WBOT = Math.max(LB.bottom, WB.bottom) + 1;
   const TX = 255 - WX0 * K, TY = 238; // wordmark origin (baseline)
   const X0 = TX + WX0 * K, X1 = TX + WX1 * K, YT = TY + WTOP * K, YB = TY + WBOT * K;
   const E = (YB - YT) / 1.633; // die edge at rest: the die is as tall as the text block
@@ -88,8 +101,8 @@ export function createPrintIntro(svg: SVGSVGElement, D: PrintIntroData): PrintIn
   const X = (u: number) => TX + u * K;
   const Y = (v: number) => TY + v * K;
   const groups = [
-    { from: 2, to: -77.5, n: 10, x0: WX0, x1: WX1 },
-    { from: -86.5, to: -108.5, n: 4, x0: WX0, x1: WX0 + D.labelWidth },
+    { from: WB.bottom + 1, to: WB.top - 1, n: 10, x0: WB.x0, x1: WB.x1 },
+    { from: LB.bottom + 1, to: LB.top - 1, n: 4, x0: LB.x0, x1: LB.x1 },
   ];
   interface Layer { yb: number; yt: number; xa: number; xb: number; dir: number; s: number; d: number; first: boolean }
   const PLAN: Layer[] = [];
@@ -132,7 +145,11 @@ export function createPrintIntro(svg: SVGSVGElement, D: PrintIntroData): PrintIn
 
   // ---- build the scene
   while (svg.firstChild) svg.removeChild(svg.firstChild);
-  svg.setAttribute("viewBox", D.viewBox ?? "0 0 1000 360");
+  // From the die's left side to the end of the print bed, and from the print head's highest
+  // point (about 1.25 die edges above the name) to just under the bed.
+  const vx = REST.x - E * 0.7071 - 6, vy = YT - 1.25 * E;
+  const viewBox = [vx, vy, X1 + 20 - vx, YB + 15 - vy].map(fx).join(" ");
+  svg.setAttribute("viewBox", viewBox);
   const defs = el("defs", {}, svg);
   el("filter", { id: `${uid}glow`, x: "-100%", y: "-100%", width: "300%", height: "300%" }, defs).appendChild(
     el("feGaussianBlur", { stdDeviation: 3 }),
@@ -313,5 +330,5 @@ export function createPrintIntro(svg: SVGSVGElement, D: PrintIntroData): PrintIn
   };
 
   seek(0);
-  return { duration: total, motionEnd: t0.hold, seek };
+  return { duration: total, motionEnd: t0.hold, viewBox, seek };
 }

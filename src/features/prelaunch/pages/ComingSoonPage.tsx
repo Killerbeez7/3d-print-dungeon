@@ -7,7 +7,7 @@ import { ROUTES } from "@/constants/routeConstants";
 import { AuthModal } from "@/features/auth/components/AuthModal";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useModal } from "@/features/shared/modal/hooks/useModal";
-import { BigLogo } from "../components/BigLogo";
+import { PrintIntro } from "../intro/PrintIntro";
 import { DEVLOG_QUERY_KEY, fetchDevlogPosts } from "../services/devlogService";
 import { formatDevlogDate } from "../utils/formatDevlogDate";
 
@@ -83,7 +83,8 @@ export const ComingSoonPage = () => {
             aria-labelledby="tab-soon"
             className="flex flex-1 flex-col items-center justify-center text-center"
           >
-            <BigLogo />
+            {/* The logo prints itself on every visit; click to skip or to print it again. */}
+            <PrintIntro once={false} className="max-w-[36rem]" />
             <p className="label-mono mt-12 text-accent">In development</p>
             <h1 className="mt-3 max-w-2xl text-4xl font-bold leading-tight text-txt-primary sm:text-6xl">
               The dungeon is being built
