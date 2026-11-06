@@ -1,4 +1,4 @@
-import { createElement, useEffect, useState, type ChangeEvent } from "react";
+import { createElement, useEffect, useMemo, useState, type ChangeEvent } from "react";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
 import { Group } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
@@ -11,12 +11,13 @@ import { finalConvertFileToGLB } from "@/features/models/utils/converter";
 import { bakeImpostor, type BakedImpostor } from "../impostor/bakeImpostor";
 import { ImpostorViewer, type ImpostorBlend } from "../impostor/ImpostorViewer";
 
-/** grid × tile ≤ 4096 so the atlas fits every phone's texture limit. */
+/** Views (grid × grid over the upper half) and pixels per view. The size depends on the model. */
 const PRESETS = [
-  { id: "10x384", grid: 10, tile: 384, label: "100 views × 384 px (balanced)" },
-  { id: "8x512", grid: 8, tile: 512, label: "64 views × 512 px (sharpest)" },
-  { id: "12x320", grid: 12, tile: 320, label: "144 views × 320 px (smoothest)" },
-  { id: "16x256", grid: 16, tile: 256, label: "256 views × 256 px" },
+  { id: "20x640", grid: 20, tile: 640, label: "400 views × 640 px (recommended)" },
+  { id: "22x640", grid: 22, tile: 640, label: "484 views × 640 px (smoothest)" },
+  { id: "16x896", grid: 16, tile: 896, label: "256 views × 896 px (sharpest)" },
+  { id: "20x512", grid: 20, tile: 512, label: "400 views × 512 px (lighter)" },
+  { id: "16x640", grid: 16, tile: 640, label: "256 views × 640 px (lightest)" },
 ] as const;
 
 interface SiteModel {
@@ -33,11 +34,12 @@ interface Source {
 }
 
 const BLENDS: { id: ImpostorBlend; label: string }[] = [
-  { id: "fade", label: "Nearest view, quick fade (sharp)" },
-  { id: "snap", label: "Nearest view, no fade" },
-  { id: "soft", label: "Mostly the nearest view" },
-  { id: "blend", label: "Blend 3 views (smooth, ghosting)" },
+  { id: "fade", label: "Quick fade (smoother)" },
+  { id: "snap", label: "No fade (crisper while turning)" },
 ];
+
+/** A few of the views, to show what the browser gets. */
+const SAMPLE_COUNT = 8;
 
 const mb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 
@@ -56,7 +58,7 @@ export const ImpostorLabPage = () => {
   const [models, setModels] = useState<SiteModel[]>([]);
   const [modelsError, setModelsError] = useState(false);
   const [source, setSource] = useState<Source | null>(null);
-  const [preset, setPreset] = useState<(typeof PRESETS)[number]["id"]>("10x384");
+  const [preset, setPreset] = useState<(typeof PRESETS)[number]["id"]>("20x640");
   const [zUp, setZUp] = useState(false);
   const [blend, setBlend] = useState<ImpostorBlend>("fade");
   const [baked, setBaked] = useState<BakedImpostor | null>(null);
@@ -69,9 +71,12 @@ export const ImpostorLabPage = () => {
       .catch(() => setModelsError(true));
   }, []);
 
-  useEffect(() => () => {
-    if (baked) URL.revokeObjectURL(baked.url);
+  const samples = useMemo(() => {
+    if (!baked) return [];
+    const step = Math.max(1, Math.floor(baked.frames.length / SAMPLE_COUNT));
+    return baked.frames.filter((_, index) => index % step === 0).slice(0, SAMPLE_COUNT).map((frame) => URL.createObjectURL(frame));
   }, [baked]);
+  useEffect(() => () => samples.forEach((url) => URL.revokeObjectURL(url)), [samples]);
 
   const pickSiteModel = async (event: ChangeEvent<HTMLSelectElement>) => {
     const model = models.find((item) => item.id === event.target.value);
@@ -106,12 +111,19 @@ export const ImpostorLabPage = () => {
     const { grid, tile } = PRESETS.find((item) => item.id === preset) ?? PRESETS[0];
     setBusy(true);
     setStatus(`Rendering ${grid * grid} views…`);
+    setBaked(null);
     try {
       const gltf = await new GLTFLoader().loadAsync(source.glbUrl);
       const model = new Group();
       if (zUp) gltf.scene.rotation.x = -Math.PI / 2;
       model.add(gltf.scene);
-      const result = await bakeImpostor(model, { grid, tile });
+      const result = await bakeImpostor(model, {
+        grid,
+        tile,
+        onProgress: (done, total) => {
+          if (done % 20 === 0 || done === total) setStatus(`Rendering views: ${done} of ${total}…`);
+        },
+      });
       setBaked(result);
       setStatus(null);
     } catch (error) {
@@ -215,15 +227,14 @@ export const ImpostorLabPage = () => {
               </h2>
               {baked && (
                 <p className="text-sm text-txt-secondary">
-                  {mb(baked.blob.size)} · {baked.grid * baked.grid} views · made in{" "}
+                  {mb(baked.bytes)} · {baked.grid * baked.grid} views · {baked.tile} px · made in{" "}
                   {(baked.bakeMs / 1000).toFixed(1)} s
                 </p>
               )}
             </header>
             {baked ? (
               <ImpostorViewer
-                key={baked.url}
-                atlasUrl={baked.url}
+                frames={baked.frames}
                 grid={baked.grid}
                 tile={baked.tile}
                 blend={blend}
@@ -264,9 +275,14 @@ export const ImpostorLabPage = () => {
       {baked && (
         <details className={`${panel} mt-6 p-4`}>
           <summary className="cursor-pointer text-sm font-medium text-txt-primary">
-            What the browser downloads instead of the mesh (the atlas)
+            What the browser downloads instead of the mesh: {baked.grid * baked.grid} pictures like these (
+            {Math.round(baked.bytes / baked.frames.length / 1024)} KB each on average)
           </summary>
-          <img src={baked.url} alt="All the impostor's views in one image" className="mt-4 w-full max-w-3xl rounded-lg bg-page" />
+          <div className="mt-4 grid grid-cols-4 gap-2 sm:grid-cols-8">
+            {samples.map((url, index) => (
+              <img key={url} src={url} alt={`View ${index + 1}`} className="aspect-square w-full rounded-md bg-page" />
+            ))}
+          </div>
         </details>
       )}
     </div>

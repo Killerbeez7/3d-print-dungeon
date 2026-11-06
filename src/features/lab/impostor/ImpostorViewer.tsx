@@ -16,12 +16,15 @@ import {
 
 import { encodeDirection, frameBasis, orbitDirection } from "./impostorMath";
 
-/** How the viewer moves between the pre-rendered views. */
-export type ImpostorBlend = "fade" | "blend" | "soft" | "snap";
+/** How the viewer moves from one pre-rendered view to the next. */
+export type ImpostorBlend = "fade" | "snap";
 
-const SHARPNESS: Record<Exclude<ImpostorBlend, "fade">, number> = { blend: 1, soft: 6, snap: 40 };
 /** Cross-fade time when the nearest view changes. */
-const FADE_MS = 110;
+const FADE_MS = 90;
+/** Decoded views kept in memory (each is tile² × 4 bytes, ~1.6 MB at 640 px). */
+const CACHE_SIZE = 40;
+/** Views around the current one decoded ahead of time, in grid steps. */
+const PREFETCH_RADIUS = 2;
 
 const VERTEX = /* glsl */ `
 varying vec2 vNdc;
@@ -32,22 +35,18 @@ void main() {
 `;
 
 // Mirrors impostorMath.ts. Each pixel is a point on the plane through the model's centre,
-// facing the viewer; it is projected into the 3 frames nearest the view direction and their
-// colours are blended by how close each frame is.
+// facing the viewer; it is projected into the frame of each of the two views being shown.
 const FRAGMENT = /* glsl */ `
-uniform sampler2D atlas;
-uniform float grid;
-uniform float tile;
-uniform vec3 viewDir;
-uniform vec3 viewRight;
-uniform vec3 viewUp;
-uniform vec2 halfExtent;
-uniform float sharpness;
-// mode 1: only the nearest view, cross-fading from the previous one (cellA) to it (cellB).
-uniform float mode;
+uniform sampler2D frameA;
+uniform sampler2D frameB;
 uniform vec2 cellA;
 uniform vec2 cellB;
 uniform float fade;
+uniform float grid;
+uniform float tile;
+uniform vec3 viewRight;
+uniform vec3 viewUp;
+uniform vec2 halfExtent;
 varying vec2 vNdc;
 
 vec3 decodeDir(vec2 uv) {
@@ -57,14 +56,7 @@ vec3 decodeDir(vec2 uv) {
   return normalize(vec3(p.x, y, p.y));
 }
 
-vec2 encodeDir(vec3 d) {
-  d.y = max(d.y, 0.0);
-  vec2 p = d.xz / (abs(d.x) + d.y + abs(d.z));
-  return vec2(p.x + p.y, p.x - p.y) * 0.5 + 0.5;
-}
-
-vec4 frameSample(vec2 cell, vec3 P) {
-  cell = clamp(cell, 0.0, grid - 1.0);
+vec4 sampleFrame(sampler2D frame, vec2 cell, vec3 P) {
   vec3 d = decodeDir(cell / (grid - 1.0));
   vec3 r = cross(vec3(0.0, 1.0, 0.0), d);
   r = dot(r, r) < 1e-8 ? vec3(1.0, 0.0, 0.0) : normalize(r);
@@ -73,66 +65,38 @@ vec4 frameSample(vec2 cell, vec3 P) {
   if (t.x < 0.0 || t.y < 0.0 || t.x > 1.0 || t.y > 1.0) return vec4(0.0);
   float pad = 0.5 / tile;
   t = clamp(t, pad, 1.0 - pad);
-  return texture2D(atlas, (cell + vec2(t.x, 1.0 - t.y)) / grid);
+  return texture2D(frame, vec2(t.x, 1.0 - t.y));
 }
 
 void main() {
   vec3 P = viewRight * vNdc.x * halfExtent.x + viewUp * vNdc.y * halfExtent.y;
-  if (mode > 0.5) {
-    vec4 faded = frameSample(cellA, P) * (1.0 - fade) + frameSample(cellB, P) * fade;
-    if (faded.a < 0.004) discard;
-    gl_FragColor = vec4(faded.rgb / faded.a, faded.a);
-    return;
-  }
-  vec2 g = encodeDir(viewDir) * (grid - 1.0);
-  vec2 b = floor(g);
-  vec2 f = g - b;
-  // The 3 nearest frames and how close each is; raising the weights to a power and
-  // renormalising favours the nearest one (sharpness 1 = even blend, high = snap to nearest).
-  vec2 c0, c1, c2;
-  vec3 w;
-  if (f.x + f.y < 1.0) {
-    c0 = b; c1 = b + vec2(1.0, 0.0); c2 = b + vec2(0.0, 1.0);
-    w = vec3(1.0 - f.x - f.y, f.x, f.y);
-  } else {
-    c0 = b + vec2(1.0, 1.0); c1 = b + vec2(0.0, 1.0); c2 = b + vec2(1.0, 0.0);
-    w = vec3(f.x + f.y - 1.0, 1.0 - f.x, 1.0 - f.y);
-  }
-  // Relative to the strongest weight first, so high powers never underflow to zero.
-  w = max(w, vec3(0.0));
-  w = pow(w / max(max(w.x, w.y), max(w.z, 1e-5)), vec3(sharpness));
-  w /= w.x + w.y + w.z;
-  // Snap: only the nearest view, no blending at all.
-  if (sharpness >= 30.0) w = w.x >= w.y && w.x >= w.z ? vec3(1.0, 0.0, 0.0) : (w.y >= w.z ? vec3(0.0, 1.0, 0.0) : vec3(0.0, 0.0, 1.0));
-  vec4 c = frameSample(c0, P) * w.x + frameSample(c1, P) * w.y + frameSample(c2, P) * w.z;
+  vec4 c = sampleFrame(frameA, cellA, P) * (1.0 - fade) + sampleFrame(frameB, cellB, P) * fade;
   if (c.a < 0.004) discard;
   gl_FragColor = vec4(c.rgb / c.a, c.a);
 }
 `;
 
 const MIN_PITCH = 0;
-const MAX_PITCH = (80 * Math.PI) / 180;
+const MAX_PITCH = (82 * Math.PI) / 180;
 const MIN_ZOOM = 0.8;
 const MAX_ZOOM = 3;
 
 interface ImpostorViewerProps {
-  atlasUrl: string;
+  /** One WebP per view, in grid order (row j, column i → index j × grid + i). */
+  frames: Blob[];
   grid: number;
   tile: number;
-  /**
-   * fade: the nearest view, cross-fading quickly to the next as you turn (sharp, recommended);
-   * blend: the 3 nearest views mixed (smoothest, ghosting); soft: mostly the nearest; snap: only
-   * the nearest, no fade.
-   */
+  /** fade: the nearest view, cross-fading quickly to the next as you turn; snap: no fade. */
   blend?: ImpostorBlend;
   className?: string;
 }
 
 /**
  * Shows a baked impostor: drag to turn it (any angle on the upper half), wheel or pinch to zoom.
- * It turns slowly on its own until touched. No mesh is ever loaded: only the atlas image.
+ * Only the views near the current angle are decoded, so hundreds of views stay light on memory.
+ * No mesh is ever loaded.
  */
-export const ImpostorViewer = ({ atlasUrl, grid, tile, blend = "fade", className = "" }: ImpostorViewerProps) => {
+export const ImpostorViewer = ({ frames, grid, tile, blend = "fade", className = "" }: ImpostorViewerProps) => {
   const hostRef = useRef<HTMLDivElement>(null);
   const blendRef = useRef(blend);
   const redrawRef = useRef<() => void>(() => {});
@@ -149,19 +113,25 @@ export const ImpostorViewer = ({ atlasUrl, grid, tile, blend = "fade", className
     const renderer = new WebGLRenderer({ alpha: true, antialias: false });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
-    renderer.domElement.style.touchAction = "none";
-    renderer.domElement.style.display = "block";
-    renderer.domElement.style.width = "100%";
-    renderer.domElement.style.height = "100%";
-    host.appendChild(renderer.domElement);
+    const canvas = renderer.domElement;
+    canvas.style.touchAction = "none";
+    canvas.style.display = "block";
+    canvas.style.width = "100%";
+    canvas.style.height = "100%";
+    host.appendChild(canvas);
 
-    const texture = new Texture();
-    texture.flipY = false;
-    texture.premultiplyAlpha = true;
-    texture.colorSpace = NoColorSpace;
-    texture.minFilter = LinearFilter;
-    texture.magFilter = LinearFilter;
-    texture.generateMipmaps = false;
+    const makeTexture = () => {
+      const texture = new Texture();
+      // Bitmaps are decoded already premultiplied and top-down (see decode()).
+      texture.flipY = false;
+      texture.colorSpace = NoColorSpace;
+      texture.minFilter = LinearFilter;
+      texture.magFilter = LinearFilter;
+      texture.generateMipmaps = false;
+      return texture;
+    };
+    const textureA = makeTexture();
+    const textureB = makeTexture();
 
     const material = new ShaderMaterial({
       vertexShader: VERTEX,
@@ -169,18 +139,16 @@ export const ImpostorViewer = ({ atlasUrl, grid, tile, blend = "fade", className
       transparent: true,
       depthTest: false,
       uniforms: {
-        atlas: { value: texture },
-        grid: { value: grid },
-        tile: { value: tile },
-        viewDir: { value: new Vector3() },
-        viewRight: { value: new Vector3() },
-        viewUp: { value: new Vector3() },
-        halfExtent: { value: new Vector2(1, 1) },
-        sharpness: { value: 1 },
-        mode: { value: 1 },
+        frameA: { value: textureA },
+        frameB: { value: textureB },
         cellA: { value: new Vector2() },
         cellB: { value: new Vector2() },
         fade: { value: 1 },
+        grid: { value: grid },
+        tile: { value: tile },
+        viewRight: { value: new Vector3() },
+        viewUp: { value: new Vector3() },
+        halfExtent: { value: new Vector2(1, 1) },
       },
     });
     // One triangle that covers the whole canvas.
@@ -192,80 +160,128 @@ export const ImpostorViewer = ({ atlasUrl, grid, tile, blend = "fade", className
     scene.add(quad);
     const camera = new Camera();
 
-    const view = { yaw: 0.6, pitch: 0.35, zoom: 1, spinning: !window.matchMedia("(prefers-reduced-motion: reduce)").matches };
+    let disposed = false;
     let frame = 0;
-    let ready = false;
-    // The view being faded out (a) and in (b), as grid cells, and when the fade started.
-    let cellA: [number, number] | null = null;
-    let cellB: [number, number] | null = null;
+    // Views on screen: B is the current one, A the one fading out (indices into frames).
+    let shownA = -1;
+    let shownB = -1;
     let fadeStart = 0;
 
-    const draw = () => {
+    const requestDraw = () => {
+      if (!frame && !disposed) frame = requestAnimationFrame(draw);
+    };
+    redrawRef.current = requestDraw;
+
+    // ---- decoded views: a small most-recently-used cache, filled around the current angle
+    const decoded = new Map<number, ImageBitmap>();
+    const pending = new Set<number>();
+    const indexOf = (i: number, j: number) => j * grid + i;
+    const touch = (index: number) => {
+      const bitmap = decoded.get(index);
+      if (!bitmap) return;
+      decoded.delete(index);
+      decoded.set(index, bitmap);
+    };
+    const evict = () => {
+      for (const [index, bitmap] of decoded) {
+        if (decoded.size <= CACHE_SIZE) break;
+        if (index === shownA || index === shownB) continue;
+        decoded.delete(index);
+        bitmap.close();
+      }
+    };
+    const decode = (index: number) => {
+      if (decoded.has(index)) return touch(index);
+      if (pending.has(index)) return;
+      pending.add(index);
+      createImageBitmap(frames[index], { premultiplyAlpha: "premultiply", colorSpaceConversion: "none" })
+        .then((bitmap) => {
+          pending.delete(index);
+          if (disposed) return bitmap.close();
+          decoded.set(index, bitmap);
+          evict();
+          requestDraw();
+        })
+        .catch(() => pending.delete(index));
+    };
+    const prefetchAround = (i: number, j: number) => {
+      decode(indexOf(i, j));
+      for (let dj = -PREFETCH_RADIUS; dj <= PREFETCH_RADIUS; dj++) {
+        for (let di = -PREFETCH_RADIUS; di <= PREFETCH_RADIUS; di++) {
+          const ni = i + di;
+          const nj = j + dj;
+          if (ni >= 0 && nj >= 0 && ni < grid && nj < grid) decode(indexOf(ni, nj));
+        }
+      }
+    };
+
+    const view = {
+      yaw: 0.6,
+      pitch: 0.35,
+      zoom: 1,
+      spinning: !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+    };
+
+    const upload = (texture: Texture, index: number) => {
+      texture.image = decoded.get(index)!;
+      texture.needsUpdate = true;
+    };
+
+    function draw() {
       frame = 0;
-      if (!ready) return;
       if (view.spinning) view.yaw += 0.006;
       const direction = orbitDirection(view.yaw, view.pitch);
       const { right, up } = frameBasis(direction);
-      const { width, height } = host.getBoundingClientRect();
-      const aspect = width / Math.max(height, 1);
-      const extent = 1.04 / view.zoom;
-      material.uniforms.viewDir.value.set(...direction);
-      material.uniforms.viewRight.value.set(...right);
-      material.uniforms.viewUp.value.set(...up);
-      material.uniforms.halfExtent.value.set(extent * Math.max(aspect, 1), extent * Math.max(1 / aspect, 1));
-      const mode = blendRef.current;
-      let fading = false;
-      if (mode === "fade") {
-        const [u, v] = encodeDirection(direction);
-        const nearest: [number, number] = [Math.round(u * (grid - 1)), Math.round(v * (grid - 1))];
-        if (!cellB) {
-          cellA = cellB = nearest;
-        } else if (nearest[0] !== cellB[0] || nearest[1] !== cellB[1]) {
-          cellA = cellB;
-          cellB = nearest;
-          fadeStart = performance.now();
-        }
-        const fade = cellA === cellB ? 1 : Math.min(1, (performance.now() - fadeStart) / FADE_MS);
-        fading = fade < 1;
-        material.uniforms.mode.value = 1;
-        material.uniforms.cellA.value.set(...(cellA ?? nearest));
-        material.uniforms.cellB.value.set(...nearest);
-        material.uniforms.fade.value = fade;
-      } else {
-        material.uniforms.mode.value = 0;
-        material.uniforms.sharpness.value = SHARPNESS[mode];
+
+      const [u, v] = encodeDirection(direction);
+      const ci = Math.round(u * (grid - 1));
+      const cj = Math.round(v * (grid - 1));
+      const nearest = indexOf(ci, cj);
+      prefetchAround(ci, cj);
+
+      // Show the nearest view once it is decoded; until then keep what is on screen.
+      if (nearest !== shownB && decoded.has(nearest)) {
+        shownA = shownB < 0 ? nearest : shownB;
+        upload(textureA, shownA);
+        shownB = nearest;
+        upload(textureB, nearest);
+        fadeStart = performance.now();
       }
-      renderer.render(scene, camera);
+
+      let fading = false;
+      if (shownB >= 0) {
+        const fade =
+          blendRef.current === "snap" || shownA === shownB ? 1 : Math.min(1, (performance.now() - fadeStart) / FADE_MS);
+        fading = fade < 1;
+        material.uniforms.fade.value = fade;
+        material.uniforms.cellA.value.set(shownA % grid, Math.floor(shownA / grid));
+        material.uniforms.cellB.value.set(shownB % grid, Math.floor(shownB / grid));
+
+        const { width, height } = host!.getBoundingClientRect();
+        const aspect = width / Math.max(height, 1);
+        const extent = 1.04 / view.zoom;
+        material.uniforms.viewRight.value.set(...right);
+        material.uniforms.viewUp.value.set(...up);
+        material.uniforms.halfExtent.value.set(extent * Math.max(aspect, 1), extent * Math.max(1 / aspect, 1));
+        renderer.render(scene, camera);
+      }
       if (view.spinning || fading) frame = requestAnimationFrame(draw);
-    };
-    const requestDraw = () => {
-      if (!frame) frame = requestAnimationFrame(draw);
-    };
+    }
 
     const resize = () => {
       const { width, height } = host.getBoundingClientRect();
       renderer.setSize(Math.max(width, 1), Math.max(height, 1), false);
       requestDraw();
     };
-    redrawRef.current = requestDraw;
     const observer = new ResizeObserver(resize);
     observer.observe(host);
-
-    const image = new Image();
-    image.onload = () => {
-      texture.image = image;
-      texture.needsUpdate = true;
-      ready = true;
-      resize();
-    };
-    image.src = atlasUrl;
 
     // Drag to turn, two fingers or the wheel to zoom.
     const pointers = new Map<number, { x: number; y: number }>();
     let pinch = 0;
     const onDown = (event: PointerEvent) => {
       view.spinning = false;
-      renderer.domElement.setPointerCapture(event.pointerId);
+      canvas.setPointerCapture(event.pointerId);
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     };
     const onMove = (event: PointerEvent) => {
@@ -294,7 +310,6 @@ export const ImpostorViewer = ({ atlasUrl, grid, tile, blend = "fade", className
       view.zoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, view.zoom * Math.exp(-event.deltaY * 0.0015)));
       requestDraw();
     };
-    const canvas = renderer.domElement;
     canvas.addEventListener("pointerdown", onDown);
     canvas.addEventListener("pointermove", onMove);
     canvas.addEventListener("pointerup", onUp);
@@ -302,6 +317,7 @@ export const ImpostorViewer = ({ atlasUrl, grid, tile, blend = "fade", className
     canvas.addEventListener("wheel", onWheel, { passive: false });
 
     return () => {
+      disposed = true;
       cancelAnimationFrame(frame);
       observer.disconnect();
       canvas.removeEventListener("pointerdown", onDown);
@@ -309,13 +325,16 @@ export const ImpostorViewer = ({ atlasUrl, grid, tile, blend = "fade", className
       canvas.removeEventListener("pointerup", onUp);
       canvas.removeEventListener("pointercancel", onUp);
       canvas.removeEventListener("wheel", onWheel);
+      for (const bitmap of decoded.values()) bitmap.close();
+      decoded.clear();
       geometry.dispose();
       material.dispose();
-      texture.dispose();
+      textureA.dispose();
+      textureB.dispose();
       renderer.dispose();
       canvas.remove();
     };
-  }, [atlasUrl, grid, tile]);
+  }, [frames, grid, tile]);
 
   return (
     <div

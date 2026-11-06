@@ -20,18 +20,27 @@ import { frameBasis, frameDirection, type Vec3 } from "./impostorMath";
 export interface BakeOptions {
   /** Frames per side of the hemi-octahedral grid (N × N views). */
   grid: number;
-  /** Pixels per frame. grid × tile must stay ≤ 4096 for phones. */
+  /** Pixels per frame (square). */
   tile: number;
+  /** Called after each view with how many are done. */
+  onProgress?: (done: number, total: number) => void;
 }
 
 export interface BakedImpostor {
-  /** The atlas as WebP: what a paid model's page would download instead of a mesh. */
-  blob: Blob;
-  url: string;
+  /**
+   * One WebP per view, in grid order (row j, column i → index j × grid + i): what a paid
+   * model's page would download instead of a mesh. Separate pictures so the viewer only has to
+   * decode the few near the current angle.
+   */
+  frames: Blob[];
+  bytes: number;
   grid: number;
   tile: number;
   bakeMs: number;
 }
+
+/** WebP quality per view: high, since the views are the whole preview; 0.85 keeps 400 views of a detailed model under ~10 MB. */
+const QUALITY = 0.85;
 
 /** At most this many vertices are used to measure the model's outline (plenty for framing). */
 const FRAMING_SAMPLES = 60_000;
@@ -71,15 +80,13 @@ function framingHalfSize(model: Object3D, center: Vector3, grid: number): number
 }
 
 /**
- * Renders the model from grid × grid directions over the upper hemisphere into one atlas image.
+ * Renders the model from grid × grid directions over the upper hemisphere, one WebP per view.
  * Colour only: no depth or normal maps, which would make rebuilding the mesh much easier.
  * Lit like today's viewer (near-white material, neutral studio light plus a key light, neutral
  * tone mapping).
  */
-export async function bakeImpostor(model: Object3D, { grid, tile }: BakeOptions): Promise<BakedImpostor> {
+export async function bakeImpostor(model: Object3D, { grid, tile, onProgress }: BakeOptions): Promise<BakedImpostor> {
   const started = performance.now();
-  const size = grid * tile;
-  if (size > 4096) throw new Error("The atlas would be larger than 4096 px; use fewer or smaller frames.");
 
   const material = new MeshStandardMaterial({ color: "#f2f2f4", roughness: 0.6, metalness: 0 });
   model.traverse((node) => {
@@ -113,11 +120,16 @@ export async function bakeImpostor(model: Object3D, { grid, tile }: BakeOptions)
   key.target.position.copy(center);
   scene.add(key, key.target);
 
-  const atlas = document.createElement("canvas");
-  atlas.width = size;
-  atlas.height = size;
-  const context = atlas.getContext("2d");
-  if (!context) throw new Error("Canvas 2D is not available.");
+  const frames: Blob[] = [];
+  const total = grid * grid;
+  const encode = () =>
+    new Promise<Blob>((resolve, reject) =>
+      renderer.domElement.toBlob(
+        (result) => (result ? resolve(result) : reject(new Error("Encoding a view failed."))),
+        "image/webp",
+        QUALITY,
+      ),
+    );
 
   try {
     for (let j = 0; j < grid; j++) {
@@ -128,10 +140,9 @@ export async function bakeImpostor(model: Object3D, { grid, tile }: BakeOptions)
         camera.up.set(...up);
         camera.lookAt(center);
         renderer.render(scene, camera);
-        context.drawImage(renderer.domElement, i * tile, j * tile);
+        frames.push(await encode());
+        onProgress?.(frames.length, total);
       }
-      // Let the page breathe between rows so the progress can paint.
-      await new Promise((resolve) => setTimeout(resolve, 0));
     }
   } finally {
     environment.dispose();
@@ -140,9 +151,6 @@ export async function bakeImpostor(model: Object3D, { grid, tile }: BakeOptions)
     material.dispose();
   }
 
-  const blob = await new Promise<Blob>((resolve, reject) =>
-    atlas.toBlob((result) => (result ? resolve(result) : reject(new Error("Encoding failed."))), "image/webp", 0.86),
-  );
-
-  return { blob, url: URL.createObjectURL(blob), grid, tile, bakeMs: performance.now() - started };
+  const bytes = frames.reduce((sum, frame) => sum + frame.size, 0);
+  return { frames, bytes, grid, tile, bakeMs: performance.now() - started };
 }
