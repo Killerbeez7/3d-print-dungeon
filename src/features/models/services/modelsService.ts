@@ -128,7 +128,7 @@ export async function createAdvancedModel({
     let sourceTriangles: number | null = null;
 
     // Loaded here so the mesh tools only download when someone uploads.
-    const [{ fileToTriangles }, { makeLightPreview }] = await Promise.all([
+    const [{ fileToTriangles }, { makeLightPreview, PREVIEW_VERSION }] = await Promise.all([
         import("@/features/models/utils/converter"),
         import("@/features/models/utils/lightPreview"),
     ]);
@@ -239,7 +239,7 @@ export async function createAdvancedModel({
         convertedFileUrl,
         previewTriangles,
         sourceTriangles,
-        previewVersion: triangles ? 1 : null,
+        previewVersion: triangles ? PREVIEW_VERSION : null,
         renderPrimaryUrl,
         renderExtraUrls,
         posterUrl,

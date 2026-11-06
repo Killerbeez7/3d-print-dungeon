@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { hash32, scrambleOffset, scramblePositions } from "@/features/lab/mesh/scramble";
+import { hash32, scrambleOffset, scramblePositions } from "@/features/models/preview3d/scramble";
 
 describe("scrambled mesh", () => {
   it("hashes exactly like 32-bit unsigned arithmetic (what the GLSL version does)", () => {

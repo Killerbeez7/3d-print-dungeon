@@ -11,10 +11,10 @@ import { db } from "@/config/firebaseConfig";
 import { finalConvertFileToGLB } from "@/features/models/utils/converter";
 import { bakeImpostor, type BakedImpostor } from "../impostor/bakeImpostor";
 import { ImpostorViewer, type ImpostorBlend } from "../impostor/ImpostorViewer";
-import { MeshPreview } from "../mesh/MeshPreview";
+import { MeshPreview } from "@/features/models/preview3d/MeshPreview";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { encodeRipTest, publishRipTest } from "../mesh/ripTest";
-import { scrambleGeometry } from "../mesh/scramble";
+import { scrambleGeometry } from "@/features/models/preview3d/scramble";
 import { loadSoup, makeLabMesh, soupTriangles, type LabMesh } from "../mesh/sourceMesh";
 
 type Method = "fewer" | "scrambled" | "sharp" | "impostor";

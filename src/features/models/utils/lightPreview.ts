@@ -1,19 +1,47 @@
 import { MeshoptSimplifier } from "meshoptimizer/simplifier";
 
+import { scramblePositions } from "../preview3d/scramble";
+
 /**
  * Light previews: the public 3D viewer gets a reduced copy of the model, never
  * the printable original. Used by the upload page and by
  * scripts/make-light-previews.ts, so it depends on nothing but meshoptimizer.
  */
 
-/** Triangles kept in the public preview. */
-export const PREVIEW_TRIANGLES = 100_000;
+/**
+ * Triangles kept in the public preview. The preview is scrambled (see preview3d/scramble.ts),
+ * so a saved copy is a shapeless cloud; it can carry more detail than an open copy could.
+ */
+export const PREVIEW_TRIANGLES = 250_000;
+
+/**
+ * Stored on each listing (previewVersion). 1: plain light preview; 2: scrambled light preview.
+ * scripts/make-light-previews.ts redoes listings below this.
+ */
+export const PREVIEW_VERSION = 2;
+
+/** Stored in the GLB (meshes[0].extras.pd) so the viewer can undo the scramble. */
+export interface PreviewScramble {
+    key: number;
+    amount: number;
+    /** Radius of the real (centred) model, for framing; the file's own bounds are the cloud's. */
+    radius: number;
+}
 
 export interface LightPreview {
     glb: ArrayBuffer;
     triangles: number;
     sourceTriangles: number;
+    scramble: PreviewScramble | null;
 }
+
+export interface LightPreviewOptions {
+    /** Move every vertex by a keyed offset that only the site's viewer undoes. Default true. */
+    scramble?: boolean;
+}
+
+/** Share of the model's radius each vertex can move: enough to scatter it into a cloud. */
+const SCRAMBLE_AMOUNT = 0.9;
 
 /**
  * Builds the preview GLB from a triangle soup (three floats per vertex, three
@@ -21,7 +49,8 @@ export interface LightPreview {
  */
 export async function makeLightPreview(
     soup: Float32Array,
-    targetTriangles = PREVIEW_TRIANGLES
+    targetTriangles = PREVIEW_TRIANGLES,
+    { scramble: shouldScramble = true }: LightPreviewOptions = {}
 ): Promise<LightPreview> {
     await MeshoptSimplifier.ready;
 
@@ -49,11 +78,29 @@ export async function makeLightPreview(
     centerPositions(positions);
     const mesh = creasedNormals(positions, simplified);
 
+    let scramble: PreviewScramble | null = null;
+    if (shouldScramble) {
+        const radius = boundingRadius(mesh.positions);
+        const key = crypto.getRandomValues(new Uint32Array(1))[0];
+        scramble = { key, amount: radius * SCRAMBLE_AMOUNT, radius };
+        scramblePositions(mesh.positions, key, scramble.amount);
+    }
+
     return {
-        glb: writeGlb(mesh.positions, mesh.normals, mesh.indices),
+        glb: writeGlb(mesh.positions, mesh.normals, mesh.indices, scramble),
         triangles: simplified.length / 3,
         sourceTriangles,
+        scramble,
     };
+}
+
+/** Largest distance of a vertex from the origin (positions are centred). */
+function boundingRadius(positions: Float32Array): number {
+    let max = 0;
+    for (let i = 0; i < positions.length; i += 3) {
+        max = Math.max(max, Math.hypot(positions[i], positions[i + 1], positions[i + 2]));
+    }
+    return max || 1;
 }
 
 /** Rewrites indices to only the vertices they use and returns those positions. */
@@ -181,7 +228,12 @@ function creasedNormals(
 }
 
 /** Minimal binary glTF: one mesh with positions, normals and indices. */
-function writeGlb(positions: Float32Array, normals: Float32Array, indices: Uint32Array): ArrayBuffer {
+function writeGlb(
+    positions: Float32Array,
+    normals: Float32Array,
+    indices: Uint32Array,
+    scramble: PreviewScramble | null
+): ArrayBuffer {
     const min = [Infinity, Infinity, Infinity];
     const max = [-Infinity, -Infinity, -Infinity];
     for (let i = 0; i < positions.length; i += 3) {
@@ -202,7 +254,12 @@ function writeGlb(positions: Float32Array, normals: Float32Array, indices: Uint3
         scene: 0,
         scenes: [{ nodes: [0] }],
         nodes: [{ mesh: 0 }],
-        meshes: [{ primitives: [{ attributes: { POSITION: 0, NORMAL: 1 }, indices: 2, material: 0 }] }],
+        meshes: [
+            {
+                primitives: [{ attributes: { POSITION: 0, NORMAL: 1 }, indices: 2, material: 0 }],
+                ...(scramble ? { extras: { pd: [scramble.key, scramble.amount, scramble.radius] } } : {}),
+            },
+        ],
         materials: [
             {
                 pbrMetallicRoughness: {

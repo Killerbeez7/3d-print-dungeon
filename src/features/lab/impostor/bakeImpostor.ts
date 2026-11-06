@@ -10,7 +10,7 @@ import {
   type Object3D,
 } from "three";
 
-import { setUpStudio, studioMaterial } from "../mesh/studio";
+import { setUpStudio, studioMaterial } from "@/features/models/preview3d/studio";
 
 import { frameBasis, frameDirection, type Vec3 } from "./impostorMath";
 

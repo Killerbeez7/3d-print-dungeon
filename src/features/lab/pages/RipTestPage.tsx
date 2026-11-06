@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import { Sphere, Vector3, type BufferGeometry, type Mesh } from "three";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
-import { MeshPreview } from "../mesh/MeshPreview";
+import { MeshPreview } from "@/features/models/preview3d/MeshPreview";
 import { decodeRipTest, ripTestUrl } from "../mesh/ripTest";
 
 /**

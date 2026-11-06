@@ -1,6 +1,7 @@
-// One-time job: give existing listings a light 3D preview (see
-// src/features/models/utils/lightPreview.ts) and delete their full-detail
-// viewer files, which anyone could convert back into a printable model.
+// Job: give existing listings the current light 3D preview (see
+// src/features/models/utils/lightPreview.ts: scrambled since version 2) and
+// delete their old viewer files, which anyone could convert back into a
+// printable model.
 //
 // Run functions/scripts/protect-original-files.js first, then from the repo
 // root, with a service account key (never commit it):
@@ -8,7 +9,8 @@
 //   GOOGLE_APPLICATION_CREDENTIALS=src/keys/service_key.json npx tsx scripts/make-light-previews.ts
 //
 // That is a dry run: it only prints what it would do. Add --apply to do it.
-// Safe to run again; listings that already have a preview are skipped.
+// Safe to run again; listings that already have the current preview version
+// are skipped.
 
 import { randomUUID } from "node:crypto";
 import process from "node:process";
@@ -18,7 +20,7 @@ import { getStorage, getDownloadURL } from "firebase-admin/storage";
 
 import { originalPathOf, pathFromDownloadUrl } from "../functions/src/shared/storagePaths.js";
 import { fileToTriangles } from "../src/features/models/utils/converter";
-import { makeLightPreview } from "../src/features/models/utils/lightPreview";
+import { makeLightPreview, PREVIEW_VERSION } from "../src/features/models/utils/lightPreview";
 
 const apply = process.argv.includes("--apply");
 
@@ -49,7 +51,7 @@ const main = async () => {
 
     for (const doc of models) {
         const data = doc.data();
-        if (data.previewVersion >= 1) continue;
+        if (data.previewVersion >= PREVIEW_VERSION) continue;
 
         const label = `${doc.id} "${data.name ?? ""}"`;
         const originalPath = originalPathOf(data);
@@ -65,7 +67,7 @@ const main = async () => {
         if (cached !== undefined) {
             if (cached === null) {
                 console.log(`CLEAR ${label}: same file as an earlier listing; viewer link removed`);
-                if (apply) await doc.ref.update({ convertedFileUrl: "", previewVersion: 1 });
+                if (apply) await doc.ref.update({ convertedFileUrl: "", previewVersion: PREVIEW_VERSION });
                 cleared += 1;
             } else {
                 console.log(`REUSE ${label}: preview of an earlier listing with the same file`);
@@ -74,7 +76,7 @@ const main = async () => {
                         convertedFileUrl: cached.url,
                         previewTriangles: cached.triangles,
                         sourceTriangles: cached.sourceTriangles,
-                        previewVersion: 1,
+                        previewVersion: PREVIEW_VERSION,
                     });
                 }
                 reused += 1;
@@ -93,7 +95,7 @@ const main = async () => {
             // original itself. Images only from now on.
             console.log(`CLEAR ${label}: ${fileName} has no 3D preview; viewer link removed`);
             if (apply) {
-                await doc.ref.update({ convertedFileUrl: "", previewVersion: 1 });
+                await doc.ref.update({ convertedFileUrl: "", previewVersion: PREVIEW_VERSION });
             }
             viewerAfter.set(doc.id, "");
             previewByOriginal.set(cacheKey, null);
@@ -121,7 +123,7 @@ const main = async () => {
                 convertedFileUrl: url,
                 previewTriangles: preview.triangles,
                 sourceTriangles: preview.sourceTriangles,
-                previewVersion: 1,
+                previewVersion: PREVIEW_VERSION,
             });
             viewerAfter.set(doc.id, url);
             previewByOriginal.set(cacheKey, { url, triangles: preview.triangles, sourceTriangles: preview.sourceTriangles });

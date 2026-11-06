@@ -38,7 +38,8 @@ export interface LabMesh {
  * creased normals and centred: the same code that makes today's light previews.
  */
 export async function makeLabMesh(soup: Float32Array, targetTriangles: number): Promise<LabMesh> {
-  const preview = await makeLightPreview(soup, targetTriangles);
+  // Plain: the lab scrambles separately, to compare the methods.
+  const preview = await makeLightPreview(soup, targetTriangles, { scramble: false });
   const gltf = await new GLTFLoader().parseAsync(preview.glb, "");
   let geometry: BufferGeometry | null = null;
   gltf.scene.traverse((node) => {
