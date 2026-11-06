@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { lazy, Suspense, useCallback, useState, useRef, useEffect } from "react";
 import { fullscreenConfig } from "@/config/fullscreenConfig";
 // import { LazyImage } from "@/features/shared/reusable/LazyImage";
 import { useModelLoader } from "@/features/models/hooks/useModelLoader";
@@ -11,8 +11,11 @@ import { getContainerClasses } from "@/features/models/utils/getContainerClasses
 import { getResponsiveThumbnails } from "@/utils/imageUtils";
 import { getDeviceType } from "@/features/models/utils/getDeviceType";
 //types
-import type { ModelViewerElement } from "@google/model-viewer";
 import type { ModelViewerProps } from "@/features/models/types/modelViewer";
+import type { MeshPreviewHandle } from "@/features/models/preview3d/MeshPreview";
+
+// three.js and the viewer load only when someone reaches for the 3D view (see ModelPage).
+const PreviewMeshViewer = lazy(() => import("@/features/models/preview3d/PreviewMeshViewer"));
 
 // device detection
 const { isIOS, isMobile } = getDeviceType();
@@ -23,7 +26,6 @@ export const ModelViewer = ({
     model,
     selectedRenderIndex,
     setSelectedRenderIndex,
-    threeImported = false,
 }: ModelViewerProps) => {
     //Menu State
     const [autoRotate, setAutoRotate] = useState<boolean>(true);
@@ -41,7 +43,7 @@ export const ModelViewer = ({
     //Refs
     const containerRef = useRef<HTMLDivElement | null>(null);
     const autoHideTimerRef = useRef<NodeJS.Timeout | null>(null);
-    const modelViewerRef = useRef<ModelViewerElement | null>(null);
+    const viewerHandleRef = useRef<MeshPreviewHandle | null>(null);
 
     //Model URLs
     const modelUrl = model.convertedFileUrl || "";
@@ -121,27 +123,21 @@ export const ModelViewer = ({
         setIsHovering(false);
     };
     const toggleRotation = () => {
-        const viewer = modelViewerRef.current;
-        if (viewer) {
-            setAutoRotate((prev) => !prev);
-        }
+        setAutoRotate((prev) => !prev);
     };
     const toggleMenu = () => {
         setControlsVisible((prev) => !prev);
     };
     const resetView = () => {
-        const mainViewer = modelViewerRef.current;
-        if (mainViewer) {
-            mainViewer.cameraOrbit = "0deg 75deg 105%";
-            mainViewer.fieldOfView = "50deg";
-        }
+        viewerHandleRef.current?.resetView();
     };
     const takeScreenshot = () => {
-        const viewer = modelViewerRef.current;
+        const viewer = viewerHandleRef.current;
         if (!viewer) return;
 
         try {
-            viewer.toBlob({ idealAspect: true, mimeType: "image/png" }).then((blob) => {
+            viewer.screenshot().then((blob) => {
+                if (!blob) return;
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement("a");
                 a.href = url;
@@ -319,26 +315,8 @@ export const ModelViewer = ({
     };
 
     // Ready once the viewer has drawn the model, not just when the file arrived.
-    useEffect(() => {
-        const viewer = modelViewerRef.current;
-        if (!threeImported || !isLoadButtonClicked || !viewer || !modelBlobUrl) return;
-
-        if ((viewer as ModelViewerElement & { loaded?: boolean }).loaded) setViewerReady(true);
-        const onLoad = () => setViewerReady(true);
-        // Fires as soon as the model is on screen, a moment before "load".
-        const onVisibility = (event: Event) => {
-            if ((event as CustomEvent<{ visible?: boolean }>).detail?.visible) setViewerReady(true);
-        };
-        const onError = () => setViewerFailed(true);
-        viewer.addEventListener("load", onLoad);
-        viewer.addEventListener("model-visibility", onVisibility);
-        viewer.addEventListener("error", onError);
-        return () => {
-            viewer.removeEventListener("load", onLoad);
-            viewer.removeEventListener("model-visibility", onVisibility);
-            viewer.removeEventListener("error", onError);
-        };
-    }, [threeImported, isLoadButtonClicked, modelBlobUrl]);
+    const handleViewerReady = useCallback(() => setViewerReady(true), []);
+    const handleViewerError = useCallback(() => setViewerFailed(true), []);
 
     const loadPhase: ViewerLoadPhase =
         viewerFailed || modelGlobalStatus === "error"
@@ -371,20 +349,19 @@ export const ModelViewer = ({
                     </>
                 ) : (
                     <>
-                        {/* @ts-expect-error - model-viewer is not a valid HTML element */}
-                        <model-viewer
-                            ref={modelViewerRef}
-                            poster={posterUrl}
-                            src={modelBlobUrl ?? ""}
-                            alt="3D Model"
-                            camera-controls
-                            interaction-prompt="none"
-                            crossOrigin="anonymous"
-                            environment-image="neutral"
-                            auto-rotate={autoRotate}
-                            className="w-full h-full"
-                            style={{ borderRadius: "0.5rem" }}
-                        />
+                        {modelBlobUrl && (
+                            <Suspense fallback={null}>
+                                {/* The preview is scrambled; this viewer unscrambles it on screen. */}
+                                <PreviewMeshViewer
+                                    src={modelBlobUrl}
+                                    autoRotate={autoRotate}
+                                    handleRef={viewerHandleRef}
+                                    onReady={handleViewerReady}
+                                    onError={handleViewerError}
+                                    className="absolute inset-0 h-full w-full rounded-lg"
+                                />
+                            </Suspense>
+                        )}
 
                         <LoadingOverlay
                             phase={loadPhase}

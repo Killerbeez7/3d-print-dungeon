@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MutableRefObject } from "react";
 import {
   Mesh,
   PerspectiveCamera,
@@ -14,6 +14,12 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 
 import { unscrambleInShader } from "./scramble";
 import { setUpStudio, studioMaterial } from "./studio";
+
+export interface MeshPreviewHandle {
+  resetView: () => void;
+  /** A PNG of exactly what is on screen. */
+  screenshot: () => Promise<Blob | null>;
+}
 
 interface MeshPreviewProps {
   /** The mesh the browser receives (scrambled, if `scramble` is set). */
@@ -35,6 +41,10 @@ interface MeshPreviewProps {
   asPoints?: boolean;
   /** Show every triangle (flat shading): the geometry as a slicer and printer would get it. */
   flat?: boolean;
+  /** Filled with actions for outside controls (reset the view, save a screenshot). */
+  handleRef?: MutableRefObject<MeshPreviewHandle | null>;
+  /** Called once the model has been drawn. */
+  onReady?: () => void;
   className?: string;
   label: string;
 }
@@ -49,11 +59,23 @@ export const MeshPreview = ({
   autoRotate = true,
   asPoints = false,
   flat = false,
+  handleRef,
+  onReady,
   className = "",
   label,
 }: MeshPreviewProps) => {
   const hostRef = useRef<HTMLDivElement>(null);
   const [sharpShown, setSharpShown] = useState(false);
+  // Turning auto-rotate on or off doesn't rebuild the scene.
+  const autoRotateRef = useRef(autoRotate);
+  const setAutoRotateRef = useRef<(on: boolean) => void>(() => {});
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
+
+  useEffect(() => {
+    autoRotateRef.current = autoRotate;
+    setAutoRotateRef.current(autoRotate);
+  }, [autoRotate]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -93,7 +115,9 @@ export const MeshPreview = ({
     controls.enablePan = false;
     controls.minDistance = distance * 0.35;
     controls.maxDistance = distance * 2;
-    controls.autoRotate = autoRotate && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    controls.autoRotate = autoRotateRef.current && !reducedMotion;
+    const home = camera.position.clone();
     controls.autoRotateSpeed = 1.5;
 
     // ---- sharp still (a second canvas on top, shown only while nothing moves)
@@ -132,10 +156,17 @@ export const MeshPreview = ({
     let frame = 0;
     let settleFrames = 0;
     let needsRender = true;
+    let drawn = false;
     const loop = () => {
       frame = 0;
       const changed = controls.update();
-      if (changed || needsRender) renderer.render(scene, camera);
+      if (changed || needsRender) {
+        renderer.render(scene, camera);
+        if (!drawn) {
+          drawn = true;
+          onReadyRef.current?.();
+        }
+      }
       needsRender = false;
       if (changed || controls.autoRotate) {
         settleFrames = 0;
@@ -188,7 +219,29 @@ export const MeshPreview = ({
     observer.observe(host);
     resize();
 
+    setAutoRotateRef.current = (on) => {
+      controls.autoRotate = on && !reducedMotion;
+      wake();
+    };
+    if (handleRef) {
+      handleRef.current = {
+        resetView: () => {
+          camera.position.copy(home);
+          controls.target.copy(center);
+          controls.update();
+          wake();
+        },
+        screenshot: () => {
+          // Draw now, so the buffer holds the picture when it is read.
+          renderer.render(scene, camera);
+          return new Promise((resolve) => renderer.domElement.toBlob(resolve, "image/png"));
+        },
+      };
+    }
+
     return () => {
+      setAutoRotateRef.current = () => {};
+      if (handleRef) handleRef.current = null;
       cancelAnimationFrame(frame);
       window.clearTimeout(sharpTimer);
       observer.disconnect();
@@ -206,7 +259,7 @@ export const MeshPreview = ({
         sharp.renderer.domElement.remove();
       }
     };
-  }, [geometry, bounds, scramble, sharpGeometry, sharpDelayMs, autoRotate, asPoints, flat]);
+  }, [geometry, bounds, scramble, sharpGeometry, sharpDelayMs, asPoints, flat, handleRef]);
 
   return (
     <div ref={hostRef} className={`relative overflow-hidden ${className}`} role="img" aria-label={label}>

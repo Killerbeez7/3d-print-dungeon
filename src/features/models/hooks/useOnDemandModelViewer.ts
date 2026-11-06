@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 
-// Global state to ensure Three.js model-viewer library is only loaded once
+// Global state to ensure the 3D viewer (three.js and the preview viewer) is only loaded once
 let threeJsImported = false;
 let importPromise: Promise<void> | null = null;
 
@@ -24,12 +24,12 @@ export function useThreeJsImporter() {
 
         // Create import promise only once
         if (!importPromise) {
-            importPromise = import("@google/model-viewer").then(() => {
+            importPromise = import("@/features/models/preview3d/PreviewMeshViewer").then(() => {
                 threeJsImported = true;
                 setThreeImported(true);
                 setImporting(false);
             }).catch((error) => {
-                console.error("Failed to import Three.js model-viewer library:", error);
+                console.error("Failed to load the 3D viewer:", error);
                 setImporting(false);
                 throw error;
             });
