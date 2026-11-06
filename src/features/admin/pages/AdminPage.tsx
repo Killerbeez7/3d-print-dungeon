@@ -1,7 +1,7 @@
 import { lazy, Suspense } from "react";
 import { Navigate, NavLink, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Box, Flag, LayoutDashboard, Settings, Users, Wrench } from "lucide-react";
+import { Box, Flag, LayoutDashboard, NotebookPen, Settings, Users, Wrench } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 import { useAuth } from "@/features/auth/hooks/useAuth";
@@ -24,6 +24,9 @@ const SiteSettings = lazy(() =>
 );
 const MaintenanceSettings = lazy(() =>
   import("../components/MaintenanceSettings").then((m) => ({ default: m.MaintenanceSettings }))
+);
+const DevlogManager = lazy(() =>
+  import("../components/DevlogManager").then((m) => ({ default: m.DevlogManager }))
 );
 const Scripts = lazy(() => import("../components/Scripts").then((m) => ({ default: m.Scripts })));
 
@@ -85,6 +88,22 @@ const SECTIONS: Section[] = [
             <MaintenanceSettings />
           </Panel>
         </div>
+      </>
+    ),
+  },
+  {
+    id: "devlog",
+    label: "Dev log",
+    icon: NotebookPen,
+    render: () => (
+      <>
+        <AdminSectionHeader
+          title="Dev log"
+          description="Posts shown in the Dev log tab of the coming-soon page. Anyone can read them."
+        />
+        <Panel>
+          <DevlogManager />
+        </Panel>
       </>
     ),
   },

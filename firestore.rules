@@ -244,6 +244,22 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // -------------- Dev log (coming-soon page) --------------
+    // Public posts about how the site is being built; only admins write them.
+    match /devlog/{postId} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(["title", "body", "createdAt", "updatedAt"])
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.body is string
+        && request.resource.data.body.size() <= 5000
+        && request.resource.data.createdAt is timestamp
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if isAdmin();
+    }
+
     // -------------- Reports --------------
     match /reports/{reportId} {
       allow read: if isAdmin();
