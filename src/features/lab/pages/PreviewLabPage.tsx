@@ -45,6 +45,8 @@ const METHODS: { id: Method; label: string; summary: string }[] = [
 
 const FEWER_TARGETS = [5_000, 10_000, 25_000, 50_000, 100_000];
 const ROUGH_TARGETS = [3_000, 6_000, 12_000];
+/** The scrambled file is a cloud to a ripper, so it can carry far more detail than today's preview. */
+const SCRAMBLED_TARGETS = [100_000, 250_000, 500_000, Number.MAX_SAFE_INTEGER];
 /** Today's light previews keep this many triangles. */
 const TODAY_TRIANGLES = 100_000;
 
@@ -461,7 +463,9 @@ const FewerMethod = ({ soup }: { soup: Float32Array }) => {
 };
 
 const ScrambledMethod = ({ soup }: { soup: Float32Array }) => {
-  const mesh = useLabMesh(soup, TODAY_TRIANGLES);
+  const total = soupTriangles(soup);
+  const [target, setTarget] = useState(250_000);
+  const mesh = useLabMesh(soup, Math.min(target, total));
   const scrambled = useMemo(() => {
     if (!mesh) return null;
     const bounds = boundsOf(mesh);
@@ -490,6 +494,19 @@ const ScrambledMethod = ({ soup }: { soup: Float32Array }) => {
           <div className="aspect-square w-full bg-page" />
         )}
       </Card>
+      <Choice
+        id="lab-scrambled"
+        label={`Detail (the model has ${thousands(total)} triangles)`}
+        value={target}
+        options={SCRAMBLED_TARGETS.map((value) => ({
+          value,
+          label:
+            value === Number.MAX_SAFE_INTEGER
+              ? `Full model (${thousands(total)})`
+              : `${thousands(value)}${value === TODAY_TRIANGLES ? " (today's preview)" : ""}${value >= total ? " = full model" : ""}`,
+        }))}
+        onChange={setTarget}
+      />
       <RipperCard
         verdict="a shapeless cloud"
         download={scrambled && mesh ? meshDownload(mesh, "scrambled.glb", scrambled.geometry) : null}
