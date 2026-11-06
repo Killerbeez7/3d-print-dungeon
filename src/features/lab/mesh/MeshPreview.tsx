@@ -33,6 +33,8 @@ interface MeshPreviewProps {
   autoRotate?: boolean;
   /** Draw only the vertices, as dots (for showing a scrambled file cheaply). */
   asPoints?: boolean;
+  /** Show every triangle (flat shading): the geometry as a slicer and printer would get it. */
+  flat?: boolean;
   className?: string;
   label: string;
 }
@@ -46,6 +48,7 @@ export const MeshPreview = ({
   sharpDelayMs = 350,
   autoRotate = true,
   asPoints = false,
+  flat = false,
   className = "",
   label,
 }: MeshPreviewProps) => {
@@ -72,7 +75,9 @@ export const MeshPreview = ({
     renderer.domElement.style.touchAction = "none";
     const scene = new Scene();
     const tearDownStudio = setUpStudio(renderer, scene, center, radius);
-    const material = asPoints ? new PointsMaterial({ color: "#c9c6d4", size: 1.5, sizeAttenuation: false }) : studioMaterial();
+    const material = asPoints
+      ? new PointsMaterial({ color: "#c9c6d4", size: 1.5, sizeAttenuation: false })
+      : Object.assign(studioMaterial(), { flatShading: flat });
     if (scramble) unscrambleInShader(material, scramble.key, scramble.amount);
     const mesh = asPoints ? new Points(geometry, material) : new Mesh(geometry, material);
     // A scrambled mesh's own bounds are far off; never cull it.
@@ -201,7 +206,7 @@ export const MeshPreview = ({
         sharp.renderer.domElement.remove();
       }
     };
-  }, [geometry, bounds, scramble, sharpGeometry, sharpDelayMs, autoRotate, asPoints]);
+  }, [geometry, bounds, scramble, sharpGeometry, sharpDelayMs, autoRotate, asPoints, flat]);
 
   return (
     <div ref={hostRef} className={`relative overflow-hidden ${className}`} role="img" aria-label={label}>

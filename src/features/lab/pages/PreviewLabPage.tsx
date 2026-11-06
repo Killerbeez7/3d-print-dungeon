@@ -1,6 +1,7 @@
 import { createElement, useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent, type ReactNode } from "react";
 import { collection, getDocs, limit, orderBy, query } from "firebase/firestore";
-import { Group, Sphere } from "three";
+import { Group, Mesh, Sphere, type BufferGeometry } from "three";
+import { GLTFExporter } from "three/examples/jsm/exporters/GLTFExporter.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 // Registers <model-viewer>; this page is its own lazy chunk.
 import "@google/model-viewer";
@@ -240,22 +241,25 @@ export const PreviewLabPage = () => {
             </Card>
           )}
 
-          <Card title="Today's viewer" note="the 3D mesh" stats={source.glbBytes !== null ? mb(source.glbBytes) : undefined}>
-            {/* <model-viewer> has no JSX type in this project, so it is created by name. */}
-            {createElement("model-viewer", {
-              key: source.glbUrl,
-              src: source.glbUrl,
-              alt: `${source.name}, today's 3D viewer`,
-              "camera-controls": true,
-              "auto-rotate": true,
-              "interaction-prompt": "none",
-              "environment-image": "neutral",
-              crossOrigin: "anonymous",
-              // Same "stand it up" turn as the other methods (roll, pitch, yaw).
-              orientation: standUp ? "0deg -90deg 0deg" : "0deg 0deg 0deg",
-              className: "block aspect-square h-auto w-full bg-page",
-            })}
-          </Card>
+          <div className="space-y-4">
+            <Card title="Today's viewer" note="the 3D mesh" stats={source.glbBytes !== null ? mb(source.glbBytes) : undefined}>
+              {/* <model-viewer> has no JSX type in this project, so it is created by name. */}
+              {createElement("model-viewer", {
+                key: source.glbUrl,
+                src: source.glbUrl,
+                alt: `${source.name}, today's 3D viewer`,
+                "camera-controls": true,
+                "auto-rotate": true,
+                "interaction-prompt": "none",
+                "environment-image": "neutral",
+                crossOrigin: "anonymous",
+                // Same "stand it up" turn as the other methods (roll, pitch, yaw).
+                orientation: standUp ? "0deg -90deg 0deg" : "0deg 0deg 0deg",
+                className: "block aspect-square h-auto w-full bg-page",
+              })}
+            </Card>
+            {soup && <TodayRipper soup={soup} />}
+          </div>
         </div>
       )}
     </div>
@@ -273,6 +277,81 @@ const Card = ({ title, note, stats, children }: { title: string; note?: string; 
     {children}
   </section>
 );
+
+/** Saves a file the way a ripper would have it, to open in a slicer or 3D program. */
+const saveFile = (blob: Blob, filename: string) => {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+
+/** The geometry exactly as the browser would receive it, as a GLB (opens in slicers). */
+const geometryToGlb = async (geometry: BufferGeometry): Promise<Blob> => {
+  const result = await new GLTFExporter().parseAsync(new Mesh(geometry), { binary: true });
+  return new Blob([result as ArrayBuffer], { type: "model/gltf-binary" });
+};
+
+interface RipperDownload {
+  label: string;
+  filename: string;
+  make: () => Promise<Blob>;
+}
+
+/** What someone who saves the downloaded preview gets, shown as it would print. */
+const RipperCard = ({
+  verdict,
+  note,
+  download,
+  children,
+}: {
+  verdict: string;
+  note: ReactNode;
+  download?: RipperDownload | null;
+  children: ReactNode;
+}) => {
+  const [saving, setSaving] = useState(false);
+  const save = async () => {
+    if (!download) return;
+    setSaving(true);
+    try {
+      saveFile(await download.make(), download.filename);
+    } finally {
+      setSaving(false);
+    }
+  };
+  return (
+    <section className="overflow-hidden rounded-xl border border-br-subtle bg-surface-card">
+      <header className="border-b border-br-subtle px-4 py-3">
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <h2 className="font-bold text-txt-primary">
+            What a ripper gets <span className="font-normal text-txt-muted">· {verdict}</span>
+          </h2>
+          {download && (
+            <Button variant="secondary" size="sm" onClick={save} isLoading={saving}>
+              {download.label}
+            </Button>
+          )}
+        </div>
+        <p className="mt-1 text-sm text-txt-secondary">{note}</p>
+      </header>
+      {children}
+    </section>
+  );
+};
+
+const meshDownload = (mesh: LabMesh | null, filename: string, geometry?: BufferGeometry): RipperDownload | null =>
+  mesh ? { label: "Download it", filename, make: () => geometryToGlb(geometry ?? mesh.geometry) } : null;
+
+/** A mesh as a ripper would have it: every triangle visible (flat shading), not turning. */
+const RippedMesh = ({ mesh, bounds, label }: { mesh: LabMesh | null; bounds: Sphere | null; label: string }) =>
+  mesh && bounds ? (
+    <MeshPreview geometry={mesh.geometry} bounds={bounds} flat autoRotate={false} label={label} className="aspect-[4/3] w-full bg-page" />
+  ) : (
+    <div className="aspect-[4/3] w-full bg-page" />
+  );
 
 const Choice = <T extends string | number>({
   id,
@@ -331,6 +410,25 @@ function useLabMesh(soup: Float32Array, target: number): LabMesh | null {
 
 const meshStats = (mesh: LabMesh) => `${mb(mesh.bytes)} · ${thousands(mesh.triangles)} triangles`;
 
+const TodayRipper = ({ soup }: { soup: Float32Array }) => {
+  const mesh = useLabMesh(soup, TODAY_TRIANGLES);
+  const bounds = useMemo(() => (mesh ? boundsOf(mesh) : null), [mesh]);
+  return (
+    <RipperCard
+      verdict="printable as it is"
+      download={meshDownload(mesh, "today-preview.glb")}
+      note={
+        <>
+          The site&apos;s light preview ({mesh ? meshStats(mesh) : "…"}): one click in the browser&apos;s network tab
+          saves it, ready for a slicer.
+        </>
+      }
+    >
+      <RippedMesh mesh={mesh} bounds={bounds} label="Today's preview mesh, as saved by a ripper" />
+    </RipperCard>
+  );
+};
+
 const FewerMethod = ({ soup }: { soup: Float32Array }) => {
   const [target, setTarget] = useState(25_000);
   const mesh = useLabMesh(soup, target);
@@ -351,10 +449,13 @@ const FewerMethod = ({ soup }: { soup: Float32Array }) => {
         options={FEWER_TARGETS.map((value) => ({ value, label: thousands(value) }))}
         onChange={setTarget}
       />
-      <p className="text-sm text-txt-secondary">
-        What a ripper gets: exactly this mesh. At miniature size a printer can&apos;t show much more than about
-        25,000-50,000 triangles of detail, so a count that looks good here also prints well.
-      </p>
+      <RipperCard
+        verdict="this exact mesh"
+        download={meshDownload(mesh, `fewer-${target}.glb`)}
+        note="Printable as it is. At miniature size a printer can't show much more than about 25,000-50,000 triangles of detail, so a count that looks good above also prints well."
+      >
+        <RippedMesh mesh={mesh} bounds={bounds} label="The simplified mesh, as saved by a ripper" />
+      </RipperCard>
     </div>
   );
 };
@@ -389,7 +490,11 @@ const ScrambledMethod = ({ soup }: { soup: Float32Array }) => {
           <div className="aspect-square w-full bg-page" />
         )}
       </Card>
-      <Card title="What a ripper gets" note="the downloaded file, opened in any 3D program">
+      <RipperCard
+        verdict="a shapeless cloud"
+        download={scrambled && mesh ? meshDownload(mesh, "scrambled.glb", scrambled.geometry) : null}
+        note="The downloaded file (and what simple WebGL ripping tools capture), opened in any 3D program. Unusable unless someone reads the viewer's code and reverses the scramble."
+      >
         {scrambled ? (
           <MeshPreview
             geometry={scrambled.geometry}
@@ -402,7 +507,7 @@ const ScrambledMethod = ({ soup }: { soup: Float32Array }) => {
         ) : (
           <div className="aspect-[4/3] w-full bg-page" />
         )}
-      </Card>
+      </RipperCard>
     </div>
   );
 };
@@ -412,6 +517,7 @@ const SharpMethod = ({ soup }: { soup: Float32Array }) => {
   const rough = useLabMesh(soup, target);
   const full = useLabMesh(soup, soupTriangles(soup));
   const bounds = useMemo(() => (full ? boundsOf(full) : null), [full]);
+  const roughBounds = useMemo(() => (rough ? boundsOf(rough) : null), [rough]);
   return (
     <div className="space-y-4">
       <Card title="Rough + sharp still" note="stop turning to see it" stats={rough ? meshStats(rough) : "Simplifying…"}>
@@ -434,10 +540,13 @@ const SharpMethod = ({ soup }: { soup: Float32Array }) => {
         options={ROUGH_TARGETS.map((value) => ({ value, label: thousands(value) }))}
         onChange={setTarget}
       />
-      <p className="text-sm text-txt-secondary">
-        What a ripper gets: the rough mesh (and pictures, one per stop, about 100-200 KB each on the real site). The
-        sharp picture appears about 0.35 s after you stop, like a server response would.
-      </p>
+      <RipperCard
+        verdict="the rough mesh"
+        download={meshDownload(rough, `rough-${target}.glb`)}
+        note="Only this rough mesh, plus the sharp pictures of the angles they stopped at (about 100-200 KB each on the real site, rate-limited by the server). The detailed mesh never leaves the server. Here the sharp picture appears about 0.35 s after you stop, like a server response would."
+      >
+        <RippedMesh mesh={rough} bounds={roughBounds} label="The rough mesh, as saved by a ripper" />
+      </RipperCard>
     </div>
   );
 };
@@ -450,6 +559,16 @@ const ImpostorMethod = ({ glbUrl, standUp }: { glbUrl: string; standUp: boolean 
   const [busy, setBusy] = useState(false);
 
   useEffect(() => setBaked(null), [glbUrl, standUp]);
+
+  const samples = useMemo(() => {
+    if (!baked) return [];
+    const step = Math.max(1, Math.floor(baked.frames.length / 8));
+    return baked.frames
+      .filter((_, index) => index % step === 0)
+      .slice(0, 8)
+      .map((frame) => URL.createObjectURL(frame));
+  }, [baked]);
+  useEffect(() => () => samples.forEach((url) => URL.revokeObjectURL(url)), [samples]);
 
   const bake = async () => {
     const { grid, tile } = IMPOSTOR_PRESETS.find((item) => item.id === preset) ?? IMPOSTOR_PRESETS[0];
@@ -514,6 +633,29 @@ const ImpostorMethod = ({ glbUrl, standUp }: { glbUrl: string; standUp: boolean 
           Make impostor
         </Button>
       </div>
+      <RipperCard
+        verdict="pictures, no 3D data"
+        download={
+          baked
+            ? {
+                label: "Download one picture",
+                filename: "impostor-view.webp",
+                make: async () => baked.frames[Math.floor(baked.frames.length / 2)],
+              }
+            : null
+        }
+        note={
+          baked
+            ? `${baked.grid * baked.grid} pictures like these (${Math.round(baked.bytes / baked.frames.length / 1024)} KB each on average). Rebuilding a mesh from them gives a soft blob without the fine detail.`
+            : "Pictures from all around the model. Make the impostor to see them."
+        }
+      >
+        <div className="grid grid-cols-4 gap-2 bg-page p-3">
+          {samples.map((url, index) => (
+            <img key={url} src={url} alt={`View ${index + 1}`} className="aspect-square w-full rounded-md" />
+          ))}
+        </div>
+      </RipperCard>
     </div>
   );
 };
