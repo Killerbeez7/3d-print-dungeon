@@ -11,6 +11,8 @@ export type CustomClaims = {
   super?: boolean;
   admin?: boolean;
   moderator?: boolean;
+  /** May use the full site before launch (see PrelaunchGate). */
+  tester?: boolean;
   contributor?: boolean;
   premium?: boolean;
 };

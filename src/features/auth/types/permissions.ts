@@ -1,4 +1,4 @@
-export type Role = "user" | "artist" | "moderator" | "admin" | "superadmin";
+export type Role = "user" | "artist" | "moderator" | "admin" | "superadmin" | "tester";
 
 export type Permission =
   | "read:models"

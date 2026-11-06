@@ -36,7 +36,8 @@ export const setUserRole = onCall(async (request) => {
 
         // Only the roles the admin screen manages. Only a super admin
         // can grant or remove admin, and super is never granted from here.
-        const ASSIGNABLE_ROLES = ["user", "artist", "moderator", "admin"];
+        // tester: may use the full site before launch.
+        const ASSIGNABLE_ROLES = ["user", "artist", "moderator", "tester", "admin"];
         if (!ASSIGNABLE_ROLES.includes(role)) {
             throw new HttpsError("invalid-argument", "Unknown role.");
         }

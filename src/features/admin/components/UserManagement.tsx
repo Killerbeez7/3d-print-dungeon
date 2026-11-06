@@ -16,6 +16,7 @@ const MANAGEABLE_ROLES = [
   "user",
   "artist",
   "moderator",
+  "tester",
   "admin",
 ] as const satisfies readonly Role[];
 
@@ -23,6 +24,7 @@ const ALL_ROLES = [
   "user",
   "artist",
   "moderator",
+  "tester",
   "admin",
   "superadmin",
 ] as const satisfies readonly Role[];
@@ -31,6 +33,7 @@ const ROLE_CLASSES: Record<Role, string> = {
   user: "bg-muted text-txt-secondary",
   artist: "bg-info/15 text-info",
   moderator: "bg-accent-soft text-accent",
+  tester: "bg-success/15 text-success",
   admin: "bg-error/15 text-error",
   superadmin: "bg-warning/15 text-warning",
 };

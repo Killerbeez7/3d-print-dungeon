@@ -234,6 +234,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       roles.push("moderator");
     }
 
+    if (claims.tester === true) {
+      roles.push("tester");
+    }
+
     return roles;
   }, [claims]);
 
