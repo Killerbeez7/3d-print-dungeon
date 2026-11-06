@@ -1,3 +1,4 @@
+import { lazy } from "react";
 import { useRoutes, type RouteObject } from "react-router-dom";
 
 import { ROUTES } from "./constants/routeConstants";
@@ -24,7 +25,13 @@ import { MaintenanceRoute } from "@/routes/guards/MaintenanceRoute";
 import { PrelaunchGate } from "@/features/prelaunch/components/PrelaunchGate";
 import { ComingSoonPage } from "@/features/prelaunch/pages/ComingSoonPage";
 
+const ImpostorLabPage = lazy(() =>
+  import("@/features/lab/pages/ImpostorLabPage").then((m) => ({ default: m.ImpostorLabPage }))
+);
+
 const mainRoutes: RouteObject[] = [
+  // Prototype for testing on the preview (not linked anywhere).
+  { path: "/lab/impostor", element: <ImpostorLabPage /> },
   ...homeRoutes,
   ...userRoutes,
   ...blogRoutes,
