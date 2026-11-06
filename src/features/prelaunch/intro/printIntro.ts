@@ -27,6 +27,8 @@ export interface PrintIntroData {
   lettersBox: InkBox;
   /** Die face symbols (100 x 100 face). */
   gate: string;
+  /** The gate's portcullis, half raised in the doorway (as on the header die). */
+  portcullis: string;
   eye: string;
   maze: string;
   colors: { accent: string; text: string; muted: string; ink: string; bed: string; hot: string };
@@ -158,6 +160,7 @@ export function createPrintIntro(svg: SVGSVGElement, D: PrintIntroData): PrintIn
   el("rect", { x: 3, y: 3, width: 94, height: 94, rx: 5, id: `${uid}plate` }, defs);
   el("polygon", { points: "0.8,0 100,0 100,99.2" }, el("clipPath", { id: `${uid}back` }, defs));
   el("polygon", { points: "0,0.8 0,100 99.2,100" }, el("clipPath", { id: `${uid}front` }, defs));
+  el("path", { d: D.gate }, el("clipPath", { id: `${uid}door` }, defs));
 
   const bed = el("line", { x1: X0 - 14, x2: X1 + 14, y1: YB + 7, y2: YB + 7, stroke: BED, "stroke-width": 2, "stroke-linecap": "round", opacity: 0 }, svg);
 
@@ -187,7 +190,14 @@ export function createPrintIntro(svg: SVGSVGElement, D: PrintIntroData): PrintIn
     const g = el("g", {}, head);
     const inner = el("g", clip ? { "clip-path": `url(#${uid}${clip})` } : {}, g);
     el("use", { href: `#${uid}plate`, fill: ACC }, inner);
-    const ink = el("path", { d: sym, fill: INK, "fill-rule": "evenodd" }, inner);
+    // The header die (CSS 3D) lays the top face out a quarter turn from this face's axes; the
+    // maze is turned to match it, so the logo looks the same here and in the header.
+    const turn = sym === D.maze ? { transform: "matrix(0 1 -1 0 100 0)" } : {};
+    const ink = el("path", { d: sym, fill: INK, "fill-rule": "evenodd", ...turn }, inner);
+    if (sym === D.gate) {
+      // the portcullis hangs half raised in the doorway, in the die's colour
+      el("path", { d: D.portcullis, fill: ACC, "clip-path": `url(#${uid}door)` }, inner);
+    }
     const dark = el("use", { href: `#${uid}plate`, fill: INK, opacity: 0 }, inner);
     return { g, ink, dark };
   };

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { DIE_FACES } from "@/features/shared/components/dieFaces";
+import { DIE_FACES, PORTCULLIS } from "@/features/shared/components/dieFaces";
 import { LABEL_PATH, LETTERS_PATH } from "@/features/shared/components/brandPaths";
 import { createPrintIntro, type InkBox, type PrintIntro as Intro } from "./printIntro";
 
@@ -56,6 +56,7 @@ export const PrintIntro = ({ className = "", once = true }: { className?: string
       labelBox: measure(svg, LABEL_PATH),
       lettersBox: measure(svg, LETTERS_PATH),
       gate: DIE_FACES.gate,
+      portcullis: PORTCULLIS,
       eye: DIE_FACES.eye,
       maze: DIE_FACES.maze,
       colors: {
