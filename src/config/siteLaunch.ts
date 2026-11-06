@@ -29,5 +29,8 @@ function gateForcedOnPreview(): boolean {
 export const PRELAUNCH_GATE =
   !SITE_LAUNCHED && (LIVE_HOSTS.includes(window.location.hostname) || gateForcedOnPreview());
 
-/** Pages everyone can open before launch: the policies and the password reset link from emails. */
-export const OPEN_BEFORE_LAUNCH = ["/policies", "/reset-password"];
+/**
+ * Pages everyone can open before launch: the policies, the password reset link from emails, and
+ * the 3D preview rip test (so friends can try to rip a scrambled preview).
+ */
+export const OPEN_BEFORE_LAUNCH = ["/policies", "/reset-password", "/lab/rip-test"];

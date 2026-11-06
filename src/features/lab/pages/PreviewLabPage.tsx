@@ -12,6 +12,8 @@ import { finalConvertFileToGLB } from "@/features/models/utils/converter";
 import { bakeImpostor, type BakedImpostor } from "../impostor/bakeImpostor";
 import { ImpostorViewer, type ImpostorBlend } from "../impostor/ImpostorViewer";
 import { MeshPreview } from "../mesh/MeshPreview";
+import { useAuth } from "@/features/auth/hooks/useAuth";
+import { encodeRipTest, publishRipTest } from "../mesh/ripTest";
 import { scrambleGeometry } from "../mesh/scramble";
 import { loadSoup, makeLabMesh, soupTriangles, type LabMesh } from "../mesh/sourceMesh";
 
@@ -507,6 +509,7 @@ const ScrambledMethod = ({ soup }: { soup: Float32Array }) => {
         }))}
         onChange={setTarget}
       />
+      {scrambled && mesh && <PublishRipTest geometry={scrambled.geometry} scramble={scrambled.scramble} radius={scrambled.bounds.radius} />}
       <RipperCard
         verdict="a shapeless cloud"
         download={scrambled && mesh ? meshDownload(mesh, "scrambled.glb", scrambled.geometry) : null}
@@ -525,6 +528,69 @@ const ScrambledMethod = ({ soup }: { soup: Float32Array }) => {
           <div className="aspect-[4/3] w-full bg-page" />
         )}
       </RipperCard>
+    </div>
+  );
+};
+
+/** Puts this scrambled mesh online on its own, with a link for someone to try ripping it. */
+const PublishRipTest = ({
+  geometry,
+  scramble,
+  radius,
+}: {
+  geometry: BufferGeometry;
+  scramble: { key: number; amount: number };
+  radius: number;
+}) => {
+  const { currentUser } = useAuth();
+  const [link, setLink] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    setLink(null);
+    setMessage(null);
+  }, [geometry]);
+
+  const publish = async () => {
+    if (!currentUser) return;
+    setBusy(true);
+    setMessage(null);
+    try {
+      const test = await publishRipTest(await geometryToGlb(geometry), currentUser.uid, scramble, radius);
+      setLink(`${window.location.origin}/lab/rip-test?t=${encodeRipTest(test)}`);
+    } catch {
+      setMessage("Publishing failed. Are you signed in on printdungeon.com (sign-in doesn't work on previews)?");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="rounded-xl border border-br-subtle bg-surface-card p-4">
+      <p className="font-medium text-txt-primary">Let someone try to rip it</p>
+      <p className="mt-1 text-sm text-txt-secondary">
+        Publishes only this scrambled file, with a page that shows it. Anyone with the link can open it.
+      </p>
+      {currentUser ? (
+        <Button className="mt-3" variant="secondary" size="sm" onClick={publish} isLoading={busy}>
+          Publish a rip test
+        </Button>
+      ) : (
+        <p className="mt-3 text-sm text-txt-muted">Sign in on printdungeon.com to publish one.</p>
+      )}
+      {link && (
+        <p className="mt-3 break-all text-sm">
+          <a href={link} target="_blank" rel="noreferrer" className="text-accent underline underline-offset-4">
+            {link}
+          </a>
+        </p>
+      )}
+      {message && (
+        <p role="alert" className="mt-3 text-sm text-error">
+          {message}
+        </p>
+      )}
     </div>
   );
 };

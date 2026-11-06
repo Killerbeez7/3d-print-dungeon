@@ -29,10 +29,15 @@ const PreviewLabPage = lazy(() =>
   import("@/features/lab/pages/PreviewLabPage").then((m) => ({ default: m.PreviewLabPage }))
 );
 
+const RipTestPage = lazy(() =>
+  import("@/features/lab/pages/RipTestPage").then((m) => ({ default: m.RipTestPage }))
+);
+
 const mainRoutes: RouteObject[] = [
   // Prototype for testing on the preview (not linked anywhere).
   { path: "/lab/preview", element: <PreviewLabPage /> },
   { path: "/lab/impostor", element: <PreviewLabPage /> },
+  { path: "/lab/rip-test", element: <RipTestPage /> },
   ...homeRoutes,
   ...userRoutes,
   ...blogRoutes,

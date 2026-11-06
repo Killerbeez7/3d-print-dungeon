@@ -45,3 +45,15 @@ describe("scrambled mesh", () => {
     }
   });
 });
+
+describe("rip test links", () => {
+  it("round-trips a test and rejects anything that isn't one", async () => {
+    const { decodeRipTest, encodeRipTest } = await import("@/features/lab/mesh/ripTest");
+    const test = { path: "models/converted/abc123/rip-test/m1-x2.glb", key: 4000000000, amount: 27.5, radius: 30.6 };
+    expect(decodeRipTest(encodeRipTest(test))).toEqual(test);
+    expect(decodeRipTest(null)).toBeNull();
+    expect(decodeRipTest("not-a-token")).toBeNull();
+    expect(decodeRipTest(encodeRipTest({ ...test, path: "models/original/abc123/secret.stl" }))).toBeNull();
+    expect(decodeRipTest(encodeRipTest({ ...test, path: "models/converted/abc/rip-test/../../x.glb" }))).toBeNull();
+  });
+});
