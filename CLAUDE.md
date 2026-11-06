@@ -20,6 +20,9 @@ Site content is in English.
 - Never invent business facts (prices, reviews, ratings, stats, company details, service
   promises). If a fact is unknown, hide that UI and add it to `TODO.md`.
 - Model files and images in the database are placeholders; model listings are real.
+- Set-aside work (features, logos, animations, styles, ideas) is indexed on the `stash` branch
+  in `STASH.md`. Before removing or replacing something we built, add it there and anchor its
+  commit (see STASH.md), so it can be brought back. Check the stash before rebuilding an idea.
 
 ## Design system
 
