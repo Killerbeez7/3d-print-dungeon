@@ -1,11 +1,7 @@
 import {
   Box3,
-  DirectionalLight,
   Mesh,
-  MeshStandardMaterial,
-  NeutralToneMapping,
   OrthographicCamera,
-  PMREMGenerator,
   Scene,
   Sphere,
   Vector3,
@@ -13,7 +9,8 @@ import {
   type BufferGeometry,
   type Object3D,
 } from "three";
-import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
+
+import { setUpStudio, studioMaterial } from "../mesh/studio";
 
 import { frameBasis, frameDirection, type Vec3 } from "./impostorMath";
 
@@ -88,7 +85,7 @@ function framingHalfSize(model: Object3D, center: Vector3, grid: number): number
 export async function bakeImpostor(model: Object3D, { grid, tile, onProgress }: BakeOptions): Promise<BakedImpostor> {
   const started = performance.now();
 
-  const material = new MeshStandardMaterial({ color: "#f2f2f4", roughness: 0.6, metalness: 0 });
+  const material = studioMaterial();
   model.traverse((node) => {
     if ((node as Mesh).isMesh) (node as Mesh).material = material;
   });
@@ -108,17 +105,7 @@ export async function bakeImpostor(model: Object3D, { grid, tile, onProgress }: 
   renderer.setPixelRatio(1);
   renderer.setSize(tile, tile, false);
   renderer.setClearColor(0x000000, 0);
-  renderer.toneMapping = NeutralToneMapping;
-  const pmrem = new PMREMGenerator(renderer);
-  const environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environment = environment;
-  // Soft studio light alone washes out fine surface detail; a key light from above-front-left
-  // (fixed to the model, like a lamp in a room) brings the relief back.
-  scene.environmentIntensity = 0.55;
-  const key = new DirectionalLight("#ffffff", 1.6);
-  key.position.set(center.x - radius, center.y + radius * 1.6, center.z + radius);
-  key.target.position.copy(center);
-  scene.add(key, key.target);
+  const tearDownStudio = setUpStudio(renderer, scene, center, radius);
 
   const frames: Blob[] = [];
   const total = grid * grid;
@@ -145,8 +132,7 @@ export async function bakeImpostor(model: Object3D, { grid, tile, onProgress }: 
       }
     }
   } finally {
-    environment.dispose();
-    pmrem.dispose();
+    tearDownStudio();
     renderer.dispose();
     material.dispose();
   }
