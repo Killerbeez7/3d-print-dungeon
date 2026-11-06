@@ -32,6 +32,7 @@ live work happens on `claude/redesign-v2`.
 | `logo-layered-keep` | Logo: the layered keep, with tab and home-screen icons | `a9d5898` | Reference |
 | `logo-keep-dragon-eye` | Logo: keep badge, DUNGEON with a dragon-eye O | `f793c72` | Reference |
 | `logo-keep-plain-o` | Logo: keep badge, DUNGEON with a plain O | `f52eb45` | Reference |
+| `model-viewer-plain-preview` | Model page 3D view with Google's model-viewer showing the plain light preview (100,000 triangles), before the scrambled preview | `3016d7d` | `git revert 315ea56 4816965` |
 | `wordmark-unbounded` | Wordmark: DUNGEON in Unbounded with a redrawn E and G (before Chakra Petch) | `0470d9f` | Reference; the generator is `design/brand/scripts/wordmark_letters.py` |
 
 Also kept on `claude/redesign-v2`, not in this list because they never left: `design/brand/`
