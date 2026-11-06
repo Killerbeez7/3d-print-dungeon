@@ -4,6 +4,7 @@ export const ROUTES = {
   SEARCH: "/search",
   SEARCH_ARTISTS: "/search/artists",
   MAINTENANCE: "/maintenance",
+  COMING_SOON: "/coming-soon",
 
   /* Artists */
   ARTISTS_LIST: "/artists",

@@ -978,6 +978,16 @@ body {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* Coming-soon logo: the wordmark prints in layer by layer, the die just before it. */
+  .logo-print {
+    display: inline-flex;
+    animation: print-in 1.6s steps(28, end) 0.35s both;
+  }
+  .logo-print--die {
+    animation-duration: 0.9s;
+    animation-delay: 0s;
+  }
+
   .hero-print {
     animation: print-in 0.9s steps(18, end) 0.1s both;
   }

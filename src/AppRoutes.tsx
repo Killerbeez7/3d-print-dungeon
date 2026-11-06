@@ -21,6 +21,8 @@ import Layout from "@/features/shared/Layout";
 import { NotFoundPage } from "@/features/shared/pages/NotFoundPage";
 import { MaintenancePage } from "@/features/maintenance/pages/MaintenancePage";
 import { MaintenanceRoute } from "@/routes/guards/MaintenanceRoute";
+import { PrelaunchGate } from "@/features/prelaunch/components/PrelaunchGate";
+import { ComingSoonPage } from "@/features/prelaunch/pages/ComingSoonPage";
 
 const mainRoutes: RouteObject[] = [
   ...homeRoutes,
@@ -46,10 +48,17 @@ const routesConfig: RouteObject[] = [
     element: <MaintenancePage />,
   },
   {
+    // The page visitors see before launch, so admins can look at it too.
+    path: ROUTES.COMING_SOON,
+    element: <ComingSoonPage />,
+  },
+  {
     element: (
-      <MaintenanceRoute>
-        <Layout />
-      </MaintenanceRoute>
+      <PrelaunchGate>
+        <MaintenanceRoute>
+          <Layout />
+        </MaintenanceRoute>
+      </PrelaunchGate>
     ),
     children: mainRoutes,
   },
