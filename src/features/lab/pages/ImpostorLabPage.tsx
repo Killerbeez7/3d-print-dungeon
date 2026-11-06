@@ -9,10 +9,11 @@ import { Button } from "@/components";
 import { db } from "@/config/firebaseConfig";
 import { finalConvertFileToGLB } from "@/features/models/utils/converter";
 import { bakeImpostor, type BakedImpostor } from "../impostor/bakeImpostor";
-import { ImpostorViewer } from "../impostor/ImpostorViewer";
+import { ImpostorViewer, type ImpostorBlend } from "../impostor/ImpostorViewer";
 
 /** grid × tile ≤ 4096 so the atlas fits every phone's texture limit. */
 const PRESETS = [
+  { id: "10x384", grid: 10, tile: 384, label: "100 views × 384 px (balanced)" },
   { id: "8x512", grid: 8, tile: 512, label: "64 views × 512 px (sharpest)" },
   { id: "12x320", grid: 12, tile: 320, label: "144 views × 320 px (smoothest)" },
   { id: "16x256", grid: 16, tile: 256, label: "256 views × 256 px" },
@@ -31,11 +32,12 @@ interface Source {
   glbBytes: number | null;
 }
 
-const BLENDS = [
-  { id: "blend", sharpness: 1, label: "Blend (smooth, some ghosting)" },
-  { id: "soft", sharpness: 6, label: "Mostly the nearest view" },
-  { id: "snap", sharpness: 40, label: "Snap (sharp, moves in steps)" },
-] as const;
+const BLENDS: { id: ImpostorBlend; label: string }[] = [
+  { id: "fade", label: "Nearest view, quick fade (sharp)" },
+  { id: "snap", label: "Nearest view, no fade" },
+  { id: "soft", label: "Mostly the nearest view" },
+  { id: "blend", label: "Blend 3 views (smooth, ghosting)" },
+];
 
 const mb = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(2)} MB`;
 
@@ -54,9 +56,9 @@ export const ImpostorLabPage = () => {
   const [models, setModels] = useState<SiteModel[]>([]);
   const [modelsError, setModelsError] = useState(false);
   const [source, setSource] = useState<Source | null>(null);
-  const [preset, setPreset] = useState<(typeof PRESETS)[number]["id"]>("8x512");
+  const [preset, setPreset] = useState<(typeof PRESETS)[number]["id"]>("10x384");
   const [zUp, setZUp] = useState(false);
-  const [blend, setBlend] = useState<(typeof BLENDS)[number]["id"]>("blend");
+  const [blend, setBlend] = useState<ImpostorBlend>("fade");
   const [baked, setBaked] = useState<BakedImpostor | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -179,7 +181,7 @@ export const ImpostorLabPage = () => {
               id="lab-blend"
               className="field"
               value={blend}
-              onChange={(event) => setBlend(event.target.value as typeof blend)}
+              onChange={(event) => setBlend(event.target.value as ImpostorBlend)}
             >
               {BLENDS.map((item) => (
                 <option key={item.id} value={item.id}>
@@ -224,7 +226,7 @@ export const ImpostorLabPage = () => {
                 atlasUrl={baked.url}
                 grid={baked.grid}
                 tile={baked.tile}
-                sharpness={BLENDS.find((item) => item.id === blend)?.sharpness ?? 1}
+                blend={blend}
                 className="aspect-square w-full bg-page"
               />
             ) : (

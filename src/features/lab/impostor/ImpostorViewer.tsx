@@ -14,7 +14,14 @@ import {
   WebGLRenderer,
 } from "three";
 
-import { frameBasis, orbitDirection } from "./impostorMath";
+import { encodeDirection, frameBasis, orbitDirection } from "./impostorMath";
+
+/** How the viewer moves between the pre-rendered views. */
+export type ImpostorBlend = "fade" | "blend" | "soft" | "snap";
+
+const SHARPNESS: Record<Exclude<ImpostorBlend, "fade">, number> = { blend: 1, soft: 6, snap: 40 };
+/** Cross-fade time when the nearest view changes. */
+const FADE_MS = 110;
 
 const VERTEX = /* glsl */ `
 varying vec2 vNdc;
@@ -36,6 +43,11 @@ uniform vec3 viewRight;
 uniform vec3 viewUp;
 uniform vec2 halfExtent;
 uniform float sharpness;
+// mode 1: only the nearest view, cross-fading from the previous one (cellA) to it (cellB).
+uniform float mode;
+uniform vec2 cellA;
+uniform vec2 cellB;
+uniform float fade;
 varying vec2 vNdc;
 
 vec3 decodeDir(vec2 uv) {
@@ -66,6 +78,12 @@ vec4 frameSample(vec2 cell, vec3 P) {
 
 void main() {
   vec3 P = viewRight * vNdc.x * halfExtent.x + viewUp * vNdc.y * halfExtent.y;
+  if (mode > 0.5) {
+    vec4 faded = frameSample(cellA, P) * (1.0 - fade) + frameSample(cellB, P) * fade;
+    if (faded.a < 0.004) discard;
+    gl_FragColor = vec4(faded.rgb / faded.a, faded.a);
+    return;
+  }
   vec2 g = encodeDir(viewDir) * (grid - 1.0);
   vec2 b = floor(g);
   vec2 f = g - b;
@@ -101,8 +119,12 @@ interface ImpostorViewerProps {
   atlasUrl: string;
   grid: number;
   tile: number;
-  /** 1 blends the 3 nearest views evenly (smooth, some ghosting); higher snaps to the nearest. */
-  sharpness?: number;
+  /**
+   * fade: the nearest view, cross-fading quickly to the next as you turn (sharp, recommended);
+   * blend: the 3 nearest views mixed (smoothest, ghosting); soft: mostly the nearest; snap: only
+   * the nearest, no fade.
+   */
+  blend?: ImpostorBlend;
   className?: string;
 }
 
@@ -110,15 +132,15 @@ interface ImpostorViewerProps {
  * Shows a baked impostor: drag to turn it (any angle on the upper half), wheel or pinch to zoom.
  * It turns slowly on its own until touched. No mesh is ever loaded: only the atlas image.
  */
-export const ImpostorViewer = ({ atlasUrl, grid, tile, sharpness = 1, className = "" }: ImpostorViewerProps) => {
+export const ImpostorViewer = ({ atlasUrl, grid, tile, blend = "fade", className = "" }: ImpostorViewerProps) => {
   const hostRef = useRef<HTMLDivElement>(null);
-  const sharpnessRef = useRef(sharpness);
+  const blendRef = useRef(blend);
   const redrawRef = useRef<() => void>(() => {});
 
   useEffect(() => {
-    sharpnessRef.current = sharpness;
+    blendRef.current = blend;
     redrawRef.current();
-  }, [sharpness]);
+  }, [blend]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -154,7 +176,11 @@ export const ImpostorViewer = ({ atlasUrl, grid, tile, sharpness = 1, className 
         viewRight: { value: new Vector3() },
         viewUp: { value: new Vector3() },
         halfExtent: { value: new Vector2(1, 1) },
-        sharpness: { value: sharpnessRef.current },
+        sharpness: { value: 1 },
+        mode: { value: 1 },
+        cellA: { value: new Vector2() },
+        cellB: { value: new Vector2() },
+        fade: { value: 1 },
       },
     });
     // One triangle that covers the whole canvas.
@@ -169,6 +195,10 @@ export const ImpostorViewer = ({ atlasUrl, grid, tile, sharpness = 1, className 
     const view = { yaw: 0.6, pitch: 0.35, zoom: 1, spinning: !window.matchMedia("(prefers-reduced-motion: reduce)").matches };
     let frame = 0;
     let ready = false;
+    // The view being faded out (a) and in (b), as grid cells, and when the fade started.
+    let cellA: [number, number] | null = null;
+    let cellB: [number, number] | null = null;
+    let fadeStart = 0;
 
     const draw = () => {
       frame = 0;
@@ -183,9 +213,30 @@ export const ImpostorViewer = ({ atlasUrl, grid, tile, sharpness = 1, className 
       material.uniforms.viewRight.value.set(...right);
       material.uniforms.viewUp.value.set(...up);
       material.uniforms.halfExtent.value.set(extent * Math.max(aspect, 1), extent * Math.max(1 / aspect, 1));
-      material.uniforms.sharpness.value = sharpnessRef.current;
+      const mode = blendRef.current;
+      let fading = false;
+      if (mode === "fade") {
+        const [u, v] = encodeDirection(direction);
+        const nearest: [number, number] = [Math.round(u * (grid - 1)), Math.round(v * (grid - 1))];
+        if (!cellB) {
+          cellA = cellB = nearest;
+        } else if (nearest[0] !== cellB[0] || nearest[1] !== cellB[1]) {
+          cellA = cellB;
+          cellB = nearest;
+          fadeStart = performance.now();
+        }
+        const fade = cellA === cellB ? 1 : Math.min(1, (performance.now() - fadeStart) / FADE_MS);
+        fading = fade < 1;
+        material.uniforms.mode.value = 1;
+        material.uniforms.cellA.value.set(...(cellA ?? nearest));
+        material.uniforms.cellB.value.set(...nearest);
+        material.uniforms.fade.value = fade;
+      } else {
+        material.uniforms.mode.value = 0;
+        material.uniforms.sharpness.value = SHARPNESS[mode];
+      }
       renderer.render(scene, camera);
-      if (view.spinning) frame = requestAnimationFrame(draw);
+      if (view.spinning || fading) frame = requestAnimationFrame(draw);
     };
     const requestDraw = () => {
       if (!frame) frame = requestAnimationFrame(draw);
