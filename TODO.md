@@ -177,6 +177,16 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
 - [ ] Pre-existing lint errors (6) and warnings (14), e.g. unused `ModelData` in
       `useFetchUserModels`, `no-console` disables
 
+## Upload page ("Share a model") revisit, queued 6 Nov 2026
+
+- [ ] Live listing preview: desktop shows the listing as buyers will see it (card, 3D preview,
+      price) beside the steps, filling in as you go; phones get a "Preview" button
+- [ ] Upload while you fill in: the model file starts uploading when picked, so "Publish" is
+      quick; a progress panel with stages (file, 3D preview, images, listing)
+- [ ] Seller verification only inside "Set a price", not a banner above every step
+- [ ] Calmer layout: clickable steps to go back, more room under the header, tighter cards,
+      clearer free/paid choice
+
 ## Admin dashboard: next steps
 
 - [ ] Reports: a real moderation queue (report button on models and comments, reasons,
