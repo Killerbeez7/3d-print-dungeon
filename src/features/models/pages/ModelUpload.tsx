@@ -500,8 +500,8 @@ export function ModelUpload() {
 
       {/* Stepper: a print-progress bar split in three layers */}
       <ol className="mb-8 grid grid-cols-3 gap-2" aria-label="Upload steps">
-        {steps.map((item) => (
-          <StepIndicator key={item.number} {...item} currentStep={step} />
+        {steps.map((item, index) => (
+          <StepIndicator key={item.number} {...item} currentStep={step} index={index} count={steps.length} />
         ))}
       </ol>
 
@@ -586,9 +586,10 @@ export function ModelUpload() {
                   <span className="text-txt-primary">{Math.round(uploadProgress)}%</span>
                 </div>
                 <div className="h-2 overflow-hidden bg-muted">
+                  {/* The full gradient, revealed as it fills (not squeezed into the filled part). */}
                   <div
-                    className="bg-layer-lines h-full bg-gradient-to-r from-accent to-ember-fill transition-[width] duration-300"
-                    style={{ width: `${uploadProgress}%` }}
+                    className="h-full bg-gradient-to-r from-accent to-ember-fill transition-[clip-path] duration-300"
+                    style={{ clipPath: `inset(0 ${100 - Math.min(100, Math.max(0, uploadProgress))}% 0 0)` }}
                   />
                 </div>
               </div>
@@ -650,19 +651,30 @@ interface StepIndicatorProps {
   label: string;
   hint: string;
   currentStep: number;
+  /** Position among the steps, so the bars share one gradient. */
+  index: number;
+  count: number;
 }
 
-function StepIndicator({ number, label, hint, currentStep }: StepIndicatorProps) {
+/** Gap between the step bars (the list's gap-2), for lining up the shared gradient. */
+const STEP_GAP = "0.5rem";
+
+function StepIndicator({ number, label, hint, currentStep, index, count }: StepIndicatorProps) {
   const isActive = currentStep === number;
   const isCompleted = currentStep > number;
 
   return (
     <li aria-current={isActive ? "step" : undefined}>
       <div className="h-1.5 overflow-hidden bg-muted">
+        {/* One violet-to-molten gradient across all the bars: each bar shows its slice of it,
+            and is revealed (not stretched) when its step is reached. */}
         <div
-          className={`h-full origin-left bg-gradient-to-r from-accent to-ember-fill transition-transform duration-500 ease-forge ${
-            isCompleted || isActive ? "scale-x-100" : "scale-x-0"
-          } ${isActive ? "opacity-60" : ""}`}
+          className="h-full bg-gradient-to-r from-accent to-ember-fill transition-[clip-path] duration-500 ease-forge"
+          style={{
+            backgroundSize: `calc(${count * 100}% + ${count - 1} * ${STEP_GAP}) 100%`,
+            backgroundPosition: `${count > 1 ? (index / (count - 1)) * 100 : 0}% 0`,
+            clipPath: isCompleted || isActive ? "inset(0 0 0 0)" : "inset(0 100% 0 0)",
+          }}
         />
       </div>
       <div className="mt-3 flex items-center gap-2">
