@@ -78,6 +78,21 @@ folder the old rules don't allow, and the old site uploads to a folder the new r
         10 minutes)
       - Firestore → TTL policies → collection group `rateLimits`, field `expireAt`, so old
         counters delete themselves
+- [ ] Coming-soon mode (6 Nov 2026): after the next publish, printdungeon.com shows a coming-soon
+      page to everyone except admins and testers. Before or right after publishing, from an
+      up-to-date checkout of `claude/redesign-v2`:
+      - `firebase deploy --only firestore:rules --project print-dungeon-3d` (the `devlog`
+        collection; until then the Dev log tab says it couldn't load and Admin > Dev log can't save)
+      - `firebase deploy --only functions:setUserRole --project print-dungeon-3d` (so Admin > Users
+        can give someone the **tester** role; they may need to sign out and in once)
+- [ ] Launch, when the site is ready (payments, real images, legal operator details):
+      1. GitHub → Settings → Secrets and variables → Actions → Variables → `VITE_SITE_LAUNCHED` =
+         `true`. The next preview build has no coming-soon page and no noindex; then publish it.
+      2. A real sitemap on `printdungeon.com` (static pages + every model), linked from robots.txt
+      3. Per-page titles and descriptions (model name, artist, image) and noindex on the
+         "not found" page and the hidden demo pages
+      4. Google Search Console: verify `printdungeon.com`, submit the sitemap, and check that no
+         preview or `print-dungeon-3d.web.app` pages are indexed
 - [ ] App Check, so only the site (not scripts) can call the functions. In this order:
       1. Google Cloud console → Security → reCAPTCHA → Create key: Website; domains
          `printdungeon.com`, `print-dungeon-3d.web.app`,
