@@ -1,0 +1,12 @@
+/* From src/styles.css at f95d5ca, inside @media (prefers-reduced-motion: no-preference).
+   Uses the print-in keyframes that are still in src/styles.css. */
+  /* Coming-soon logo: the wordmark prints in layer by layer, the die just before it. */
+  .logo-print {
+    display: inline-flex;
+    animation: print-in 1.6s steps(28, end) 0.35s both;
+  }
+  .logo-print--die {
+    animation-duration: 0.9s;
+    animation-delay: 0s;
+  }
+
