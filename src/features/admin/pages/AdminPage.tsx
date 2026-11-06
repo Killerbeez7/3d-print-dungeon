@@ -25,6 +25,9 @@ const SiteSettings = lazy(() =>
 const MaintenanceSettings = lazy(() =>
   import("../components/MaintenanceSettings").then((m) => ({ default: m.MaintenanceSettings }))
 );
+const ComingSoonSettings = lazy(() =>
+  import("../components/ComingSoonSettings").then((m) => ({ default: m.ComingSoonSettings }))
+);
 const DevlogManager = lazy(() =>
   import("../components/DevlogManager").then((m) => ({ default: m.DevlogManager }))
 );
@@ -79,8 +82,14 @@ const SECTIONS: Section[] = [
     icon: Settings,
     render: () => (
       <>
-        <AdminSectionHeader title="Site settings" description="Registration, uploads and maintenance mode." />
+        <AdminSectionHeader
+          title="Site settings"
+          description="Coming-soon page, registration, uploads and maintenance mode."
+        />
         <div className="space-y-6">
+          <Panel>
+            <ComingSoonSettings />
+          </Panel>
           <Panel>
             <SiteSettings />
           </Panel>

@@ -8,6 +8,7 @@ const auth = vi.hoisted(() => ({
   value: { currentUser: null as object | null, authReady: true, loading: false, isAdmin: false, roles: [] as string[] },
 }));
 const hint = vi.hoisted(() => ({ value: null as object | null }));
+const setting = vi.hoisted(() => ({ value: { loading: false, comingSoon: true } }));
 
 vi.mock("@/config/siteLaunch", () => ({
   PRELAUNCH_GATE: true,
@@ -15,6 +16,7 @@ vi.mock("@/config/siteLaunch", () => ({
 }));
 vi.mock("@/features/auth/hooks/useAuth", () => ({ useAuth: () => auth.value }));
 vi.mock("@/features/auth/utils/sessionHint", () => ({ readSessionHint: () => hint.value }));
+vi.mock("@/features/prelaunch/hooks/useComingSoon", () => ({ useComingSoon: () => setting.value }));
 // The real page talks to Firestore and opens the sign-in dialog; the gate only decides which one shows.
 vi.mock("@/features/prelaunch/pages/ComingSoonPage", () => ({
   ComingSoonPage: () => <h1>Coming soon</h1>,
@@ -33,12 +35,25 @@ describe("PrelaunchGate", () => {
   beforeEach(() => {
     auth.value = { currentUser: null, authReady: true, loading: false, isAdmin: false, roles: [] };
     hint.value = null;
+    setting.value = { loading: false, comingSoon: true };
   });
 
   it("shows the coming-soon page to visitors", () => {
     renderAt("/model/abc");
     expect(screen.getByRole("heading", { name: "Coming soon" })).toBeInTheDocument();
     expect(screen.queryByText("The site")).not.toBeInTheDocument();
+  });
+
+  it("lets everyone in while an admin has switched the page off", () => {
+    setting.value = { loading: false, comingSoon: false };
+    renderAt("/model/abc");
+    expect(screen.getByRole("heading", { name: "The site" })).toBeInTheDocument();
+  });
+
+  it("waits for the switch instead of flashing either page", () => {
+    setting.value = { loading: true, comingSoon: true };
+    renderAt();
+    expect(screen.queryByRole("heading")).not.toBeInTheDocument();
   });
 
   it("lets admins in", () => {

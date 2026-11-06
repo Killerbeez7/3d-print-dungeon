@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { OPEN_BEFORE_LAUNCH, PRELAUNCH_GATE } from "@/config/siteLaunch";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { readSessionHint } from "@/features/auth/utils/sessionHint";
+import { useComingSoon } from "../hooks/useComingSoon";
 import { ComingSoonPage } from "../pages/ComingSoonPage";
 
 /**
@@ -14,12 +15,23 @@ import { ComingSoonPage } from "../pages/ComingSoonPage";
 export function PrelaunchGate({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   const { currentUser, authReady, loading, isAdmin, roles } = useAuth();
+  // Admins can switch the page off for a while (Admin > Site settings).
+  const setting = useComingSoon(PRELAUNCH_GATE);
 
   if (!PRELAUNCH_GATE || OPEN_BEFORE_LAUNCH.some((path) => pathname.startsWith(path))) {
     return children;
   }
 
   if (isAdmin || roles.includes("tester")) {
+    return children;
+  }
+
+  // Wait for the switch rather than flash either page.
+  if (setting.loading) {
+    return <div className="min-h-dvh bg-page" aria-busy="true" />;
+  }
+
+  if (!setting.comingSoon) {
     return children;
   }
 
