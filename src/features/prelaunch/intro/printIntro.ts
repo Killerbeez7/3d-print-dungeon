@@ -192,7 +192,7 @@ export function createPrintIntro(svg: SVGSVGElement, D: PrintIntroData): PrintIn
     el("use", { href: `#${uid}plate`, fill: ACC }, inner);
     // The header die (CSS 3D) lays the top face out a quarter turn from this face's axes; the
     // maze is turned to match it, so the logo looks the same here and in the header.
-    const turn = sym === D.maze ? { transform: "matrix(0 1 -1 0 100 0)" } : {};
+    const turn: Record<string, string> = sym === D.maze ? { transform: "matrix(0 1 -1 0 100 0)" } : {};
     const ink = el("path", { d: sym, fill: INK, "fill-rule": "evenodd", ...turn }, inner);
     if (sym === D.gate) {
       // the portcullis hangs half raised in the doorway, in the die's colour
