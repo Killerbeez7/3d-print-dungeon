@@ -27,11 +27,8 @@
 <br/>
 
 <p align="center">
-  <img
-    src="docs/images/print-dungeon-hero.png"
-    alt="3D Print Dungeon marketplace"
-    width="950"
-  />
+<img width="1920" height="993" alt="image" src="https://github.com/user-attachments/assets/3403ccf5-6b68-4877-abe9-5bbfa5e2c1ae" />
+
 </p>
 
 
@@ -127,11 +124,8 @@ The hero screenshot is shown above. Additional screenshots are available in `doc
 
 
 <p align="center">
-  <img
-    src="docs/images/model-details.png"
-    alt="Model details page with interactive 3D preview"
-    width="49%"
-  />
+<img width="1920" height="992" alt="image" src="https://github.com/user-attachments/assets/7e071af7-2ade-4519-ab24-10699103036d" />
+
   <img
     src="docs/images/search-results.png"
     alt="Search results and marketplace filters"
