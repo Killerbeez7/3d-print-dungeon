@@ -57,3 +57,30 @@ describe("rip test links", () => {
     expect(decodeRipTest(encodeRipTest({ ...test, path: "models/converted/abc/rip-test/../../x.glb" }))).toBeNull();
   });
 });
+
+describe("scrambled normals", () => {
+  it("reorders and flips each normal by a keyed signed permutation, exactly reversibly", async () => {
+    const { normalCode, scrambleNormals, unscrambleNormals } = await import("@/features/models/preview3d/scramble");
+    const count = 200;
+    const original = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      const a = i * 0.37;
+      const b = i * 0.11;
+      original.set([Math.cos(a) * Math.cos(b), Math.sin(b), Math.sin(a) * Math.cos(b)], i * 3);
+    }
+    const scrambled = original.slice();
+    scrambleNormals(scrambled, 777);
+    const codes = new Set(Array.from({ length: count }, (_, i) => normalCode(i, 777)));
+    expect(codes.size).toBeGreaterThan(30);
+    // Most normals point somewhere else after scrambling...
+    let changed = 0;
+    for (let i = 0; i < count; i++) {
+      const d = Math.hypot(...[0, 1, 2].map((k) => scrambled[i * 3 + k] - original[i * 3 + k]));
+      if (d > 0.1) changed++;
+    }
+    expect(changed).toBeGreaterThan(count * 0.8);
+    // ...and unscrambling gives them back exactly.
+    unscrambleNormals(scrambled, 777);
+    expect(Array.from(scrambled)).toEqual(Array.from(original));
+  });
+});
