@@ -9,11 +9,14 @@ interface Entry {
     controller?: AbortController;
     blob?: Blob; // Cache model data
     lastAccessed?: number; // Track when model was last accessed
+    /** The bytes received so far (buffer may be larger than `received`). */
+    buffer?: Uint8Array<ArrayBuffer>;
+    received?: number;
 }
 
 const registry = new Map<string, Entry>();
 const listeners = new Map<string, Set<() => void>>();
-const modelCache = new Map<string, Blob>();
+const modelCache = new Map<string, Uint8Array<ArrayBuffer>>();
 
 // Track currently downloading URLs (for debugging/cancellation only)
 const activeDownloads = new Set<string>();
@@ -44,7 +47,11 @@ async function startDownload(url: string) {
         }
 
         let receivedLength = 0;
-        const chunks: BlobPart[] = [];
+        // One growing buffer, so the viewer can read what has arrived without copying
+        // (a packed preview's light level can be shown before the rest is in).
+        let buffer = new Uint8Array(contentLength > 0 ? contentLength : 1 << 20);
+        entry.buffer = buffer;
+        entry.received = 0;
         let lastReportedProgress = 0;
 
         while (true) {
@@ -52,9 +59,15 @@ async function startDownload(url: string) {
             if (done) break;
 
             if (value) {
-                const normalizedChunk = new Uint8Array(value);
-                chunks.push(normalizedChunk);
-                receivedLength += normalizedChunk.length;
+                if (receivedLength + value.length > buffer.length) {
+                    const grown = new Uint8Array(Math.max(buffer.length * 2, receivedLength + value.length));
+                    grown.set(buffer.subarray(0, receivedLength));
+                    buffer = grown;
+                    entry.buffer = buffer;
+                }
+                buffer.set(value, receivedLength);
+                receivedLength += value.length;
+                entry.received = receivedLength;
 
                 // Without a size, approach 95% gradually (half way at 3 MB).
                 const progress =
@@ -74,11 +87,13 @@ async function startDownload(url: string) {
             }
         }
 
-        const blob = new Blob(chunks);
+        const bytes = buffer.subarray(0, receivedLength);
+        entry.buffer = bytes;
+        entry.received = receivedLength;
         entry.status = "loaded";
         entry.progress = 1;
-        entry.blob = blob;
-        modelCache.set(url, blob);
+        entry.blob = new Blob([bytes]);
+        modelCache.set(url, bytes);
         notify(url);
     } catch (err) {
         if (controller.signal.aborted) {
@@ -178,10 +193,13 @@ export function useModelLoader(url: string) {
         }
 
         // If cached, mark as loaded instantly
-        if (modelCache.has(url)) {
+        const cached = modelCache.get(url);
+        if (cached) {
             entry.status = "loaded";
             entry.progress = 1;
-            entry.blob = modelCache.get(url);
+            entry.buffer = cached;
+            entry.received = cached.length;
+            entry.blob = new Blob([cached]);
             notify(url);
             return;
         }
@@ -213,6 +231,12 @@ export function useModelLoader(url: string) {
         entry.progress = 0;
         delete entry.controller;
         notify(url);
+    }, [url]);
+
+    /** What has arrived so far (all of it once loaded), or null before the download starts. */
+    const getBytes = useCallback((): Uint8Array | null => {
+        const entry = getEntry(url);
+        return entry.buffer ? entry.buffer.subarray(0, entry.received ?? 0) : null;
     }, [url]);
 
     const getBlob = useCallback(() => {
@@ -249,6 +273,8 @@ export function useModelLoader(url: string) {
         entry.status = "idle";
         entry.progress = 0;
         delete entry.blob;
+        delete entry.buffer;
+        delete entry.received;
         delete entry.controller;
         notify(url);
     }, [url]);
@@ -264,6 +290,7 @@ export function useModelLoader(url: string) {
         cancelLoading,
         resetToIdle,
         getBlob,
+        getBytes,
         isCached,
         updateProgress,
         markLoaded,

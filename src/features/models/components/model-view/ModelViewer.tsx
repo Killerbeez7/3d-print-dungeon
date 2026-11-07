@@ -37,8 +37,8 @@ export const ModelViewer = ({
     // Model State
     const [isLoadButtonClicked, setIsLoadButtonClicked] = useState<boolean>(false);
 
-    // Object URL for loaded model blob
-    const [modelBlobUrl, setModelBlobUrl] = useState<string | null>(null);
+    // Bumped on retry, so the viewer starts over.
+    const [attempt, setAttempt] = useState(0);
 
     //Refs
     const containerRef = useRef<HTMLDivElement | null>(null);
@@ -58,7 +58,7 @@ export const ModelViewer = ({
         totalBytes: modelTotalBytes,
         markLoading: markModelLoading,
         cancelLoading: cancelModelLoading,
-        getBlob: getModelBlob,
+        getBytes: getModelBytes,
         forget: forgetModel,
     } = useModelLoader(modelUrl);
 
@@ -70,25 +70,7 @@ export const ModelViewer = ({
     const modelFileLoaded = modelGlobalStatus === "loaded";
     const modelLoadProgress = modelGlobalProgress;
 
-    // Create / revoke object URL when model blob becomes available
-    const blobUrlCreatedRef = useRef(false);
-
     useEffect(() => {
-        if (modelFileLoaded && !blobUrlCreatedRef.current) {
-            const blob = getModelBlob();
-            if (blob) {
-                setModelBlobUrl((prev) => {
-                    if (prev) URL.revokeObjectURL(prev);
-                    return URL.createObjectURL(blob);
-                });
-                blobUrlCreatedRef.current = true;
-            }
-        }
-    }, [modelFileLoaded, getModelBlob]);
-
-    // Reset blob URL ref when model URL changes
-    useEffect(() => {
-        blobUrlCreatedRef.current = false;
         setViewerReady(false);
         setViewerFailed(false);
     }, [modelUrl]);
@@ -289,27 +271,11 @@ export const ModelViewer = ({
         };
     }, [cancelModelLoading]);
 
-    // Cleanup object URL on unmount
-    const blobUrlRef = useRef<string | null>(null);
-    blobUrlRef.current = modelBlobUrl;
-
-    useEffect(() => {
-        return () => {
-            if (blobUrlRef.current) {
-                URL.revokeObjectURL(blobUrlRef.current);
-            }
-        };
-    }, []);
-
     // Retry after a failed download or a file the viewer couldn't open.
     const retryLoad = () => {
         setViewerFailed(false);
         setViewerReady(false);
-        setModelBlobUrl((prev) => {
-            if (prev) URL.revokeObjectURL(prev);
-            return null;
-        });
-        blobUrlCreatedRef.current = false;
+        setAttempt((n) => n + 1);
         forgetModel();
         markModelLoading();
     };
@@ -349,11 +315,15 @@ export const ModelViewer = ({
                     </>
                 ) : (
                     <>
-                        {modelBlobUrl && (
+                        {(modelGlobalStatus === "loading" || modelFileLoaded) && (
                             <Suspense fallback={null}>
-                                {/* The preview is scrambled; this viewer unscrambles it on screen. */}
+                                {/* Starts with the light level while the rest downloads; the
+                                    preview is scrambled and unscrambled on the graphics card. */}
                                 <PreviewMeshViewer
-                                    src={modelBlobUrl}
+                                    key={`${modelUrl}-${attempt}`}
+                                    getBytes={getModelBytes}
+                                    complete={modelFileLoaded}
+                                    progress={modelLoadProgress}
                                     autoRotate={autoRotate}
                                     handleRef={viewerHandleRef}
                                     onReady={handleViewerReady}
@@ -361,6 +331,15 @@ export const ModelViewer = ({
                                     className="absolute inset-0 h-full w-full rounded-lg"
                                 />
                             </Suspense>
+                        )}
+
+                        {viewerReady && modelGlobalStatus === "loading" && (
+                            <span
+                                role="status"
+                                className="label-mono pointer-events-none absolute left-3 top-3 z-10 rounded bg-surface-card/85 px-2 py-1 text-txt-secondary"
+                            >
+                                Full detail · {Math.round(modelLoadProgress * 100)}%
+                            </span>
                         )}
 
                         <LoadingOverlay

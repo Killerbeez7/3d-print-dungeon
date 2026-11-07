@@ -27,7 +27,12 @@ interface MeshPreviewProps {
   /** The real shape's bounds, for framing (a scrambled geometry's own bounds are meaningless). */
   bounds: Sphere;
   /** Undo a scramble in the vertex shader. Leave out to draw the geometry as it is. */
-  scramble?: { key: number; amount: number };
+  scramble?: { key: number; amount: number; normals?: boolean };
+  /**
+   * A more detailed version of `geometry` (same scramble), swapped in when it arrives without
+   * moving the camera: a packed preview's full level after its light one.
+   */
+  detailGeometry?: BufferGeometry | null;
   /**
    * A full-detail mesh for "sharp when you stop": while you drag you see `geometry`; when you
    * let go, a picture of this one at exactly that angle appears. On the real site that picture
@@ -52,6 +57,7 @@ interface MeshPreviewProps {
 /** Real 3D view of a mesh with the lab's lighting: drag to turn, scroll or pinch to zoom. */
 export const MeshPreview = ({
   geometry,
+  detailGeometry,
   bounds,
   scramble,
   sharpGeometry,
@@ -71,6 +77,16 @@ export const MeshPreview = ({
   const setAutoRotateRef = useRef<(on: boolean) => void>(() => {});
   const onReadyRef = useRef(onReady);
   onReadyRef.current = onReady;
+  const meshRef = useRef<Mesh | Points | null>(null);
+  const wakeRef = useRef<() => void>(() => {});
+
+  // The full level replaces the light one in place (camera, zoom and turning stay as they are).
+  useEffect(() => {
+    const mesh = meshRef.current;
+    if (!mesh || !detailGeometry) return;
+    mesh.geometry = detailGeometry;
+    wakeRef.current();
+  }, [detailGeometry]);
 
   useEffect(() => {
     autoRotateRef.current = autoRotate;
@@ -100,8 +116,9 @@ export const MeshPreview = ({
     const material = asPoints
       ? new PointsMaterial({ color: "#c9c6d4", size: 1.5, sizeAttenuation: false })
       : Object.assign(studioMaterial(), { flatShading: flat });
-    if (scramble) unscrambleInShader(material, scramble.key, scramble.amount);
+    if (scramble) unscrambleInShader(material, scramble.key, scramble.amount, scramble.normals);
     const mesh = asPoints ? new Points(geometry, material) : new Mesh(geometry, material);
+    meshRef.current = mesh;
     // A scrambled mesh's own bounds are far off; never cull it.
     mesh.frustumCulled = false;
     scene.add(mesh);
@@ -187,6 +204,7 @@ export const MeshPreview = ({
       settleFrames = 0;
       if (!frame) frame = requestAnimationFrame(loop);
     };
+    wakeRef.current = wake;
     const onStart = () => {
       controls.autoRotate = false;
       moving = true;
@@ -241,6 +259,8 @@ export const MeshPreview = ({
 
     return () => {
       setAutoRotateRef.current = () => {};
+      wakeRef.current = () => {};
+      meshRef.current = null;
       if (handleRef) handleRef.current = null;
       cancelAnimationFrame(frame);
       window.clearTimeout(sharpTimer);
