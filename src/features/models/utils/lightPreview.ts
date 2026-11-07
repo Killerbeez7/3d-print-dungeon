@@ -1,6 +1,7 @@
 import { MeshoptSimplifier } from "meshoptimizer/simplifier";
 
-import { scramblePositions } from "../preview3d/scramble";
+import { encodePackedPreview, optimizeForPacking, type MeshLevel } from "../preview3d/packedPreview";
+import { scrambleNormals, scramblePositions } from "../preview3d/scramble";
 
 /**
  * Light previews: the public 3D viewer gets a reduced copy of the model, never
@@ -14,11 +15,15 @@ import { scramblePositions } from "../preview3d/scramble";
  */
 export const PREVIEW_TRIANGLES = 250_000;
 
+/** The light first level of a packed preview, shown while the full one downloads. */
+export const PREVIEW_LITE_TRIANGLES = 60_000;
+
 /**
- * Stored on each listing (previewVersion). 1: plain light preview; 2: scrambled light preview.
+ * Stored on each listing (previewVersion). 1: plain light preview (GLB); 2: scrambled GLB;
+ * 3: packed preview (scrambled positions and normals, light level first).
  * scripts/make-light-previews.ts redoes listings below this.
  */
-export const PREVIEW_VERSION = 2;
+export const PREVIEW_VERSION = 3;
 
 /** Stored in the GLB (meshes[0].extras.pd) so the viewer can undo the scramble. */
 export interface PreviewScramble {
@@ -43,9 +48,80 @@ export interface LightPreviewOptions {
 /** Share of the model's radius each vertex can move: enough to scatter it into a cloud. */
 const SCRAMBLE_AMOUNT = 0.9;
 
+export interface PackedLightPreview {
+    /** The packed file (see preview3d/packedPreview.ts). */
+    bytes: Uint8Array<ArrayBuffer>;
+    /** Triangles in the full level, and in the light first level (when there is one). */
+    triangles: number;
+    liteTriangles: number | null;
+    sourceTriangles: number;
+}
+
 /**
- * Builds the preview GLB from a triangle soup (three floats per vertex, three
- * vertices per triangle, as STLLoader returns it).
+ * The public 3D preview as uploaded: a packed file with a light level (about 60,000
+ * triangles) followed by the full one (up to 250,000), both scrambled with one key.
+ * From a triangle soup (three floats per vertex, three vertices per triangle).
+ */
+export async function makePackedPreview(
+    soup: Float32Array,
+    { fullTriangles = PREVIEW_TRIANGLES, liteTriangles = PREVIEW_LITE_TRIANGLES } = {}
+): Promise<PackedLightPreview> {
+    await MeshoptSimplifier.ready;
+
+    const sourceTriangles = Math.floor(soup.length / 9);
+    if (sourceTriangles === 0) {
+        throw new Error("The model has no triangles.");
+    }
+
+    // Weld and centre once, so every level shares the same position and scramble.
+    const indices = MeshoptSimplifier.generatePositionRemap(soup, 3);
+    const welded = compact(indices, soup);
+    centerPositions(welded);
+    const radius = boundingRadius(welded);
+    const key = crypto.getRandomValues(new Uint32Array(1))[0];
+    const amount = radius * SCRAMBLE_AMOUNT;
+
+    const targets =
+        sourceTriangles > liteTriangles * 1.5
+            ? [liteTriangles, Math.min(fullTriangles, sourceTriangles)]
+            : [Math.min(fullTriangles, sourceTriangles)];
+
+    const levels: MeshLevel[] = [];
+    let triangles = 0;
+    for (const target of targets) {
+        const simplified = simplifyTo(indices.slice(), welded, target);
+        const positions = compact(simplified, welded);
+        const mesh = await optimizeForPacking(creasedNormals(positions, simplified));
+        scramblePositions(mesh.positions, key, amount);
+        scrambleNormals(mesh.normals, key);
+        levels.push(mesh);
+        triangles = simplified.length / 3;
+    }
+
+    const bytes = await encodePackedPreview(levels, { key, amount, radius, normals: true });
+    return {
+        bytes,
+        triangles,
+        liteTriangles: levels.length > 1 ? levels[0].indices.length / 3 : null,
+        sourceTriangles,
+    };
+}
+
+/** Reduces a welded mesh to about `target` triangles (or keeps it when it has fewer). */
+function simplifyTo(indices: Uint32Array, welded: Float32Array, target: number): Uint32Array {
+    if (indices.length / 3 <= target) return indices;
+    const targetIndices = target * 3;
+    let [simplified] = MeshoptSimplifier.simplify(indices, welded, 3, targetIndices, 1);
+    // Meshes with many separate parts can stall above the target.
+    if (simplified.length > targetIndices * 1.25) {
+        [simplified] = MeshoptSimplifier.simplifySloppy(indices, welded, 3, null, targetIndices, 1);
+    }
+    return simplified;
+}
+
+/**
+ * Builds a GLB preview from a triangle soup (three floats per vertex, three
+ * vertices per triangle, as STLLoader returns it). Plain or scrambled; used by the lab.
  */
 export async function makeLightPreview(
     soup: Float32Array,

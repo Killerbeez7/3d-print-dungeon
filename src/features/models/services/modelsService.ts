@@ -128,25 +128,28 @@ export async function createAdvancedModel({
     let sourceTriangles: number | null = null;
 
     // Loaded here so the mesh tools only download when someone uploads.
-    const [{ fileToTriangles }, { makeLightPreview, PREVIEW_VERSION }] = await Promise.all([
+    const [{ fileToTriangles }, { makePackedPreview, PREVIEW_VERSION }] = await Promise.all([
         import("@/features/models/utils/converter"),
         import("@/features/models/utils/lightPreview"),
     ]);
     const triangles = await fileToTriangles(file);
     if (triangles) {
-        const preview = await makeLightPreview(triangles);
+        // Packed and scrambled, light level first (see preview3d/packedPreview.ts).
+        const preview = await makePackedPreview(triangles);
         previewTriangles = preview.triangles;
         sourceTriangles = preview.sourceTriangles;
 
         const baseName = file.name.replace(/\.[^.]+$/, "");
         const previewRef = ref(
             storage,
-            `${STORAGE_PATHS.CONVERTED}/${uploadKey}/${baseName}-preview.glb`
+            `${STORAGE_PATHS.CONVERTED}/${uploadKey}/${baseName}-preview.pdp`
         );
 
         convertedFileUrl = await uploadAndGetUrl(
             previewRef,
-            new Blob([preview.glb], { type: "model/gltf-binary" }),
+            // The storage rules only accept this type for previews (until they allow the
+            // packed format's own); the viewer reads the format from the file itself.
+            new Blob([preview.bytes], { type: "model/gltf-binary" }),
             "model/gltf-binary",
             (snapshot) => {
                 const progress =

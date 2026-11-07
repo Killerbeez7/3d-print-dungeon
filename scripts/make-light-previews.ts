@@ -20,7 +20,7 @@ import { getStorage, getDownloadURL } from "firebase-admin/storage";
 
 import { originalPathOf, pathFromDownloadUrl } from "../functions/src/shared/storagePaths.js";
 import { fileToTriangles } from "../src/features/models/utils/converter";
-import { makeLightPreview, PREVIEW_VERSION } from "../src/features/models/utils/lightPreview";
+import { makePackedPreview, PREVIEW_VERSION } from "../src/features/models/utils/lightPreview";
 
 const apply = process.argv.includes("--apply");
 
@@ -104,17 +104,17 @@ const main = async () => {
             continue;
         }
 
-        const preview = await makeLightPreview(triangles);
+        const preview = await makePackedPreview(triangles);
         const baseName = fileName.replace(/\.[^.]+$/, "");
-        const previewPath = `models/converted/${data.uploaderId}/${randomUUID()}/${baseName}-preview.glb`;
+        const previewPath = `models/converted/${data.uploaderId}/${randomUUID()}/${baseName}-preview.pdp`;
         console.log(
             `PREVIEW ${label}: ${preview.sourceTriangles} -> ${preview.triangles} triangles, ` +
-                `${(preview.glb.byteLength / 1048576).toFixed(1)} MB at ${previewPath}`
+                `${(preview.bytes.byteLength / 1048576).toFixed(1)} MB at ${previewPath}`
         );
 
         if (apply) {
             const target = bucket.file(previewPath);
-            await target.save(Buffer.from(preview.glb), {
+            await target.save(Buffer.from(preview.bytes), {
                 contentType: "model/gltf-binary",
                 metadata: { cacheControl: "public,max-age=31536000,immutable" },
             });
